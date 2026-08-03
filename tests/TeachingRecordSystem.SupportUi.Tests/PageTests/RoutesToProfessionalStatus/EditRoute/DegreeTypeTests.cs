@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -58,7 +59,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var editRouteState = builder.Build();
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -134,7 +135,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var editRouteState = builder.Build();
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -168,7 +169,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -214,7 +215,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
 
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -257,7 +258,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 ));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
 
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -300,7 +301,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -342,7 +343,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -387,11 +388,11 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithStatus(status)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)

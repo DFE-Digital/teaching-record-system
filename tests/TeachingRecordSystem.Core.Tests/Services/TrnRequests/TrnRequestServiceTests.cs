@@ -903,7 +903,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         TrnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds = applicationUserRequiresFurtherChecks ? [applicationUser.UserId] : [];
 
         var person = await TestData.CreatePersonAsync(p => p.WithAlert());
-        Debug.Assert(person.Alerts.Count != 0);
+        Debug.Assert(person.Alerts!.Count != 0);
 
         // Act
         var result = await WithServiceAsync(s => s.RequiresFurtherChecksNeededSupportTaskAsync(person.PersonId, applicationUser.UserId));
@@ -964,7 +964,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
         TrnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds = applicationUserRequiresFurtherChecks ? [applicationUser.UserId] : [];
 
         var person = await TestData.CreatePersonAsync();
-        Debug.Assert(person.Alerts.Count == 0);
+        Debug.Assert(person.Alerts!.Count == 0);
         Debug.Assert(person.QtsDate is null);
         Debug.Assert(person.EytsDate is null);
 
@@ -1294,7 +1294,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
             await dbContext.SaveChangesAsync();
         });
 
-        var createPersonResult = await TestData.CreatePersonAsync(p =>
+        var person = await TestData.CreatePersonAsync(p =>
         {
             p
                 .WithFirstName(options.FirstName!)
@@ -1310,7 +1310,7 @@ public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTes
             }
         });
 
-        return (trnRequest, createPersonResult.Person);
+        return (trnRequest, person);
     }
 
     private CreateTrnRequestOptions GetCreateTrnRequestOptions(Guid applicationUserId, bool tryResolve = true) =>

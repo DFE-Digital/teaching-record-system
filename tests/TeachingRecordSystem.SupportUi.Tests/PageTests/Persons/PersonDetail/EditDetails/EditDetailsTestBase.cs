@@ -1,6 +1,6 @@
 using GovUk.Questions.AspNetCore.State;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -10,7 +10,7 @@ public abstract class EditDetailsTestBase(HostFixture hostFixture) : TestBase(ho
     /// Builds the state the coordinator starts the journey with — the person's details as both the
     /// original and the current values — optionally applying the edits a test is interested in.
     /// </summary>
-    protected static EditDetailsState CreateState(CreatePersonResult person, Action<EditDetailsState>? configure = null)
+    protected static EditDetailsState CreateState(Person person, Action<EditDetailsState>? configure = null)
     {
         var emailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
         var nationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
@@ -38,7 +38,7 @@ public abstract class EditDetailsTestBase(HostFixture hostFixture) : TestBase(ho
         return state;
     }
 
-    protected Task<EditDetailsJourneyCoordinator> CreateJourneyInstanceAsync(CreatePersonResult person, Action<EditDetailsState>? configure = null) =>
+    protected Task<EditDetailsJourneyCoordinator> CreateJourneyInstanceAsync(Person person, Action<EditDetailsState>? configure = null) =>
         CreateJourneyInstanceAsync(person.PersonId, CreateState(person, configure));
 
     protected Task<EditDetailsJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, EditDetailsState state) =>

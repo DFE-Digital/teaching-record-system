@@ -50,7 +50,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         return (ResolveTrnRequestState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
     }
 
-    protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
+    protected async Task<(SupportTask SupportTask, Person MatchedPerson)> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
     {
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
 
@@ -61,7 +61,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                 .WithFirstName(TestData.GenerateChangedFirstName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithMiddleName(TestData.GenerateChangedMiddleName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithLastName(TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
-                .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
+                .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth!.Value))
                 .WithEmailAddress(TestData.GenerateUniqueEmail())
                 .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!))
                 .WithGender(TestData.GenerateGender()));
@@ -69,7 +69,7 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         return (supportTask, matchedPerson);
     }
 
-    protected async Task<(SupportTask SupportTask, TestData.CreatePersonResult MatchedPerson)> CreateSupportTaskWithSingleDifferenceToMatch(
+    protected async Task<(SupportTask SupportTask, Person MatchedPerson)> CreateSupportTaskWithSingleDifferenceToMatch(
         Guid applicationUserId,
         PersonMatchedAttribute differentAttribute,
         bool matchedPersonHasFlags = false)
@@ -105,8 +105,8 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
                         : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithDateOfBirth(
                     differentAttribute != PersonMatchedAttribute.DateOfBirth
-                        ? matchedPerson.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
+                        ? matchedPerson.DateOfBirth!.Value
+                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth!.Value))
                 .WithEmailAddress(
                     differentAttribute != PersonMatchedAttribute.EmailAddress
                         ? matchedPerson.EmailAddress

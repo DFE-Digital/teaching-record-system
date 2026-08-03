@@ -32,7 +32,7 @@ public class FindPersonByLastNameAndDateOfBirthTests(OperationTestFixture operat
 
         var command = new FindPersonByLastNameAndDateOfBirthCommand(
             LastName: person.LastName,
-            DateOfBirth: person.DateOfBirth);
+            DateOfBirth: person.DateOfBirth!.Value);
 
         // Act
         var result = await ExecuteCommandAsync(command);

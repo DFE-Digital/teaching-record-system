@@ -130,7 +130,7 @@ public partial class TrnRequestServiceTests
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: person2.PersonId,
-            verifiedInfo: ([person2.FirstName, person2.LastName], person2.DateOfBirth));
+            verifiedInfo: ([person2.FirstName, person2.LastName], person2.DateOfBirth!.Value));
 
         var requestData = new TrnRequestMetadata()
         {
@@ -277,8 +277,8 @@ public partial class TrnRequestServiceTests
 
         var dateOfBirth = dateOfBirthOption switch
         {
-            TrnRequest.DateOfBirthArgumentOption.Matches => person.DateOfBirth,
-            _ => TestData.GenerateChangedDateOfBirth(person.DateOfBirth)
+            TrnRequest.DateOfBirthArgumentOption.Matches => person.DateOfBirth!.Value,
+            _ => TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)
         };
 
         var nationalInsuranceNumber = nationalInsuranceNumberOption switch
@@ -322,14 +322,14 @@ public partial class TrnRequestServiceTests
         if (expectedOutcome != result.Outcome)
         {
             var outputHelper = TestContext.Current.TestOutputHelper!;
-            var pad = new[] { person.EmailAddress, person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth.ToShortDateString(), person.NationalInsuranceNumber, person.Gender.ToString() }
+            var pad = new[] { person.EmailAddress, person.FirstName, person.MiddleName, person.LastName, person.DateOfBirth!.Value.ToShortDateString(), person.NationalInsuranceNumber, person.Gender.ToString() }
                 .Max(s => s?.Length ?? 0);
             outputHelper.WriteLine($"                         {"Record".PadRight(pad)} Request");
             outputHelper.WriteLine($"EmailAddress:            {(person.EmailAddress ?? "").PadRight(pad)} {emailAddress}");
             outputHelper.WriteLine($"FirstName:               {(person.FirstName ?? "").PadRight(pad)} {firstName}");
             outputHelper.WriteLine($"MiddleName:              {(person.MiddleName ?? "").PadRight(pad)} {middleName}");
             outputHelper.WriteLine($"LastName:                {(person.LastName ?? "").PadRight(pad)} {lastName}");
-            outputHelper.WriteLine($"DateOfBirth:             {(person.DateOfBirth.ToShortDateString() ?? "").PadRight(pad)} {dateOfBirth}");
+            outputHelper.WriteLine($"DateOfBirth:             {(person.DateOfBirth!.Value.ToShortDateString() ?? "").PadRight(pad)} {dateOfBirth}");
             outputHelper.WriteLine($"NationalInsuranceNumber: {(person.NationalInsuranceNumber ?? "").PadRight(pad)} {nationalInsuranceNumber}");
             outputHelper.WriteLine($"Gender:                  {(person.Gender?.ToString() ?? "").PadRight(pad)} {gender}");
         }

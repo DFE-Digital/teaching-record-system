@@ -42,8 +42,8 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -105,8 +105,8 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -171,8 +171,8 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -242,8 +242,8 @@ public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 

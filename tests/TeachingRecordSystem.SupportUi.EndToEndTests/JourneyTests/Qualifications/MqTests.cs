@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
@@ -98,7 +99,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -140,7 +141,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -184,7 +185,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var personId = person.PersonId;
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -262,7 +263,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var personId = person.PersonId;
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -312,7 +313,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var deletionReasonDetail = "My deletion reason detail";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

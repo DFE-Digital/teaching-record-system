@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -57,7 +58,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var editRouteState = builder.Build();
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/training-provider?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -132,7 +133,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var editRouteState = builder.Build();
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/training-provider?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -166,7 +167,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -211,7 +212,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
 
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -251,7 +252,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status.Value)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -292,7 +293,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(s => !s.Name.Contains('\'')).SingleRandom();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -333,7 +334,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
             .WithRouteType(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -371,11 +372,11 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStatus(status)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)

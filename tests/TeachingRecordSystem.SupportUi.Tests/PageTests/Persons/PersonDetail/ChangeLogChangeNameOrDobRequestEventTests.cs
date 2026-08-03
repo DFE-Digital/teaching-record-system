@@ -305,7 +305,7 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
         Assert.NotNull(title);
 
         item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(requestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
-        item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
     }
 
     [Fact]

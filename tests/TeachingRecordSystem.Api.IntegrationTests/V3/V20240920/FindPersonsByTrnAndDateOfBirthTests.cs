@@ -144,7 +144,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/persons/find")
         {

@@ -273,8 +273,8 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync();
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
         var addRouteState = new AddRouteStateBuilder()

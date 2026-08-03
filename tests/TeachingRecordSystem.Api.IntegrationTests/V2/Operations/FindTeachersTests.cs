@@ -259,7 +259,7 @@
 //     public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
 //     {
 //         // Arrange
-//         var createPersonResult = await TestData.CreatePersonAsync(b =>
+//         var person = await TestData.CreatePersonAsync(b =>
 //         {
 //             if (activeSanctions == true)
 //             {
@@ -267,7 +267,7 @@
 //             }
 //         });
 //
-//         var contact1 = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new Microsoft.Xrm.Sdk.Query.ColumnSet(allColumns: true)))
+//         var contact1 = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, person.ContactId, new Microsoft.Xrm.Sdk.Query.ColumnSet(allColumns: true)))
 //             .ToEntity<Contact>();
 //
 //         DataverseAdapterMock

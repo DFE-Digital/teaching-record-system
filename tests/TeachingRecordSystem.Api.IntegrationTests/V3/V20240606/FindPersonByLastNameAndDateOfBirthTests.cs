@@ -155,8 +155,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person1.Alerts.Single().AlertType!.DqtSanctionCode,
-                                startDate = person1.Alerts.Single().StartDate
+                                code = person1.Alerts!.Single().AlertType!.DqtSanctionCode,
+                                startDate = person1.Alerts!.Single().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -172,8 +172,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person2.Alerts.Single().AlertType!.DqtSanctionCode,
-                                startDate = person2.Alerts.Single().StartDate
+                                code = person2.Alerts!.Single().AlertType!.DqtSanctionCode,
+                                startDate = person2.Alerts!.Single().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()

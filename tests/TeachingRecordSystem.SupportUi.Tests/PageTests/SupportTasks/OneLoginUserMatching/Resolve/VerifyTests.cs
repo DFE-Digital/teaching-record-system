@@ -233,7 +233,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
             oneLoginUser.Subject, t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!));
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
@@ -245,7 +245,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 

@@ -318,8 +318,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddMqTestBase(hostFixt
         var person = await TestData.CreatePersonAsync();
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");

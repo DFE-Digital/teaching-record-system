@@ -21,7 +21,7 @@ public partial class TestData
 
         (var apiSupportTask, _, _) = await CreateResolvedApiTrnRequestSupportTaskAsync(
             applicationUserId.Value,
-            matchedPerson.Person,
+            matchedPerson,
             t =>
             {
                 t.WithTrnRequestStatus(TrnRequestStatus.Pending);

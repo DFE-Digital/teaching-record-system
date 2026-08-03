@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
@@ -15,7 +16,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -58,7 +59,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -110,7 +111,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithInductionExemption(true)));
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -153,7 +154,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -192,7 +193,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         EventObserver.Clear();
 
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -253,7 +254,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithHoldsFrom(qtsDate)));
         EventObserver.Clear();
 
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -312,8 +313,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithHoldsFrom(holdsFromLatest)));
         EventObserver.Clear();
 
-        var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromEarliest).QualificationId;
-        var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromLatest).QualificationId;
+        var qualificationIdEarliestDate = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single(p => p.HoldsFrom == holdsFromEarliest).QualificationId;
+        var qualificationIdLatestDate = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single(p => p.HoldsFrom == holdsFromLatest).QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -362,11 +363,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,

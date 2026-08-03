@@ -404,7 +404,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         var matchedPerson = await TestData.CreatePersonAsync(p => p
             .WithDateOfBirth(dateOfBirth)
             .WithNationalInsuranceNumber(nationalInsuranceNumber));
-        Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+        Debug.Assert(matchedPerson.Alerts!.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
 
         var command = CreateCommand() with
         {
@@ -546,13 +546,13 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             .WithNationalInsuranceNumber()
             .WithEmailAddress()
             .WithGender());
-        Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+        Debug.Assert(matchedPerson.Alerts!.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
 
         var command = CreateCommand() with
         {
             FirstName = matchedPerson.FirstName,
             LastName = matchedPerson.LastName,
-            DateOfBirth = matchedPerson.DateOfBirth,
+            DateOfBirth = matchedPerson.DateOfBirth!.Value,
             EmailAddresses = [matchedPerson.EmailAddress!],
             Gender = matchedPerson.Gender,
             NationalInsuranceNumber = null
@@ -636,7 +636,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
                 await dbContext.SaveChangesAsync();
             });
         }
-        Debug.Assert(matchedPerson.Alerts.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
+        Debug.Assert(matchedPerson.Alerts!.Count == 0 && matchedPerson.QtsDate is null && matchedPerson.EytsDate is null);
 
         var command = CreateCommand() with
         {
@@ -653,9 +653,9 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             },
             DateOfBirth = dob switch
             {
-                Field.Matches => matchedPerson.DateOfBirth,
+                Field.Matches => matchedPerson.DateOfBirth!.Value,
                 Field.NullOnRecord => TestData.GenerateDateOfBirth(),
-                _ => TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth)
+                _ => TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth!.Value)
             },
             EmailAddresses = email switch
             {

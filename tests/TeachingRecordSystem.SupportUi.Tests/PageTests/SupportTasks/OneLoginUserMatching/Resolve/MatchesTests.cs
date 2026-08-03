@@ -20,13 +20,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!));
         var supportTaskData = supportTask.GetData<IOneLoginUserMatchingData>();
         var firstVerifiedOrStatedName = supportTaskData.VerifiedOrStatedNames!.First();
@@ -40,7 +40,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
@@ -78,14 +78,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(nonNormalizedTrn)
                     .WithStatedNationalInsuranceNumber(nonNormalizedNino)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(nonNormalizedTrn)
                     .WithStatedNationalInsuranceNumber(nonNormalizedNino));
 
@@ -98,7 +98,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]));
 
         var request = new HttpRequestMessage(
@@ -162,7 +162,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson2.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson2.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson2.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson2.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]),
             new MatchPersonResult(
                 matchedPerson3.PersonId,
@@ -170,7 +170,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson3.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson3.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson3.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson3.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]));
 
         var request = new HttpRequestMessage(
@@ -188,7 +188,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         Assert.NotNull(matchDetails);
         Assert.Equal($"{matchedPerson1.FirstName} {matchedPerson1.MiddleName} {matchedPerson1.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
         Assert.Equal(matchedPerson1.NationalInsuranceNumber, matchDetails.GetSummaryListValueByKey("National Insurance number"));
-        Assert.Equal(matchedPerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat), matchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(matchedPerson1.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), matchDetails.GetSummaryListValueByKey("Date of birth"));
         AssertMatchRowIsHighlighted(matchDetails, "Name");
         AssertMatchRowIsHighlighted(matchDetails, "Date of birth");
 
@@ -204,7 +204,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         matchDetails = doc.GetAllElementsByTestId("match")[2];
         Assert.NotNull(matchDetails);
         Assert.Equal($"{matchedPerson3.FirstName} {matchedPerson3.MiddleName} {matchedPerson3.LastName}", matchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal($"{matchedPerson3.PreviousNames.First().FirstName} {matchedPerson3.PreviousNames.First().MiddleName} {matchedPerson3.PreviousNames.First().LastName}", matchDetails.GetSummaryListValueByKey("Previous names"));
+        Assert.Equal($"{matchedPerson3.PreviousNames!.First().FirstName} {matchedPerson3.PreviousNames!.First().MiddleName} {matchedPerson3.PreviousNames!.First().LastName}", matchDetails.GetSummaryListValueByKey("Previous names"));
         Assert.Equal(WebConstants.EmptyFallbackContent, matchDetails.GetSummaryListValueByKey("National Insurance number"));
         AssertMatchRowNotHighlighted(matchDetails, "Name");
         AssertMatchRowIsHighlighted(matchDetails, "National Insurance number");
@@ -238,7 +238,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 matchedPerson.Trn,
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]));
 
         var request = new HttpRequestMessage(
@@ -289,7 +289,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 matchedPerson1.Trn,
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.LastName,  matchedPerson1.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson1.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson1.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]),
             new MatchPersonResult(
                 matchedPerson2.PersonId,
@@ -326,13 +326,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!));
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
@@ -344,7 +344,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
@@ -371,13 +371,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!));
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
@@ -389,7 +389,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
@@ -425,13 +425,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!));
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
@@ -443,7 +443,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
@@ -487,13 +487,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!));
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
@@ -505,7 +505,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 
@@ -582,13 +582,13 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!));
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
@@ -600,7 +600,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
                 ]));
 

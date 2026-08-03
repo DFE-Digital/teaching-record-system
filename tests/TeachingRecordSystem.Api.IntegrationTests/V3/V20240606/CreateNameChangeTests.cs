@@ -24,7 +24,7 @@ public class CreateNameChangeTests : TestBase
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/person/name-changes")
         {
@@ -39,7 +39,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -49,7 +49,7 @@ public class CreateNameChangeTests : TestBase
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -70,7 +70,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
@@ -80,7 +80,7 @@ public class CreateNameChangeTests : TestBase
     public async Task Post_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -121,14 +121,14 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         await WithDbContextAsync(async dbContext =>
         {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
+            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == person.PersonId);
             Assert.NotNull(supportTask);
             Assert.Equal(SupportTaskType.ChangeNameRequest, supportTask.SupportTaskType);
             var requestData = supportTask.Data as ChangeNameRequestData;

@@ -29,8 +29,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var person = await TestData.CreatePersonAsync();
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -48,8 +48,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var person = await TestData.CreatePersonAsync();
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -260,8 +260,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var personToUpdate = await TestData.CreatePersonAsync(p => p.WithFirstName("Alfred"));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToUpdate.Person);
-            personToUpdate.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToUpdate);
+            personToUpdate.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -534,8 +534,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToDeactivate.Person);
-            personToDeactivate.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToDeactivate);
+            personToDeactivate.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -660,8 +660,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToReactivate.Person);
-            personToReactivate.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToReactivate);
+            personToReactivate.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -700,9 +700,9 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var dateOfDeath = TimeProvider.Today;
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToReactivate.Person);
-            personToReactivate.Person.Status = PersonStatus.Deactivated;
-            personToReactivate.Person.DateOfDeath = dateOfDeath;
+            dbContext.Attach(personToReactivate);
+            personToReactivate.Status = PersonStatus.Deactivated;
+            personToReactivate.DateOfDeath = dateOfDeath;
             await dbContext.SaveChangesAsync();
         });
 
@@ -755,8 +755,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToDeactivate.Person);
-            personToDeactivate.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToDeactivate);
+            personToDeactivate.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -795,8 +795,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToRetain.Person);
-            personToRetain.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToRetain);
+            personToRetain.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -877,8 +877,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToDeactivate.Person);
-            personToDeactivate.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToDeactivate);
+            personToDeactivate.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -939,8 +939,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personToRetain.Person);
-            personToRetain.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personToRetain);
+            personToRetain.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -1018,11 +1018,11 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             if (attr.Attribute == sourcedFromDeactivatingPersonAttribute.Attribute)
             {
-                Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromPerson(updatedPersonToRetain));
+                Assert.Equal(attr.GetValueFromPerson(personToDeactivate), attr.GetValueFromPerson(updatedPersonToRetain));
             }
             else
             {
-                Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromPerson(updatedPersonToRetain));
+                Assert.Equal(attr.GetValueFromPerson(personToRetain), attr.GetValueFromPerson(updatedPersonToRetain));
             }
         }
 
@@ -1054,18 +1054,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
                 foreach (var attr in PersonAttributeInfos)
                 {
-                    Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromEventPersonDetails(@event.OldPersonDetails));
+                    Assert.Equal(attr.GetValueFromPerson(personToRetain), attr.GetValueFromEventPersonDetails(@event.OldPersonDetails));
                 }
 
                 foreach (var attr in PersonAttributeInfos)
                 {
                     if (attr.Attribute == sourcedFromDeactivatingPersonAttribute.Attribute)
                     {
-                        Assert.Equal(attr.GetValueFromPersonResult(personToDeactivate), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
+                        Assert.Equal(attr.GetValueFromPerson(personToDeactivate), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
                     }
                     else
                     {
-                        Assert.Equal(attr.GetValueFromPersonResult(personToRetain), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
+                        Assert.Equal(attr.GetValueFromPerson(personToRetain), attr.GetValueFromEventPersonDetails(@event.PersonDetails));
                     }
                 }
 
@@ -1081,7 +1081,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var personToDeactivate = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: personToDeactivate.PersonId,
-            verifiedInfo: ([personToDeactivate.FirstName, personToDeactivate.LastName], personToDeactivate.DateOfBirth));
+            verifiedInfo: ([personToDeactivate.FirstName, personToDeactivate.LastName], personToDeactivate.DateOfBirth!.Value));
 
         var options = new MergePersonsOptions
         {
@@ -1119,7 +1119,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         var personToDeactivate = await TestData.CreatePersonAsync();
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: personToDeactivate.PersonId,
-            verifiedInfo: ([personToDeactivate.FirstName, personToDeactivate.LastName], personToDeactivate.DateOfBirth));
+            verifiedInfo: ([personToDeactivate.FirstName, personToDeactivate.LastName], personToDeactivate.DateOfBirth!.Value));
 
         var options = new DeactivatePersonViaMergeOptions(personToDeactivate.PersonId, personToRetain.PersonId);
         var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -1186,42 +1186,35 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         new(
             PersonMatchedAttribute.FirstName,
             p => p.FirstName,
-            p => p.FirstName,
             p => p.FirstName
         ),
         new(
             PersonMatchedAttribute.MiddleName,
-            p => p.MiddleName,
             p => p.MiddleName,
             p => p.MiddleName
         ),
         new(
             PersonMatchedAttribute.LastName,
             p => p.LastName,
-            p => p.LastName,
             p => p.LastName
         ),
         new(
             PersonMatchedAttribute.DateOfBirth,
-            p => p.DateOfBirth,
             p => p.DateOfBirth,
             p => p.DateOfBirth
         ),
         new(
             PersonMatchedAttribute.EmailAddress,
             p => p.EmailAddress,
-            p => p.EmailAddress,
             p => p.EmailAddress
         ),
         new(
             PersonMatchedAttribute.NationalInsuranceNumber,
             p => p.NationalInsuranceNumber,
-            p => p.NationalInsuranceNumber,
             p => p.NationalInsuranceNumber
         ),
         new(
             PersonMatchedAttribute.Gender,
-            p => p.Gender,
             p => p.Gender,
             p => p.Gender
         )
@@ -1232,11 +1225,10 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
     public record PersonAttributeInfo(
         PersonMatchedAttribute Attribute,
-        Func<TestData.CreatePersonResult, object?> GetValueFromPersonResult,
         Func<Person, object?> GetValueFromPerson,
         Func<EventModels.PersonDetails, object?> GetValueFromEventPersonDetails);
 
-    protected async Task<(TestData.CreatePersonResult PersonToRetain, TestData.CreatePersonResult PersonToDeactivate)> CreatePersonsWithSingleDifferenceToMatch(
+    protected async Task<(Person PersonToRetain, Person PersonToDeactivate)> CreatePersonsWithSingleDifferenceToMatch(
         PersonMatchedAttribute differentAttribute,
         bool useNullValues = false)
     {
@@ -1262,8 +1254,8 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
                         : TestData.GenerateChangedLastName([personToRetain.FirstName, personToRetain.MiddleName, personToRetain.LastName]))
                 .WithDateOfBirth(
                     differentAttribute != PersonMatchedAttribute.DateOfBirth
-                        ? personToRetain.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(personToRetain.DateOfBirth));
+                        ? personToRetain.DateOfBirth!.Value
+                        : TestData.GenerateChangedDateOfBirth(personToRetain.DateOfBirth!.Value));
 
             if (useNullValues)
             {

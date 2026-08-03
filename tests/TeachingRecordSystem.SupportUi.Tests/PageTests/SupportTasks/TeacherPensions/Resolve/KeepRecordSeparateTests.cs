@@ -45,7 +45,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : ResolveTeacherPe
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -101,7 +101,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : ResolveTeacherPe
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -157,7 +157,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : ResolveTeacherPe
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);

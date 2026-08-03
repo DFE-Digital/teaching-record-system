@@ -199,7 +199,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

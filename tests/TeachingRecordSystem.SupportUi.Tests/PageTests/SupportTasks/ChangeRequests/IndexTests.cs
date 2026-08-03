@@ -61,7 +61,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                 b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)))
 
             : await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth)));
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests");
 

@@ -74,7 +74,7 @@ public class GetTrnTests(OperationTestFixture operationTestFixture) : OperationT
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        Debug.Assert(person.Person.Status is PersonStatus.Active);
+        Debug.Assert(person.Status is PersonStatus.Active);
         var command = new GetTrnCommand(person.Trn);
 
         // Act

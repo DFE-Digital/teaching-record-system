@@ -122,9 +122,9 @@ public class SetCpdInductionStatusTests : TestBase
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
+            dbContext.Attach(person);
 
-            person.Person.SetCpdInductionStatus(
+            person.SetCpdInductionStatus(
                 InductionStatus.InProgress,
                 startDate,
                 completedDate: null,

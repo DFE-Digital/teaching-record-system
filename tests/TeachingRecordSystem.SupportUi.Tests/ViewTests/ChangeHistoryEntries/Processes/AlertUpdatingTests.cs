@@ -333,7 +333,7 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
                 .WithDetails(_oldDetails)
                 .WithExternalLink(_oldExternalLink)));
 
-        var baseAlert = EventModels.Alert.FromModel(person.Alerts.Single());
+        var baseAlert = EventModels.Alert.FromModel(person.Alerts!.Single());
         var alert = configureNewAlert(baseAlert);
         var oldAlert = configureOldAlert(baseAlert);
 

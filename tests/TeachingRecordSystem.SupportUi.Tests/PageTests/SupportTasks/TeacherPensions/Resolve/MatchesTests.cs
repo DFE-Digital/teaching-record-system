@@ -43,7 +43,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Closed);
@@ -80,7 +80,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -149,7 +149,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -174,9 +174,9 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
         Assert.Equal(string.JoinNonEmpty(' ', duplicatePerson1.FirstName, duplicatePerson1.MiddleName, duplicatePerson1.LastName), firstMatchDetails.GetSummaryListValueByKey("Name"));
-        Assert.Equal(string.JoinNonEmpty(' ', duplicatePerson1.PreviousNames.First().FirstName, duplicatePerson1.PreviousNames.First().MiddleName, duplicatePerson1.PreviousNames.First().LastName), firstMatchDetails.GetSummaryListValueByKey("Previous names"));
+        Assert.Equal(string.JoinNonEmpty(' ', duplicatePerson1.PreviousNames!.First().FirstName, duplicatePerson1.PreviousNames!.First().MiddleName, duplicatePerson1.PreviousNames!.First().LastName), firstMatchDetails.GetSummaryListValueByKey("Previous names"));
         Assert.Equal(duplicatePerson1.Trn, firstMatchDetails.GetSummaryListValueByKey("TRN"));
-        Assert.Equal(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(duplicatePerson1.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), firstMatchDetails.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(duplicatePerson1.NationalInsuranceNumber, firstMatchDetails.GetSummaryListValueByKey("NI number"));
         Assert.Equal(duplicatePerson1.Gender?.GetDisplayName(), firstMatchDetails.GetSummaryListValueByKey("Gender"));
     }
@@ -199,7 +199,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData("", 0);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -267,8 +267,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                         : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithDateOfBirth(
                     matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
-                        ? matchedPerson.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
+                        ? matchedPerson.DateOfBirth!.Value
+                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth!.Value))
                 .WithNationalInsuranceNumber(
                     matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
                         ? matchedPerson.NationalInsuranceNumber
@@ -407,7 +407,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData("", 0);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Closed);
@@ -456,7 +456,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData("", 0);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -507,7 +507,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData("", 0);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -561,7 +561,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData("", 0);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);

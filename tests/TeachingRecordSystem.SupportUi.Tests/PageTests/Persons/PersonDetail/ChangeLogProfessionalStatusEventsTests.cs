@@ -128,7 +128,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithEvidenceFile(filename);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
         var updatedByUser = await TestData.CreateUserAsync();
 
@@ -192,7 +192,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithSourceApplicationReference(oldSourceApplicationReference);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
         var updatedByUser = await TestData.CreateUserAsync();
 
@@ -288,7 +288,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithInductionExemption(true);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
         var updatedByUser = await TestData.CreateUserAsync();
 
@@ -364,7 +364,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithHoldsFrom(awardDate);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
         var updatedByUser = await TestData.CreateUserAsync();
 
@@ -430,7 +430,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithSourceApplicationReference(sourceApplicationReference);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
         var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
@@ -478,7 +478,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
         var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
@@ -510,7 +510,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
         var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
@@ -542,7 +542,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
         var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
@@ -574,7 +574,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var professionalStatus = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
 
         var routesToProfessionalStatusService = HostFixture.Services.GetRequiredService<RoutesToProfessionalStatusService>();
@@ -740,8 +740,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             DqtInitialTeacherTraining = dqtInitialTeacherTraining,
             DqtQtlsDate = populateOptional ? qtlsDate : null,
             DqtQtlsDateHasBeenSet = populateOptional ? true : null,
-            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person.Person),
-            OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person.Person)
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
+            OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person)
         };
 
         await WithDbContextAsync(async dbContext =>

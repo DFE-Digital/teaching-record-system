@@ -1,9 +1,9 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
-using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -646,7 +646,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         (PersonMatchedAttribute.Gender, "GenderSource", true)
     ];
 
-    private string GetRequestPath(CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
+    private string GetRequestPath(Person person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/merge?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>

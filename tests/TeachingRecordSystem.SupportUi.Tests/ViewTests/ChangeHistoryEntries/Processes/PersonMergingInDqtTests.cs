@@ -13,8 +13,8 @@ public class PersonMergingInDqtTests(HostFixture hostFixture) : ChangeHistoryEnt
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             // Note Person.MergedWithPersonId isn't set for merges that happened in DQT
             await dbContext.SaveChangesAsync();
         });
@@ -49,8 +49,8 @@ public class PersonMergingInDqtTests(HostFixture hostFixture) : ChangeHistoryEnt
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             // Note Person.MergedWithPersonId isn't set for merges that happened in DQT
             await dbContext.SaveChangesAsync();
         });

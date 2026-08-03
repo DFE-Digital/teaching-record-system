@@ -104,12 +104,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
 
             if (sourcedFromSecondaryPersonAttribute.SummaryListRowKey == kvp.Key)
             {
-                var primaryPersonValue = FormatValue(attributeInfo.GetValueFromPersonResult(personB));
+                var primaryPersonValue = FormatValue(attributeInfo.GetValueFromPerson(personB));
                 Assert.Equal(primaryPersonValue, kvp.Value);
             }
             else
             {
-                var secondaryPersonValue = FormatValue(attributeInfo.GetValueFromPersonResult(personA));
+                var secondaryPersonValue = FormatValue(attributeInfo.GetValueFromPerson(personA));
                 Assert.Equal(secondaryPersonValue, kvp.Value);
             }
         }
@@ -182,11 +182,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         {
             if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
             {
-                Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personB)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
+                Assert.Equal(FormatValue(attr.GetValueFromPerson(personB)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
             }
             else
             {
-                Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
+                Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPerson(primaryPerson)));
             }
         }
 
@@ -202,15 +202,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
 
             foreach (var attr in PersonAttributeInfos)
             {
-                Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.OldPersonAttributes)));
+                Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.OldPersonAttributes)));
 
                 if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
                 {
-                    Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personB)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
+                    Assert.Equal(FormatValue(attr.GetValueFromPerson(personB)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
                 }
                 else
                 {
-                    Assert.Equal(FormatValue(attr.GetValueFromPersonResult(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
+                    Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
                 }
             }
 
@@ -276,7 +276,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             "FirstName",
             "First name",
             p => p.FirstName,
-            p => p.FirstName,
             p => p.FirstName
         ),
         new(
@@ -284,14 +283,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             "MiddleName",
             "Middle name",
             p => p.MiddleName,
-            p => p.MiddleName,
             p => p.MiddleName
         ),
         new(
             PersonMatchedAttribute.LastName,
             "LastName",
             "Last name",
-            p => p.LastName,
             p => p.LastName,
             p => p.LastName
         ),
@@ -301,14 +298,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             "Date of birth",
             p => p.DateOfBirth,
             p => p.DateOfBirth,
-            p => p.DateOfBirth,
             value => ((DateOnly?)value)?.ToString(WebConstants.DateDisplayFormat)
         ),
         new(
             PersonMatchedAttribute.EmailAddress,
             "EmailAddress",
             "Email address",
-            p => p.EmailAddress,
             p => p.EmailAddress,
             p => p.EmailAddress
         ),
@@ -317,14 +312,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             "NationalInsuranceNumber",
             "National Insurance number",
             p => p.NationalInsuranceNumber,
-            p => p.NationalInsuranceNumber,
             p => p.NationalInsuranceNumber
         ),
         new(
             PersonMatchedAttribute.Gender,
             "Gender",
             "Gender",
-            p => p.Gender,
             p => p.Gender,
             p => p.Gender
         )
@@ -337,12 +330,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         PersonMatchedAttribute Attribute,
         string FieldName,
         string SummaryListRowKey,
-        Func<TestData.CreatePersonResult, object?> GetValueFromPersonResult,
         Func<Person, object?> GetValueFromPerson,
         Func<PersonDetails, object?> GetValueFromPersonAttributes,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
+    private string GetRequestPath(Person person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/check-answers?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>

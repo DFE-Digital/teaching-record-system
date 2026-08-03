@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -23,7 +24,7 @@ public class MergePersonStateBuilder
     public UploadedEvidenceFile? UploadedEvidenceFile { get; set; }
     private string? Comments { get; set; }
 
-    public MergePersonStateBuilder WithInitializedState(TestData.CreatePersonResult personA)
+    public MergePersonStateBuilder WithInitializedState(Person personA)
     {
         Initialized = true;
         PersonAId = personA.PersonId;
@@ -31,14 +32,14 @@ public class MergePersonStateBuilder
         return this;
     }
 
-    public MergePersonStateBuilder WithPersonB(TestData.CreatePersonResult personB)
+    public MergePersonStateBuilder WithPersonB(Person personB)
     {
         PersonBId = personB.PersonId;
         PersonBTrn = personB.Trn;
         return this;
     }
 
-    public MergePersonStateBuilder WithPrimaryPerson(TestData.CreatePersonResult person)
+    public MergePersonStateBuilder WithPrimaryPerson(Person person)
     {
         PrimaryPersonId = person.PersonId;
         return this;

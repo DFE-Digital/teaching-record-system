@@ -142,7 +142,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> ExecuteAsync(
+        internal async Task ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             Person person,
             TestData testData,
@@ -245,8 +245,6 @@ public partial class TestData
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
             dbContext.AddEventWithoutBroadcast(createdEvent);
-
-            return professionalStatus.QualificationId;
         }
     }
 }

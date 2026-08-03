@@ -77,7 +77,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithSpecialism(specialism)
                 .WithStartDate(startDate)
                 .WithStatus(status, endDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
@@ -118,7 +118,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate.Value)
                 .WithTrainingEndDate(endDate.Value)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
@@ -163,7 +163,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithHoldsFrom(holdsFrom)
                 .WithSourceApplicationReference("TESTREFERENCE")));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
@@ -204,7 +204,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithTrainingStartDate(startDate.Value)
                 .WithTrainingEndDate(endDate.Value)
                 .WithTrainingCountryId(country.CountryId)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
@@ -241,7 +241,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingCountryId(country.CountryId)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
@@ -281,7 +281,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithTrainingCountryId(country.CountryId)
                 .WithHoldsFrom(holdsFromDate)
                 .WithInductionExemption(true)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
@@ -326,7 +326,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithStatus(status)
                 .WithTrainingAgeSpecialismRangeFrom(ageFrom)
                 .WithTrainingAgeSpecialismRangeTo(ageTo)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
         // Act
@@ -412,8 +412,8 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithSpecialism(qualificationSpecialism)
                 .WithStartDate(qualificationStartDate)
                 .WithStatus(qualificationStatus, qualificationEndDate)));
-        var professionalStatusQualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var mandatoryQualificationId = person.MandatoryQualifications.First().QualificationId;
+        var professionalStatusQualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var mandatoryQualificationId = person.Qualifications!.OfType<MandatoryQualification>().First().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
 
@@ -484,15 +484,15 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 .WithSpecialism(qualificationSpecialism)
                 .WithStartDate(qualificationStartDate)
                 .WithStatus(qualificationStatus, qualificationEndDate)));
-        var professionalStatusQualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var mandatoryQualificationId = person.MandatoryQualifications.First().QualificationId;
+        var professionalStatusQualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var mandatoryQualificationId = person.Qualifications!.OfType<MandatoryQualification>().First().QualificationId;
 
         if (personStatus == PersonStatus.Deactivated)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }

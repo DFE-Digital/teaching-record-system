@@ -189,17 +189,17 @@ public class ConfirmConnectTests(HostFixture hostFixture) : ResolveOneLoginUserM
             await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)
                     .WithClientApplicationUserId(applicationUser.UserId)) :
             await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
                 oneLoginUser.Subject, t => t
                     .WithStatedFirstName(matchedPerson.FirstName)
                     .WithStatedLastName(matchedPerson.LastName)
-                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                     .WithStatedTrn(matchedPerson.Trn!)
                     .WithClientApplicationUserId(applicationUser.UserId));
 
-        return (oneLoginUser, supportTask, matchedPerson.Person);
+        return (oneLoginUser, supportTask, matchedPerson);
     }
 }

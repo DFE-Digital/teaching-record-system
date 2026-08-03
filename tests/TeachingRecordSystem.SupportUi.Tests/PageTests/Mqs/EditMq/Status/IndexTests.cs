@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
@@ -27,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
         var databaseStatus = MandatoryQualificationStatus.Passed;
         var databaseEndDate = new DateOnly(2021, 11, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus, databaseEndDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status");
 
@@ -55,7 +56,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
         var journeyStatus = MandatoryQualificationStatus.Passed;
         var journeyEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -105,7 +106,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -125,7 +126,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
         var status = MandatoryQualificationStatus.Passed;
 
@@ -154,7 +155,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = startDate.AddDays(-daysBefore);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(startDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -183,7 +184,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
         var newStatus = "Passed";
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -210,7 +211,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -235,11 +236,11 @@ public class IndexTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFixt
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");

@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
@@ -25,7 +26,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,7 +43,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var deletionReason = MqDeletionReasonOption.ProviderRequest;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
@@ -103,7 +104,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -126,7 +127,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -150,7 +151,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -174,7 +175,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var multipartContent = CreateFormFileUpload(".cs");
@@ -198,7 +199,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     public async Task Post_ValidInput_RedirectsToCheckAnswersPage()
     {
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var multipartContent = CreateFormFileUpload(".png");
@@ -225,7 +226,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -250,11 +251,11 @@ public class IndexTests(HostFixture hostFixture) : DeleteMqTestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(httpMethod, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");

@@ -23,9 +23,9 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithoutNotes_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}/notes");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -102,13 +102,13 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoteWithoutAttachment_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var expectedNoteText = "Note without attachment";
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
-        var note = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
+        var note = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, null, null);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}/notes");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -134,14 +134,14 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoteWithAttachment_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var expectedNoteText = "Note without attachment";
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var expectedOriginalFileName = "file.png";
-        var note = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, expectedOriginalFileName, Guid.NewGuid());
+        var note = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText, createdByUserId, expectedCreatedBy, expectedOriginalFileName, Guid.NewGuid());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}/notes");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -168,15 +168,15 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoteWithHtml_ReturnsPlaintext()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var expectedNoteText = "Note without attachment";
         var htmlNote = $"<html><b>{expectedNoteText}<b><html>";
         var expectedCreatedBy = TestData.GenerateName();
         var createdByUserId = Guid.NewGuid();
         var expectedOriginalFileName = "file.png";
-        var note = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, htmlNote, createdByUserId, expectedCreatedBy, expectedOriginalFileName, null);
+        var note = await TestData.CreateNoteFromDqtAsync(person.PersonId, htmlNote, createdByUserId, expectedCreatedBy, expectedOriginalFileName, null);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}/notes");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -192,7 +192,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_MultipleNotes_ReturnsContentInCorrectOrder()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var expectedNoteText1 = "Note without attachment";
         var expectedCreatedBy1 = TestData.GenerateName();
         var createdByUserId1 = Guid.NewGuid();
@@ -203,9 +203,9 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var createdByUserId2 = Guid.NewGuid();
         var expectedOriginalFileName2 = "file2.png";
         var expectedCreatedDate2 = TimeProvider.UtcNow;
-        var note1 = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, expectedNoteText1, createdByUserId1, expectedCreatedBy1, expectedOriginalFileName1, Guid.NewGuid(), expectedCreatedDate1);
-        var note2 = await TestData.CreateNoteFromDqtAsync(createPersonResult.PersonId, expectedNoteText2, createdByUserId2, expectedCreatedBy2, expectedOriginalFileName2, Guid.NewGuid(), expectedCreatedDate2);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}/notes");
+        var note1 = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText1, createdByUserId1, expectedCreatedBy1, expectedOriginalFileName1, Guid.NewGuid(), expectedCreatedDate1);
+        var note2 = await TestData.CreateNoteFromDqtAsync(person.PersonId, expectedNoteText2, createdByUserId2, expectedCreatedBy2, expectedOriginalFileName2, Guid.NewGuid(), expectedCreatedDate2);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/notes");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -257,8 +257,8 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }

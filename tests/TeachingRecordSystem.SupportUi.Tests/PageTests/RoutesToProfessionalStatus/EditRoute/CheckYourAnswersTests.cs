@@ -20,7 +20,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -164,7 +164,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
             .WithRouteType(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -195,7 +195,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -238,7 +238,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -302,7 +302,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(status.Value)
                 .WithHoldsFrom(endDate)));
 
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
@@ -348,7 +348,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.InTraining)
@@ -392,7 +392,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
@@ -442,7 +442,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         EventObserver.Clear();
 
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -529,7 +529,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
         EventObserver.Clear();
 
-        var qualification = person.ProfessionalStatuses.First();
+        var qualification = person.Qualifications!.OfType<RouteToProfessionalStatus>().First();
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualification, e => e.HoldsFrom = qualification.HoldsFrom!.Value.AddDays(-1));
 
@@ -563,7 +563,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
         EventObserver.Clear();
 
-        var qualification = person.ProfessionalStatuses.First();
+        var qualification = person.Qualifications!.OfType<RouteToProfessionalStatus>().First();
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualification, e => e.HoldsFrom = qualification.HoldsFrom!.Value.AddDays(-1));
         var request = new HttpRequestMessage(
@@ -599,7 +599,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
         EventObserver.Clear();
 
-        var qualification = person.ProfessionalStatuses.First();
+        var qualification = person.Qualifications!.OfType<RouteToProfessionalStatus>().First();
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualification, e => e.HoldsFrom = qualification.HoldsFrom!.Value.AddDays(1));
 
@@ -637,11 +637,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)

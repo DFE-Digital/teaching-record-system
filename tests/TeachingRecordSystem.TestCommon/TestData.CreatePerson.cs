@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public async Task<CreatePersonResult> CreatePersonAsync(Action<CreatePersonBuilder>? configure = null)
+    public async Task<Person> CreatePersonAsync(Action<CreatePersonBuilder>? configure = null)
     {
         var referenceData = new CreatePersonBuilder.ReferenceData(
             await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
@@ -370,7 +370,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<CreatePersonResult> ExecuteAsync(TestData testData, TimeProvider clock)
+        internal async Task<Person> ExecuteAsync(TestData testData, TimeProvider clock)
         {
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
@@ -390,8 +390,9 @@ public partial class TestData
                 _trnToken = Guid.NewGuid().ToString();
             }
 
-            var events = new List<EventBase>();
-            var newPerson = new Person()
+            // The collection navigations are initialized so that the entities we add below are fixed up into them;
+            // that way we don't have to query the person back to get a fully-populated record.
+            var person = new Person()
             {
                 PersonId = PersonId,
                 CreatedOn = createdOn,
@@ -405,117 +406,96 @@ public partial class TestData
                 NationalInsuranceNumber = _nationalInsuranceNumber,
                 Gender = _gender,
                 CreatedByTps = createdByTps,
-                MergedWithPersonId = _mergedWithPersonId
+                MergedWithPersonId = _mergedWithPersonId,
+                Qualifications = [],
+                Alerts = [],
+                PreviousNames = []
             };
 
             if (_hasNationalInsuranceNumber ?? false)
             {
-                newPerson.NationalInsuranceNumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
+                person.NationalInsuranceNumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
             }
 
             if (_hasGender ?? false)
             {
-                newPerson.Gender = gender;
+                person.Gender = gender;
             }
 
             if (_hasEmail ?? false)
             {
-                newPerson.EmailAddress = _email ?? testData.GenerateUniqueEmail();
+                person.EmailAddress = _email ?? testData.GenerateUniqueEmail();
             }
 
-            var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
+            await testData.WithDbContextAsync(async dbContext =>
             {
-                dbContext.Persons.Add(newPerson);
-
-                await dbContext.SaveChangesAsync();
-
-                var person = await dbContext.Persons
-                    .Include(p => p.Qualifications)
-                    .SingleAsync(p => p.PersonId == PersonId);
+                dbContext.Persons.Add(person);
 
                 if (_qtlsStatus is QtlsStatus qtlsStatus)
                 {
                     person.UnsafeSetQtlsStatus(qtlsStatus);
                 }
 
+                await TrackReferenceDataAsync();
+
                 AddTrnRequestMetadata();
-                var mqIds = await AddMqsAsync();
-                var alertIds = await AddAlertsAsync();
-                var routeIds = await AddProfessionalStatusRoutesAsync(person);
+                await AddMqsAsync();
+                await AddAlertsAsync();
+                await AddProfessionalStatusRoutesAsync();
                 _inductionBuilder?.Execute(person, testData, dbContext);
-                var previousNameIds = AddPreviousNames();
+                AddPreviousNames();
 
                 await dbContext.SaveChangesAsync();
 
-                person = await dbContext.Persons
-                    .Include(p => p.Alerts!).AsSplitQuery()
-                    .Include(p => p.PreviousNames).AsSplitQuery()
-                    .Include(p => p.Qualifications).AsSplitQuery()
-                    .SingleAsync(p => p.PersonId == person.PersonId);
-
-                var personMqs = person.Qualifications!.OfType<MandatoryQualification>().ToArray();
-                var personRoutes = person.Qualifications!.OfType<RouteToProfessionalStatus>().ToArray();
-
-                // Get MQs, alerts, routes and previous names that we've added *in the same order they were specified*.
-                var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
-                var alerts = alertIds.Select(id => person.Alerts!.Single(a => a.AlertId == id)).AsReadOnly();
-                var routesToProfessionalStatus = routeIds
-                    .Select(id => personRoutes.Single(q => q.QualificationId == id))
-                    .AsReadOnly();
-                var previousNames = previousNameIds.Select(id => person.PreviousNames!.Single(a => a.PreviousNameId == id)).AsReadOnly();
-
-                return (mqs, alerts, person, routesToProfessionalStatus, previousNames);
-
-                async Task<IReadOnlyCollection<Guid>> AddMqsAsync()
+                // The lookups the alerts and routes we're about to add point at are auto-included, so a query would
+                // have returned them populated. Tracking them here gets EF to fix up those navigations for us.
+                async Task TrackReferenceDataAsync()
                 {
-                    var mqIds = new List<Guid>();
+                    if (_alertBuilders.Count > 0)
+                    {
+                        await dbContext.AlertTypes.LoadAsync();
+                    }
 
+                    if (_routeToProfessionalStatusBuilders.Count > 0)
+                    {
+                        await dbContext.RouteToProfessionalStatusTypes.LoadAsync();
+                        await dbContext.DegreeTypes.LoadAsync();
+                        await dbContext.TrainingProviders.LoadAsync();
+                        await dbContext.Countries.LoadAsync();
+                    }
+                }
+
+                async Task AddMqsAsync()
+                {
                     foreach (var builder in _mqBuilders)
                     {
-                        var (mqId, mqEvents) = await builder.ExecuteAsync(this, testData, dbContext);
-                        mqIds.Add(mqId);
-                        events.AddRange(mqEvents);
+                        await builder.ExecuteAsync(this, testData, dbContext);
                     }
-
-                    return mqIds;
                 }
 
-                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync(Person person)
+                async Task AddProfessionalStatusRoutesAsync()
                 {
-                    var routeIds = new List<Guid>();
-
                     foreach (var builder in _routeToProfessionalStatusBuilders)
                     {
-                        var routeId = await builder.ExecuteAsync(this, person, testData, dbContext);
-                        routeIds.Add(routeId);
+                        await builder.ExecuteAsync(this, person, testData, dbContext);
                     }
-
-                    return routeIds;
                 }
 
-                async Task<IReadOnlyCollection<Guid>> AddAlertsAsync()
+                async Task AddAlertsAsync()
                 {
-                    var alertIds = new List<Guid>();
-
                     foreach (var builder in _alertBuilders)
                     {
-                        var alertId = await builder.ExecuteAsync(this, testData, dbContext);
-                        alertIds.Add(alertId);
+                        await builder.ExecuteAsync(this, testData, dbContext);
                     }
-
-                    return alertIds;
                 }
 
-                IReadOnlyCollection<Guid> AddPreviousNames()
+                void AddPreviousNames()
                 {
-                    var previousNameIds = new List<Guid>();
-
                     foreach (var pn in _previousNames)
                     {
-                        var id = Guid.NewGuid();
                         var previousName = new PreviousName
                         {
-                            PreviousNameId = id,
+                            PreviousNameId = Guid.NewGuid(),
                             PersonId = PersonId,
                             FirstName = pn.FirstName,
                             MiddleName = pn.MiddleName ?? string.Empty,
@@ -524,11 +504,8 @@ public partial class TestData
                             UpdatedOn = pn.Created
                         };
 
-                        previousNameIds.Add(id);
                         dbContext.PreviousNames.Add(previousName);
                     }
-
-                    return previousNameIds;
                 }
 
                 void AddTrnRequestMetadata()
@@ -558,36 +535,14 @@ public partial class TestData
                     trnRequestMetadata.ResolvedPersonId = PersonId;
                     trnRequestMetadata.Status = TrnRequestStatus.Completed;
 
-                    newPerson.SourceApplicationUserId = trnRequestMetadata.ApplicationUserId;
-                    newPerson.SourceTrnRequestId = trnRequestMetadata.RequestId;
+                    person.SourceApplicationUserId = trnRequestMetadata.ApplicationUserId;
+                    person.SourceTrnRequestId = trnRequestMetadata.RequestId;
 
                     dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
                 }
             });
 
-            return new CreatePersonResult()
-            {
-                PersonId = PersonId,
-                Person = person,
-                Events = events.AsReadOnly(),
-                Trn = person.Trn,
-                DateOfBirth = dateOfBirth,
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                StatedFirstName = statedFirstName,
-                StatedMiddleName = statedMiddleName,
-                StatedLastName = lastName,
-                EmailAddress = person.EmailAddress,
-                NationalInsuranceNumber = person.NationalInsuranceNumber,
-                Gender = person.Gender,
-                QtsDate = person.QtsDate,
-                EytsDate = person.EytsDate,
-                MandatoryQualifications = mqs,
-                Alerts = alerts,
-                ProfessionalStatuses = routes,
-                PreviousNames = previousNames
-            };
+            return person;
         }
 
         internal DateOnly? GetQtsDate() =>
@@ -666,7 +621,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> ExecuteAsync(
+        internal async Task ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
@@ -679,10 +634,9 @@ public partial class TestData
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr((DateOnly?)null);
 
-            var alertId = Guid.NewGuid();
             var alert = new Alert
             {
-                AlertId = alertId,
+                AlertId = Guid.NewGuid(),
                 PersonId = personId,
                 AlertTypeId = alertTypeId!.Value,
                 Details = details,
@@ -694,8 +648,6 @@ public partial class TestData
             };
 
             dbContext.Alerts.Add(alert);
-
-            return alertId;
         }
     }
 
@@ -786,7 +738,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<(Guid QualificationId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
+        internal async Task ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
@@ -821,8 +773,6 @@ public partial class TestData
 
             dbContext.MandatoryQualifications.Add(mq);
 
-            var events = new List<EventBase>();
-
             if (_importedByUser.HasValue)
             {
                 var createdEvent = new MandatoryQualificationDqtImportedEvent()
@@ -850,10 +800,7 @@ public partial class TestData
                 };
 
                 dbContext.AddEventWithoutBroadcast(createdEvent);
-                events.Add(createdEvent);
             }
-
-            return (QualificationId, events);
         }
     }
 
@@ -910,7 +857,7 @@ public partial class TestData
             return this;
         }
 
-        internal IReadOnlyCollection<EventBase> Execute(
+        internal void Execute(
             Person person,
             TestData testData,
             TrsDbContext dbContext)
@@ -936,10 +883,7 @@ public partial class TestData
             if (@event is not null)
             {
                 dbContext.AddEventWithoutBroadcast(@event);
-                return [@event];
             }
-
-            return [];
         }
 
         internal static DateOnly? GetDefaultStartDate(InductionStatus status, DateOnly? qtsDate) =>
@@ -950,29 +894,5 @@ public partial class TestData
 
         internal static Guid[] GetDefaultExemptionReasonIds(InductionStatus status) =>
             status is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : [];
-    }
-
-    public record CreatePersonResult
-    {
-        public required Guid PersonId { get; init; }
-        public required Person Person { get; init; }
-        public required IReadOnlyCollection<EventBase> Events { get; init; }
-        public required string Trn { get; init; }
-        public required DateOnly DateOfBirth { get; init; }
-        public required string FirstName { get; init; }
-        public required string MiddleName { get; init; }
-        public required string LastName { get; init; }
-        public required string StatedFirstName { get; init; }
-        public required string StatedMiddleName { get; init; }
-        public required string StatedLastName { get; init; }
-        public required string? EmailAddress { get; init; }
-        public required Gender? Gender { get; init; }
-        public required string? NationalInsuranceNumber { get; init; }
-        public required DateOnly? QtsDate { get; init; }
-        public required DateOnly? EytsDate { get; init; }
-        public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
-        public required IReadOnlyCollection<Alert> Alerts { get; init; }
-        public required IReadOnlyCollection<RouteToProfessionalStatus> ProfessionalStatuses { get; init; }
-        public required IReadOnlyCollection<PreviousName> PreviousNames { get; init; }
     }
 }

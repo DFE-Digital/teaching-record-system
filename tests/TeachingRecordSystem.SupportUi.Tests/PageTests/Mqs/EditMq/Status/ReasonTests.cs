@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
@@ -28,7 +29,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -107,7 +108,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         }
 
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -141,7 +142,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -175,7 +176,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -209,7 +210,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -284,7 +285,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         }
 
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -326,7 +327,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -363,7 +364,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newEndDate = new DateOnly(2021, 12, 5);
         var additionalInformation = "Some more details";
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -397,7 +398,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState
@@ -432,11 +433,11 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState

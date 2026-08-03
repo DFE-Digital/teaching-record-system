@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
@@ -49,7 +50,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 ));
 
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -256,7 +257,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithTrainingEndDate(endDate)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -298,7 +299,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -361,7 +362,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -426,7 +427,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -494,7 +495,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -559,7 +560,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithInductionExemption(false)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -619,7 +620,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -676,7 +677,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -729,7 +730,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -783,7 +784,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -842,7 +843,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 .WithTrainingCountryId(country.CountryId)
             ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -911,7 +912,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 .WithTrainingCountryId(country.CountryId)
             ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -977,7 +978,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 .WithStatus(status)
             ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -1043,7 +1044,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 .WithTrainingProviderId(provider.TrainingProviderId)
             ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -1104,7 +1105,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 .WithHoldsFrom(holdsFrom)
             ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -1147,7 +1148,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
                 .WithStatus(status)
             ));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

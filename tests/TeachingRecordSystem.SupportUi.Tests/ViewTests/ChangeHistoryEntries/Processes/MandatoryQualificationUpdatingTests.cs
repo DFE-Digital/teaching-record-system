@@ -11,7 +11,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
             .WithSpecialism(MandatoryQualificationSpecialism.Hearing)));
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var oldMandatoryQualification = EventModels.MandatoryQualification.FromModel(
             mq,
@@ -62,7 +62,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
             .WithSpecialism(MandatoryQualificationSpecialism.Hearing)));
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var oldMandatoryQualification = EventModels.MandatoryQualification.FromModel(
             mq,

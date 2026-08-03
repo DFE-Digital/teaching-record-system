@@ -152,7 +152,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.QtsDate = holdsDate.ToString("dd/MM/yyyy");
             return x;
         });
@@ -179,7 +179,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.QtsDate = holdsDate.AddDays(1).ToString("dd/MM/yyyy");
             x.QtsStatus = "71";
             return x;
@@ -201,7 +201,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = "InvalidOrg";
             x.QtsStatus = "67";
             x.QtsDate = "01/05/2025";
@@ -223,7 +223,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.QtsStatus = "67";
             x.QtsDate = TimeProvider.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
             return x;
@@ -244,7 +244,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = "InvalidOrg";
             x.QtsStatus = "67";
             x.QtsDate = "01/01/2023";
@@ -266,7 +266,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = "InvalidTrn";
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             return x;
         });
 
@@ -289,7 +289,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
         });
@@ -311,7 +311,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
         });
@@ -355,7 +355,7 @@ public class QtsImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy")!;
             return x;
         });
 

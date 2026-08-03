@@ -230,17 +230,17 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
+            dbContext.Attach(person);
 
             // Force status to `None` so that the SetCpdInductionStatus() call below always has a change to status
-            person.Person.UnsafeSetInductionStatus(
+            person.UnsafeSetInductionStatus(
                 InductionStatus.None,
                 InductionStatus.None,
                 startDate: null,
                 completedDate: null,
                 exemptionReasonIds: []);
 
-            person.Person.SetCpdInductionStatus(
+            person.SetCpdInductionStatus(
                 status,
                 startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
                 completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
@@ -287,8 +287,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
+            dbContext.Attach(person);
+            person.SetCpdInductionStatus(
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
@@ -296,7 +296,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 updatedBy: SystemUser.SystemUserId,
                 now: TimeProvider.UtcNow,
                 out _);
-            person.Person.SetInductionStatus(
+            person.SetInductionStatus(
                 trsInductionStatus,
                 startDate: null,
                 completedDate: null,
@@ -471,8 +471,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -515,8 +515,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }

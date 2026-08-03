@@ -129,7 +129,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
 
         await WithDbContextAsync(dbContext => dbContext.SupportTasks

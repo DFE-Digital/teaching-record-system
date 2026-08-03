@@ -159,7 +159,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
             .WithHoldsRouteToProfessionalStatus(RouteToProfessionalStatusType.QtlsAndSetMembershipId, holdsFrom: TimeProvider.Today)
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        var route = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var route = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
         await WithServiceAsync<RoutesToProfessionalStatusService>(routesToProfessionalStatusService =>
             routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(

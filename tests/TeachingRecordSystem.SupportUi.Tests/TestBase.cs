@@ -141,17 +141,17 @@ public abstract class TestBase : IDisposable
     protected Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
         DbContextFactory.WithDbContextAsync(action);
 
-    protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
+    protected Task<(Person, Alert)> CreatePersonWithOpenAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {
         return CreatePersonWithAlert(isOpenAlert: true, populateOptional: populateOptional, createdByUser: createdByUser);
     }
 
-    protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
+    protected Task<(Person, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {
         return CreatePersonWithAlert(isOpenAlert: false, populateOptional: populateOptional, createdByUser: createdByUser);
     }
 
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithAlert(bool isOpenAlert, bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
+    protected async Task<(Person, Alert)> CreatePersonWithAlert(bool isOpenAlert, bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a =>
@@ -161,7 +161,7 @@ public abstract class TestBase : IDisposable
                 a.WithExternalLink(populateOptional ? TestData.GenerateUrl() : null);
             }));
 
-        return (person, person.Alerts.Single());
+        return (person, person.Alerts!.Single());
     }
 
     protected static HttpContent CreateEvidenceFileBinaryContent(byte[]? content = null)

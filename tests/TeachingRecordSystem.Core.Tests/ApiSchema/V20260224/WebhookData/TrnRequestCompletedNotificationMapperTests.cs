@@ -21,7 +21,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
                     .WithFirstName(person.FirstName)
                     .WithMiddleName(person.MiddleName)
                     .WithLastName(person.LastName)
-                    .WithDateOfBirth(person.DateOfBirth)
+                    .WithDateOfBirth(person.DateOfBirth!.Value)
                     .WithEmailAddress(person.EmailAddress!)
                     .WithGender(person.Gender));
 
@@ -71,7 +71,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
                     .WithFirstName(person.FirstName)
                     .WithMiddleName(person.MiddleName)
                     .WithLastName(person.LastName)
-                    .WithDateOfBirth(person.DateOfBirth)
+                    .WithDateOfBirth(person.DateOfBirth!.Value)
                     .WithEmailAddress(person.EmailAddress!)
                     .WithGender(person.Gender)
                     .WithMatchedPersons(person.PersonId));
@@ -158,7 +158,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
                     .WithFirstName(person.FirstName)
                     .WithMiddleName(person.MiddleName)
                     .WithLastName(person.LastName)
-                    .WithDateOfBirth(person.DateOfBirth)
+                    .WithDateOfBirth(person.DateOfBirth!.Value)
                     .WithEmailAddress(person.EmailAddress!)
                     .WithGender(person.Gender));
 

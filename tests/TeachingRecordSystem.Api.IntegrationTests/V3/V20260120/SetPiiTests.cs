@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260120;
 
 [Collection(nameof(DisableParallelization))]
@@ -24,7 +26,7 @@ public class SetPiiTests : TestBase
 
     // PII updates are only permitted when the person's source application matches the calling client and the
     // person allows detail updates from its source application.
-    private async Task<TestData.CreatePersonResult> CreatePiiUpdatablePersonAsync(Action<TestData.CreatePersonBuilder>? configure = null)
+    private async Task<Person> CreatePiiUpdatablePersonAsync(Action<TestData.CreatePersonBuilder>? configure = null)
     {
         var person = await TestData.CreatePersonAsync(p =>
         {
