@@ -192,7 +192,10 @@ public partial class TestData
 
             if (professionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             {
-                professionalStatus.RefreshExemptFromInductionDueToQtsDate();
+                // Mirrors RoutesToProfessionalStatusService: QTS awarded before induction was introduced is exempt.
+                professionalStatus.ExemptFromInductionDueToQtsDate =
+                    _holdsFrom is DateOnly holdsFrom ? holdsFrom < new DateOnly(2000, 5, 7) : null;
+
                 person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes, allRoutes);
             }
 

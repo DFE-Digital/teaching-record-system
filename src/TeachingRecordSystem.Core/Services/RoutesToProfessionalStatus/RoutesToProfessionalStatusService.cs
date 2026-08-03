@@ -54,7 +54,7 @@ public class RoutesToProfessionalStatusService(
         var oldInduction = EventModels.Induction.FromModel(person);
         if (professionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
         {
-            route.RefreshExemptFromInductionDueToQtsDate();
+            RefreshExemptFromInductionDueToQtsDate(route);
             person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes, allRoutes);
         }
         var newInduction = EventModels.Induction.FromModel(person);
@@ -151,7 +151,7 @@ public class RoutesToProfessionalStatusService(
         var oldInduction = EventModels.Induction.FromModel(person);
         if (professionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
         {
-            route.RefreshExemptFromInductionDueToQtsDate();
+            RefreshExemptFromInductionDueToQtsDate(route);
             person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes);
         }
         var newInduction = EventModels.Induction.FromModel(person);
@@ -244,7 +244,7 @@ public class RoutesToProfessionalStatusService(
         var oldInduction = EventModels.Induction.FromModel(person);
         if (professionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
         {
-            route.RefreshExemptFromInductionDueToQtsDate();
+            RefreshExemptFromInductionDueToQtsDate(route);
             person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes);
         }
         var newInduction = EventModels.Induction.FromModel(person);
@@ -293,6 +293,17 @@ public class RoutesToProfessionalStatusService(
 
         dbContext.AddEventWithoutBroadcast(@event);
         await dbContext.SaveChangesAsync();
+    }
+
+    private static void RefreshExemptFromInductionDueToQtsDate(RouteToProfessionalStatus route)
+    {
+        if (route.HoldsFrom is null)
+        {
+            route.ExemptFromInductionDueToQtsDate = null;
+            return;
+        }
+
+        route.ExemptFromInductionDueToQtsDate = route.HoldsFrom < new DateOnly(2000, 5, 7);
     }
 
     private async Task<RouteToProfessionalStatus> GetRouteAsync(Guid qualificationId) =>
