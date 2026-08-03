@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 
-public enum ChangeHistoryViewType
+public enum ChangeHistoryContextType
 {
     Person
 }

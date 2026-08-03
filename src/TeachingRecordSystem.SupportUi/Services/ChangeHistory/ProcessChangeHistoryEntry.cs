@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 
 namespace TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
-public record ProcessChangeHistoryEntry(Process Process, RaisedByUserInfo RaisedByUser, IReadOnlyDictionary<Guid, PersonInfo> PersonInfo)
+public record ProcessChangeHistoryEntry(Process Process, RaisedByUserInfo RaisedByUser)
 {
     public bool ContainsEvent<T>() where T : IEvent => Process.Events!.Select(pe => pe.Payload).OfType<T>().Any();
 
@@ -25,14 +25,12 @@ public static class ProcessChangeHistoryEntryExtensions
     public static ChangeHistoryEntryViewModel ToChangeHistoryEntryViewModel(this TimelineItem<ProcessChangeHistoryEntry> timelineItem) =>
         new()
         {
-            ViewType = ChangeHistoryViewType.Person,
+            Context = ChangeHistoryContext.ForPerson(timelineItem.PersonId),
             Timestamp = timelineItem.Timestamp,
             UserName = timelineItem.ItemModel.RaisedByUser.Name,
             ProcessId = timelineItem.ItemModel.Process.ProcessId,
             ProcessType = timelineItem.ItemModel.Process.ProcessType,
             ChangeReason = timelineItem.ItemModel.Process.ChangeReason,
-            Events = timelineItem.ItemModel.Process.Events!.Select(e => e.Payload).AsReadOnly(),
-            PersonInfo = timelineItem.ItemModel.PersonInfo,
-            PersonId = timelineItem.PersonId
+            Events = timelineItem.ItemModel.Process.Events!.Select(e => e.Payload).AsReadOnly()
         };
 }
