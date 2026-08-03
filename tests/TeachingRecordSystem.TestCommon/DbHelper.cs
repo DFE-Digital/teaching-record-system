@@ -54,14 +54,12 @@ public sealed class DbHelper : IAsyncDisposable
                 .WithDatabase("trs")
                 .WithReuse(true)
                 .WithPortBinding(GetTestContainersPostgresPort(configuration), 5432)
-                // 1. Mount Postgres data directory into RAM (tmpfs)
+                // Mount Postgres's data directory into RAM (tmpfs)
                 .WithTmpfsMount("/var/lib/postgresql/data")
-                // 2. Disable fsync, WAL flushing, and full page writes
+                // Minimize the amount of WAL that's written.
+                // Note these arguments are *appended* to the ones PostgreSqlBuilder adds itself
+                // (which already include fsync=off, synchronous_commit=off and full_page_writes=off).
                 .WithCommand(
-                    "postgres",
-                    "-c", "fsync=off",
-                    "-c", "synchronous_commit=off",
-                    "-c", "full_page_writes=off",
                     "-c", "wal_level=minimal",
                     "-c", "max_wal_senders=0"
                 )
