@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.SetStatus), RequireJourneyInstance]
+[Journey(JourneyNames.SetStatus)]
 [AllowDeactivatedPerson]
 public class ReasonModel(
+    SetStatusJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    PersonService personService,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(personService, linkGenerator, evidenceController)
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -74,6 +75,31 @@ public class ReasonModel(
             .When(x => x.DeactivateReason ==  PersonDeactivateReason.AnotherReason && x.TargetStatus == PersonStatus.Active),
     };
 
+    public string? BackLink { get; set; }
+
+    [FromRoute]
+    public Guid PersonId { get; set; }
+
+    [FromRoute]
+    public PersonStatus TargetStatus { get; set; }
+
+    public string? PersonName { get; set; }
+
+    public DateOnly? DateOfBirth { get; set; }
+
+    public string? Trn { get; set; }
+
+    public Gender? Gender { get; set; }
+
+    public string? NationalInsuranceNumber { get; set; }
+
+    public string? EmailAddress { get; set; }
+
+    public PersonStatus? Status { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public PersonDeactivateReason? DeactivateReason { get; set; }
 
@@ -92,10 +118,6 @@ public class ReasonModel(
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public string BackLink => FromCheckAnswers
-        ? LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId)
-        : LinkGenerator.Persons.PersonDetail.Index(PersonId);
-
     [BindProperty]
     public string? ReactivateAdditionalInformation { get; set; }
 
@@ -104,40 +126,73 @@ public class ReasonModel(
 
     public void OnGet()
     {
-        DeactivateReason = JourneyInstance!.State.DeactivateReason;
-        DeactivateReasonDetail = JourneyInstance!.State.DeactivateReasonDetail;
-        DeactivateAdditionalInformation = JourneyInstance!.State.DeactivateAdditionalInformation;
-        ReactivateReason = JourneyInstance!.State.ReactivateReason;
-        ReactivateReasonDetail = JourneyInstance!.State.ReactivateReasonDetail;
-        ReactivateAdditionalInformation = JourneyInstance!.State.ReactivateAdditionalInformation;
-        Evidence = JourneyInstance.State.Evidence;
-        ProvideMoreInformation = JourneyInstance!.State.ProvideMoreInformation;
+        DeactivateReason = journey.State.DeactivateReason;
+        DeactivateReasonDetail = journey.State.DeactivateReasonDetail;
+        DeactivateAdditionalInformation = journey.State.DeactivateAdditionalInformation;
+        ReactivateReason = journey.State.ReactivateReason;
+        ReactivateReasonDetail = journey.State.ReactivateReasonDetail;
+        ReactivateAdditionalInformation = journey.State.ReactivateAdditionalInformation;
+        Evidence = journey.State.Evidence;
+        ProvideMoreInformation = journey.State.ProvideMoreInformation;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        await _validator.ValidateAndThrowAsync(this);
-
-        // This is required because EvidenceFile validation (e.g. validation extensions) needs be part
-        // of determining if this is valid - which the above does not do.
-        if (!ModelState.IsValid)
+        if (Cancel)
         {
-            return this.PageWithErrors();
+            return Redirect(await journey.CancelAsync());
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ProvideMoreInformation = ProvideMoreInformation;
-            state.DeactivateReason = DeactivateReason;
-            state.DeactivateReasonDetail = DeactivateReason is PersonDeactivateReason.AnotherReason ? DeactivateReasonDetail : null;
-            state.DeactivateAdditionalInformation = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? DeactivateAdditionalInformation : null;
-            state.ReactivateReason = ReactivateReason;
-            state.ReactivateReasonDetail = ReactivateReason is PersonReactivateReason.AnotherReason ? ReactivateReasonDetail : null;
-            state.ReactivateAdditionalInformation = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? ReactivateAdditionalInformation : null;
-            state.Evidence = Evidence;
-        });
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.UploadAsync(Evidence);
 
-        return Redirect(LinkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(PersonId, TargetStatus, JourneyInstance!.InstanceId));
+        await _validator.ValidateAndThrowAsync(this);
+
+        return journey.AdvanceTo(
+            linkGenerator.Persons.PersonDetail.SetStatus.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.ProvideMoreInformation = ProvideMoreInformation;
+                state.DeactivateReason = DeactivateReason;
+                state.DeactivateReasonDetail = DeactivateReason is PersonDeactivateReason.AnotherReason ? DeactivateReasonDetail : null;
+                state.DeactivateAdditionalInformation = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? DeactivateAdditionalInformation : null;
+                state.ReactivateReason = ReactivateReason;
+                state.ReactivateReasonDetail = ReactivateReason is PersonReactivateReason.AnotherReason ? ReactivateReasonDetail : null;
+                state.ReactivateAdditionalInformation = ProvideMoreInformation is ProvideMoreInformationOption.Yes ? ReactivateAdditionalInformation : null;
+                state.Evidence = Evidence;
+            });
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+        Status = personInfo.Status;
+
+        var person = await journey.GetPersonAsync();
+
+        if (person is null)
+        {
+            context.Result = NotFound();
+            return;
+        }
+
+        if (!journey.StatusChangeIsApplicable(person))
+        {
+            context.Result = BadRequest();
+            return;
+        }
+
+        NationalInsuranceNumber = person.NationalInsuranceNumber;
+        Trn = person.Trn;
+        Gender = person.Gender;
+        DateOfBirth = person.DateOfBirth;
+        EmailAddress = person.EmailAddress;
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Index(PersonId);
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

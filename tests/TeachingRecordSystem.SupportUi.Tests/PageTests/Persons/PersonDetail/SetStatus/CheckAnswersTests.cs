@@ -22,25 +22,38 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var person = await CreatePersonToBecomeStatus(targetStatus);
 
         var additionalInformation = "this is some additional information";
-        var stateBuilder = new SetStatusStateBuilder()
-            .WithInitializedState()
-            .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB");
+        var state = new SetStatusState();
+        state.Evidence = new()
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = evidenceFileId,
+                FileName = "evidence.pdf",
+                FileSizeDescription = "1.2 MB"
+            }
+        };
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
+            state.DeactivateReason = PersonDeactivateReason.AnotherReason;
+            state.DeactivateReasonDetail = ChangeReasonDetails;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.Yes;
+            state.DeactivateAdditionalInformation = additionalInformation;
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, additionalInformation);
+            state.ReactivateReason = PersonReactivateReason.AnotherReason;
+            state.ReactivateReasonDetail = ChangeReasonDetails;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.Yes;
+            state.ReactivateAdditionalInformation = additionalInformation;
 
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            stateBuilder.Build());
+            targetStatus,
+            state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, targetStatus, journeyInstance));
 
@@ -76,24 +89,37 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             .WithNationalInsuranceNumber()
             .WithEmailAddress());
 
-        var stateBuilder = new SetStatusStateBuilder()
-            .WithInitializedState()
-            .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB");
+        var state = new SetStatusState();
+        state.Evidence = new()
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = evidenceFileId,
+                FileName = "evidence.pdf",
+                FileSizeDescription = "1.2 MB"
+            }
+        };
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
+            state.DeactivateReason = PersonDeactivateReason.AnotherReason;
+            state.DeactivateReasonDetail = ChangeReasonDetails;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.No;
+            state.DeactivateAdditionalInformation = null;
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
+            state.ReactivateReason = PersonReactivateReason.AnotherReason;
+            state.ReactivateReasonDetail = ChangeReasonDetails;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.No;
+            state.ReactivateAdditionalInformation = null;
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            stateBuilder.Build());
+            targetStatus,
+            state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, targetStatus, journeyInstance));
 
@@ -118,24 +144,31 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         // Arrange
         var person = await CreatePersonToBecomeStatus(targetStatus);
 
-        var stateBuilder = new SetStatusStateBuilder()
-            .WithInitializedState()
-            .WithUploadEvidenceChoice(false);
+        var state = new SetStatusState();
+        state.Evidence = new()
+        {
+            UploadEvidence = false
+        };
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.RecordHolderDied)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
+            state.DeactivateReason = PersonDeactivateReason.RecordHolderDied;
+            state.DeactivateReasonDetail = null;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.No;
+            state.DeactivateAdditionalInformation = null;
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.DeactivatedByMistake)
-                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
+            state.ReactivateReason = PersonReactivateReason.DeactivatedByMistake;
+            state.ReactivateReasonDetail = null;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.No;
+            state.ReactivateAdditionalInformation = null;
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            stateBuilder.Build());
+            targetStatus,
+            state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, targetStatus, journeyInstance));
 
@@ -169,24 +202,37 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             .WithMiddleName("The")
             .WithLastName("Pink"));
 
-        var stateBuilder = new SetStatusStateBuilder()
-            .WithInitializedState()
-            .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB");
+        var state = new SetStatusState();
+        state.Evidence = new()
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = evidenceFileId,
+                FileName = "evidence.pdf",
+                FileSizeDescription = "1.2 MB"
+            }
+        };
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
+            state.DeactivateReason = PersonDeactivateReason.AnotherReason;
+            state.DeactivateReasonDetail = ChangeReasonDetails;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.No;
+            state.DeactivateAdditionalInformation = null;
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, ChangeReasonDetails)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.No);
+            state.ReactivateReason = PersonReactivateReason.AnotherReason;
+            state.ReactivateReasonDetail = ChangeReasonDetails;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.No;
+            state.DeactivateAdditionalInformation = null;
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            stateBuilder.Build());
+            targetStatus,
+            state);
 
         EventObserver.Clear();
 
@@ -253,16 +299,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             Assert.Equal("evidence.pdf", changeReasonInfo.EvidenceFile?.Name);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private string GetRequestPath(CreatePersonResult person, PersonStatus targetStatus, JourneyInstance<SetStatusState> journeyInstance) =>
+    private string GetRequestPath(CreatePersonResult person, PersonStatus targetStatus, SetStatusJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/set-status/{targetStatus}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<SetStatusState>> CreateJourneyInstanceAsync(Guid personId, SetStatusState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.SetStatus,
-            state ?? new SetStatusState(),
-            new KeyValuePair<string, object>("personId", personId));
 }

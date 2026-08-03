@@ -3,17 +3,18 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.SetStatus), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.SetStatus), StartsJourney]
 [AllowDeactivatedPerson]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+public class IndexModel(SetStatusJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<SetStatusState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
     [FromRoute]
     public PersonStatus TargetStatus { get; set; }
 
-    public IActionResult OnGet() => Redirect(linkGenerator.Persons.PersonDetail.SetStatus.Reason(PersonId, TargetStatus, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.Persons.PersonDetail.SetStatus.Reason(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }

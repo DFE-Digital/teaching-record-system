@@ -22,24 +22,37 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var expectedAdditionalInformation = "this is some additional information";
         var person = await CreatePersonToBecomeStatus(targetStatus);
 
-        var stateBuilder = new SetStatusStateBuilder()
-            .WithInitializedState()
-            .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB");
+        var state = new SetStatusState();
+        state.Evidence = new()
+        {
+            UploadEvidence = true,
+            UploadedEvidenceFile = new()
+            {
+                FileId = evidenceFileId,
+                FileName = "evidence.jpg",
+                FileSizeDescription = "1.2 KB"
+            }
+        };
 
         if (targetStatus == PersonStatus.Deactivated)
         {
-            stateBuilder.WithDeactivateReasonChoice(PersonDeactivateReason.AnotherReason, reasonDetail)
-                .WithDeactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, expectedAdditionalInformation);
+            state.DeactivateReason = PersonDeactivateReason.AnotherReason;
+            state.DeactivateReasonDetail = reasonDetail;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.Yes;
+            state.DeactivateAdditionalInformation = expectedAdditionalInformation;
         }
         else
         {
-            stateBuilder.WithReactivateReasonChoice(PersonReactivateReason.AnotherReason, reasonDetail)
-                .WithReactivateProvideAdditionalInformationChoice(ProvideMoreInformationOption.Yes, expectedAdditionalInformation);
+            state.ReactivateReason = PersonReactivateReason.AnotherReason;
+            state.ReactivateReasonDetail = reasonDetail;
+            state.ProvideMoreInformation = ProvideMoreInformationOption.Yes;
+            state.ReactivateAdditionalInformation = expectedAdditionalInformation;
         }
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            stateBuilder.Build());
+            targetStatus,
+            state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, targetStatus, journeyInstance));
 
@@ -96,9 +109,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, targetStatus, journeyInstance));
 
@@ -152,9 +164,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(false);
@@ -179,7 +190,6 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -202,9 +212,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, targetStatus, journeyInstance))
         {
@@ -238,9 +247,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(true);
@@ -284,9 +292,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(true);
@@ -323,9 +330,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"));
@@ -363,9 +369,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"));
@@ -416,9 +421,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -470,9 +474,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -514,9 +517,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var evidenceFileId = Guid.NewGuid();
 
@@ -557,9 +559,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"));
@@ -586,7 +587,6 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.Evidence.UploadEvidence);
         Assert.Equal("evidence.pdf", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileName);
         Assert.Equal("1.2 KB", journeyInstance.State.Evidence.UploadedEvidenceFile!.FileSizeDescription);
@@ -601,9 +601,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"));
@@ -643,9 +642,8 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new SetStatusStateBuilder()
-                .WithInitializedState()
-                .Build());
+            targetStatus,
+            new SetStatusState());
 
         var contentBuilder = new SetStatusPostRequestContentBuilder()
             .WithUploadEvidence(false, (CreateEvidenceFileBinaryContent(), "unneccessary-evidence.pdf"));
@@ -674,7 +672,6 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         FileServiceMock.AssertFileWasNotUploaded();
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         if (targetStatus == PersonStatus.Deactivated)
         {
             Assert.Equal(PersonDeactivateReason.RecordHolderDied, journeyInstance.State.DeactivateReason);
@@ -689,12 +686,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, PersonStatus targetStatus, JourneyInstance<SetStatusState> journeyInstance) =>
+    private string GetRequestPath(TestData.CreatePersonResult person, PersonStatus targetStatus, SetStatusJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/set-status/{targetStatus}/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
-    private Task<JourneyInstance<SetStatusState>> CreateJourneyInstanceAsync(Guid personId, SetStatusState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.SetStatus,
-            state ?? new SetStatusState(),
-            new KeyValuePair<string, object>("personId", personId));
 }

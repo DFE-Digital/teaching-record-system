@@ -5,15 +5,9 @@ public class SetStatusLinkGenerator(LinkGenerator linkGenerator)
     public string Index(Guid personId, PersonStatus targetStatus) =>
         linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/Index", routeValues: new { personId, targetStatus });
 
-    public string Reason(Guid personId, PersonStatus targetStatus, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/Reason", routeValues: new { personId, targetStatus, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string Reason(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/SetStatus/Reason", journeyInstanceId, returnUrl);
 
-    public string ReasonCancel(Guid personId, PersonStatus targetStatus, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/Reason", "cancel", routeValues: new { personId, targetStatus }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswers(Guid personId, PersonStatus targetStatus, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/CheckAnswers", routeValues: new { personId, targetStatus, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string CheckAnswersCancel(Guid personId, PersonStatus targetStatus, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/Persons/PersonDetail/SetStatus/CheckAnswers", "cancel", routeValues: new { personId, targetStatus }, journeyInstanceId: journeyInstanceId);
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        linkGenerator.GetJourneyPage("/Persons/PersonDetail/SetStatus/CheckAnswers", journeyInstanceId);
 }
