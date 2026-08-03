@@ -32,6 +32,9 @@ public static class TestConfiguration
             // variables *after* the configuration we hand them via UseConfiguration, so an environment variable would
             // override the value above for those hosts only. Overwriting it here keeps every configuration built in
             // this process pointing at the container.
+            // Both variables have to be set: setting only the connection string would make a subsequent call here take
+            // the other branch, and DbHelper would then never build the container to connect to.
+            Environment.SetEnvironmentVariable("UseTestContainers", "true");
             Environment.SetEnvironmentVariable($"ConnectionStrings__{TrsDbContext.ConnectionName}", connectionString);
         }
 
