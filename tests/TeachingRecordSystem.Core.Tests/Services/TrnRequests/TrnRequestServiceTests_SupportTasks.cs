@@ -53,7 +53,7 @@ public partial class TrnRequestServiceTests
             service => service.CreateManualChecksNeededSupportTaskAsync(
                 new CreateManualChecksNeededSupportTaskOptions
                 {
-                    Person = person.Person,
+                    Person = person,
                     TrnRequest = trnRequest
                 },
                 processContext));

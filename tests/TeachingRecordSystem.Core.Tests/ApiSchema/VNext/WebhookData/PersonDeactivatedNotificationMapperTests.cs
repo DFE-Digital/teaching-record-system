@@ -10,7 +10,7 @@ public class PersonDeactivatedNotificationMapperTests(ServiceFixture fixture) : 
         WithServiceAsync<PersonDeactivatedNotificationMapper>(async mapper =>
         {
             // Arrange
-            var person = (await TestData.CreatePersonAsync()).Person;
+            var person = (await TestData.CreatePersonAsync());
             var anotherPerson = await TestData.CreatePersonAsync();
 
             await WithDbContextAsync(async dbContext =>
@@ -44,7 +44,7 @@ public class PersonDeactivatedNotificationMapperTests(ServiceFixture fixture) : 
         WithServiceAsync<PersonDeactivatedNotificationMapper>(async mapper =>
         {
             // Arrange
-            var person = (await TestData.CreatePersonAsync()).Person;
+            var person = (await TestData.CreatePersonAsync());
 
             await WithDbContextAsync(async dbContext =>
             {

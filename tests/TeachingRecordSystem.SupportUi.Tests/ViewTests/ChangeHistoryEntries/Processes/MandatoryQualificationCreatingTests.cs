@@ -20,7 +20,7 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
             .WithStatus(status, endDate)));
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var @event = new MandatoryQualificationCreatedEvent
         {
@@ -49,7 +49,7 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence
         {

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240912;
 
@@ -58,7 +59,7 @@ public class GetPersonTests : TestBase
                 middleName = person.MiddleName,
                 lastName = person.LastName,
                 trn = person.Trn,
-                dateOfBirth = person.DateOfBirth.ToString("yyyy-MM-dd"),
+                dateOfBirth = person.DateOfBirth!.Value.ToString("yyyy-MM-dd"),
                 nationalInsuranceNumber = person.NationalInsuranceNumber,
                 qts = (object?)null,
                 eyts = (object?)null,
@@ -135,7 +136,7 @@ public class GetPersonTests : TestBase
                 .WithStatus(MandatoryQualificationStatus.Passed, endDate: new(2022, 9, 1))
                 .WithSpecialism(MandatoryQualificationSpecialism.Auditory)));
 
-        var validMq = person.MandatoryQualifications.Last();
+        var validMq = person.Qualifications!.OfType<MandatoryQualification>().Last();
 
         var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=MandatoryQualifications");
@@ -169,7 +170,7 @@ public class GetPersonTests : TestBase
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Sanctions");
@@ -203,7 +204,7 @@ public class GetPersonTests : TestBase
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Alerts");

@@ -608,7 +608,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: null,
             email: Option.Some<string?>("test@example.com"),
-            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             oneLoginUser.Subject,

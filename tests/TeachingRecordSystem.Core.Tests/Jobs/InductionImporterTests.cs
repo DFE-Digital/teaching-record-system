@@ -118,7 +118,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             x.StartDate = person1AwardedDate.AddDays(-10).ToString("dd/MM/yyyy");
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
             return x;
@@ -150,7 +150,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             x.StartDate = qtsDate.AddDays(-10).ToString("dd/MM/yyyy");
             x.PassedDate = person1AwardedDate.AddDays(-8).ToString("dd/MM/yyyy");
             return x;
@@ -246,7 +246,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             return x;
         });
 
@@ -275,7 +275,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             x.EmployerCode = accountNumber;
             return x;
         });
@@ -319,7 +319,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             return x;
         });
 
@@ -338,7 +338,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             return x;
         });
 
@@ -362,7 +362,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             return x;
         });
 
@@ -388,7 +388,7 @@ public class InductionImporterTests(JobFixture fixture) : JobTestBase(fixture)
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.DateOfBirth = person.DateOfBirth!.Value.ToString("dd/MM/yyyy");
             return x;
         });
 

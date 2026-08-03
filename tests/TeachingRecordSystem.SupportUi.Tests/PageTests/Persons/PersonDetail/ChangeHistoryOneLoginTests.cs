@@ -26,7 +26,7 @@ public partial class ChangeHistoryTests
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]
             },
             process);
@@ -98,7 +98,7 @@ public partial class ChangeHistoryTests
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!));
 
         var process = new ProcessContext(ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting, TimeProvider.UtcNow, user.UserId);
@@ -110,7 +110,7 @@ public partial class ChangeHistoryTests
                 [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ],
                 SupportTask = supportTask
             },
@@ -148,7 +148,7 @@ public partial class ChangeHistoryTests
             t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!));
 
         var options = new VerifiedAndConnectedOutcomeOptions
@@ -159,7 +159,7 @@ public partial class ChangeHistoryTests
             [
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ]
         };

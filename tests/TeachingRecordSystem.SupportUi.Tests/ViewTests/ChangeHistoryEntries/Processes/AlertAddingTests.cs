@@ -85,7 +85,7 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
                 .WithDetails(Faker.Lorem.Paragraph())
                 .WithExternalLink(Faker.Internet.Url())));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var process = await TestData.CreateProcessAsync(
             ProcessType.AlertCreating,

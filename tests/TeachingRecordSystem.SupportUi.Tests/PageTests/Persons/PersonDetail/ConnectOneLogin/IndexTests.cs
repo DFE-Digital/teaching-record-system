@@ -196,7 +196,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         _ = await TestData.CreateOneLoginUserAsync(
             personId: null,
             email: Option.Some<string?>(emailAddress),
-            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

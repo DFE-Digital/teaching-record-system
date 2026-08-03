@@ -1,5 +1,6 @@
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -59,7 +60,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
 
         var editRouteState = builder.Build();
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -136,7 +137,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
 
         var editRouteState = builder.Build();
 
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -171,7 +172,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -211,7 +212,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -259,7 +260,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingSubjectIds(subjects)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -297,7 +298,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -346,11 +347,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithStatus(status)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)

@@ -68,7 +68,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        Debug.Assert(person.Person.Status is PersonStatus.Active);
+        Debug.Assert(person.Status is PersonStatus.Active);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/trns/{person.Trn}");
 

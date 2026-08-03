@@ -41,7 +41,7 @@ public partial class SignInTests
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth!.Value);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
         await using var context = await HostFixture.CreateBrowserContext();

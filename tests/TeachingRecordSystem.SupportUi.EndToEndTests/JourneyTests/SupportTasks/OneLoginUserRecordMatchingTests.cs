@@ -13,7 +13,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber)
                 .WithStatedTrn(matchedPerson.Trn));
         var taskData = supportTask.GetData<OneLoginUserRecordMatchingData>();
@@ -69,7 +69,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber)
                 .WithStatedTrn(matchedPerson.Trn));
         var taskData = supportTask.GetData<OneLoginUserRecordMatchingData>();
@@ -106,7 +106,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
         var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
-                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber)
                 .WithStatedTrn(matchedPerson.Trn));
         var taskData = supportTask.GetData<OneLoginUserRecordMatchingData>();

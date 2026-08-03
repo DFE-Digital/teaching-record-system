@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -556,7 +557,7 @@ public class NameChangeReasonTests(HostFixture hostFixture) : EditDetailsTestBas
         Assert.Null(journeyInstance.State.NameChangeEvidence.UploadedEvidenceFile);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, EditDetailsJourneyCoordinator journeyInstance) =>
+    private string GetRequestPath(Person person, EditDetailsJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details/name-change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     public static TheoryData<string?, HttpMethod> UserDoesNotHavePermission_ReturnsForbiddenData =>
@@ -602,8 +603,8 @@ public class NameChangeReasonTests(HostFixture hostFixture) : EditDetailsTestBas
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 

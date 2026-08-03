@@ -68,7 +68,7 @@ public class MandatoryQualificationServiceTests(ServiceFixture fixture) : Servic
             .WithSpecialism(MandatoryQualificationSpecialism.Hearing)
             .WithStatus(MandatoryQualificationStatus.Deferred)
             .WithStartDate(new DateOnly(2021, 10, 5))));
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var options = new UpdateMandatoryQualificationOptions
         {
@@ -110,7 +110,7 @@ public class MandatoryQualificationServiceTests(ServiceFixture fixture) : Servic
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
             .WithSpecialism(MandatoryQualificationSpecialism.Hearing)
             .WithStatus(MandatoryQualificationStatus.Deferred)));
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var options = new UpdateMandatoryQualificationOptions
         {
@@ -134,7 +134,7 @@ public class MandatoryQualificationServiceTests(ServiceFixture fixture) : Servic
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var options = new DeleteMandatoryQualificationOptions
         {
@@ -170,7 +170,7 @@ public class MandatoryQualificationServiceTests(ServiceFixture fixture) : Servic
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         await WithDbContextAsync(async dbContext =>
         {

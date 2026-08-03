@@ -255,7 +255,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                     personId: null,
-                    verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+                    verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
                 await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
 

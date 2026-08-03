@@ -49,7 +49,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]
             });
 
@@ -160,7 +160,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = [
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]
             });
 
@@ -237,7 +237,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                     KeyValuePair.Create(PersonMatchedAttribute.EmailAddress, person.EmailAddress!)
                 ]
             });
@@ -444,7 +444,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
             {
                 Subject = oneLoginUser.Subject,
                 MatchedAttributes = [
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]  // DOB matches (one of the multiple DOBs)
             });
 
@@ -513,7 +513,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: null,
             email: Option.Some<string?>("test@example.com"),
-            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -523,7 +523,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]
             });
 
@@ -548,7 +548,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: null,
             email: Option.Some<string?>("test@example.com"),
-            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -558,7 +558,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
                 MatchedAttributes = [
                     KeyValuePair.Create(PersonMatchedAttribute.FirstName, person.FirstName),
                     KeyValuePair.Create(PersonMatchedAttribute.LastName, person.LastName),
-                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth.ToString("yyyy-MM-dd"))
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, person.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
                 ]
             });
 

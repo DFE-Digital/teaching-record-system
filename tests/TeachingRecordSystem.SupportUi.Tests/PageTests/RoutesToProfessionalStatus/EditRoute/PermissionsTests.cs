@@ -67,7 +67,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
                 .WithStatus(_status)));
 
         _personId = person.PersonId;
-        _qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        _qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
     }
 
     ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;

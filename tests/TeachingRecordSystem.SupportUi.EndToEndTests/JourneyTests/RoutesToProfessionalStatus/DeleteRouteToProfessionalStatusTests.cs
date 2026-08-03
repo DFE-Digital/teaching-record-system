@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
@@ -12,7 +13,7 @@ public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : Tes
         var deletionReason = ChangeReasonOption.CreatedInError;
         var person = await TestData.CreatePersonAsync(p => p.WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -41,7 +42,7 @@ public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : Tes
         var deletionReason = ChangeReasonOption.AnotherReason;
         var person = await TestData.CreatePersonAsync(p => p.WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
         var personId = person.PersonId;
-        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

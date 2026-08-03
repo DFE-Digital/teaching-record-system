@@ -52,7 +52,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -108,7 +108,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         Assert.NotNull(merge);
         Assert.Contains(person.FirstName, firstName.TextContent);
         Assert.Contains(duplicatePerson1.LastName, lastName.TextContent);
-        Assert.Contains(duplicatePerson1.DateOfBirth.ToString(WebConstants.DateDisplayFormat), dob.TextContent);
+        Assert.Contains(duplicatePerson1.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), dob.TextContent);
         Assert.Contains(person.NationalInsuranceNumber!, niNumber.TextContent);
         Assert.Contains(duplicatePerson1!.Trn, trn.TextContent);
         Assert.Contains(evidenceFileName, evidenceFile.TextContent);
@@ -135,7 +135,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -197,7 +197,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -293,7 +293,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -385,7 +385,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);
@@ -502,7 +502,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
                 s.WithLastName(person.LastName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData("test.txt", 1);
                 s.WithCreatedOn(TimeProvider.UtcNow);
                 s.WithStatus(SupportTaskStatus.Open);

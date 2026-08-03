@@ -15,10 +15,10 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+            person.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/reject");
 
@@ -35,10 +35,10 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+            person.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/reject");
 
@@ -68,10 +68,10 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
+            person.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)).WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/reject");
 
@@ -86,10 +86,10 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     public async Task Post_WhenRejectionReasonChoiceHasNoSelection_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/reject")
         {
@@ -109,10 +109,10 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+            person.PersonId,
+            b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/reject")
         {
@@ -135,19 +135,19 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     public async Task Post_WhenRejectionReasonChoiceIsNotChangeNoLongerRequired_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         SupportTask supportTask;
         if (isNameChange)
         {
             supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+                person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
         }
         else
         {
             supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+                person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
         }
 
         EventObserver.Clear();
@@ -166,7 +166,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
+            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == person.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
             Assert.Equal(
                 isNameChange ? SupportTaskOutcome.ChangeNameRequest_Rejected : SupportTaskOutcome.ChangeDateOfBirthRequest_Rejected,
@@ -182,7 +182,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
                 Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation, email.TemplateId);
-                AssertEmailPersonalisation(email, createPersonResult.FirstName);
+                AssertEmailPersonalisation(email, person.FirstName);
             }
             else
             {
@@ -194,7 +194,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.NotNull(email);
                 Assert.NotNull(email.SentOn);
                 Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation, email.TemplateId);
-                AssertEmailPersonalisation(email, createPersonResult.FirstName);
+                AssertEmailPersonalisation(email, person.FirstName);
             }
         });
 
@@ -234,19 +234,19 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
     public async Task Post_WhenRejectionReasonChoiceIsChangeNoLongerRequired_RedirectsWithFlashMessage(bool isNameChange)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         SupportTask supportTask;
         if (isNameChange)
         {
             supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+                person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
         }
         else
         {
             supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+                person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
         }
 
         EventObserver.Clear();
@@ -265,7 +265,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
+            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == person.PersonId);
             Assert.Equal(SupportTaskStatus.Closed, supportTask!.Status);
             Assert.Equal(
                 isNameChange ? SupportTaskOutcome.ChangeNameRequest_Cancelled : SupportTaskOutcome.ChangeDateOfBirthRequest_Cancelled,

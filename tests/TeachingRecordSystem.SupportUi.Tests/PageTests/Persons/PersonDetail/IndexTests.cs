@@ -85,7 +85,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var previousNames = doc.GetSummaryListValueElementByKey("Previous name(s)")?.QuerySelectorAll("li");
         Assert.Equal($"{previousFirstName1} {previousMiddleName1} {previousLastName1}", previousNames?.First().TrimmedText());
         Assert.Equal($"{previousFirstName2} {previousMiddleName2} {previousLastName2}", previousNames?.Last().TrimmedText());
-        Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(person.Trn, doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(person.NationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
         Assert.Equal(person.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
@@ -96,9 +96,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.PersonId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -106,9 +106,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetSummaryListValueByKey("Name"));
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
+        Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
+        Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetSummaryListValueByKey("Name"));
+        Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("National Insurance number"));
         Assert.Equal(WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Gender"));
@@ -137,7 +137,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        Debug.Assert(person.Alerts.Count == 0);
+        Debug.Assert(person.Alerts!.Count == 0);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -385,8 +385,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -411,8 +411,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -506,8 +506,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -545,8 +545,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -618,8 +618,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -647,8 +647,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(secondaryPerson.Person);
-            secondaryPerson.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(secondaryPerson);
+            secondaryPerson.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -676,8 +676,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -707,14 +707,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(new DateOnly(1990, 1, 1)).WithEmailAddress());
-        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         if (currentStatus == PersonStatus.Deactivated)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -760,7 +760,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
-        var user = await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var user = await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
         // Act
@@ -780,9 +780,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var dateOfBirth = new DateOnly(1990, 1, 1);
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth).WithEmailAddress());
         var email2 = TestData.GenerateUniqueEmail();
-        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
         TimeProvider.Advance(TimeSpan.FromDays(1));
-        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some<string?>(email2), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some<string?>(email2), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
         // Act

@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
@@ -5,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 public class MergePersonTestBase(HostFixture hostFixture)
     : TestBase(hostFixture)
 {
-    protected async Task<(CreatePersonResult PersonA, CreatePersonResult PersonB)> CreatePersonsWithNoDifferences(
+    protected async Task<(Person PersonA, Person PersonB)> CreatePersonsWithNoDifferences(
         Action<CreatePersonBuilder>? configurePersonA = null,
         Action<CreatePersonBuilder>? configurePersonB = null,
         bool useNullValues = false)
@@ -24,7 +25,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
                 .WithFirstName(personA.FirstName)
                 .WithMiddleName(personA.MiddleName)
                 .WithLastName(personA.LastName)
-                .WithDateOfBirth(personA.DateOfBirth);
+                .WithDateOfBirth(personA.DateOfBirth!.Value);
 
             if (useNullValues)
             {
@@ -47,7 +48,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         return (personA, personB);
     }
 
-    protected async Task<(CreatePersonResult PersonA, CreatePersonResult PersonB)> CreatePersonsWithAllDifferences(
+    protected async Task<(Person PersonA, Person PersonB)> CreatePersonsWithAllDifferences(
         bool useNullValues = false)
     {
         var personA = await TestData.CreatePersonAsync(p => p
@@ -59,7 +60,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
             .WithFirstName(TestData.GenerateChangedFirstName([personA.FirstName, personA.MiddleName, personA.LastName]))
             .WithMiddleName(TestData.GenerateChangedMiddleName([personA.FirstName, personA.MiddleName, personA.LastName]))
             .WithLastName(TestData.GenerateChangedLastName([personA.FirstName, personA.MiddleName, personA.LastName]))
-            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(personA.DateOfBirth))
+            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(personA.DateOfBirth!.Value))
             .WithEmailAddress(TestData.GenerateUniqueEmail())
             .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(personA.NationalInsuranceNumber ?? ""))
             .WithGender(TestData.GenerateChangedGender(personA.Gender ?? Gender.Other)));
@@ -67,7 +68,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         return (personA, personB);
     }
 
-    protected async Task<(CreatePersonResult PersonA, CreatePersonResult PersonB)> CreatePersonsWithSingleDifferenceToMatch(
+    protected async Task<(Person PersonA, Person PersonB)> CreatePersonsWithSingleDifferenceToMatch(
         PersonMatchedAttribute differentAttribute,
         bool useNullValues = false)
     {
@@ -93,8 +94,8 @@ public class MergePersonTestBase(HostFixture hostFixture)
                         : TestData.GenerateChangedLastName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithDateOfBirth(
                     differentAttribute != PersonMatchedAttribute.DateOfBirth
-                        ? personA.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(personA.DateOfBirth));
+                        ? personA.DateOfBirth!.Value
+                        : TestData.GenerateChangedDateOfBirth(personA.DateOfBirth!.Value));
 
             if (useNullValues)
             {
@@ -127,7 +128,7 @@ public class MergePersonTestBase(HostFixture hostFixture)
         return (personA, personB);
     }
 
-    protected async Task<(CreatePersonResult PersonA, CreatePersonResult PersonB)> CreatePersonsWithMultipleDifferencesToMatch(
+    protected async Task<(Person PersonA, Person PersonB)> CreatePersonsWithMultipleDifferencesToMatch(
         IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes,
         bool useNullValues = false)
     {
@@ -153,8 +154,8 @@ public class MergePersonTestBase(HostFixture hostFixture)
                         : TestData.GenerateChangedLastName([personA.FirstName, personA.MiddleName, personA.LastName]))
                 .WithDateOfBirth(
                     matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
-                        ? personA.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(personA.DateOfBirth));
+                        ? personA.DateOfBirth!.Value
+                        : TestData.GenerateChangedDateOfBirth(personA.DateOfBirth!.Value));
 
             if (useNullValues)
             {

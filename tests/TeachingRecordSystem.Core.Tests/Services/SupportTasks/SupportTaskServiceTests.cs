@@ -20,7 +20,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             SupportTaskType = SupportTaskType.ChangeNameRequest,
             Data = new ChangeDateOfBirthRequestData()
             {
-                DateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth),
+                DateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value),
                 EvidenceFileId = Guid.NewGuid(),
                 EvidenceFileName = "evidence.jpeg",
                 EmailAddress = person.EmailAddress!,
@@ -29,7 +29,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
             TrnRequest = null,
-            Subject = SupportTask.Subject.FromPerson(person.Person),
+            Subject = SupportTask.Subject.FromPerson(person),
             SourceApplicationUserId = null
         };
 
@@ -65,7 +65,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
             PersonId = person.PersonId,
             OneLoginUserSubject = null,
             TrnRequest = null,
-            Subject = SupportTask.Subject.FromPerson(person.Person),
+            Subject = SupportTask.Subject.FromPerson(person),
             SourceApplicationUserId = null
         };
 

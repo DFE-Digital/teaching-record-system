@@ -49,9 +49,9 @@ public partial class OneLoginServiceTests
 
         DateOnly[] datesOfBirth = dateOfBirthOption switch
         {
-            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth => [person.DateOfBirth],
-            OneLogin.DateOfBirthArgumentOption.MultipleSpecifiedAndOneMatchesPersonDateOfBirth => [person.DateOfBirth, TestData.GenerateChangedDateOfBirth(person.DateOfBirth)],
-            OneLogin.DateOfBirthArgumentOption.SpecifiedButDifferent => [TestData.GenerateChangedDateOfBirth(person.DateOfBirth)],
+            OneLogin.DateOfBirthArgumentOption.MatchesPersonDateOfBirth => [person.DateOfBirth!.Value],
+            OneLogin.DateOfBirthArgumentOption.MultipleSpecifiedAndOneMatchesPersonDateOfBirth => [person.DateOfBirth!.Value, TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)],
+            OneLogin.DateOfBirthArgumentOption.SpecifiedButDifferent => [TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)],
             _ => []
         };
 
@@ -156,7 +156,7 @@ public partial class OneLoginServiceTests
         var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithFirstName(firstName));
 
         string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
-        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        DateOnly[] datesOfBirth = [person.DateOfBirth!.Value];
         var nationalInsuranceNumber = person.NationalInsuranceNumber!;
         var trn = person.Trn;
 
@@ -185,7 +185,7 @@ public partial class OneLoginServiceTests
             p => p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         string[][] names = [[person1.FirstName, person1.LastName]];
-        DateOnly[] datesOfBirth = [person1.DateOfBirth];
+        DateOnly[] datesOfBirth = [person1.DateOfBirth!.Value];
         var nationalInsuranceNumber = person1.NationalInsuranceNumber!;
         var trn = person1.Trn;
 
@@ -299,7 +299,7 @@ public partial class OneLoginServiceTests
         var person = await TestData.CreatePersonAsync();
 
         string[][] names = [[person.FirstName, person.LastName]];
-        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        DateOnly[] datesOfBirth = [person.DateOfBirth!.Value];
 
         // Act
         var result = await WithServiceAsync(
@@ -314,7 +314,7 @@ public partial class OneLoginServiceTests
         // Assert
         Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.FirstName && kvp.Value == person.FirstName);
         Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.LastName && kvp.Value == person.LastName);
-        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.DateOfBirth && kvp.Value == person.DateOfBirth.ToString("yyyy-MM-dd"));
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.DateOfBirth && kvp.Value == person.DateOfBirth!.Value.ToString("yyyy-MM-dd"));
         Assert.DoesNotContain(result, kvp => kvp.Key == PersonMatchedAttribute.EmailAddress);
     }
 
@@ -325,7 +325,7 @@ public partial class OneLoginServiceTests
         var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
 
         string[][] names = [[person.FirstName, person.LastName]];
-        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        DateOnly[] datesOfBirth = [person.DateOfBirth!.Value];
 
         // Act
         var result = await WithServiceAsync(
@@ -349,7 +349,7 @@ public partial class OneLoginServiceTests
         var differentEmail = TestData.GenerateUniqueEmail();
 
         string[][] names = [[person.FirstName, person.LastName]];
-        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        DateOnly[] datesOfBirth = [person.DateOfBirth!.Value];
 
         // Act
         var result = await WithServiceAsync(
@@ -374,7 +374,7 @@ public partial class OneLoginServiceTests
         var differentLastName = TestData.GenerateChangedLastName(person.LastName);
 
         string[][] names = [[differentFirstName, differentLastName]];
-        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        DateOnly[] datesOfBirth = [person.DateOfBirth!.Value];
 
         // Act
         var result = await WithServiceAsync(
@@ -396,7 +396,7 @@ public partial class OneLoginServiceTests
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var differentDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
+        var differentDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value);
 
         string[][] names = [[person.FirstName, person.LastName]];
         DateOnly[] datesOfBirth = [differentDateOfBirth];
@@ -431,7 +431,7 @@ public partial class OneLoginServiceTests
         var person = await TestData.CreatePersonAsync(p => p.WithFirstName(firstName));
 
         string[][] names = [[alias, person.LastName]];
-        DateOnly[] datesOfBirth = [person.DateOfBirth];
+        DateOnly[] datesOfBirth = [person.DateOfBirth!.Value];
 
         // Act
         var result = await WithServiceAsync(

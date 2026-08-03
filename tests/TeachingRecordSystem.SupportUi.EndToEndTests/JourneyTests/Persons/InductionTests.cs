@@ -544,7 +544,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Route induction exemption reason");
 
-        await page.AssertOnRouteDetailPageAsync(person.ProfessionalStatuses.Single().QualificationId);
+        await page.AssertOnRouteDetailPageAsync(person.Qualifications!.OfType<RouteToProfessionalStatus>().Single().QualificationId);
         await page.ClickBackLinkAsync();
 
         await page.AssertOnPersonInductionPageAsync(person.PersonId);

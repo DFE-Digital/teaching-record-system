@@ -56,7 +56,7 @@ public partial class OneLoginSearchServiceTests
                 EmailAddress = "bob@example.com",
                 Name = "Bob Brown",
                 DateOfBirth = (DateOnly?)new DateOnly(1980, 5, 10),
-                Trn = (string?)person1.Person.Trn
+                Trn = (string?)person1.Trn
             },
             new
             {
@@ -64,7 +64,7 @@ public partial class OneLoginSearchServiceTests
                 EmailAddress = "alice@example.com",
                 Name = "Alice Anderson",
                 DateOfBirth = (DateOnly?)new DateOnly(1975, 3, 20),
-                Trn = (string?)person2.Person.Trn
+                Trn = (string?)person2.Trn
             },
             new
             {
@@ -235,7 +235,7 @@ public partial class OneLoginSearchServiceTests
 
         var options = new OneLoginSearchOptions
         {
-            Search = person1.Person.Trn,
+            Search = person1.Trn,
             SortBy = OneLoginSearchSortByOption.Email,
             SortDirection = SortDirection.Ascending
         };
@@ -247,7 +247,7 @@ public partial class OneLoginSearchServiceTests
         // Assert
         Assert.Single(result.Results);
         Assert.Equal(oneLoginUser1.Subject, result.Results.First().Subject);
-        Assert.Equal(person1.Person.Trn, result.Results.First().Trn);
+        Assert.Equal(person1.Trn, result.Results.First().Trn);
     }
 
     [Fact]

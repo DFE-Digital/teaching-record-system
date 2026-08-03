@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -130,7 +132,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain(doc.GetElementsByClassName("govuk-pagination__link"), e => e.GetAttribute("rel") == "prev");
     }
 
-    private async Task<TestData.CreatePersonResult> CreatePersonWithEventsAsync(int eventCount)
+    private async Task<Person> CreatePersonWithEventsAsync(int eventCount)
     {
         var person = await TestData.CreatePersonAsync();
 

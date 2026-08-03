@@ -469,7 +469,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!));
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
@@ -482,7 +482,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             [
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ]
         };
@@ -540,7 +540,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             oneLoginUser.Subject, t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!)
                 .WithClientApplicationUserId(applicationUser.UserId));
 
@@ -552,7 +552,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             [
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ]
         };
@@ -583,7 +583,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             oneLoginUser.Subject, t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
                 .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
                 .WithStatedTrn(matchedPerson.Trn!)
                 .WithClientApplicationUserId(applicationUser.UserId));
 
@@ -595,7 +595,7 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             [
                 KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
                 KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
-                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth.ToString("yyyy-MM-dd")),
+                KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
                 KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
             ]
         };

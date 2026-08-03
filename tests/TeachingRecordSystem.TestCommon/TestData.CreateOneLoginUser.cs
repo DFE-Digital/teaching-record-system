@@ -7,12 +7,12 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<OneLoginUser> CreateOneLoginUserAsync(CreatePersonResult createPersonResult, Option<string> subject = default, Option<string?> email = default) =>
+    public Task<OneLoginUser> CreateOneLoginUserAsync(Person person, Option<string> subject = default, Option<string?> email = default) =>
         CreateOneLoginUserAsync(
-            createPersonResult.PersonId,
+            person.PersonId,
             subject,
             email,
-            verifiedInfo: ([createPersonResult.FirstName, createPersonResult.LastName], createPersonResult.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
     public Task<OneLoginUser> CreateOneLoginUserAsync(Option<string> subject = default, Option<string?> email = default, bool verified = false) =>
         CreateOneLoginUserAsync(

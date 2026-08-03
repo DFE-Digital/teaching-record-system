@@ -203,7 +203,7 @@ public class BackfillResolvedAttributesJobTests(JobFixture fixture) : JobTestBas
             FirstName = person.FirstName,
             MiddleName = person.MiddleName,
             LastName = person.LastName,
-            DateOfBirth = person.DateOfBirth,
+            DateOfBirth = person.DateOfBirth!.Value,
             EmailAddress = requestEmailAddress,
             NationalInsuranceNumber = person.NationalInsuranceNumber,
             Gender = person.Gender,

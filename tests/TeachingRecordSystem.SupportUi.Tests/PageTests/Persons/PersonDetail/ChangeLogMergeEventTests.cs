@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
@@ -21,8 +22,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
     private Gender _gender = Gender.Female;
 
     private Core.DataStore.Postgres.Models.User? _createdByUser;
-    private TestData.CreatePersonResult? _person;
-    private TestData.CreatePersonResult? _secondaryPerson;
+    private Person? _person;
+    private Person? _secondaryPerson;
 
     async ValueTask IAsyncLifetime.InitializeAsync()
     {
@@ -43,8 +44,8 @@ public class ChangeLogMergeEventTests(HostFixture hostFixture) : TestBase(hostFi
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(_secondaryPerson.Person);
-            _secondaryPerson.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(_secondaryPerson);
+            _secondaryPerson.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
     }

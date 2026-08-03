@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
@@ -671,7 +672,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         });
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, EditDetailsJourneyCoordinator journeyInstance) =>
+    private string GetRequestPath(Person person, EditDetailsJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     public static TheoryData<string?, HttpMethod> UserDoesNotHavePermission_ReturnsForbiddenData =>
@@ -717,8 +718,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 

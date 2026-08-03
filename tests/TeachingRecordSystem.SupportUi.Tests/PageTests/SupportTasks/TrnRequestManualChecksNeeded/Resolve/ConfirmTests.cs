@@ -96,7 +96,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var (apiSupportTask, _, _) = await TestData.CreateResolvedApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            matchedPerson.Person,
+            matchedPerson,
             t => t.WithTrnRequestStatus(TrnRequestStatus.Pending));
 
         return await TestData.CreateTrnRequestManualChecksNeededSupportTaskAsync(

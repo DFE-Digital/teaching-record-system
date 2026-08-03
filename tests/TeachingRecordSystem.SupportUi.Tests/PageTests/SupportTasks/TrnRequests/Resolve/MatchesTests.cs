@@ -200,7 +200,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert());
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
@@ -238,7 +238,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithQts());
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
@@ -276,7 +276,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var matchedPerson = await TestData.CreatePersonAsync(p => p.WithEyts(TimeProvider.Today.AddDays(-1)));
-        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson.Person);
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId, matchedPerson);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask,
@@ -478,14 +478,14 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             applicationUser.UserId, t => t
                 .WithFirstName(initialMatchedPerson.FirstName)
                 .WithLastName(initialMatchedPerson.LastName)
-                .WithDateOfBirth(initialMatchedPerson.DateOfBirth)
+                .WithDateOfBirth(initialMatchedPerson.DateOfBirth!.Value)
                 .WithNationalInsuranceNumber(initialMatchedPerson.NationalInsuranceNumber)
                 .WithMatchedPersons(initialMatchedPerson.PersonId));
 
         var subsequentMatchedPerson = await TestData.CreatePersonAsync(p => p
             .WithFirstName(initialMatchedPerson.FirstName)
             .WithLastName(initialMatchedPerson.LastName)
-            .WithDateOfBirth(initialMatchedPerson.DateOfBirth)
+            .WithDateOfBirth(initialMatchedPerson.DateOfBirth!.Value)
             .WithNationalInsuranceNumber(initialMatchedPerson.NationalInsuranceNumber!));
 
         var journeyInstance = await CreateJourneyInstance(
@@ -668,8 +668,8 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
                         : TestData.GenerateChangedLastName([matchedPerson.FirstName, matchedPerson.MiddleName, matchedPerson.LastName]))
                 .WithDateOfBirth(
                     matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
-                        ? matchedPerson.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
+                        ? matchedPerson.DateOfBirth!.Value
+                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth!.Value))
                 .WithEmailAddress(
                     matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
                         ? matchedPerson.EmailAddress

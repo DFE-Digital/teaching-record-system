@@ -107,8 +107,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
+            dbContext.Attach(person);
+            person.SetCpdInductionStatus(
                 InductionStatus.Passed,
                 startDate: lessThanSevenYearsAgo.AddYears(-1),
                 completedDate: lessThanSevenYearsAgo,
@@ -154,8 +154,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
+            dbContext.Attach(person);
+            person.SetCpdInductionStatus(
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
@@ -163,7 +163,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 updatedBy: SystemUser.SystemUserId,
                 now: TimeProvider.UtcNow,
                 out _);
-            person.Person.SetInductionStatus(
+            person.SetInductionStatus(
                 status,
                 startDate: null,
                 completedDate: null,
@@ -278,8 +278,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
+            dbContext.Attach(person);
+            person.SetCpdInductionStatus(
                 InductionStatus.Passed,
                 startDate: lessThanSevenYearsAgo.AddYears(-1),
                 completedDate: lessThanSevenYearsAgo,
@@ -328,17 +328,17 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
+            dbContext.Attach(person);
 
             // Force status to `None` so that the SetCpdInductionStatus() call below always has a change to status
-            person.Person.UnsafeSetInductionStatus(
+            person.UnsafeSetInductionStatus(
                 InductionStatus.None,
                 InductionStatus.None,
                 startDate: null,
                 completedDate: null,
                 exemptionReasonIds: []);
 
-            person.Person.SetCpdInductionStatus(
+            person.SetCpdInductionStatus(
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
@@ -347,7 +347,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 now: TimeProvider.UtcNow,
                 out _);
 
-            person.Person.SetInductionStatus(
+            person.SetInductionStatus(
                 status,
                 startDate: null,
                 completedDate: null,
@@ -394,8 +394,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             p => p.WithQts());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
+            dbContext.Attach(person);
+            person.SetCpdInductionStatus(
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
                 completedDate: null,
@@ -403,7 +403,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 updatedBy: SystemUser.SystemUserId,
                 now: TimeProvider.UtcNow,
                 out _);
-            person.Person.SetInductionStatus(
+            person.SetInductionStatus(
                 status,
                 startDate: null,
                 completedDate: null,

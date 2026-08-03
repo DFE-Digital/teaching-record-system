@@ -20,7 +20,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStartDateTestBas
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState
@@ -78,7 +78,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStartDateTestBas
         var newStartDate = new DateOnly(2021, 10, 6);
 
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
-        var qualification = person.MandatoryQualifications.First();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().First();
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
         var changeReason = MqChangeStartDateReasonOption.AnotherReason;
@@ -152,7 +152,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStartDateTestBas
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState
@@ -199,11 +199,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStartDateTestBas
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState

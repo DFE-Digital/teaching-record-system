@@ -7,20 +7,20 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public async Task SelectChangeRequestAndApprove(bool isNameChange)
     {
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         string supportTaskReference;
         if (isNameChange)
         {
             var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName([createPersonResult.FirstName, createPersonResult.MiddleName, createPersonResult.LastName])));
+                person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName([person.FirstName, person.MiddleName, person.LastName])));
             supportTaskReference = supportTask.SupportTaskReference;
         }
         else
         {
             var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+                person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
             supportTaskReference = supportTask.SupportTaskReference;
         }
 
@@ -31,7 +31,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnChangeRequestsPageAsync();
 
-        await page.ClickAsync($"a{TextIsSelector($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
 
         await page.AssertOnChangeRequestDetailPageAsync(supportTaskReference);
 
@@ -51,20 +51,20 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public async Task SelectChangeRequestAndReject(bool isNameChange)
     {
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         string supportTaskReference;
         if (isNameChange)
         {
             var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName([createPersonResult.FirstName, createPersonResult.MiddleName, createPersonResult.LastName])));
+                person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName([person.FirstName, person.MiddleName, person.LastName])));
             supportTaskReference = supportTask.SupportTaskReference;
         }
         else
         {
             var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+                person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
             supportTaskReference = supportTask.SupportTaskReference;
         }
 
@@ -75,7 +75,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnChangeRequestsPageAsync();
 
-        await page.ClickAsync($"a{TextIsSelector($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
 
         await page.AssertOnChangeRequestDetailPageAsync(supportTaskReference);
 
@@ -97,20 +97,20 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public async Task SelectChangeRequestAndCancel(bool isNameChange)
     {
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         string supportTaskReference;
         if (isNameChange)
         {
             var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithLastName(TestData.GenerateChangedLastName([createPersonResult.FirstName, createPersonResult.MiddleName, createPersonResult.LastName])));
+                person.PersonId,
+                b => b.WithLastName(TestData.GenerateChangedLastName([person.FirstName, person.MiddleName, person.LastName])));
             supportTaskReference = supportTask.SupportTaskReference;
         }
         else
         {
             var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-                createPersonResult.PersonId,
-                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth)));
+                person.PersonId,
+                b => b.WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
             supportTaskReference = supportTask.SupportTaskReference;
         }
 
@@ -119,7 +119,7 @@ public class ChangeRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.GotoAsync("/support-tasks/change-requests");
 
-        await page.ClickAsync($"a{TextIsSelector($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}")}");
+        await page.ClickAsync($"a{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
 
         await page.AssertOnChangeRequestDetailPageAsync(supportTaskReference);
 

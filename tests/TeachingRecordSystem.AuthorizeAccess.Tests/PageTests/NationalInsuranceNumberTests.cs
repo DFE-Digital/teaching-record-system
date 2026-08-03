@@ -186,7 +186,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                     personId: null,
-                    verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+                    verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
                 await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser);
 

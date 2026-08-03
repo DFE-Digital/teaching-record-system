@@ -1,5 +1,6 @@
 using System.Globalization;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEventChanges;
@@ -1023,10 +1024,10 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         Assert.Null(journeyInstance.State.OtherDetailsChangeEvidence.UploadedEvidenceFile);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person) =>
+    private string GetRequestPath(Person person) =>
         $"/persons/{person.PersonId}/edit-details";
 
-    private string GetRequestPath(TestData.CreatePersonResult person, EditDetailsJourneyCoordinator journeyInstance) =>
+    private string GetRequestPath(Person person, EditDetailsJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     public static TheoryData<string?, HttpMethod> UserDoesNotHavePermission_ReturnsForbiddenData =>
@@ -1072,8 +1073,8 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 

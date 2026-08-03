@@ -1,4 +1,5 @@
 using GovUk.Questions.AspNetCore.State;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -6,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Se
 
 public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected async Task<CreatePersonResult> CreatePersonWithCurrentStatus(PersonStatus currentStatus, Action<CreatePersonBuilder>? configure = null)
+    protected async Task<Person> CreatePersonWithCurrentStatus(PersonStatus currentStatus, Action<CreatePersonBuilder>? configure = null)
     {
         configure ??= _ => { };
 
@@ -16,8 +17,8 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }
@@ -25,7 +26,7 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
         return person;
     }
 
-    protected async Task<CreatePersonResult> CreatePersonToBecomeStatus(PersonStatus targetStatus, Action<CreatePersonBuilder>? configure = null)
+    protected async Task<Person> CreatePersonToBecomeStatus(PersonStatus targetStatus, Action<CreatePersonBuilder>? configure = null)
     {
         configure ??= _ => { };
 
@@ -35,8 +36,8 @@ public class SetStatusTestBase(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }

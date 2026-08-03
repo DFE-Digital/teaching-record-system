@@ -280,7 +280,7 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
                 FirstName = person6.FirstName,
                 MiddleName = person6.MiddleName,
                 LastName = person6.LastName,
-                DateOfBirth = person6.DateOfBirth.AddYears(-1),
+                DateOfBirth = person6.DateOfBirth!.Value.AddYears(-1),
                 EmailAddress = person6.EmailAddress,
                 NationalInsuranceNumber = person6.NationalInsuranceNumber,
                 Gender = person6.Gender
@@ -364,7 +364,7 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
                 FirstName = person8.FirstName,
                 MiddleName = person8.MiddleName,
                 LastName = person8.LastName,
-                DateOfBirth = person8.DateOfBirth.AddYears(-1),
+                DateOfBirth = person8.DateOfBirth!.Value.AddYears(-1),
                 EmailAddress = person8.EmailAddress,
                 NationalInsuranceNumber = person8.NationalInsuranceNumber,
                 Gender = person8.Gender

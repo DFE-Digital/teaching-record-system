@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.TestCommon;
 public partial class TestData
 {
     public async Task<TpsEmployment> CreateTpsEmploymentAsync(
-        CreatePersonResult person,
+        Person person,
         Establishment establishment,
         DateOnly startDate,
         DateOnly lastKnownEmployedDate,

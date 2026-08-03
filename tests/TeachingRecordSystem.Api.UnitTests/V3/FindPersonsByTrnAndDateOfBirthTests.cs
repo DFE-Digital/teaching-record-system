@@ -27,7 +27,7 @@ public class FindPersonsByTrnAndDateOfBirthTests(OperationTestFixture operationT
         var person = await TestData.CreatePersonAsync(p => p.WithDateOfBirth(new DateOnly(1988, 7, 10)));
 
         var command = new FindPersonsByTrnAndDateOfBirthCommand(
-            [(person.Trn, person.DateOfBirth)]);
+            [(person.Trn, person.DateOfBirth!.Value)]);
 
         // Act
         var result = await ExecuteCommandAsync(command);
@@ -66,7 +66,7 @@ public class FindPersonsByTrnAndDateOfBirthTests(OperationTestFixture operationT
 
         var command = new FindPersonsByTrnAndDateOfBirthCommand(
             [
-                (matchingPerson.Trn, matchingPerson.DateOfBirth),
+                (matchingPerson.Trn, matchingPerson.DateOfBirth!.Value),
                 (nonMatchingPerson.Trn, new DateOnly(2000, 1, 1))
             ]);
 

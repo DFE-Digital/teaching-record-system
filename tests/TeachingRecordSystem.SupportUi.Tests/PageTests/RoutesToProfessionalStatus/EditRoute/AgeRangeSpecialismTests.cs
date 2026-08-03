@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -39,7 +40,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithTrainingProviderId(trainingProvider.TrainingProviderId)
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithTrainingCountryId(country.CountryId)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var builder = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
@@ -116,7 +117,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithTrainingProviderId(trainingProvider.TrainingProviderId)
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithTrainingCountryId(country.CountryId)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var builder = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
@@ -172,7 +173,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -216,7 +217,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -261,7 +262,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -309,7 +310,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -357,7 +358,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
@@ -403,11 +404,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithStatus(status)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)

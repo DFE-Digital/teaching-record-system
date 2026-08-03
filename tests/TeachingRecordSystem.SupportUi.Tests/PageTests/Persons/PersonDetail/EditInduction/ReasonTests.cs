@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -469,7 +470,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditInductionState> journeyInstance) =>
+    private string GetRequestPath(Person person, JourneyInstance<EditInductionState> journeyInstance) =>
         $"/persons/{person.PersonId}/edit-induction/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>

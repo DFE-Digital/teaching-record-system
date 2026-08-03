@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
@@ -27,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism");
 
@@ -51,7 +52,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
         var journeySpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState
@@ -81,7 +82,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         Debug.Assert(MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
         var dqtSpecialism = LegacyDataCache.Instance.GetMqSpecialismByValue(specialism.GetDqtValue());
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism, dqtSpecialism.Value)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
@@ -113,7 +114,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var specialism = MandatoryQualificationSpecialism.Hearing;
         Debug.Assert(!MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
@@ -166,7 +167,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -188,7 +189,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldSpecialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState
@@ -218,7 +219,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         // Arrange
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState
@@ -249,11 +250,11 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState

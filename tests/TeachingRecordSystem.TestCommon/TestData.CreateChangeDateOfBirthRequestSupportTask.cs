@@ -15,7 +15,7 @@ public partial class TestData
 
         configure ??= b => { };
         Action<CreateChangeDateOfBirthRequestSupportTaskBuilder> configureWithDob = b =>
-            configure(b.WithDateOfBirth(GenerateChangedDateOfBirth(person.DateOfBirth)));
+            configure(b.WithDateOfBirth(GenerateChangedDateOfBirth(person.DateOfBirth!.Value)));
 
         return await CreateChangeDateOfBirthRequestSupportTaskAsync(person.PersonId, configureWithDob);
     }

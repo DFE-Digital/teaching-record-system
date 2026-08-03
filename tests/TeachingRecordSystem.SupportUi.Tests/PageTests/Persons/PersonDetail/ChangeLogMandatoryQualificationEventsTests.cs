@@ -386,7 +386,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             .WithMandatoryQualification(q => q.WithStatus(status ?? MandatoryQualificationStatus.Passed)));
 
         var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
-            .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
+            .SingleAsync(q => q.QualificationId == person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId));
 
         Debug.Assert(mq.ProviderId.HasValue);
         Debug.Assert(mq.Specialism.HasValue);
@@ -411,7 +411,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .WithProvider(null)));
 
         var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
-            .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
+            .SingleAsync(q => q.QualificationId == person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId));
 
         Debug.Assert(!mq.DqtMqEstablishmentId.HasValue);
         Debug.Assert(!mq.ProviderId.HasValue);
@@ -428,7 +428,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .WithDqtMqEstablishment(legacyProvider.Value, mandatoryQualificationProviderId: null)));
 
         var mq = await WithDbContextAsync(dbContext => dbContext.MandatoryQualifications
-            .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
+            .SingleAsync(q => q.QualificationId == person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId));
 
         Debug.Assert(mq.DqtMqEstablishmentValue is not null);
         Debug.Assert(!mq.ProviderId.HasValue);

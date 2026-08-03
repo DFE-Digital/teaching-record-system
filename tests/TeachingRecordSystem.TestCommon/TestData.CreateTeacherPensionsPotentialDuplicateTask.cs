@@ -34,7 +34,7 @@ public partial class TestData
                 s.WithMiddleName(person.MiddleName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
                 s.WithGender(person.Gender);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithSupportTaskData(fileName, integrationTransactionId);
                 s.WithCreatedOn((createdOn ?? TimeProvider.UtcNow).ToUniversalTime());
             });

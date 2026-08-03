@@ -18,7 +18,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqSpecialismTestBa
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState
@@ -74,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqSpecialismTestBa
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
 
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualification = person.MandatoryQualifications.First();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().First();
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
         var changeReason = MqChangeSpecialismReasonOption.AnotherReason;
@@ -148,7 +148,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqSpecialismTestBa
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState
@@ -193,11 +193,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqSpecialismTestBa
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState

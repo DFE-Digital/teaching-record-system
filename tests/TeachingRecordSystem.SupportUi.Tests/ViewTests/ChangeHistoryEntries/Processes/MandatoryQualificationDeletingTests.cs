@@ -20,7 +20,7 @@ public class MandatoryQualificationDeletingTests(HostFixture hostFixture) : Chan
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
             .WithStatus(status, endDate)));
-        var mq = person.MandatoryQualifications.Single();
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence
         {

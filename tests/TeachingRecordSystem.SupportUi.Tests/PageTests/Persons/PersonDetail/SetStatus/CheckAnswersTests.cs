@@ -1,10 +1,10 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
-using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.SetStatus;
 
@@ -130,9 +130,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Name", v => Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
         doc.AssertSummaryListRowValue("Gender", v => Assert.Equal(person.Gender!.GetDisplayName(), v.TrimmedText()));
-        doc.AssertSummaryListRowValue("Status", v => Assert.Equal(person.Person.Status.GetDisplayName(), v.TrimmedText()));
+        doc.AssertSummaryListRowValue("Status", v => Assert.Equal(person.Status.GetDisplayName(), v.TrimmedText()));
         doc.AssertSummaryListRowValue("National insurance number", v => Assert.Equal(person.NationalInsuranceNumber, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Email address", v => Assert.Equal(person.EmailAddress, v.TrimmedText()));
     }
@@ -302,7 +302,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
-    private string GetRequestPath(CreatePersonResult person, PersonStatus targetStatus, SetStatusJourneyCoordinator journeyInstance) =>
+    private string GetRequestPath(Person person, PersonStatus targetStatus, SetStatusJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/set-status/{targetStatus}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
 
 }

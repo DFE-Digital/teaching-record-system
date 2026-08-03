@@ -43,7 +43,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithEndDate(null)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
 
@@ -91,7 +91,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10))));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
 
@@ -507,8 +507,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             await WithDbContextAsync(async dbContext =>
             {
-                dbContext.Attach(person.Person);
-                person.Person.Status = PersonStatus.Deactivated;
+                dbContext.Attach(person);
+                person.Status = PersonStatus.Deactivated;
                 await dbContext.SaveChangesAsync();
             });
         }

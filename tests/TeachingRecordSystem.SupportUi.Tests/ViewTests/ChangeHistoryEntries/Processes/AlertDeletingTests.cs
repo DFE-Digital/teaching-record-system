@@ -84,7 +84,7 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
                 .WithDetails(Faker.Lorem.Paragraph())
                 .WithExternalLink(Faker.Internet.Url())));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         await WithDbContextAsync(dbContext => dbContext.Alerts
             .Where(a => a.AlertId == alert.AlertId)

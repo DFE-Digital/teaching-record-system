@@ -545,7 +545,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<TrnRequestData>();
         AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
-        AssertPersonAttributesMatchPerson(supportTaskData.SelectedPersonAttributes, matchedPerson.Person);
+        AssertPersonAttributesMatchPerson(supportTaskData.SelectedPersonAttributes, matchedPerson);
 
         EventObserver.AssertEventsSaved(@event =>
         {
@@ -740,7 +740,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         var person = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == matchedPerson.PersonId));
-        Assert.Equal(matchedPerson.Person.MiddleName, person.MiddleName);
+        Assert.Equal(matchedPerson.MiddleName, person.MiddleName);
 
         var updatedSupportTask = await WithDbContextAsync(dbContext => dbContext
             .SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
@@ -849,7 +849,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         string FieldName,
         string SummaryListRowKey,
         Func<TrnRequestMetadata, object?> GetValueFromRequestData,
-        Func<TestData.CreatePersonResult, object?> GetValueFromPerson,
+        Func<Person, object?> GetValueFromPerson,
         Func<object?, object?>? MapValueToSummaryListRowValue = null);
 
     [Fact]

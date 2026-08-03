@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -686,7 +687,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         Assert.Null(journeyInstance.State.Evidence.UploadedEvidenceFile);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, PersonStatus targetStatus, SetStatusJourneyCoordinator journeyInstance) =>
+    private string GetRequestPath(Person person, PersonStatus targetStatus, SetStatusJourneyCoordinator journeyInstance) =>
         $"/persons/{person.PersonId}/set-status/{targetStatus}/reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
 }

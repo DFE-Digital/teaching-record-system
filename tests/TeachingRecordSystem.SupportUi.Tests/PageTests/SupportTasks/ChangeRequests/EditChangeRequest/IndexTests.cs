@@ -13,10 +13,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: null));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+            person.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
@@ -33,10 +33,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)));
+            person.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
@@ -66,10 +66,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_WithSupportTaskReferenceForClosedSupportTask_ReturnsNotFound()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
-            b => b.WithLastName(TestData.GenerateChangedLastName(createPersonResult.LastName)).WithStatus(SupportTaskStatus.Closed));
+            person.PersonId,
+            b => b.WithLastName(TestData.GenerateChangedLastName(person.LastName)).WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}");
 
@@ -91,15 +91,15 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_WithSupportTaskReferenceForOpenChangeNameRequestSupportTask_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName, bool evidenceIsPdf, bool hasRequestEmail)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+        var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
-            createPersonResult.PersonId,
+            person.PersonId,
             b =>
             {
                 var builder = b
-                    .WithFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
-                    .WithMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
-                    .WithLastName(hasNewLastName ? TestData.GenerateChangedLastName(createPersonResult.LastName) : createPersonResult.LastName)
+                    .WithFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(person.FirstName) : person.FirstName)
+                    .WithMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(person.MiddleName) : person.MiddleName)
+                    .WithLastName(hasNewLastName ? TestData.GenerateChangedLastName(person.LastName) : person.LastName)
                     .WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg");
                 if (!hasRequestEmail)
                 {
@@ -123,7 +123,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         if (hasNewFirstName)
         {
             Assert.NotNull(firstNameRow);
-            Assert.Equal(createPersonResult.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TrimmedText());
+            Assert.Equal(person.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TrimmedText());
             Assert.Equal(changeNameRequestData.FirstName, firstNameRow.GetElementByTestId("first-name-new")!.TrimmedText());
         }
         else
@@ -135,7 +135,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         if (hasNewMiddleName)
         {
             Assert.NotNull(middleNameRow);
-            Assert.Equal(createPersonResult.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TrimmedText());
+            Assert.Equal(person.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TrimmedText());
             Assert.Equal(changeNameRequestData.MiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TrimmedText());
         }
         else
@@ -147,7 +147,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         if (hasNewLastName)
         {
             Assert.NotNull(lastNameRow);
-            Assert.Equal(createPersonResult.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TrimmedText());
+            Assert.Equal(person.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TrimmedText());
             Assert.Equal(changeNameRequestData.LastName, lastNameRow.GetElementByTestId("last-name-new")!.TrimmedText());
         }
         else
@@ -172,7 +172,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         }
         else
         {
-            Assert.Equal(createPersonResult.Person.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
+            Assert.Equal(person.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
         }
 
         Assert.NotNull(doc.GetElementByTestId("linked-record"));
@@ -184,13 +184,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_WithSupportTaskReferenceForOpenChangeDateOfBirthRequestSupportTask_RendersExpectedContent(bool requestHasEmail)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
+        var person = await TestData.CreatePersonAsync(p => p.WithEmailAddress());
         var supportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
-            createPersonResult.PersonId,
+            person.PersonId,
             b =>
             {
                 var builder = b
-                    .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth));
+                    .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value));
                 if (!requestHasEmail)
                 {
                     builder = builder.WithoutEmailAddress();
@@ -211,7 +211,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(WebConstants.DateDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TrimmedText());
+        Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TrimmedText());
         Assert.Equal(changeDateOfBirthRequestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TrimmedText());
 
         var imageDocument = doc.GetElementByTestId($"image-{changeDateOfBirthRequestData.EvidenceFileId}");
@@ -223,7 +223,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         }
         else
         {
-            Assert.Equal(createPersonResult.Person.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
+            Assert.Equal(person.EmailAddress, doc.GetElementByTestId("email-value")?.InnerHtml);
         }
 
         Assert.NotNull(doc.GetElementByTestId("linked-record"));

@@ -28,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         // Arrange
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider");
 
@@ -50,7 +50,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState
@@ -98,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -120,7 +120,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState
@@ -150,7 +150,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         // Arrange
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState
@@ -180,11 +180,11 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState

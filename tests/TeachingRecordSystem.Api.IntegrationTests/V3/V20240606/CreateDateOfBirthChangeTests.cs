@@ -22,7 +22,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
 
         var newDateOfBirth = newDateOfBirthString is not null ? DateOnly.ParseExact(newDateOfBirthString, "yyyy-MM-dd") : (DateOnly?)null;
 
@@ -37,7 +37,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -93,8 +93,8 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
+        var person = await TestData.CreatePersonAsync();
+        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: person.DateOfBirth!.Value);
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -110,7 +110,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
@@ -120,8 +120,8 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_ValidRequest_CreatesSupportTaskAndSendsEmailAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePersonAsync();
-        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
+        var person = await TestData.CreatePersonAsync();
+        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: person.DateOfBirth!.Value);
 
         var emailAddress = Faker.Internet.Email();
         var evidenceFileName = "evidence.txt";
@@ -157,14 +157,14 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn).SendAsync(request);
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         await WithDbContextAsync(async dbContext =>
         {
-            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == createPersonResult.PersonId);
+            var supportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.PersonId == person.PersonId);
             Assert.NotNull(supportTask);
             Assert.Equal(SupportTaskType.ChangeDateOfBirthRequest, supportTask.SupportTaskType);
             var requestData = supportTask.Data as ChangeDateOfBirthRequestData;

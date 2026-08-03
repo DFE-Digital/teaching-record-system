@@ -125,7 +125,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var user = await TestData.CreateOneLoginUserAsync(
             personId: person.PersonId,
             email: Option.Some<string?>(email),
-            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/one-logins/{user.Subject}");
 
@@ -150,7 +150,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedName = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);
         connectedRecordCard.AssertSummaryListRowValue("Name", v => Assert.Equal(expectedName, v.TrimmedText()));
         connectedRecordCard.AssertSummaryListRowValue("Email address", v => Assert.Equal(person.EmailAddress, v.TrimmedText()));
-        connectedRecordCard.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+        connectedRecordCard.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
         connectedRecordCard.AssertSummaryListRowValue("TRN", v => Assert.Equal(person.Trn, v.TrimmedText()));
         connectedRecordCard.AssertSummaryListRowValue("National Insurance number", v => Assert.Equal(person.NationalInsuranceNumber, v.TrimmedText()));
         connectedRecordCard.AssertSummaryListRowValue("Gender", v => Assert.Equal(person.Gender?.GetDisplayName(), v.TrimmedText()));
@@ -177,7 +177,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var user = await TestData.CreateOneLoginUserAsync(
             personId: person.PersonId,
             email: Option.Some<string?>(email),
-            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+            verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         // Set the person status
         if (personStatus == PersonStatus.Deactivated)

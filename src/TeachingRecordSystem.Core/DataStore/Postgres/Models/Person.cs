@@ -49,10 +49,10 @@ public class Person
     public DateOnly? EytsDate { get; internal set; }
     public bool HasEyps { get; internal set; }
     public DateOnly? PqtsDate { get; internal set; }
-    public ICollection<Qualification>? Qualifications { get; protected set; }
-    public ICollection<Alert>? Alerts { get; }
-    public ICollection<PreviousName>? PreviousNames { get; }
-    public ICollection<OneLoginUser>? OneLoginUsers { get; }
+    public ICollection<Qualification>? Qualifications { get; init; }
+    public ICollection<Alert>? Alerts { get; init; }
+    public ICollection<PreviousName>? PreviousNames { get; init; }
+    public ICollection<OneLoginUser>? OneLoginUsers { get; init; }
     public bool CreatedByTps { get; set; }
     public Guid? SourceApplicationUserId { get; set; }
     public string? SourceTrnRequestId { get; set; }

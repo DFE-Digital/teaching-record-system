@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
@@ -200,8 +201,8 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personB.Person);
-            personB.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personB);
+            personB.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -233,8 +234,8 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personA.Person);
-            personA.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personA);
+            personA.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -359,7 +360,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         Assert.Equal(personB.Trn, journeyInstance.State.PersonBTrn);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
+    private string GetRequestPath(Person person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
         $"/persons/{person.PersonId}/merge/enter-trn?{journeyInstance?.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>

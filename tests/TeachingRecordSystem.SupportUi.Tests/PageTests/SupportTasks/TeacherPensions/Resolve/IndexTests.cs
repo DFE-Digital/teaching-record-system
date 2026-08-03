@@ -136,7 +136,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
                 s.WithFirstName(person.FirstName);
                 s.WithLastName(person.LastName);
                 s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
-                s.WithDateOfBirth(person.DateOfBirth);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
                 s.WithStatus(SupportTaskStatus.Open);
             });
     }

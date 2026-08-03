@@ -864,7 +864,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
 
         var firstName = person.FirstName;
         var lastName = person.LastName;
-        var dateOfBirth = person.DateOfBirth.AddDays(1);
+        var dateOfBirth = person.DateOfBirth!.Value.AddDays(1);
 
         await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(

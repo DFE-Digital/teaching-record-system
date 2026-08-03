@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
@@ -283,8 +284,8 @@ public class CommonPageTests(HostFixture hostFixture) : MergePersonTestBase(host
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personA.Person);
-            personA.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personA);
+            personA.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -405,8 +406,8 @@ public class CommonPageTests(HostFixture hostFixture) : MergePersonTestBase(host
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(personB.Person);
-            personB.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(personB);
+            personB.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
@@ -599,7 +600,7 @@ public class CommonPageTests(HostFixture hostFixture) : MergePersonTestBase(host
         AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person, string page, JourneyInstance<MergePersonState>? journeyInstance = null, bool? fromCheckAnswers = null) =>
+    private string GetRequestPath(Person person, string page, JourneyInstance<MergePersonState>? journeyInstance = null, bool? fromCheckAnswers = null) =>
         $"/persons/{person.PersonId}/merge/{page}?{journeyInstance?.GetUniqueIdQueryParameter()}{(fromCheckAnswers is bool f ? $"&fromCheckAnswers={f}" : "")}";
 
     private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>

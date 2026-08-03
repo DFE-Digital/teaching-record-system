@@ -30,7 +30,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithEndDate(null)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -48,7 +48,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10))));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -75,7 +75,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -95,7 +95,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -115,7 +115,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -135,7 +135,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -156,7 +156,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -178,7 +178,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 
@@ -200,7 +200,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
 

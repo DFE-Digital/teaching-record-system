@@ -33,9 +33,9 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(inductionCompletee1.Person);
+            dbContext.Attach(inductionCompletee1);
 
-            inductionCompletee1.Person.SetInductionStatus(
+            inductionCompletee1.SetInductionStatus(
                 InductionStatus.Passed,
                 inductionStartDate,
                 inductionCompletedDate,

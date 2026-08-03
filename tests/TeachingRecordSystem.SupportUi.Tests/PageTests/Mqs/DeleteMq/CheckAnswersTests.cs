@@ -33,7 +33,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostF
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
             .WithStatus(status, endDate)));
-        var qualification = person.MandatoryQualifications.Single();
+        var qualification = person.Qualifications!.OfType<MandatoryQualification>().Single();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
             new DeleteMqState
@@ -108,7 +108,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostF
 
         EventObserver.Clear();
 
-        var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
@@ -175,7 +175,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostF
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new DeleteMqState
@@ -225,12 +225,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostF
             .WithStatus(status, endDate)));
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.Attach(person.Person);
-            person.Person.Status = PersonStatus.Deactivated;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
 
-        var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,

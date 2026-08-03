@@ -1,4 +1,5 @@
 using System.Text.Json;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
@@ -57,7 +58,7 @@ public class GetPersonByTrnTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var dateOfBirth = person.DateOfBirth.AddDays(1);
+        var dateOfBirth = person.DateOfBirth!.Value.AddDays(1);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={dateOfBirth:yyyy-MM-dd}");
 
@@ -120,7 +121,7 @@ public class GetPersonByTrnTests : TestBase
                 middleName = person.MiddleName,
                 lastName = person.LastName,
                 trn = person.Trn,
-                dateOfBirth = person.DateOfBirth.ToString("yyyy-MM-dd"),
+                dateOfBirth = person.DateOfBirth!.Value.ToString("yyyy-MM-dd"),
                 nationalInsuranceNumber = person.NationalInsuranceNumber,
                 qts = (object?)null,
                 eyts = (object?)null,
@@ -195,7 +196,7 @@ public class GetPersonByTrnTests : TestBase
                 .WithStatus(MandatoryQualificationStatus.Passed, endDate: new(2022, 9, 1))
                 .WithSpecialism(MandatoryQualificationSpecialism.Auditory)));
 
-        var validMq = person.MandatoryQualifications.Last();
+        var validMq = person.Qualifications!.OfType<MandatoryQualification>().Last();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=MandatoryQualifications");
 
@@ -228,7 +229,7 @@ public class GetPersonByTrnTests : TestBase
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Sanctions");
 
@@ -261,7 +262,7 @@ public class GetPersonByTrnTests : TestBase
         var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
-        var alert = person.Alerts.Single();
+        var alert = person.Alerts!.Single();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Alerts");
 

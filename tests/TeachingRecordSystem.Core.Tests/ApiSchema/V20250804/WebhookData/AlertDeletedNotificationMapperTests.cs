@@ -19,7 +19,7 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             var person = await TestData.CreatePersonAsync(p => p
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
-            var alert = person.Alerts.Single();
+            var alert = person.Alerts!.Single();
 
             var @event = await WithDbContextAsync(async dbContext =>
             {
@@ -67,7 +67,7 @@ public class AlertDeletedNotificationMapperTests(ServiceFixture fixture) : Servi
             var person = await TestData.CreatePersonAsync(p => p
                 .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
-            var alert = person.Alerts.Single();
+            var alert = person.Alerts!.Single();
 
             var @event = await WithDbContextAsync(async dbContext =>
             {

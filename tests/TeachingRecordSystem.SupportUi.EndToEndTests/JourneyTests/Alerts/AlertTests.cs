@@ -96,7 +96,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var details = TestData.GenerateLoremIpsum();
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithDetails(details)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var newDetails = TestData.GenerateLoremIpsum();
         var reason = AlertChangeDetailsReasonOption.ChangeOfDetails;
         var reasonDetail = TestData.GenerateLoremIpsum();
@@ -147,7 +147,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2023, 1, 1);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var newStartDate = new DateOnly(2023, 2, 3);
         var reason = AlertChangeStartDateReasonOption.AnotherReason;
         var reasonDetail = TestData.GenerateLoremIpsum();
@@ -199,7 +199,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = TestData.TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var newEndDate = TestData.TimeProvider.Today.AddDays(-5);
         var reason = AlertChangeEndDateReasonOption.AnotherReason;
         var reasonDetail = TestData.GenerateLoremIpsum();
@@ -253,7 +253,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var link = hasCurrentLink ? TestData.GenerateUrl() : null;
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithExternalLink(link)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var newLink = TestData.GenerateUrl();
         var changeReason = AlertChangeLinkReasonOption.ChangeOfLink;
         var changeReasonDetail = TestData.GenerateLoremIpsum();
@@ -313,7 +313,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = TestData.TimeProvider.Today.AddDays(-50);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var newEndDate = TestData.TimeProvider.Today.AddDays(-5);
         var changeReason = CloseAlertReasonOption.AlertPeriodHasEnded;
         var changeReasonDetail = TestData.GenerateLoremIpsum();
@@ -365,7 +365,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = TestData.TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var changeReason = ReopenAlertReasonOption.ClosedInError;
         var changeReasonDetail = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
@@ -410,7 +410,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = TestData.TimeProvider.Today.AddDays(-10);
         var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
-        var alertId = person.Alerts.First().AlertId;
+        var alertId = person.Alerts!.First().AlertId;
         var reason = DeleteAlertReasonOption.AnotherReason;
         var deleteReasonDetails = TestData.GenerateLoremIpsum();
         var additionalInformation = TestData.GenerateLoremIpsum();

@@ -30,7 +30,7 @@ public class PersonCreatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
 
         entry.AssertSummaryListHasRows(
             ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
-            ("Date of birth", person.DateOfBirth.ToString(WebConstants.DateDisplayFormat)),
+            ("Date of birth", person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat)),
             ("Email address", person.EmailAddress),
             ("National Insurance number", person.NationalInsuranceNumber),
             ("Gender", person.Gender?.GetDisplayName()));

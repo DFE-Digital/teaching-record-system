@@ -11,7 +11,7 @@ public class ChangeLogTrnAllocatedEventTests(HostFixture hostFixture) : TestBase
     {
         // arrange
         var person = await TestData.CreatePersonAsync();
-        var trn = person.Person.Trn;
+        var trn = person.Trn;
         var trnAllocatedEvent = new TrnAllocatedEvent
         {
             EventId = Guid.NewGuid(),

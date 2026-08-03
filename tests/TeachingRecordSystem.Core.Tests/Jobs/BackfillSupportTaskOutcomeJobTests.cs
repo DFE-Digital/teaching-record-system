@@ -429,7 +429,7 @@ public class BackfillSupportTaskOutcomeJobTests(JobFixture fixture) : JobTestBas
             FirstName = person.FirstName,
             MiddleName = person.MiddleName,
             LastName = person.LastName,
-            DateOfBirth = person.DateOfBirth,
+            DateOfBirth = person.DateOfBirth!.Value,
             EmailAddress = person.EmailAddress,
             NationalInsuranceNumber = person.NationalInsuranceNumber,
             Gender = person.Gender,

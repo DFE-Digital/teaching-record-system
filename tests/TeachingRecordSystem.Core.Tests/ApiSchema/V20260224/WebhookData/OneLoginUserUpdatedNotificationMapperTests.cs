@@ -13,7 +13,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             var person = await TestData.CreatePersonAsync();
             var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                 personId: person.PersonId,
-                verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+                verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
             var oldEmailAddress = oneLoginUser.EmailAddress;
             var newEmailAddress = Faker.Internet.Email();
@@ -78,7 +78,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             var person = await TestData.CreatePersonAsync();
             var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                 personId: person.PersonId,
-                verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+                verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
             var @event = new OneLoginUserUpdatedEvent
             {
@@ -107,7 +107,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             var newPerson = await TestData.CreatePersonAsync();
             var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                 personId: oldPerson.PersonId,
-                verifiedInfo: ([oldPerson.FirstName, oldPerson.LastName], oldPerson.DateOfBirth));
+                verifiedInfo: ([oldPerson.FirstName, oldPerson.LastName], oldPerson.DateOfBirth!.Value));
 
             var @event = new OneLoginUserUpdatedEvent
             {
@@ -136,7 +136,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             var person = await TestData.CreatePersonAsync();
             var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                 personId: person.PersonId,
-                verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+                verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
             var @event = new OneLoginUserUpdatedEvent
             {
@@ -162,7 +162,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             var newPerson = await TestData.CreatePersonAsync();
             var oneLoginUser = await TestData.CreateOneLoginUserAsync(
                 personId: oldPerson.PersonId,
-                verifiedInfo: ([oldPerson.FirstName, oldPerson.LastName], oldPerson.DateOfBirth));
+                verifiedInfo: ([oldPerson.FirstName, oldPerson.LastName], oldPerson.DateOfBirth!.Value));
 
             var oldEmailAddress = oneLoginUser.EmailAddress;
             var newEmailAddress = Faker.Internet.Email();
