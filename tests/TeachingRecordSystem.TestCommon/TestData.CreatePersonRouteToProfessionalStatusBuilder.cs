@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -141,7 +141,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<(Guid ProfessionalStatusId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
+        internal async Task<Guid> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             Person person,
             TestData testData,
@@ -154,38 +154,36 @@ public partial class TestData
 
             _createdByUser ??= SystemUser.SystemUserId;
 
-            var allRouteTypes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
+            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
+                dbContext,
+                testData.ReferenceDataCache,
+                testData.TimeProvider);
 
-            var professionalStatus = RouteToProfessionalStatus.Create(
-                person,
-                allRouteTypes,
-                _routeToProfessionalStatusTypeId!.Value,
-                sourceApplicationUserId: null,
-                sourceApplicationReference: _sourceApplicationReference,
-                status: _status,
-                holdsFrom: _holdsFrom,
-                trainingStartDate: _trainingStartDate,
-                trainingEndDate: _trainingEndDate,
-                trainingSubjectIds: _trainingSubjectIds,
-                trainingAgeSpecialismType: _trainingAgeSpecialismType,
-                trainingAgeSpecialismRangeFrom: _trainingAgeSpecialismRangeFrom,
-                trainingAgeSpecialismRangeTo: _trainingAgeSpecialismRangeTo,
-                trainingCountryId: _trainingCountryId,
-                trainingProviderId: _trainingProviderId,
-                degreeTypeId: _degreeTypeId,
-                isExemptFromInduction: _exemptFromInduction,
-                createdBy: _createdByUser,
-                now: testData.TimeProvider.UtcNow,
-                changeReason: _changeReason,
-                changeReasonDetail: _changeReasonDetail,
-                evidenceFile: _evidenceFile,
-                additionalInformation: null,
-                @event: out var createdEvent);
+            var professionalStatus = await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                new CreateRouteToProfessionalStatusOptions
+                {
+                    PersonId = person.PersonId,
+                    RouteToProfessionalStatusTypeId = _routeToProfessionalStatusTypeId!.Value,
+                    Status = _status,
+                    CreatedBy = _createdByUser,
+                    SourceApplicationReference = _sourceApplicationReference,
+                    HoldsFrom = _holdsFrom,
+                    TrainingStartDate = _trainingStartDate,
+                    TrainingEndDate = _trainingEndDate,
+                    TrainingSubjectIds = _trainingSubjectIds,
+                    TrainingAgeSpecialismType = _trainingAgeSpecialismType,
+                    TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
+                    TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
+                    TrainingCountryId = _trainingCountryId,
+                    TrainingProviderId = _trainingProviderId,
+                    DegreeTypeId = _degreeTypeId,
+                    IsExemptFromInduction = _exemptFromInduction,
+                    ChangeReason = _changeReason,
+                    ChangeReasonDetail = _changeReasonDetail,
+                    EvidenceFile = _evidenceFile
+                });
 
-            dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
-            dbContext.AddEventWithoutBroadcast(createdEvent);
-
-            return (professionalStatus.QualificationId, [createdEvent]);
+            return professionalStatus.QualificationId;
         }
     }
 }

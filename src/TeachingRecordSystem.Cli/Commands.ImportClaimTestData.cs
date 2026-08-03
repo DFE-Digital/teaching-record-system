@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -56,12 +57,15 @@ public static partial class Commands
                 .AddMemoryCache()
                 .AddEventPublisher()
                 .AddBackgroundJobScheduler(environment)
-                .AddHangfire(environment);
+                .AddHangfire(environment)
+                .AddSingleton<ReferenceDataCache>()
+                .AddRoutesToProfessionalStatusService();
 
             var serviceProvider = services.BuildServiceProvider();
 
             using var scope = serviceProvider.CreateScope();
             var personService = scope.ServiceProvider.GetRequiredService<PersonService>();
+            var routesToProfessionalStatusService = scope.ServiceProvider.GetRequiredService<RoutesToProfessionalStatusService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
             var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow,
                 SystemUser.SystemUserId);
@@ -87,7 +91,6 @@ public static partial class Commands
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
             var subjects = dbContext.TrainingSubjects.ToArray();
-            var allRoutes = await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
             foreach (var rec in records)
             {
                 var dict = ((IDictionary<string, object?>)rec)
@@ -135,34 +138,20 @@ public static partial class Commands
                 var routeId = RouteToProfessionalStatusType.AssessmentOnlyRouteId;
                 var routeStatus = RouteToProfessionalStatusStatus.Holds;
                 DateOnly? holdsFrom = qtsDate;
-                var professionalStatus = RouteToProfessionalStatus.Create(
-                    person,
-                    allRouteTypes: allRoutes,
-                    routeToProfessionalStatusTypeId: routeId,
-                    sourceApplicationUserId: SystemUser.SystemUserId,
-                    sourceApplicationReference: nameof(CreateImportClaimTestDataCommand),
-                    status: routeStatus,
-                    holdsFrom: qtsDate,
-                    trainingStartDate: startDate,
-                    trainingEndDate: null,
-                    trainingSubjectIds: subjectIds,
-                    trainingAgeSpecialismType: null,
-                    trainingAgeSpecialismRangeFrom: null,
-                    trainingAgeSpecialismRangeTo: null,
-                    trainingCountryId: null,
-                    trainingProviderId: null,
-                    degreeTypeId: null,
-                    isExemptFromInduction: false,
-                    createdBy: SystemUser.SystemUserId,
-                    now: DateTime.UtcNow,
-                    changeReason: null,
-                    changeReasonDetail: null,
-                    evidenceFile: null,
-                    additionalInformation: null,
-                    @event: out var @event);
-
-                dbContext.Qualifications.Add(professionalStatus);
-                dbContext.AddEventWithoutBroadcast(@event);
+                await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                    new CreateRouteToProfessionalStatusOptions
+                    {
+                        PersonId = person.PersonId,
+                        RouteToProfessionalStatusTypeId = routeId,
+                        Status = routeStatus,
+                        CreatedBy = SystemUser.SystemUserId,
+                        SourceApplicationUserId = SystemUser.SystemUserId,
+                        SourceApplicationReference = nameof(CreateImportClaimTestDataCommand),
+                        HoldsFrom = qtsDate,
+                        TrainingStartDate = startDate,
+                        TrainingSubjectIds = subjectIds,
+                        IsExemptFromInduction = false
+                    });
 
                 if (!string.IsNullOrWhiteSpace(inductionStatusStr))
                 {

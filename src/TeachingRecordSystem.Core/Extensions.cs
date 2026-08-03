@@ -20,6 +20,7 @@ using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Users;
@@ -117,6 +118,7 @@ public static class Extensions
             .AddPersonService()
             .AddAlertService()
             .AddMandatoryQualificationService()
+            .AddRoutesToProfessionalStatusService()
             .AddUserService()
             .AddInductionExemptionService()
             .AddOneLoginService();

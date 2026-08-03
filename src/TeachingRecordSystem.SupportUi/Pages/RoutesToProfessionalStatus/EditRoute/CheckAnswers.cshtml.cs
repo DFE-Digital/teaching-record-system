@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Optional;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -11,10 +12,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 [TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class CheckYourAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController,
-    TimeProvider timeProvider) : PageModel
+    RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -98,41 +98,29 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus;
-        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
-
-        professionalStatus.Update(
-            allRoutes,
-            r =>
+        await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+            new UpdateRouteToProfessionalStatusOptions
             {
-                r.Status = RouteDetail.Status;
-                r.RouteToProfessionalStatusTypeId = RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId;
-                r.HoldsFrom = RouteDetail.HoldsFrom;
-                r.TrainingStartDate = RouteDetail.TrainingStartDate;
-                r.TrainingEndDate = RouteDetail.TrainingEndDate;
-                r.TrainingSubjectIds = RouteDetail.TrainingSubjectIds ?? [];
-                r.TrainingAgeSpecialismType = RouteDetail.TrainingAgeSpecialismType;
-                r.TrainingAgeSpecialismRangeFrom = RouteDetail.TrainingAgeSpecialismRangeFrom;
-                r.TrainingAgeSpecialismRangeTo = RouteDetail.TrainingAgeSpecialismRangeTo;
-                r.TrainingCountryId = RouteDetail.TrainingCountryId;
-                r.TrainingProviderId = RouteDetail.TrainingProviderId;
-                r.ExemptFromInduction = RouteDetail.IsExemptFromInduction;
-                r.DegreeTypeId = RouteDetail.DegreeTypeId;
-            },
-            changeReason: ChangeReason?.GetDisplayName(),
-            ChangeReasonDetail.ChangeReasonDetail,
-            evidenceFile: ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            timeProvider.UtcNow,
-            additionalInformation: ChangeReasonDetail.AdditionalInformation,
-            out var updatedEvent
-            );
-
-        if (updatedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+                QualificationId = QualificationId,
+                UpdatedBy = User.GetUserId(),
+                RouteToProfessionalStatusTypeId = Option.Some(RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId),
+                Status = Option.Some(RouteDetail.Status),
+                HoldsFrom = Option.Some(RouteDetail.HoldsFrom),
+                TrainingStartDate = Option.Some(RouteDetail.TrainingStartDate),
+                TrainingEndDate = Option.Some(RouteDetail.TrainingEndDate),
+                TrainingSubjectIds = Option.Some(RouteDetail.TrainingSubjectIds ?? []),
+                TrainingAgeSpecialismType = Option.Some(RouteDetail.TrainingAgeSpecialismType),
+                TrainingAgeSpecialismRangeFrom = Option.Some(RouteDetail.TrainingAgeSpecialismRangeFrom),
+                TrainingAgeSpecialismRangeTo = Option.Some(RouteDetail.TrainingAgeSpecialismRangeTo),
+                TrainingCountryId = Option.Some(RouteDetail.TrainingCountryId),
+                TrainingProviderId = Option.Some(RouteDetail.TrainingProviderId),
+                DegreeTypeId = Option.Some(RouteDetail.DegreeTypeId),
+                ExemptFromInduction = Option.Some(RouteDetail.IsExemptFromInduction),
+                ChangeReason = ChangeReason?.GetDisplayName(),
+                ChangeReasonDetail = ChangeReasonDetail.ChangeReasonDetail,
+                EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                AdditionalInformation = ChangeReasonDetail.AdditionalInformation
+            });
 
         await JourneyInstance!.CompleteAsync();
 

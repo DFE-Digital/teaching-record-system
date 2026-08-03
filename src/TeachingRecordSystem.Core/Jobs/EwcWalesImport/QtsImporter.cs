@@ -5,6 +5,7 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
@@ -13,16 +14,20 @@ public class QtsImporter
     public const string DateFormat = "dd/MM/yyyy";
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
-    private readonly ReferenceDataCache _cache;
     private DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate = new DateOnly(2023, 02, 01);
     private readonly TimeProvider _timeProvider;
+    private readonly RoutesToProfessionalStatusService _routesToProfessionalStatusService;
 
-    public QtsImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, TimeProvider timeProvider)
+    public QtsImporter(
+        ILogger<InductionImporter> logger,
+        TrsDbContext dbContext,
+        TimeProvider timeProvider,
+        RoutesToProfessionalStatusService routesToProfessionalStatusService)
     {
         _dbContext = dbContext;
         _logger = logger;
-        _cache = cache;
         _timeProvider = timeProvider;
+        _routesToProfessionalStatusService = routesToProfessionalStatusService;
     }
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -109,36 +114,15 @@ public class QtsImporter
                     //create route for teacher
                     if (lookupData.Person != null)
                     {
-                        var allRoutes = await _cache.GetRouteToProfessionalStatusTypesAsync();
-                        var route = RouteToProfessionalStatus.Create(
-                           person: lookupData.Person,
-                           allRouteTypes: allRoutes,
-                           routeToProfessionalStatusTypeId: routeToProfessionalStatusTypeId,
-                           sourceApplicationUserId: null,
-                           sourceApplicationReference: null,
-                           status: RouteToProfessionalStatusStatus.Holds,
-                           holdsFrom: awardedDate,
-                           trainingStartDate: null,
-                           trainingEndDate: null,
-                           trainingSubjectIds: null,
-                           trainingAgeSpecialismType: null,
-                           trainingAgeSpecialismRangeFrom: null,
-                           trainingAgeSpecialismRangeTo: null,
-                           trainingCountryId: null,
-                           trainingProviderId: null,
-                           degreeTypeId: null,
-                           isExemptFromInduction: null,
-                           createdBy: SystemUser.SystemUserId,
-                           now: _timeProvider.UtcNow,
-                           changeReason: null,
-                           changeReasonDetail: null,
-                           evidenceFile: null,
-                           additionalInformation: null,
-                           out var routeevent);
-
-                        _dbContext.AddEventWithoutBroadcast(routeevent);
-
-                        _dbContext.RouteToProfessionalStatuses.Add(route);
+                        await _routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                            new CreateRouteToProfessionalStatusOptions
+                            {
+                                PersonId = lookupData.Person.PersonId,
+                                RouteToProfessionalStatusTypeId = routeToProfessionalStatusTypeId,
+                                Status = RouteToProfessionalStatusStatus.Holds,
+                                CreatedBy = SystemUser.SystemUserId,
+                                HoldsFrom = awardedDate
+                            });
                     }
 
                     //soft validation errors can be appended to the IntegrationTransactionRecord Failure message

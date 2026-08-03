@@ -1,6 +1,8 @@
+using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Operations.Common;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -8,9 +10,8 @@ public record SetQtlsCommand(string Trn, DateOnly? QtsDate) : ICommand<QtlsResul
 
 public class SetQtlsHandler(
     TrsDbContext dbContext,
-    ReferenceDataCache referenceDataCache,
     ICurrentUserProvider currentUserProvider,
-    TimeProvider timeProvider) :
+    RoutesToProfessionalStatusService routesToProfessionalStatusService) :
     ICommandHandler<SetQtlsCommand, QtlsResult>
 {
     private static readonly DateOnly QtsCutoff = new(2012, 4, 1);
@@ -47,71 +48,37 @@ public class SetQtlsHandler(
         {
             if (existingQualification is null)
             {
-                var professionalStatus = PostgresModels.RouteToProfessionalStatus.Create(
-                    person,
-                    allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                    routeToProfessionalStatusTypeId: qtlsRouteId,
-                    sourceApplicationUserId: null,
-                    sourceApplicationReference: null,
-                    status: RouteToProfessionalStatusStatus.Holds,
-                    holdsFrom: adjustedQtsDate,
-                    trainingStartDate: null,
-                    trainingEndDate: null,
-                    trainingSubjectIds: null,
-                    trainingAgeSpecialismType: null,
-                    trainingAgeSpecialismRangeFrom: null,
-                    trainingAgeSpecialismRangeTo: null,
-                    trainingCountryId: null,
-                    trainingProviderId: null,
-                    degreeTypeId: null,
-                    isExemptFromInduction: true,
-                    createdBy: currentUserId,
-                    now: timeProvider.UtcNow,
-                    changeReason: null,
-                    changeReasonDetail: null,
-                    evidenceFile: null,
-                    additionalInformation: null,
-                    @event: out var @event);
-
-                dbContext.Qualifications.Add(professionalStatus);
-                dbContext.AddEventWithoutBroadcast(@event);
+                await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                    new CreateRouteToProfessionalStatusOptions
+                    {
+                        PersonId = person.PersonId,
+                        RouteToProfessionalStatusTypeId = qtlsRouteId,
+                        Status = RouteToProfessionalStatusStatus.Holds,
+                        CreatedBy = currentUserId,
+                        HoldsFrom = adjustedQtsDate,
+                        IsExemptFromInduction = true
+                    });
             }
             else
             {
-                existingQualification.Update(
-                    allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(
-                        activeOnly: false),
-                    ps => ps.HoldsFrom = adjustedQtsDate,
-                    changeReason: null,
-                    changeReasonDetail: null,
-                    evidenceFile: null,
-                    updatedBy: currentUserId,
-                    now: timeProvider.UtcNow,
-                    additionalInformation: null,
-                    out var @event);
-
-                if (@event is not null)
-                {
-                    dbContext.AddEventWithoutBroadcast(@event);
-                }
+                await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
+                    new UpdateRouteToProfessionalStatusOptions
+                    {
+                        QualificationId = existingQualification.QualificationId,
+                        UpdatedBy = currentUserId,
+                        HoldsFrom = Option.Some(adjustedQtsDate)
+                    });
             }
         }
         else if (existingQualification is not null)
         {
-            existingQualification.Delete(
-                allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                deletionReason: null,
-                deletionReasonDetail: null,
-                evidenceFile: null,
-                deletedBy: currentUserId,
-                now: timeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
-
-            dbContext.AddEventWithoutBroadcast(@event);
+            await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+                new DeleteRouteToProfessionalStatusOptions
+                {
+                    QualificationId = existingQualification.QualificationId,
+                    DeletedBy = currentUserId
+                });
         }
-
-        await dbContext.SaveChangesAsync();
 
         return new QtlsResult()
         {

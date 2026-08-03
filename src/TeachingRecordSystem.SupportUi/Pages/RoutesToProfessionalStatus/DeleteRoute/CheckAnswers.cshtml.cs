@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -10,10 +10,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.Delete
 [TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     EvidenceUploadManager evidenceController,
-    TimeProvider timeProvider) : PageModel
+    RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
     public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
 
@@ -75,25 +74,16 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus;
-        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
-
-        // ... or adapt the current all-in-one method
-        professionalStatus.Delete(
-            allRoutes,
-            ChangeReason!.GetDisplayName(),
-            ChangeReasonDetail.ChangeReasonDetail,
-            ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            timeProvider.UtcNow,
-            additionalInformation: ChangeReasonDetail.AdditionalInformation,
-            out var deletedEvent
-            );
-        if (deletedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(deletedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+        await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
+            new DeleteRouteToProfessionalStatusOptions
+            {
+                QualificationId = QualificationId,
+                DeletedBy = User.GetUserId(),
+                DeletionReason = ChangeReason!.GetDisplayName(),
+                DeletionReasonDetail = ChangeReasonDetail.ChangeReasonDetail,
+                EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                AdditionalInformation = ChangeReasonDetail.AdditionalInformation
+            });
 
         await JourneyInstance!.CompleteAsync();
 

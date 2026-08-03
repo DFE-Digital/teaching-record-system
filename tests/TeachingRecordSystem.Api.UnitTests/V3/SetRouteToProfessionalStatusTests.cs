@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
@@ -288,43 +289,26 @@ public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTes
         DateOnly? holdsFrom = null)
     {
         var currentUserId = CurrentUserProvider.GetCurrentApplicationUserId();
-        var allRouteTypes = await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
 
         await WithDbContextAsync(async dbContext =>
         {
-            var person = await dbContext.Persons
-                .Include(p => p.Qualifications)
-                .SingleAsync(p => p.PersonId == personId);
+            var routesToProfessionalStatusService = new RoutesToProfessionalStatusService(
+                dbContext,
+                TestData.ReferenceDataCache,
+                TimeProvider);
 
-            var route = RouteToProfessionalStatus.Create(
-                person,
-                allRouteTypes,
-                routeTypeId,
-                sourceApplicationUserId: currentUserId,
-                sourceApplicationReference: sourceRef,
-                status: status,
-                holdsFrom: holdsFrom,
-                trainingStartDate: null,
-                trainingEndDate: null,
-                trainingSubjectIds: [],
-                trainingAgeSpecialismType: null,
-                trainingAgeSpecialismRangeFrom: null,
-                trainingAgeSpecialismRangeTo: null,
-                trainingCountryId: null,
-                trainingProviderId: null,
-                degreeTypeId: null,
-                isExemptFromInduction: null,
-                createdBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                additionalInformation: null,
-                @event: out var createdEvent);
-
-            dbContext.RouteToProfessionalStatuses.Add(route);
-            dbContext.AddEventWithoutBroadcast(createdEvent);
-            await dbContext.SaveChangesAsync();
+            await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                new CreateRouteToProfessionalStatusOptions
+                {
+                    PersonId = personId,
+                    RouteToProfessionalStatusTypeId = routeTypeId,
+                    Status = status,
+                    CreatedBy = SystemUser.SystemUserId,
+                    SourceApplicationUserId = currentUserId,
+                    SourceApplicationReference = sourceRef,
+                    HoldsFrom = holdsFrom,
+                    TrainingSubjectIds = []
+                });
         });
     }
 }
