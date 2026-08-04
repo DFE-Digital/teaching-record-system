@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
@@ -20,17 +20,19 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .WithValidChangeReasonOption()
-            .WithChangeReasonDetail(x =>
-                {
-                    x.WithAdditionalInformation(ProvideMoreInformationOption.Yes, additionalInfo);
-                    x.WithChangeReasonDetail(reasonDetail);
-                    x.WithFileUploadChoice(false);
-                })
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred,
+            ChangeReason = ChangeReasonOption.AnotherReason,
+            ChangeReasonDetail = new()
+            {
+                ChangeReasonDetail = reasonDetail,
+                ProvideAdditionalInformation = ProvideMoreInformationOption.Yes,
+                AdditionalInformation = additionalInfo,
+                Evidence = new() { UploadEvidence = false }
+            }
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -77,12 +79,13 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred,
+            ChangeReason = ChangeReasonOption.AnotherReason,
+            ChangeReasonDetail = CreateChangeReasonDetail()
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -125,10 +128,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -147,11 +151,10 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason?.GetDisplayName());
-        Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail);
-        Assert.Equal(ProvideMoreInformationOption.Yes, journeyInstance.State.ChangeReasonDetail.ProvideAdditionalInformation);
-        Assert.Equal(additionalInformation, journeyInstance.State.ChangeReasonDetail.AdditionalInformation);
+        Assert.Equal(changeReason.GetDisplayName(), GetJourneyInstanceState(journeyInstance)!.ChangeReason?.GetDisplayName());
+        Assert.Equal(changeReasonDetails, GetJourneyInstanceState(journeyInstance)!.ChangeReasonDetail.ChangeReasonDetail);
+        Assert.Equal(ProvideMoreInformationOption.Yes, GetJourneyInstanceState(journeyInstance)!.ChangeReasonDetail.ProvideAdditionalInformation);
+        Assert.Equal(additionalInformation, GetJourneyInstanceState(journeyInstance)!.ChangeReasonDetail.AdditionalInformation);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -166,10 +169,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -198,10 +202,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -234,12 +239,17 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .WithChangeReasonOption(changeReason)
-            .WithChangeReasonDetail(detail: changeReasonDetails, fileUpload: false)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = new()
+            {
+                ChangeReasonDetail = changeReasonDetails,
+                Evidence = new() { UploadEvidence = false }
+            }
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -272,12 +282,17 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .WithChangeReasonOption(changeReason)
-            .WithChangeReasonDetail(detail: changeReasonDetails, fileUpload: false)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = new()
+            {
+                ChangeReasonDetail = changeReasonDetails,
+                Evidence = new() { UploadEvidence = false }
+            }
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -295,50 +310,42 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.ChangeReasonDetail.Evidence.UploadEvidence);
-        Assert.Equal(ProvideMoreInformationOption.No, journeyInstance.State.ChangeReasonDetail.ProvideAdditionalInformation);
-        Assert.Equal(evidenceFileName, journeyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile!.FileName);
+        Assert.True(GetJourneyInstanceState(journeyInstance)!.ChangeReasonDetail.Evidence.UploadEvidence);
+        Assert.Equal(ProvideMoreInformationOption.No, GetJourneyInstanceState(journeyInstance)!.ChangeReasonDetail.ProvideAdditionalInformation);
+        Assert.Equal(evidenceFileName, GetJourneyInstanceState(journeyInstance)!.ChangeReasonDetail.Evidence.UploadedEvidenceFile!.FileName);
     }
 
     [Fact]
-    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToQualifications()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
-        var status = ProfessionalStatusStatusRegistry.All
-            .SingleRandom()
-            .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -348,9 +355,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
-        var status = ProfessionalStatusStatusRegistry.All
-            .SingleRandom()
-            .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -362,10 +366,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             await dbContext.SaveChangesAsync();
         });
 
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = RouteToProfessionalStatusStatus.Deferred
+        };
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
         var request = new HttpRequestMessage(httpMethod, $"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -376,10 +381,4 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddRouteToProfessionalStatus,
-            state ?? new AddRouteState(),
-            new KeyValuePair<string, object>("personId", personId));
 }

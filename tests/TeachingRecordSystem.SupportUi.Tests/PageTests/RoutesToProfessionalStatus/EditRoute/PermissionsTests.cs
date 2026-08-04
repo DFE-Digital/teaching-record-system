@@ -1,7 +1,6 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
-using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
@@ -21,18 +20,6 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         // {0}: qualification ID
         // {1}: journey ID
         // {2}: person ID
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/age-range?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/reason?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/check-answers?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/country?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/degree-type?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/holds-from?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/induction-exemption?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/route?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/start-and-end-date?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/status?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/subjects?{1}&personId={2}"),
-        (JourneyNames.AddRouteToProfessionalStatus, "/routes/add/training-provider?{1}&personId={2}"),
         (JourneyNames.EditRouteToProfessionalStatus, "/routes/{0}/edit/reason?{1}"),
         (JourneyNames.EditRouteToProfessionalStatus, "/routes/{0}/edit/check-answers?{1}"),
         (JourneyNames.EditRouteToProfessionalStatus, "/routes/{0}/edit/country?{1}"),
@@ -88,14 +75,6 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
                     .WithStatus(_status)
                     .Build(),
                 new KeyValuePair<string, object>("qualificationId", _qualificationId)),
-
-            JourneyNames.AddRouteToProfessionalStatus => await CreateJourneyInstance(
-                JourneyNames.AddRouteToProfessionalStatus,
-                new AddRouteStateBuilder()
-                    .WithRouteToProfessionalStatusId(_route!.RouteToProfessionalStatusTypeId)
-                    .WithStatus(_status)
-                    .Build(),
-                new KeyValuePair<string, object>("personId", _personId)),
 
             _ => await CreateJourneyInstance(
                 JourneyNames.DeleteRouteToProfessionalStatus,

@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public partial class SubjectSpecialismsTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
 {
     [Theory]
     [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, true)]
@@ -16,10 +16,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
@@ -54,10 +55,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == routeName);
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, addRouteState);
 
@@ -91,11 +93,12 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status,
+            TrainingSubjectIds = subjects.Select(s => s.TrainingSubjectId).ToArray()
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -127,10 +130,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -153,8 +157,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), journeyInstance.State.TrainingSubjectIds);
+        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), GetJourneyInstanceState(journeyInstance)!.TrainingSubjectIds);
     }
 
     [Fact]
@@ -169,10 +172,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -193,7 +197,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     }
 
     [Fact]
-    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToQualifications()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -204,34 +208,29 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await ReadContentAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", response.Headers.Location?.OriginalString);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -253,10 +252,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -280,10 +280,4 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var parser = new HtmlParser();
         return await parser.ParseDocumentAsync(content);
     }
-
-    private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
-        CreateJourneyInstance(
-           JourneyNames.AddRouteToProfessionalStatus,
-           state ?? new AddRouteState(),
-           new KeyValuePair<string, object>("personId", personId));
 }

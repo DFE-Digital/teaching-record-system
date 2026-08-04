@@ -1,4 +1,4 @@
-@page "/routes/add/check-answers/{handler?}"
+@page "/routes/add/check-answers"
 @model CheckAnswersModel
 @{
     ViewBag.Title = "Check details before adding route";
@@ -13,14 +13,147 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            <partial name="_RouteDetail" model="@Model.RouteDetail" />
+            <govuk-summary-list>
+                <row>
+                    <key>Route</key>
+                    <value>@Model.RouteType.Name</value>
+                    <row-actions>
+                        <action data-testid="add-route-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Route(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="route">Change</action>
+                    </row-actions>
+                </row>
+
+                <row>
+                    <key>Status</key>
+                    <value>@Model.Status.GetTitle()</value>
+                    <row-actions>
+                        <action data-testid="add-status-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Status(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="status">Change</action>
+                    </row-actions>
+                </row>
+
+                @if (Model.StartDateRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Start date</key>
+                        <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        <row-actions>
+                            <action data-testid="add-start-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.StartAndEndDate(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="start date">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.EndDateRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>End date</key>
+                        <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        <row-actions>
+                            <action data-testid="add-end-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.StartAndEndDate(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="end date">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.HoldsFromRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Held since</key>
+                        <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
+                        <row-actions>
+                            <action data-testid="add-holds-from-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.HoldsFrom(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="held since">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.InductionExemptionRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Induction exemption</key>
+                        <value use-empty-fallback>@(Model.IsExemptFromInduction.HasValue ? Model.IsExemptFromInduction.Value ? "Yes" : "No" : null)</value>
+                        @if (!Model.HasImplicitExemption)
+                        {
+                            <row-actions>
+                                <action data-testid="add-induction-exemption-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.InductionExemption(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="induction exemption">Change</action>
+                            </row-actions>
+                        }
+                    </row>
+                }
+
+                @if (Model.TrainingProviderRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Training provider</key>
+                        <value use-empty-fallback>@Model.TrainingProvider</value>
+                        <row-actions>
+                            <action data-testid="add-training-provider-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.TrainingProvider(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="training provider">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.DegreeTypeRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Degree type</key>
+                        <value use-empty-fallback>@Model.DegreeType</value>
+                        <row-actions>
+                            <action data-testid="add-degree-type-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.DegreeType(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="degree type">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.TrainingCountryRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Country of training</key>
+                        <value use-empty-fallback>@Model.TrainingCountry</value>
+                        <row-actions>
+                            <action data-testid="add-country-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Country(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="country of training">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.AgeSpecialismRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Age range</key>
+                        <value use-empty-fallback>@(Model.TrainingAgeSpecialismRange ?? Model.TrainingAgeSpecialismType?.GetDisplayName())</value>
+                        <row-actions>
+                            <action data-testid="add-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.AgeRangeSpecialism(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="age range">Change</action>
+                        </row-actions>
+                    </row>
+                }
+
+                @if (Model.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
+                {
+                    <row>
+                        <key>Subjects</key>
+                        <value>
+                            @if (Model.TrainingSubjects is not null && Model.TrainingSubjects.Length > 0)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var subject in Model.TrainingSubjects)
+                                    {
+                                        <li>@subject</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </value>
+                        <row-actions>
+                            <action data-testid="add-subjects-link" href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.SubjectSpecialisms(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="subjects">Change</action>
+                        </row-actions>
+                    </row>
+                }
+            </govuk-summary-list>
+
             <h2 class="govuk-heading-m">Why are you adding this route?</h2>
             <govuk-summary-list>
                 <row>
                     <key>Reason</key>
                     <value>@Model.ChangeReason?.GetDisplayName()</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
                                 visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
@@ -37,7 +170,7 @@
                         }
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
                                 visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
@@ -45,8 +178,8 @@
                     <key>Additional information</key>
                     <value use-empty-fallback>@Model.ChangeReasonDetail.AdditionalInformation</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="additional information">Change</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
+                                visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -55,18 +188,16 @@
                         <vc:evidence-file-link evidence-file="@Model.ChangeReasonDetail.Evidence.UploadedEvidenceFile" />
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="evidence">Change</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
+                                visually-hidden-text="evidence">Change</action>
                     </row-actions>
-
                 </row>
             </govuk-summary-list>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">Confirm and add route</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.CheckAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
 </div>
-

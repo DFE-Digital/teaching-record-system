@@ -1,15 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class InductionExemptionModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : AddRoutePostStatusPageModel(AddRoutePage.InductionExemption, linkGenerator, referenceDataCache, evidenceUploadManager)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class InductionExemptionModel(AddRouteJourneyCoordinator journey) : PageModel
 {
     private readonly InlineValidator<InductionExemptionModel> _validator = new()
     {
@@ -17,36 +13,37 @@ public class InductionExemptionModel(
             .NotNull().WithMessage("Select yes if this route provides an induction exemption")
     };
 
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public bool? IsExemptFromInduction { get; set; }
 
-    public IActionResult OnGet()
+    public void OnGet()
     {
-        IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
-        return Page();
+        IsExemptFromInduction = journey.State.IsExemptFromInduction;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.IsExemptFromInduction = IsExemptFromInduction;
-        });
-
-        return await ContinueAsync();
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.InductionExemption, state => state.IsExemptFromInduction = IsExemptFromInduction);
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        BackLink = journey.GetBackLink();
 
-        if (RouteType.InductionExemptionRequired == FieldRequirement.NotApplicable
-            || (RouteType.InductionExemptionReason is not null && RouteType.InductionExemptionReason.RouteImplicitExemption))
-        {
-            context.Result = BadRequest();
-            return;
-        }
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

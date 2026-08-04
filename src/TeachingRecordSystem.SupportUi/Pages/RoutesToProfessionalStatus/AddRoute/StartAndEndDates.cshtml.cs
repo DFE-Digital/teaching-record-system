@@ -1,63 +1,68 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartAndEndDateModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : AddRoutePostStatusPageModel(AddRoutePage.StartAndEndDate, linkGenerator, referenceDataCache, evidenceController)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class StartAndEndDateModel(AddRouteJourneyCoordinator journey) : PageModel
 {
+    private readonly InlineValidator<StartAndEndDateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.TrainingStartDate)
+            .NotNull().WithMessage("Enter a start date")
+            .When(m => m.StartAndEndDatesRequired),
+        v => v.RuleFor(m => m.TrainingEndDate)
+            .NotNull().WithMessage("Enter an end date")
+            .When(m => m.StartAndEndDatesRequired),
+        v => v.RuleFor(m => m.TrainingEndDate)
+            .Must((m, endDate) => !(m.TrainingStartDate >= endDate))
+                .WithMessage("End date must be after start date")
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Start date")]
+    public bool Cancel { get; set; }
+
+    [BindProperty]
     public DateOnly? TrainingStartDate { get; set; }
 
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "End date")]
     public DateOnly? TrainingEndDate { get; set; }
 
-    public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement())
-        == FieldRequirement.Mandatory;
+    public bool StartAndEndDatesRequired { get; set; }
 
     public void OnGet()
     {
-        TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
-        TrainingEndDate = JourneyInstance!.State.TrainingEndDate;
+        TrainingStartDate = journey.State.TrainingStartDate;
+        TrainingEndDate = journey.State.TrainingEndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartAndEndDatesRequired)
+        if (Cancel)
         {
-            if (TrainingStartDate is null)
-            {
-                ModelState.AddModelError(nameof(TrainingStartDate), "Enter a start date");
-            }
-
-            if (TrainingEndDate is null)
-            {
-                ModelState.AddModelError(nameof(TrainingEndDate), "Enter an end date");
-            }
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (TrainingStartDate >= TrainingEndDate)
-        {
-            ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(state =>
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.StartAndEndDate, state =>
         {
             state.TrainingStartDate = TrainingStartDate;
             state.TrainingEndDate = TrainingEndDate;
         });
+    }
 
-        return await ContinueAsync();
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        StartAndEndDatesRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.StartAndEndDate);
+
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

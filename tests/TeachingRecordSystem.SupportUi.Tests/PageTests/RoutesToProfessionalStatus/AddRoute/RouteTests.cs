@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class RouteTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPreviouslyStoredRoute_ShowsSelectedRoute()
@@ -11,19 +11,11 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .SingleRandom();
-        var status = ProfessionalStatusStatusRegistry.All
-            .SingleRandom()
-            .Value;
         var person = await TestData.CreatePersonAsync();
-
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            addRouteState
-            );
+            new AddRouteState { RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -42,19 +34,11 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => !r.IsActive)
             .SingleRandom();
-        var status = ProfessionalStatusStatusRegistry.All
-            .SingleRandom()
-            .Value;
         var person = await TestData.CreatePersonAsync();
-
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            addRouteState
-            );
+            new AddRouteState { RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -70,21 +54,14 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NoRouteSelected_ShowsError()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .SingleRandom();
-
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Routeid", "" }
+                { "RouteId", "" }
             }
         };
 
@@ -106,11 +83,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
             .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -136,17 +109,13 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
             .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Routeid", route.RouteToProfessionalStatusTypeId }
+                { "RouteId", route.RouteToProfessionalStatusTypeId }
             }
         };
 
@@ -154,8 +123,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(route.RouteToProfessionalStatusTypeId, journeyInstance.State.RouteToProfessionalStatusId);
+        Assert.Equal(route.RouteToProfessionalStatusTypeId, GetJourneyInstanceState(journeyInstance)!.RouteToProfessionalStatusId);
     }
 
     [Fact]
@@ -166,17 +134,13 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
             .SingleRandom();
 
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Routeid", route.RouteToProfessionalStatusTypeId }
+                { "RouteId", route.RouteToProfessionalStatusTypeId }
             }
         };
 
@@ -189,35 +153,24 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Cancel_DeletesJourneyStateAndRedirectsToQualifications()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToQualifications()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .SingleRandom();
-
         var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", response.Headers.Location?.OriginalString);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -225,9 +178,6 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task PersonIsDeactivated_ReturnsBadRequest(HttpMethod httpMethod)
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .SingleRandom();
-
         var person = await TestData.CreatePersonAsync();
         await WithDbContextAsync(async dbContext =>
         {
@@ -235,11 +185,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var addRouteState = new AddRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
+
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(httpMethod, $"/routes/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -249,10 +196,4 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.AddRouteToProfessionalStatus,
-            state ?? new AddRouteState(),
-            new KeyValuePair<string, object>("personId", personId));
 }

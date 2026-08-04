@@ -1,4 +1,4 @@
-@page "/routes/add/country/{handler?}"
+@page "/routes/add/country"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.CountryModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
@@ -52,7 +52,7 @@
             </govuk-select>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.CountryCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

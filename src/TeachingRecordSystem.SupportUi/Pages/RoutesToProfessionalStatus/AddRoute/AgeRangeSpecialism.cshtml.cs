@@ -1,50 +1,64 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class AgeRangeSpecialismModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : AddRoutePostStatusPageModel(AddRoutePage.AgeRangeSpecialism, linkGenerator, referenceDataCache, evidenceUploadManager)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class AgeRangeSpecialismModel(AddRouteJourneyCoordinator journey) : PageModel
 {
+    private readonly InlineValidator<AgeRangeSpecialismModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.TrainingAgeSpecialism.AgeRangeType)
+            .NotNull().WithMessage("Enter an age range specialism")
+            .When(m => m.AgeRangeSpecialismRequired)
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
-    public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
-        == FieldRequirement.Mandatory;
+    public bool AgeRangeSpecialismRequired { get; set; }
 
     public void OnGet()
     {
         TrainingAgeSpecialism = new AgeRange
         {
-            AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom,
-            AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
-            AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType
+            AgeRangeFrom = journey.State.TrainingAgeSpecialismRangeFrom,
+            AgeRangeTo = journey.State.TrainingAgeSpecialismRangeTo,
+            AgeRangeType = journey.State.TrainingAgeSpecialismType
         };
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (AgeRangeSpecialismRequired && TrainingAgeSpecialism.AgeRangeType is null)
+        if (Cancel)
         {
-            ModelState.AddModelError($"{nameof(TrainingAgeSpecialism)}.{nameof(TrainingAgeSpecialism.AgeRangeType)}", "Enter an age range specialism");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.AgeRangeSpecialism, state =>
         {
-            state.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
-            state.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
-            state.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
+            state.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism.AgeRangeFrom;
+            state.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism.AgeRangeTo;
+            state.TrainingAgeSpecialismType = TrainingAgeSpecialism.AgeRangeType;
         });
+    }
 
-        return await ContinueAsync();
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        AgeRangeSpecialismRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.AgeRangeSpecialism);
+
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

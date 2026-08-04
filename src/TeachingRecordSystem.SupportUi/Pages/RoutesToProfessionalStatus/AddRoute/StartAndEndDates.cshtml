@@ -1,4 +1,4 @@
-@page "/routes/add/start-and-end-date/{handler?}"
+@page "/routes/add/start-and-end-date"
 
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StartAndEndDateModel
 @{
@@ -18,14 +18,14 @@
                 <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">
                     @ViewBag.Title
                 </govuk-fieldset-legend>
-                <govuk-date-input for="TrainingStartDate">
+                <govuk-date-input for="TrainingStartDate" error-message-prefix="Start date">
                     <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m">
                         Route start date
                     </govuk-date-input-fieldset-legend>
                     <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
                 </govuk-date-input>
 
-                <govuk-date-input for="TrainingEndDate">
+                <govuk-date-input for="TrainingEndDate" error-message-prefix="End date">
                     <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m">
                         Route end date
                     </govuk-date-input-fieldset-legend>
@@ -35,7 +35,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.AddRoute.StartAndEndDateCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

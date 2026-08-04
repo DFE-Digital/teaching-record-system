@@ -4,10 +4,10 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase(hostFixture)
+public partial class InductionExemptionTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithInvalidRoute_ReturnsBadRequest()
+    public async Task Get_QuestionIsNotAskedForRoute_RedirectsToCheckAnswers()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -18,24 +18,25 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .SingleRandom()
             .Value;
         var person = await TestData.CreatePersonAsync();
-        var personId = person.PersonId;
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            personId,
-            addRouteState
-            );
+            person.PersonId,
+            new AddRouteState
+            {
+                RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+                Status = status
+            });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/induction-exemption?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/induction-exemption?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
-        // Act, Assert
+        // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/routes/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -51,11 +52,12 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .WithInductionExemption(isExempt: true)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status,
+            IsExemptFromInduction = true
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personId,
@@ -92,10 +94,11 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personId,
@@ -116,8 +119,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/add/{page}?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
+        Assert.Equal(true, GetJourneyInstanceState(journeyInstance)!.IsExemptFromInduction);
     }
 
     [Fact]
@@ -133,10 +135,11 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
-        var editRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personId,
@@ -153,7 +156,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     }
 
     [Fact]
-    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToQualifications()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -165,34 +168,30 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
-        var editRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/add/induction-exemption?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/add/induction-exemption?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -217,10 +216,11 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             await dbContext.SaveChangesAsync();
         });
         var personId = person.PersonId;
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var addRouteState = new AddRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personId,
@@ -235,10 +235,4 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
-        CreateJourneyInstance(
-           JourneyNames.AddRouteToProfessionalStatus,
-           state ?? new AddRouteState(),
-           new KeyValuePair<string, object>("personId", personId));
 }
