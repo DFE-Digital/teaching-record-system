@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 using CoreNationalInsuranceNumber = TeachingRecordSystem.Core.NationalInsuranceNumber;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching.Resolve;
@@ -270,6 +271,83 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.True(journeyState!.Verified);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool supportTaskDashboardEnabled)
+    {
+        // Arrange
+        // Recreate AdminUser since [ClearDbBeforeTest] removes it
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Users.Add(HostFixture.AdminUser);
+            await dbContext.SaveChangesAsync();
+        });
+
+        FeatureProvider.Features.Clear();
+        if (supportTaskDashboardEnabled)
+        {
+            FeatureProvider.Features.Add("SupportTaskDashboard");
+        }
+
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var verified = true;
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Action", "SaveAndComeBackLater" },
+                { "Verified", verified.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        if (supportTaskDashboardEnabled)
+        {
+            Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", response.Headers.Location?.OriginalString);
+        }
+        else
+        {
+            Assert.Equal($"/support-tasks/one-login-user-matching/id-verification", response.Headers.Location?.OriginalString);
+        }
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            supportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+            Assert.NotNull(supportTask.ResolveJourneySavedState);
+
+            Assert.Equal("VerifyModel", supportTask.ResolveJourneySavedState.PageName);
+
+            Assert.Collection(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp =>
+                {
+                    Assert.Equal("Verified", kvp.Key);
+                    Assert.Equal(verified.ToString(), kvp.Value);
+                });
+
+            var savedState = supportTask.ResolveJourneySavedState.GetState<ResolveOneLoginUserMatchingState>();
+            Assert.NotNull(savedState);
+        });
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+
+        Events.AssertProcessesCreated(p => Assert.Equal(
+            ProcessType.OneLoginUserIdVerificationSupportTaskSaving,
+            p.ProcessContext.ProcessType));
+    }
+
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
     {
@@ -283,7 +361,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Cancel", "True" }
+                { "Action", "Cancel" }
             }
         };
 
@@ -327,7 +405,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         {
             Content = new FormUrlEncodedContentBuilder
             {
-                { "Cancel", "True" }
+                { "action", "Cancel" }
             }
         };
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
@@ -10,16 +11,24 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 public class Matches(
     ResolveTrnRequestJourneyCoordinator journey,
     TrsDbContext dbContext,
+    SupportTaskService supportTaskService,
+    TimeProvider timeProvider,
+    IFeatureProvider featureProvider,
     SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(journey, dbContext)
 {
+    public static class Actions
+    {
+        public const string SaveAndComeBackLater = nameof(SaveAndComeBackLater);
+        public const string Cancel = nameof(Cancel);
+    }
+
     private readonly InlineValidator<Matches> _validator = new()
     {
         v => v.RuleFor(m => m.PersonId)
             .NotNull().WithMessage("Select a record")
     };
 
-    [BindProperty]
-    public bool Cancel { get; set; }
+    private SupportTask? _supportTask;
 
     public TrnRequestMetadata? RequestData { get; set; }
 
@@ -38,16 +47,22 @@ public class Matches(
 
     public void OnGet()
     {
+        Journey.State.ApplySavedModelStateValues(nameof(Matches), ModelState);
         PersonId = Journey.State.PersonId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string? action)
     {
-        if (Cancel)
+        if (action is Actions.Cancel)
         {
             Journey.DeleteInstance();
 
             return Redirect(Journey.State.CompletionUrl);
+        }
+
+        if (action is Actions.SaveAndComeBackLater)
+        {
+            return await HandleSaveAndReturnAsync();
         }
 
         // Verify the submitted ID is legit
@@ -67,6 +82,7 @@ public class Matches(
         {
             var oldPersonId = state.PersonId;
             state.PersonId = PersonId;
+            state.ClearSavedModelStateValues(nameof(Matches));
 
             if (oldPersonId != PersonId)
             {
@@ -82,8 +98,37 @@ public class Matches(
         });
     }
 
+    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    {
+        var savedJourneyState = this.CreateSavedJourneyState(
+            nameof(Matches),
+            Journey.State,
+            excludeKeys: ["Action"]);
+
+        var processContext = new ProcessContext(ProcessType.TrnRequestSupportTaskSaving, timeProvider.UtcNow, User.GetUserId());
+
+        await supportTaskService.SaveProgressAsync(
+            new()
+            {
+                SupportTaskReference = _supportTask!.SupportTaskReference,
+                SavedJourneyState = savedJourneyState
+            },
+            processContext);
+
+        Journey.DeleteInstance();
+
+        if (featureProvider.IsEnabled("SupportTaskDashboard"))
+        {
+            return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(_supportTask.SupportTaskReference));
+        }
+
+        return Redirect(Journey.State.CompletionUrl);
+    }
+
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+
         RequestData = GetRequestData();
 
         BackLink = Journey.GetBackLink() ?? Journey.State.CompletionUrl;
