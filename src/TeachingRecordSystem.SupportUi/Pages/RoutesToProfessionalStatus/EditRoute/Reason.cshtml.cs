@@ -83,12 +83,8 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     public async Task<IActionResult> OnPostAsync()
     {
         await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;

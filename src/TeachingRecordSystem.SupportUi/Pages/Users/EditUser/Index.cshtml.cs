@@ -64,7 +64,7 @@ public class IndexModel(
             return BadRequest();
         }
 
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var processContext = new ProcessContext(ProcessType.UserUpdating, timeProvider.UtcNow, User.GetUserId());
 

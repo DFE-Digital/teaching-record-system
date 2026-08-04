@@ -41,7 +41,7 @@ public class Matches(
         PersonId = Journey.State.PersonId;
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (Cancel)
         {
@@ -57,7 +57,7 @@ public class Matches(
             return BadRequest();
         }
 
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var nextStepUrl = PersonId == ResolveTrnRequestState.CreateNewRecordPersonIdSentinel ?
             linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(Journey.InstanceId) :

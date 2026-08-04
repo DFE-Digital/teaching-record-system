@@ -52,7 +52,7 @@ public class NameChangeReasonModel(
         // with errors.
         await evidenceUploadManager.UploadAsync(Evidence);
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceToNextQuestion(
             journey.State.OtherDetailsChanged

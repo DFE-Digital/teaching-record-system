@@ -34,7 +34,7 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, UserS
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var processContext = new ProcessContext(ProcessType.ApiKeyCreating, timeProvider.UtcNow, User.GetUserId());
 

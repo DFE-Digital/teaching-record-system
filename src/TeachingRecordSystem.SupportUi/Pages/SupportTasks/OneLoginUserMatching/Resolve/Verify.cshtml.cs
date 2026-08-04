@@ -51,7 +51,7 @@ public class VerifyModel(
             return Redirect(journey.State.CompletionUrl);
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var resolveLinkGenerator = linkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
 

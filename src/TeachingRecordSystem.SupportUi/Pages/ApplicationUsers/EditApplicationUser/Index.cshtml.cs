@@ -197,7 +197,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             }
         }
 
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         if (IsOidcClient)
         {

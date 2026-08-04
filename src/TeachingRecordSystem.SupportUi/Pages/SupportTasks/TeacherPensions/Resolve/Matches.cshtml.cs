@@ -60,7 +60,7 @@ public class MatchesModel(
             return BadRequest();
         }
 
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var nextStepUrl = PersonId == ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel ?
             linkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Journey.InstanceId) :

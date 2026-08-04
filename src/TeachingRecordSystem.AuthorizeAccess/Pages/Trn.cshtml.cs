@@ -40,7 +40,7 @@ public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         coordinator.UpdateState(state => state.SetTrn(HaveTrn!.Value, Trn));
 

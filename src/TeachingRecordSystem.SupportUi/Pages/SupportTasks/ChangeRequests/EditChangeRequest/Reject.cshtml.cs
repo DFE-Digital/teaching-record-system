@@ -44,7 +44,7 @@ public class RejectModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         string requestStatus;
         string flashMessage;

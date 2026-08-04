@@ -34,7 +34,7 @@ public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) 
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         coordinator.UpdateState(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
 

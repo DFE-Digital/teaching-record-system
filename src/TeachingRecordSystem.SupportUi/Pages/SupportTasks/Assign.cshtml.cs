@@ -44,7 +44,7 @@ public class Assign(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         // Belt & braces check that user assignment is valid
         var validAssignmentIds = AssignToOptions!.Select(u => u.UserId).Concat([CurrentUserId, UnassignedUserId]);

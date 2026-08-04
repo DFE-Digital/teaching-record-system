@@ -38,7 +38,7 @@ public class AddNote(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, timeProvider.UtcNow, User.GetUserId());
 

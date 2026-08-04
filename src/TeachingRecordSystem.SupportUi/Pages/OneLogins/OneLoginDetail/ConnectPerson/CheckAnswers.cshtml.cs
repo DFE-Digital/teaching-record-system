@@ -70,7 +70,7 @@ public class CheckAnswersModel(
             return CancelJourney();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var oneLoginUserFeature = HttpContext.GetCurrentOneLoginUserFeature();
 

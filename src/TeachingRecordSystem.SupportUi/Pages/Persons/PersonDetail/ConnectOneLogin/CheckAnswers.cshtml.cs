@@ -68,7 +68,7 @@ public class CheckAnswersModel(
             return CancelJourney();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Where(u => u.Subject == journey.State.Subject)

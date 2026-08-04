@@ -193,12 +193,7 @@ public class MergeModel(
         // with errors.
         await evidenceUploadManager.UploadAsync(Evidence);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.MergePerson.CheckAnswers(journey.InstanceId),

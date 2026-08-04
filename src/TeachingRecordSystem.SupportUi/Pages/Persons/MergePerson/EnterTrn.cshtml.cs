@@ -65,7 +65,7 @@ public class EnterTrnModel(
             return BadRequest();
         }
 
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         if (OtherTrn == ThisTrn)
         {

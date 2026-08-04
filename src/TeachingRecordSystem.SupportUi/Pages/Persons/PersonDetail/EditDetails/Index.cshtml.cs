@@ -120,7 +120,7 @@ public class IndexModel(
             return BadRequest();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceToNextQuestion(
             NameChanged
