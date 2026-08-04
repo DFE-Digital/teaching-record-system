@@ -36,6 +36,10 @@ When working in a git worktree, set the following environment variables before r
 - `UseTestContainers` to `true`, so the tests spin up their own postgres container.
 - `TestContainersPostgresPort` to a random free port, so the container doesn't clash with the ones other worktrees are using.
 
+These two are sufficient — when `UseTestContainers` is set the container's connection string (database `trs` on
+`TestContainersPostgresPort`) overrides any `ConnectionStrings:DefaultConnection` from user secrets or the environment, so don't
+set `ConnectionStrings__DefaultConnection` as well.
+
 ### Resetting the database schema and data
 
 The test database schema is cached in a `.tests-schema-version.txt` file at the root of the repository (this file is git-ignored, so each
