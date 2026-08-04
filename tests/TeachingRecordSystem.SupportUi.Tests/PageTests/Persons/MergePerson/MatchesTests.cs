@@ -1,6 +1,7 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
+using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
@@ -27,12 +28,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             .WithNationalInsuranceNumber("AB987654D")
             .WithGender(Gender.Other));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -72,12 +68,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             .WithAlert(a => a.WithEndDate(null))
             .WithAlert(a => a.WithEndDate(null)));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -125,12 +116,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         // Arrange
         var (personA, personB) = await CreatePersonsWithMultipleDifferencesToMatch(matchedAttributes, useNullValues: useNullValues);
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -172,14 +158,8 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             await dbContext.SaveChangesAsync();
         });
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
-        // Assert
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
         // Act
@@ -207,12 +187,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var personB = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithEndDate(null)));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -251,12 +226,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
                 .WithStartDate(new DateOnly(2024, 1, 1))
                 .WithCompletedDate(new DateOnly(2024, 1, 1))));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -301,12 +271,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
                 .WithStartDate(new DateOnly(2024, 1, 1))
                 .WithCompletedDate(new DateOnly(2024, 1, 1))));
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -333,13 +298,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
 
         var personB = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .WithPrimaryPerson(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB, s => s.PrimaryPersonId = personB.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
@@ -355,6 +314,49 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
     }
 
     [Fact]
+    public async Task Get_BacklinkLinksToEnterTrnPage()
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var backlink = doc.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.NotNull(backlink);
+        Assert.Contains($"/persons/{personA.PersonId}/merge/enter-trn", backlink.Href);
+    }
+
+    [Fact]
+    public async Task Get_ContinueAndCancelButtons_ExistOnPage()
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
+        Assert.NotNull(form);
+        var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
+        Assert.Collection(buttons,
+            b => Assert.Equal("Continue", b.TrimmedText()),
+            b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
+    }
+
+    [Fact]
     public async Task Post_PrimaryPersonNotSelected_ShowsPageError()
     {
         // Arrange
@@ -362,12 +364,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
 
         var personB = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -383,6 +380,122 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "Select primary record");
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_PersonIsDeactivated_ReturnsBadRequest(bool deactivatePersonA)
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var person = deactivatePersonA ? personA : personB;
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePersonPostRequestContentBuilder()
+                .WithPrimaryPersonId(personB.PersonId)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_PersonHasOpenAlert_ReturnsBadRequest(bool alertOnPersonA)
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences(
+            configurePersonA: p => { if (alertOnPersonA) { p.WithAlert(a => a.WithEndDate(null)); } },
+            configurePersonB: p => { if (!alertOnPersonA) { p.WithAlert(a => a.WithEndDate(null)); } });
+
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePersonPostRequestContentBuilder()
+                .WithPrimaryPersonId(personB.PersonId)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    public static TheoryData<bool, InductionStatus> Post_PersonHasInvalidInductionStatus_ReturnsBadRequestData =>
+        new MatrixTheoryData<bool, InductionStatus>(
+            [true, false],
+            [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed]);
+
+    [Theory]
+    [MemberData(nameof(Post_PersonHasInvalidInductionStatus_ReturnsBadRequestData))]
+    public async Task Post_PersonHasInvalidInductionStatus_ReturnsBadRequest(bool statusOnPersonA, InductionStatus status)
+    {
+        // Arrange
+        void ConfigureInductionStatus(CreatePersonBuilder p) => p
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(new DateOnly(2024, 1, 1)));
+
+        var (personA, personB) = await CreatePersonsWithNoDifferences(
+            configurePersonA: p => { if (statusOnPersonA) { ConfigureInductionStatus(p); } },
+            configurePersonB: p => { if (!statusOnPersonA) { ConfigureInductionStatus(p); } });
+
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePersonPostRequestContentBuilder()
+                .WithPrimaryPersonId(personB.PersonId)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToPersonDetailPage()
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
     [Fact]
     public async Task Post_PersistsDetailsAndRedirectsToNextPage()
     {
@@ -391,12 +504,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
 
         var personB = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB);
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -412,8 +520,9 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         AssertEx.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
+        var state = GetJourneyInstanceState(journeyInstance);
+        Assert.NotNull(state);
+        Assert.Equal(personB.PersonId, state.PrimaryPersonId);
     }
 
     [Fact]
@@ -422,23 +531,18 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         // Arrange
         var (personA, personB) = await CreatePersonsWithAllDifferences();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            new MergePersonStateBuilder()
-                .WithInitializedState(personA)
-                .WithPersonB(personB)
-                .WithPrimaryPerson(personA)
-                .WithAttributeSourcesSet()
-                .WithFirstNameSource(PersonAttributeSource.PrimaryPerson)
-                .WithMiddleNameSource(PersonAttributeSource.SecondaryPerson)
-                // Leaving LastNameSource unselected
-                .WithDateOfBirthSource(PersonAttributeSource.SecondaryPerson)
-                .WithEmailAddressSource(PersonAttributeSource.SecondaryPerson)
-                // Leaving NationalInsuranceNumberSource unselected
-                .WithGenderSource(PersonAttributeSource.PrimaryPerson)
-                .WithUploadEvidenceChoice(false)
-                .WithComments(null)
-                .Build());
+        var journeyInstance = await CreateJourneyInstanceAsync(personA, personB, s =>
+        {
+            s.PrimaryPersonId = personA.PersonId;
+            s.FirstNameSource = PersonAttributeSource.PrimaryPerson;
+            s.MiddleNameSource = PersonAttributeSource.SecondaryPerson;
+            // Leaving LastNameSource unselected
+            s.DateOfBirthSource = PersonAttributeSource.SecondaryPerson;
+            s.EmailAddressSource = PersonAttributeSource.SecondaryPerson;
+            // Leaving NationalInsuranceNumberSource unselected
+            s.GenderSource = PersonAttributeSource.PrimaryPerson;
+            s.Evidence = new() { UploadEvidence = false };
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
@@ -454,24 +558,19 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         AssertEx.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
+        var state = GetJourneyInstanceState(journeyInstance);
+        Assert.NotNull(state);
+        Assert.Equal(personB.PersonId, state.PrimaryPersonId);
 
-        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.FirstNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.MiddleNameSource);
-        Assert.Null(journeyInstance.State.LastNameSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.DateOfBirthSource);
-        Assert.Equal(PersonAttributeSource.PrimaryPerson, journeyInstance.State.EmailAddressSource);
-        Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
-        Assert.Equal(PersonAttributeSource.SecondaryPerson, journeyInstance.State.GenderSource);
+        Assert.Equal(PersonAttributeSource.SecondaryPerson, state.FirstNameSource);
+        Assert.Equal(PersonAttributeSource.PrimaryPerson, state.MiddleNameSource);
+        Assert.Null(state.LastNameSource);
+        Assert.Equal(PersonAttributeSource.PrimaryPerson, state.DateOfBirthSource);
+        Assert.Equal(PersonAttributeSource.PrimaryPerson, state.EmailAddressSource);
+        Assert.Null(state.NationalInsuranceNumberSource);
+        Assert.Equal(PersonAttributeSource.SecondaryPerson, state.GenderSource);
     }
 
-    private string GetRequestPath(Person person, JourneyInstance<MergePersonState>? journeyInstance = null) =>
-        $"/persons/{person.PersonId}/merge/matches?{journeyInstance?.GetUniqueIdQueryParameter()}";
-
-    private Task<JourneyInstance<MergePersonState>> CreateJourneyInstanceAsync(Guid personId, MergePersonState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.MergePerson,
-            state ?? new MergePersonState(),
-            new KeyValuePair<string, object>("personId", personId));
+    private string GetRequestPath(Person person, MergePersonJourneyCoordinator journeyInstance) =>
+        $"/persons/{person.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
 }

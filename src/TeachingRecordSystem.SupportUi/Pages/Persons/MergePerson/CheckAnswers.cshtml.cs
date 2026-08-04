@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -9,19 +9,22 @@ using TeachingRecordSystem.SupportUi.Services;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.MergePerson), RequireJourneyInstance]
+[Journey(JourneyNames.MergePerson)]
 public class CheckAnswersModel(
-    TrsDbContext dbContext,
+    MergePersonJourneyCoordinator journey,
     PersonService personService,
     SupportUiLinkGenerator linkGenerator,
-    EvidenceUploadManager evidenceUploadManager,
     TimeProvider timeProvider,
-    PersonChangeableAttributesService changedService)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceUploadManager)
+    PersonChangeableAttributesService changedService) : PageModel
 {
-    public string BackLink => GetPageLink(MergePersonJourneyPage.Merge);
-    public string ChangePrimaryPersonLink => GetPageLink(MergePersonJourneyPage.Matches, fromCheckAnswers: true);
-    public string ChangeDetailsLink => GetPageLink(MergePersonJourneyPage.Merge, fromCheckAnswers: true);
+    private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
+
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
@@ -33,8 +36,6 @@ public class CheckAnswersModel(
     public string? Trn { get; set; }
     public UploadedEvidenceFile? EvidenceFile { get; set; }
     public string? Comments { get; set; }
-
-    private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
 
     public IEnumerable<ResolvedMergedAttribute>? ResolvableAttributes { get; private set; }
 
@@ -52,62 +53,6 @@ public class CheckAnswersModel(
 
     public bool IsEmailAddressChangeable => ResolvableAttributes?.Any(r => r.Attribute == PersonMatchedAttribute.EmailAddress) == true;
 
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
-    {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        var state = JourneyInstance!.State;
-
-        if (state.PersonAId is not Guid personAId || state.PersonBId is not Guid personBId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.EnterTrn));
-            return;
-        }
-
-        if (state.PrimaryPersonId is not Guid primaryPersonId)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Matches));
-            return;
-        }
-
-        if (state.PersonAttributeSourcesSet is false ||
-            !state.Evidence.IsComplete)
-        {
-            context.Result = Redirect(GetPageLink(MergePersonJourneyPage.Merge));
-            return;
-        }
-
-        _potentialDuplicates = await GetPotentialDuplicatesAsync(personAId, personBId);
-
-        ResolvableAttributes = changedService.GetResolvableMergedAttributes(
-             new List<ResolvedMergedAttribute>
-             {
-                 new(PersonMatchedAttribute.Gender, state.GenderSource),
-                 new(PersonMatchedAttribute.FirstName, state.FirstNameSource),
-                 new(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
-                 new(PersonMatchedAttribute.LastName, state.LastNameSource),
-                 new(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
-                 new(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
-                 new(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
-             });
-
-        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
-
-        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
-        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
-
-        FirstName = state.FirstNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.FirstName : secondaryPerson.FirstName;
-        MiddleName = state.MiddleNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
-        LastName = state.LastNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.LastName : secondaryPerson.LastName;
-        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.DateOfBirth : secondaryPerson.DateOfBirth;
-        EmailAddress = state.EmailAddressSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.EmailAddress : secondaryPerson.EmailAddress;
-        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
-        Gender = state.GenderSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.Gender : secondaryPerson.Gender;
-        Trn = primaryPerson.Trn;
-        EvidenceFile = JourneyInstance.State.Evidence.UploadedEvidenceFile;
-        Comments = state.Comments;
-    }
-
     public IActionResult OnGet()
     {
         return Page();
@@ -115,14 +60,19 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         if (_potentialDuplicates!.Any(p => p.IsInvalid))
         {
             return BadRequest();
         }
 
-        var state = JourneyInstance!.State;
+        var state = journey.State;
         var primaryPersonId = state.PrimaryPersonId!.Value;
-        var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
+        var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId;
 
         var processContext = new ProcessContext(
             ProcessType.PersonMerging,
@@ -151,12 +101,56 @@ public class CheckAnswersModel(
             },
             processContext);
 
+        journey.DeleteInstance();
+
         TempData.SetFlashNotificationBanner(
             $"Records merged for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
-            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(LinkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
+            buildMessageHtml: LinkTagBuilder.BuildViewRecordLink(linkGenerator.Persons.PersonDetail.Index(primaryPersonId)));
 
-        await JourneyInstance!.CompleteAsync();
+        return Redirect(linkGenerator.Persons.PersonDetail.Index(journey.PersonId));
+    }
 
-        return Redirect(GetPageLink(null));
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        BackLink = journey.GetBackLink();
+
+        var state = journey.State;
+        var personAId = state.PersonAId;
+        var personBId = state.PersonBId!.Value;
+        var primaryPersonId = state.PrimaryPersonId!.Value;
+
+        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync(personAId, personBId);
+
+        ResolvableAttributes = changedService.GetResolvableMergedAttributes(
+             new List<ResolvedMergedAttribute>
+             {
+                 new(PersonMatchedAttribute.Gender, state.GenderSource),
+                 new(PersonMatchedAttribute.FirstName, state.FirstNameSource),
+                 new(PersonMatchedAttribute.MiddleName, state.MiddleNameSource),
+                 new(PersonMatchedAttribute.LastName, state.LastNameSource),
+                 new(PersonMatchedAttribute.DateOfBirth, state.DateOfBirthSource),
+                 new(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
+                 new(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
+             });
+
+        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
+
+        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
+        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
+
+        FirstName = state.FirstNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.FirstName : secondaryPerson.FirstName;
+        MiddleName = state.MiddleNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
+        LastName = state.LastNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.LastName : secondaryPerson.LastName;
+        DateOfBirth = state.DateOfBirthSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.DateOfBirth : secondaryPerson.DateOfBirth;
+        EmailAddress = state.EmailAddressSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.EmailAddress : secondaryPerson.EmailAddress;
+        NationalInsuranceNumber = state.NationalInsuranceNumberSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.NationalInsuranceNumber : secondaryPerson.NationalInsuranceNumber;
+        Gender = state.GenderSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.Gender : secondaryPerson.Gender;
+        Trn = primaryPerson.Trn;
+        EvidenceFile = state.Evidence.UploadedEvidenceFile;
+        Comments = state.Comments;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

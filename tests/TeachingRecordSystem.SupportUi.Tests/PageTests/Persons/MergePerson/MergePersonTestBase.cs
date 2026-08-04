@@ -1,11 +1,63 @@
+using GovUk.Questions.AspNetCore.State;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.MergePerson;
 
-public class MergePersonTestBase(HostFixture hostFixture)
+public abstract class MergePersonTestBase(HostFixture hostFixture)
     : TestBase(hostFixture)
 {
+    /// <summary>
+    /// Builds the state the coordinator starts the journey with — the record the journey was started
+    /// from — optionally adding the record it's being merged with and whatever else a test needs.
+    /// </summary>
+    protected static MergePersonState CreateState(
+        Person personA,
+        Person? personB = null,
+        Action<MergePersonState>? configure = null)
+    {
+        var state = new MergePersonState
+        {
+            PersonAId = personA.PersonId,
+            PersonATrn = personA.Trn,
+            PersonBId = personB?.PersonId,
+            PersonBTrn = personB?.Trn
+        };
+
+        configure?.Invoke(state);
+
+        return state;
+    }
+
+    protected Task<MergePersonJourneyCoordinator> CreateJourneyInstanceAsync(
+        Person personA,
+        Person? personB = null,
+        Action<MergePersonState>? configure = null) =>
+        CreateJourneyInstanceAsync(personA.PersonId, CreateState(personA, personB, configure));
+
+    protected Task<MergePersonJourneyCoordinator> CreateJourneyInstanceAsync(Guid personId, MergePersonState state) =>
+        // Seed the whole journey path so that any page under test is reachable (the real journey builds
+        // this path up as the user advances through the steps).
+        JourneyHelper.CreateInstanceAsync<MergePersonJourneyCoordinator>(
+            JourneyNames.MergePerson,
+            new RouteValueDictionary { ["personId"] = personId },
+            _ => Task.FromResult<object>(state),
+            pathUrls:
+            [
+                $"/persons/{personId}/merge/enter-trn",
+                $"/persons/{personId}/merge/matches",
+                $"/persons/{personId}/merge/merge",
+                $"/persons/{personId}/merge/check-answers",
+            ],
+            coordinatorFactory: CreateJourneyCoordinator<MergePersonJourneyCoordinator>);
+
+    protected MergePersonState? GetJourneyInstanceState(MergePersonJourneyCoordinator coordinator)
+    {
+        var stateStorage = HostFixture.Services.GetRequiredService<IJourneyStateStorage>();
+        return (MergePersonState?)stateStorage.GetState(coordinator.InstanceId, coordinator.Journey)?.State;
+    }
+
     protected async Task<(Person PersonA, Person PersonB)> CreatePersonsWithNoDifferences(
         Action<CreatePersonBuilder>? configurePersonA = null,
         Action<CreatePersonBuilder>? configurePersonB = null,
