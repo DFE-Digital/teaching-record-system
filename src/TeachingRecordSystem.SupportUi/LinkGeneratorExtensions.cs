@@ -40,11 +40,11 @@ public static class LinkGeneratorExtensions
         return NormalizePath(url);
     }
 
-    // The journey library identifies a step by the URL of the request that reached it, which ASP.NET Core
-    // reports with only the characters that are illegal in a path escaped (a One Login subject's ':' stays
-    // as-is). Link generation escapes route values far more aggressively (':' becomes "%3A"), so a step
-    // pushed from a generated URL would never match the request it redirects to and the browser would
-    // bounce between the two forever. Re-encode generated URLs the way the request will arrive.
+    // Link generation escapes route values far more aggressively than ASP.NET Core does when it reports a
+    // request's path: a One Login subject's ':' becomes "%3A" on the way out but stays as-is on the way in.
+    // Both forms address the same page, and GovUk.Questions 1.0.4 matches journey steps across the two, so
+    // this is about consistency rather than correctness — without it the same URL is spelled two different
+    // ways depending on where it came from, in the address bar and in anything that compares URLs.
     private static string NormalizePath(string url)
     {
         var queryIndex = url.IndexOf('?', StringComparison.Ordinal);
