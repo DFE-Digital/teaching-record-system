@@ -1,114 +1,86 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class HoldsFromModel(
-    TimeProvider timeProvider,
+    EditRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceUploadManager)
+    TimeProvider timeProvider) : PageModel
 {
-    [BindProperty]
-    [DateInput(ErrorMessagePrefix = "The date they first held this professional status")]
-    public DateOnly? HoldsFrom { get; set; }
+    private readonly InlineValidator<HoldsFromModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.HoldsFrom)
+            .NotNull().WithMessage("Enter the date they first held this professional status")
+            .When(m => m.HoldsFromRequired),
+        v => v.RuleFor(m => m.HoldsFrom)
+            .Must(holdsFrom => !(holdsFrom > timeProvider.Today))
+                .WithMessage("The date they first held this professional status must not be in the future")
+    };
 
-    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
-        == FieldRequirement.Mandatory;
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    public bool HoldsFromRequired { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    [BindProperty]
+    public DateOnly? HoldsFrom { get; set; }
 
     public void OnGet()
     {
-        HoldsFrom = JourneyInstance!.State.HoldsFrom;
+        HoldsFrom = journey.State.HoldsFrom;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HoldsFromRequired && HoldsFrom is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(HoldsFrom), "Enter the date they first held this professional status");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (HoldsFrom > timeProvider.Today)
+        await this.ThrowIfInvalidAsync(_validator);
+
+        var detailUrl = linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
+
+        if (!journey.IsCompletingRoute)
         {
-            ModelState.AddModelError(nameof(HoldsFrom), "The date they first held this professional status must not be in the future");
+            journey.UpdateState(state => state.HoldsFrom = HoldsFrom);
+            return Redirect(journey.GetReturnUrlOrDefault(detailUrl));
         }
 
-        if (!ModelState.IsValid)
+        if (await journey.IsLastCompletingRoutePageAsync(EditRoutePage.HoldsFrom))
         {
-            return this.PageWithErrors();
-        }
-
-        var nextPage = JourneyInstance!.State.IsCompletingRoute ?
-            NextCompletingRoutePage :
-            FromCheckAnswers ?
-                LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
-                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
-
-        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
-        {
-            if (IsLastCompletingRoutePage()) // if this is the last page of the data collection for the status
+            journey.CompleteRoute(state =>
             {
-                await JourneyInstance!.UpdateStateAsync(s => // update the main journey state with the data
-                {
-                    s.Status = s.EditStatusState!.Status;
-                    s.HoldsFrom = HoldsFrom;
-                    s.IsExemptFromInduction = s.EditStatusState.InductionExemption;
-                    s.EditStatusState = null;
-                });
-            }
-            else // there are more pages to come - store the data in the temporary journey state
-            {
-                await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.HoldsFrom = HoldsFrom);
-            }
-        }
-        else // user is editing the Professional status 'hold' date on an already-completed route
-        {
-            await JourneyInstance!.UpdateStateAsync(s => s.HoldsFrom = HoldsFrom);
+                state.HoldsFrom = HoldsFrom;
+                state.IsExemptFromInduction = state.EditStatusState!.InductionExemption;
+            });
+
+            await journey.RefreshAvailablePagesAsync();
+
+            return Redirect(detailUrl);
         }
 
-        return Redirect(nextPage);
+        journey.UpdateState(state => state.EditStatusState = state.EditStatusState! with { HoldsFrom = HoldsFrom });
+
+        return Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.InductionExemption(journey.InstanceId));
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        HoldsFromRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.HoldsFrom);
 
-        var inductionexemptionReason = RouteType!.InductionExemptionReason;
+        BackLink = journey.GetReturnUrlOrDefault(
+            journey.IsCompletingRoute
+                ? linkGenerator.RoutesToProfessionalStatus.EditRoute.Status(journey.InstanceId)
+                : linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId));
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
-
-    public string BackLink => FromCheckAnswers ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            JourneyInstance!.State.IsCompletingRoute ?
-                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Status(QualificationId, JourneyInstance!.InstanceId) :
-                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
-
-
-    private bool IsLastCompletingRoutePage()
-    {
-        if (JourneyInstance!.State.EditStatusState != null)
-        {
-            if (QuestionDriverHelper.FieldRequired(RouteType!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
-                == FieldRequirement.NotApplicable)
-            {
-                return true;
-            }
-            else
-            {
-                return RouteType.InductionExemptionReason is not null &&
-                    RouteType.InductionExemptionReason.RouteImplicitExemption;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    private string NextCompletingRoutePage =>
-        IsLastCompletingRoutePage() ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.InductionExemption(QualificationId, JourneyInstance!.InstanceId);
 }

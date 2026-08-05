@@ -1,53 +1,66 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class TrainingProviderModel(
+    EditRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
+    ReferenceDataCache referenceDataCache) : PageModel
 {
+    private readonly InlineValidator<TrainingProviderModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.TrainingProviderId)
+            .NotNull().WithMessage("Select a training provider")
+            .When(m => m.TrainingProviderRequired)
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string BackLink => journey.GetReturnUrlOrDefault(DetailUrl);
+
     public TrainingProvider[] TrainingProviders { get; set; } = [];
+
+    public bool TrainingProviderRequired { get; set; }
+
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public Guid? TrainingProviderId { get; set; }
 
-    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteType!.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
-            == FieldRequirement.Mandatory;
+
+    private string DetailUrl => linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 
     public void OnGet()
     {
-        TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
+        TrainingProviderId = journey.State.TrainingProviderId;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (TrainingProviderRequired && TrainingProviderId is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
+        journey.UpdateState(state => state.TrainingProviderId = TrainingProviderId);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
+        return Redirect(journey.GetReturnUrlOrDefault(DetailUrl));
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        TrainingProviderRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.TrainingProvider);
+        TrainingProviders = await referenceDataCache.GetTrainingProvidersAsync();
 
-        TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

@@ -9,7 +9,7 @@
         <key>Status</key>
         <value>@Model.Status.GetTitle()</value>
         <row-actions>
-            <action data-testid="edit-status-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Status(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="status">Change</action>
+            <action data-testid="edit-status-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Status(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="status">Change</action>
         </row-actions>
     </row>
 
@@ -19,7 +19,7 @@
             <key>Start date</key>
             <value use-empty-fallback>@Model.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
             <row-actions>
-                <action data-testid="edit-start-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</action>
+                <action data-testid="edit-start-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="start date">Change</action>
             </row-actions>
         </row>
     }
@@ -30,7 +30,7 @@
             <key>End date</key>
             <value use-empty-fallback>@Model.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
             <row-actions>
-                <action data-testid="edit-end-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</action>
+                <action data-testid="edit-end-date-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDate(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="end date">Change</action>
             </row-actions>
         </row>
     }
@@ -41,7 +41,7 @@
             <key>Held since</key>
             <value use-empty-fallback>@Model.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
             <row-actions>
-                <action data-testid="edit-holds-from-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="held since">Change</action>
+                <action data-testid="edit-holds-from-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="held since">Change</action>
             </row-actions>
         </row>
     }
@@ -54,7 +54,7 @@
             @if (!Model.HasImplicitExemption.HasValue || Model.HasImplicitExemption.HasValue && !Model.HasImplicitExemption.Value)
             {
                 <row-actions>
-                    <action data-testid="edit-induction-exemption-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.InductionExemption(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="induction exemption">Change</action>
+                    <action data-testid="edit-induction-exemption-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.InductionExemption(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="induction exemption">Change</action>
                 </row-actions>
             }
         </row>
@@ -66,7 +66,7 @@
             <key>Training provider</key>
             <value use-empty-fallback>@Model.TrainingProvider</value>
             <row-actions>
-                <action data-testid="edit-training-provider-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingProvider(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training provider">Change</action>
+                <action data-testid="edit-training-provider-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingProvider(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="training provider">Change</action>
             </row-actions>
         </row>
     }
@@ -77,7 +77,7 @@
             <key>Degree type</key>
             <value use-empty-fallback>@Model.DegreeType</value>
             <row-actions>
-                <action data-testid="edit-degree-type-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.DegreeType(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</action>
+                <action data-testid="edit-degree-type-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.DegreeType(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="degree type">Change</action>
             </row-actions>
         </row>
     }
@@ -88,7 +88,7 @@
             <key>Country of training</key>
             <value use-empty-fallback>@Model.TrainingCountry</value>
             <row-actions>
-                <action data-testid="edit-country-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingCountry(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</action>
+                <action data-testid="edit-country-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Country(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="training country">Change</action>
             </row-actions>
         </row>
     }
@@ -101,14 +101,14 @@
             {
                 <value use-empty-fallback>@Model.TrainingAgeSpecialismRange</value>
                 <row-actions>
-                    <action data-testid="edit-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</action>
+                    <action data-testid="edit-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="age range">Change</action>
                 </row-actions>
             }
             else
             {
                 <value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</value>
                 <row-actions>
-                    <action data-testid="edit-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</action>
+                    <action data-testid="edit-age-range-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.AgeRangeSpecialism(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="age range">Change</action>
                 </row-actions>
             }
         </row>
@@ -134,7 +134,7 @@
                 }
             </value>
             <row-actions>
-                <action data-testid="edit-subjects-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.TrainingSubjects(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</action>
+                <action data-testid="edit-subjects-link" href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.SubjectSpecialisms(Model.InstanceId, Model.ReturnUrl)" visually-hidden-text="training subjects">Change</action>
             </row-actions>
         </row>
     }

@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRout
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+public class PermissionsTests(HostFixture hostFixture) : EditRouteTestBase(hostFixture), IAsyncLifetime
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
         (null, false),
@@ -66,17 +66,19 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: userRole));
 
-        // Edit Route is still on FormFlow, so the two journeys are seeded differently.
+        // This class covers both journeys, so it takes Edit Route's seeding from its base class and
+        // seeds Delete Route itself.
         var journeyQueryParameter = journeyName switch
         {
             JourneyNames.EditRouteToProfessionalStatus =>
-                (await CreateJourneyInstance(
-                    JourneyNames.EditRouteToProfessionalStatus,
-                    new EditRouteStateBuilder()
-                        .WithRouteToProfessionalStatusId(_route!.RouteToProfessionalStatusTypeId)
-                        .WithStatus(_status)
-                        .Build(),
-                    new KeyValuePair<string, object>("qualificationId", _qualificationId))).GetUniqueIdQueryParameter(),
+                (await CreateJourneyInstanceAsync(
+                    _qualificationId,
+                    new Pages.RoutesToProfessionalStatus.EditRoute.EditRouteState
+                    {
+                        RouteToProfessionalStatusId = _route!.RouteToProfessionalStatusTypeId,
+                        Status = _status,
+                        CurrentStatus = _status
+                    })).GetUniqueIdQueryParameter(),
 
             _ => (await CreateDeleteRouteJourneyInstanceAsync()).GetUniqueIdQueryParameter()
         };

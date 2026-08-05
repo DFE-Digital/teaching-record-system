@@ -4,82 +4,57 @@ public class EditRouteLinkGenerator(LinkGenerator linkGenerator)
 {
     public string Index(Guid qualificationId, bool? fromInductions = null) =>
         linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Index", routeValues: new { qualificationId, fromInductions });
-    public string Detail(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromInductions = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Detail", routeValues: new { qualificationId, fromInductions }, journeyInstanceId: journeyInstanceId);
-    public string DetailCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Detail", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string Route(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Route", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Route", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string Status(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Status", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string StatusCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Status", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string StartAndEndDate(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartAndEndDates", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string StartAndEndDateCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartAndEndDates", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string HoldsFrom(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string HoldsFromCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string DegreeType(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/DegreeType", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string DegreeTypeCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/DegreeType", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string Country(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Country", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string CountryCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Country", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string SubjectSpecialisms(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/SubjectSpecialisms", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string SubjectSpecialismsCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/SubjectSpecialisms", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string TrainingProvider(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/TrainingProvider", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string TrainingProviderCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/TrainingProvider", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string AgeRangeSpecialism(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/AgeRangeSpecialism", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string AgeRangeSpecialismCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/AgeRangeSpecialism", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string TrainingCountry(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Country", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string TrainingCountryCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Country", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string TrainingSubjects(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/SubjectSpecialisms", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string TrainingSubjectsCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/SubjectSpecialisms", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string InductionExemption(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/InductionExemption", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string InductionExemptionCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/InductionExemption", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string Reason(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Reason", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string ReasonCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Reason", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string CheckAnswers(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/CheckAnswers", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string CheckAnswersCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/CheckAnswers", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
-    public string EditRoutePage(AddRoutePage page, Guid personId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string Detail(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/Detail", journeyInstanceId, returnUrl);
+
+    public string Status(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/Status", journeyInstanceId, returnUrl);
+
+    public string StartAndEndDate(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/StartAndEndDates", journeyInstanceId, returnUrl);
+
+    public string HoldsFrom(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", journeyInstanceId, returnUrl);
+
+    public string InductionExemption(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/InductionExemption", journeyInstanceId, returnUrl);
+
+    public string TrainingProvider(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/TrainingProvider", journeyInstanceId, returnUrl);
+
+    public string DegreeType(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/DegreeType", journeyInstanceId, returnUrl);
+
+    public string Country(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/Country", journeyInstanceId, returnUrl);
+
+    public string AgeRangeSpecialism(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/AgeRangeSpecialism", journeyInstanceId, returnUrl);
+
+    public string SubjectSpecialisms(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/SubjectSpecialisms", journeyInstanceId, returnUrl);
+
+    public string Reason(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/Reason", journeyInstanceId, returnUrl);
+
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/EditRoute/CheckAnswers", journeyInstanceId, returnUrl);
+
+    public string Page(EditRoutePage page, JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
         page switch
         {
-            AddRoutePage.Status => Status(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.StartAndEndDate => StartAndEndDate(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.HoldsFrom => HoldsFrom(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.InductionExemption => InductionExemption(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.TrainingProvider => TrainingProvider(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.DegreeType => DegreeType(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.Country => Country(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.AgeRangeSpecialism => AgeRangeSpecialism(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.SubjectSpecialisms => SubjectSpecialisms(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.ChangeReason => Reason(personId, journeyInstanceId, fromCheckAnswers),
-            AddRoutePage.CheckAnswers => CheckAnswers(personId, journeyInstanceId),
-            AddRoutePage.Route => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
+            EditRoutePage.Status => Status(journeyInstanceId, returnUrl),
+            EditRoutePage.StartAndEndDate => StartAndEndDate(journeyInstanceId, returnUrl),
+            EditRoutePage.HoldsFrom => HoldsFrom(journeyInstanceId, returnUrl),
+            EditRoutePage.InductionExemption => InductionExemption(journeyInstanceId, returnUrl),
+            EditRoutePage.TrainingProvider => TrainingProvider(journeyInstanceId, returnUrl),
+            EditRoutePage.DegreeType => DegreeType(journeyInstanceId, returnUrl),
+            EditRoutePage.Country => Country(journeyInstanceId, returnUrl),
+            EditRoutePage.AgeRangeSpecialism => AgeRangeSpecialism(journeyInstanceId, returnUrl),
+            EditRoutePage.SubjectSpecialisms => SubjectSpecialisms(journeyInstanceId, returnUrl),
+            EditRoutePage.ChangeReason => Reason(journeyInstanceId, returnUrl),
+            EditRoutePage.CheckAnswers => CheckAnswers(journeyInstanceId, returnUrl),
+            _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
 }

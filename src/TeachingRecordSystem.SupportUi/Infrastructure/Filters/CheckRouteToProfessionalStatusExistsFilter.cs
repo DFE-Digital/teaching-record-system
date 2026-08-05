@@ -63,9 +63,13 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class CheckRouteToProfessionalStatusExistsFilterFactory() : Attribute, IFilterFactory
+public class CheckRouteToProfessionalStatusExistsFilterFactory() : Attribute, IFilterFactory, IOrderedFilter
 {
     public bool IsReusable => false;
+
+    // Runs ahead of the journey filter (order -100), like CheckPersonExistsFilterFactory, so that a
+    // journey coordinator can seed its state from the route.
+    public int Order => -200;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
         ActivatorUtilities.CreateInstance<CheckRouteToProfessionalStatusExistsFilter>(serviceProvider);
