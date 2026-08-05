@@ -1,2 +1,0 @@
-alter table trs_persons drop column induction_exemption_reasons
-alter table trs_persons add induction_exemption_reason_ids text

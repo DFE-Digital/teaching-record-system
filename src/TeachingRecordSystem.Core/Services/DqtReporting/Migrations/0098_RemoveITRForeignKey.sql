@@ -1,3 +1,0 @@
-ALTER TABLE trs_integration_transaction_records
-    DROP CONSTRAINT fk_trs_integrationtransactionrecord_integrationtransaction;
-

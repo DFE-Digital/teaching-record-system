@@ -1,2 +1,0 @@
-alter table trs_persons add allow_details_updates_from_source_application bit
-alter table trs_persons add dqt_allow_teacher_identity_sign_in_with_prohibitions bit

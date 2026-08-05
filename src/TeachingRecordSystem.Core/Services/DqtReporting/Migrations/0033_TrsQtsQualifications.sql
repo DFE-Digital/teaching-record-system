@@ -1,2 +1,0 @@
-alter table trs_qualifications add awarded_date date
-alter table trs_qualifications add dqt_qts_registration_id uniqueidentifier

@@ -1,1 +1,0 @@
-alter table trs_users add use_shared_one_login_signing_keys bit

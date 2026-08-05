@@ -1,1 +1,0 @@
-alter table trs_qualifications add professional_status_type int
