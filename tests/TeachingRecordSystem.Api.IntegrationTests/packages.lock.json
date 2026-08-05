@@ -20,9 +20,9 @@
       },
       "JustEat.HttpClientInterception": {
         "type": "Direct",
-        "requested": "[5.1.2, )",
-        "resolved": "5.1.2",
-        "contentHash": "Zy8UCcI8dVGVYY7MDZ2bLhKFhms+gLU1BhyJnoEi9o67P8+XpwxvXlATnKzuzZVRPALU5g4CL+cScqkcERDDVg=="
+        "requested": "[5.1.4, )",
+        "resolved": "5.1.4",
+        "contentHash": "E8KDKBOqBpEAd3V5eZogvPneCt+O9IW0vgj+3W598uZUCcaNZ2Vt5Qmxzuswb/Dlr1hF0Gr9jDT14KxJyeaVIw=="
       },
       "Microsoft.AspNetCore.Mvc.Testing": {
         "type": "Direct",

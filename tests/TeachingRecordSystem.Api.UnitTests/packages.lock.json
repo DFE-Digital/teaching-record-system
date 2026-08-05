@@ -10,11 +10,11 @@
       },
       "JustEat.HttpClientInterception": {
         "type": "Direct",
-        "requested": "[5.1.2, )",
-        "resolved": "5.1.2",
-        "contentHash": "Zy8UCcI8dVGVYY7MDZ2bLhKFhms+gLU1BhyJnoEi9o67P8+XpwxvXlATnKzuzZVRPALU5g4CL+cScqkcERDDVg==",
+        "requested": "[5.1.4, )",
+        "resolved": "5.1.4",
+        "contentHash": "E8KDKBOqBpEAd3V5eZogvPneCt+O9IW0vgj+3W598uZUCcaNZ2Vt5Qmxzuswb/Dlr1hF0Gr9jDT14KxJyeaVIw==",
         "dependencies": {
-          "Microsoft.AspNetCore.WebUtilities": "2.3.0"
+          "Microsoft.AspNetCore.WebUtilities": "2.3.10"
         }
       },
       "Microsoft.Extensions.Configuration.UserSecrets": {
@@ -325,10 +325,10 @@
       },
       "Microsoft.AspNetCore.WebUtilities": {
         "type": "Transitive",
-        "resolved": "2.3.0",
-        "contentHash": "trbXdWzoAEUVd0PE2yTopkz4kjZaAIA7xUWekd5uBw+7xE8Do/YOVTeb9d9koPTlbtZT539aESJjSLSqD8eYrQ==",
+        "resolved": "2.3.10",
+        "contentHash": "7LpnJixI2B3uh+enEw/6xKJS6s7A/N5gRWIMc0NZsKjKXJ64mn7bA09KtjWuSE/SnMpgycLPudFCNtMipRp6yQ==",
         "dependencies": {
-          "Microsoft.Net.Http.Headers": "2.3.0"
+          "Microsoft.Net.Http.Headers": "2.3.9"
         }
       },
       "Microsoft.Azure.Services.AppAuthentication": {
@@ -771,8 +771,8 @@
       },
       "Microsoft.Net.Http.Headers": {
         "type": "Transitive",
-        "resolved": "2.3.0",
-        "contentHash": "/M0wVg6tJUOHutWD3BMOUVZAioJVXe0tCpFiovzv0T9T12TBf4MnaHP0efO8TCr1a6O9RZgQeZ9Gdark8L9XdA==",
+        "resolved": "2.3.9",
+        "contentHash": "n0+KbDZfgy8v5vju20dDCiHW/XRpwL5nc28nwy6Iqu5SfXYIZ8OSz0qS02YpffoPf97YChMIIqfGja1BjkdlRQ==",
         "dependencies": {
           "Microsoft.Extensions.Primitives": "8.0.0"
         }
