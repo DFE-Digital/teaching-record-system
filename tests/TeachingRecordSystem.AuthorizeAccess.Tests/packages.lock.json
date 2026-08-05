@@ -4,11 +4,11 @@
     "net10.0": {
       "GovUk.Questions.AspNetCore.Testing": {
         "type": "Direct",
-        "requested": "[1.0.3, )",
-        "resolved": "1.0.3",
-        "contentHash": "bjHk2zosZ+sY62WraeS9Rc2VLN82AUMU46QNyQYI25qbS238G2ilv8+m5JskwXbrxBduYmMJoXluTYZPIT0ODA==",
+        "requested": "[1.0.4, )",
+        "resolved": "1.0.4",
+        "contentHash": "a+K8ueYB5mNXtNMhkARMcJpgXKEkxwnYx9XSAgH0+3m2M/arIA0NGc+QLlJNywLDH2A6FdcCQRCwLjSyKqLBqA==",
         "dependencies": {
-          "GovUk.Questions.AspNetCore": "1.0.3"
+          "GovUk.Questions.AspNetCore": "1.0.4"
         }
       },
       "JetBrains.Annotations": {
@@ -1069,7 +1069,7 @@
           "DfeAnalytics.AspNetCore": "[0.6.1, )",
           "GovUk.Frontend.AspNetCore": "[4.4.0, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
-          "GovUk.Questions.AspNetCore": "[1.0.3, )",
+          "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
@@ -1366,9 +1366,9 @@
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.0.3, )",
-        "resolved": "1.0.3",
-        "contentHash": "AHmac3NlLQ4FaOwBR/u6yh/erZtKzySq0UsMnpoaCwl0+3SGs7CONX2rnsSvPHHAU9BbW5XqynkoCT2yHH5CCA==",
+        "requested": "[1.0.4, )",
+        "resolved": "1.0.4",
+        "contentHash": "pgdXnplkIlBFzRfmDyW1f/Y24FNtVgnPOIcBqg14VvIJahlLyE51Hd+auEzIpMxBUnrF9GSKFfIrqWPLpUpYWQ==",
         "dependencies": {
           "UUID": "1.1.1"
         }

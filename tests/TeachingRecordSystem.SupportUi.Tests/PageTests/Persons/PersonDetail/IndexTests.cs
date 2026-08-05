@@ -707,7 +707,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(new DateOnly(1990, 1, 1)).WithEmailAddress());
-        await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: person.PersonId, email: Option.Some(person.EmailAddress), verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
 
         if (currentStatus == PersonStatus.Deactivated)
         {
@@ -730,6 +730,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         if (expectDisconnectLinkToBeShown)
         {
             Assert.NotNull(disconnectLink);
+            Assert.Equal($"/persons/{person.PersonId}/disconnect-one-login/{oneLoginUser.Subject}", disconnectLink.GetAttribute("href"));
         }
         else
         {

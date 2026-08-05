@@ -1088,7 +1088,7 @@
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.102.0, )",
           "GovUk.Frontend.AspNetCore": "[4.4.0, )",
-          "GovUk.Questions.AspNetCore": "[1.0.3, )",
+          "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
           "Humanizer.Core": "[3.0.10, )",
@@ -1318,9 +1318,9 @@
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.0.3, )",
-        "resolved": "1.0.3",
-        "contentHash": "AHmac3NlLQ4FaOwBR/u6yh/erZtKzySq0UsMnpoaCwl0+3SGs7CONX2rnsSvPHHAU9BbW5XqynkoCT2yHH5CCA==",
+        "requested": "[1.0.4, )",
+        "resolved": "1.0.4",
+        "contentHash": "pgdXnplkIlBFzRfmDyW1f/Y24FNtVgnPOIcBqg14VvIJahlLyE51Hd+auEzIpMxBUnrF9GSKFfIrqWPLpUpYWQ==",
         "dependencies": {
           "UUID": "1.1.1"
         }

@@ -6,7 +6,8 @@ public static class LinkGeneratorExtensions
 {
     public static string GetRequiredPathByPage(this LinkGenerator linkGenerator, string page, string? handler = null, object? routeValues = null, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null)
     {
-        var url = linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+        var url = NormalizePath(
+            linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found."));
 
         if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
         {
@@ -34,6 +35,22 @@ public static class LinkGeneratorExtensions
 
         routeValues[JourneyInstanceId.KeyRouteValueName] = journeyInstanceId.Key;
 
-        return linkGenerator.GetPathByPage(page, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+        var url = linkGenerator.GetPathByPage(page, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+
+        return NormalizePath(url);
+    }
+
+    // Link generation escapes route values far more aggressively than ASP.NET Core does when it reports a
+    // request's path: a One Login subject's ':' becomes "%3A" on the way out but stays as-is on the way in.
+    // Both forms address the same page, and GovUk.Questions 1.0.4 matches journey steps across the two, so
+    // this is about consistency rather than correctness — without it the same URL is spelled two different
+    // ways depending on where it came from, in the address bar and in anything that compares URLs.
+    private static string NormalizePath(string url)
+    {
+        var queryIndex = url.IndexOf('?', StringComparison.Ordinal);
+        var path = queryIndex == -1 ? url : url[..queryIndex];
+        var query = queryIndex == -1 ? "" : url[queryIndex..];
+
+        return PathString.FromUriComponent(path).ToUriComponent() + query;
     }
 }
