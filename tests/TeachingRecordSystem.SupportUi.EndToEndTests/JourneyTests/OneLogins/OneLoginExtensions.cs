@@ -9,4 +9,7 @@ public static class OneLoginExtensions
 
     public static Task AssertOnOneLoginDetailPageAsync(this IPage page, string subject) =>
         page.WaitForUrlPathAsync($"/one-logins/{subject}");
+
+    public static Task ClickDisconnectRecordButtonAsync(this IPage page) =>
+        page.ClickLinkForElementWithTestIdAsync("disconnect-record-button");
 }

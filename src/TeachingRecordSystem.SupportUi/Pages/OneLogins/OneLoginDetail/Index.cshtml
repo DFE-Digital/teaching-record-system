@@ -98,7 +98,7 @@
 <div class="govuk-button-group">
     @if (Model.ConnectedPerson is not null)
     {
-        <govuk-button-link data-testid="disconnect-record-button" href="#" class="govuk-button--secondary">
+        <govuk-button-link data-testid="disconnect-record-button" href="@LinkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.Index(Model.OneLoginUserSubject, Model.ConnectedPerson.PersonId)" class="govuk-button--secondary">
             Disconnect record
         </govuk-button-link>
     }

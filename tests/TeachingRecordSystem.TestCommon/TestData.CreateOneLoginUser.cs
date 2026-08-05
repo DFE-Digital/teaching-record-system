@@ -70,7 +70,9 @@ public partial class TestData
         });
     }
 
-    public string CreateOneLoginUserSubject() => Guid.NewGuid().ToString("N");
+    // Matches the shape of a real GOV.UK One Login subject; the reserved characters matter since
+    // subjects appear in URL path segments.
+    public string CreateOneLoginUserSubject() => $"urn:fdc:gov.uk:2022:{Guid.NewGuid():N}";
 
     public JsonDocument CreateOneLoginCoreIdentityVc(string firstName, string lastName, DateOnly dateOfBirth) =>
         JsonDocument.Parse(

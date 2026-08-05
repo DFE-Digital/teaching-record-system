@@ -161,6 +161,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var disconnectButton = doc.GetElementByTestId("disconnect-record-button");
         Assert.NotNull(disconnectButton);
+        Assert.Equal($"/one-logins/{user.Subject}/disconnect-person/{person.PersonId}", disconnectButton.GetAttribute("href"));
         var connectButton = doc.GetElementByTestId("connect-to-record-button");
         Assert.Null(connectButton);
     }

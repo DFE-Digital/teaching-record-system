@@ -9,6 +9,13 @@ public static class OneLoginExtensions
         return page.GotoAsync($"/persons/{personId}/disconnect-one-login/{subject}");
     }
 
+    public static Task ClickDisconnectOneLoginLinkAsync(this IPage page, string emailAddress)
+    {
+        return page.GetByTestId("associated-one-login-users")
+            .GetByRole(AriaRole.Link, new() { Name = $"Disconnect {emailAddress}" })
+            .ClickAsync();
+    }
+
     public static Task AssertOnDisconnectOneLoginIndexPageAsync(this IPage page, Guid personId, string subject)
     {
         return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}");

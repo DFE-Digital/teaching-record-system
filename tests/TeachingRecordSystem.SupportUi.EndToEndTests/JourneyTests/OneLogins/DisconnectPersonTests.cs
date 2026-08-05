@@ -5,16 +5,21 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.OneLogins;
 public class DisconnectPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Theory]
-    [InlineData(DisconnectPersonReason.NewInformation, null)]
-    [InlineData(DisconnectPersonReason.AnotherReason, "Test disconnection reason details")]
-    public async Task DisconnectPerson_Success(DisconnectPersonReason reason, string? reasonDetail)
+    [InlineData(DisconnectPersonReason.NewInformation, null, DisconnectPersonStayVerified.Yes)]
+    [InlineData(DisconnectPersonReason.AnotherReason, "Test disconnection reason details", DisconnectPersonStayVerified.No)]
+    public async Task DisconnectPerson_FromOneLoginDetailPage_Success(
+        DisconnectPersonReason reason,
+        string? reasonDetail,
+        DisconnectPersonStayVerified stayVerified)
     {
         var person = await TestData.CreatePersonAsync();
         var oneLogin = await TestData.CreateOneLoginUserAsync(person);
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToDisconnectPersonAsync(oneLogin.Subject, person.PersonId);
+        await page.GoToOneLoginDetailPageAsync(oneLogin.Subject);
+        await page.ClickDisconnectRecordButtonAsync();
+
         await page.AssertOnDisconnectPersonIndexPageAsync(oneLogin.Subject, person.PersonId);
         await page.ClickRadioAsync(reason.ToString());
 
@@ -26,14 +31,48 @@ public class DisconnectPersonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnDisconnectPersonVerifiedPageAsync(oneLogin.Subject, person.PersonId);
-        await page.ClickRadioAsync(nameof(DisconnectPersonStayVerified.Yes));
+        await page.ClickRadioAsync(stayVerified.ToString());
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnDisconnectPersonCheckYourAnswersPageAsync(oneLogin.Subject, person.PersonId);
         await page.ClickButtonAsync("Confirm and disconnect");
-        await page.WaitForUrlPathAsync($"/one-logins/{oneLogin.Subject}");
 
-        await page.AssertFlashMessageAsync($"{person.FirstName} {person.LastName}\u2019s record disconnected from GOV.UK One Login");
+        await page.AssertOnOneLoginDetailPageAsync(oneLogin.Subject);
+        await page.AssertFlashMessageAsync($"{person.FirstName} {person.LastName}’s record disconnected from GOV.UK One Login");
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updated = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLogin.Subject);
+            Assert.Null(updated.PersonId);
+            Assert.Equal(stayVerified == DisconnectPersonStayVerified.Yes, updated.VerifiedOn is not null);
+        });
+    }
+
+    [Fact]
+    public async Task DisconnectPerson_Cancel_ReturnsToOneLoginDetailPage()
+    {
+        var person = await TestData.CreatePersonAsync();
+        var oneLogin = await TestData.CreateOneLoginUserAsync(person);
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToOneLoginDetailPageAsync(oneLogin.Subject);
+        await page.ClickDisconnectRecordButtonAsync();
+
+        await page.AssertOnDisconnectPersonIndexPageAsync(oneLogin.Subject, person.PersonId);
+        await page.ClickRadioAsync(nameof(DisconnectPersonReason.NewInformation));
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnDisconnectPersonVerifiedPageAsync(oneLogin.Subject, person.PersonId);
+        await page.ClickButtonAsync("Cancel");
+
+        await page.AssertOnOneLoginDetailPageAsync(oneLogin.Subject);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var updated = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLogin.Subject);
+            Assert.Equal(person.PersonId, updated.PersonId);
+        });
     }
 
     [Fact]
@@ -44,7 +83,9 @@ public class DisconnectPersonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToDisconnectPersonAsync(oneLogin.Subject, person.PersonId);
+        await page.GoToOneLoginDetailPageAsync(oneLogin.Subject);
+        await page.ClickDisconnectRecordButtonAsync();
+
         await page.AssertOnDisconnectPersonIndexPageAsync(oneLogin.Subject, person.PersonId);
         await page.ClickRadioAsync(nameof(DisconnectPersonReason.ConnectedIncorrectly));
         await page.ClickContinueButtonAsync();
@@ -57,13 +98,15 @@ public class DisconnectPersonTests(HostFixture hostFixture) : TestBase(hostFixtu
         await page.ClickBackLinkAsync();
 
         await page.AssertOnDisconnectPersonVerifiedPageAsync(oneLogin.Subject, person.PersonId);
-        var stayVerifiedValue = await page.IsCheckedAsync($"input[value='{nameof(DisconnectPersonStayVerified.Yes)}']");
-        Assert.True(stayVerifiedValue);
+        Assert.True(await page.IsCheckedAsync($"input[value='{nameof(DisconnectPersonStayVerified.Yes)}']"));
 
         await page.ClickBackLinkAsync();
 
         await page.AssertOnDisconnectPersonIndexPageAsync(oneLogin.Subject, person.PersonId);
-        var reasonValue = await page.IsCheckedAsync($"input[value='{nameof(DisconnectPersonReason.ConnectedIncorrectly)}']");
-        Assert.True(reasonValue);
+        Assert.True(await page.IsCheckedAsync($"input[value='{nameof(DisconnectPersonReason.ConnectedIncorrectly)}']"));
+
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnOneLoginDetailPageAsync(oneLogin.Subject);
     }
 }
