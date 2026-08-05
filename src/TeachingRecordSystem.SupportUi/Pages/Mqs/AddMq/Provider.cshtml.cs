@@ -47,7 +47,7 @@ public class ProviderModel(
             return await CancelAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Mqs.AddMq.Specialism(journey.InstanceId),

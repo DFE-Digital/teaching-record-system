@@ -40,7 +40,7 @@ public class ZendeskTickets(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var sanitizedTicketUrls = (TicketUrls ?? []).Where(url => !string.IsNullOrEmpty(url));
 

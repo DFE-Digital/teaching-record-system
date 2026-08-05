@@ -68,7 +68,7 @@ public class Matches(
             return await HandleSaveAndReturnAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var nextStepUrl = MatchedPersonId != ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel ?
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmConnect(journey.InstanceId) :

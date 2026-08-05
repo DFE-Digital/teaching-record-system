@@ -52,9 +52,9 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public void OnGet() { }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         if (ChecksCompleted == false)
         {

@@ -48,7 +48,7 @@ public class IndexModel(
             return CancelJourney();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var person = await dbContext.Persons
             .Where(p => p.Trn == Trn)

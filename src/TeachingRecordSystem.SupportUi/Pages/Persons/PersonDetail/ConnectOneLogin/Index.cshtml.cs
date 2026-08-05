@@ -47,7 +47,7 @@ public class IndexModel(
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Where(u => u.EmailAddress == EmailAddress)

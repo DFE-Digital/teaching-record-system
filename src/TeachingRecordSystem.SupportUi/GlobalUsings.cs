@@ -3,6 +3,7 @@ global using GovUk.Frontend.AspNetCore;
 global using GovUk.Questions.AspNetCore;
 global using TeachingRecordSystem.WebCommon;
 global using TeachingRecordSystem.WebCommon.FormFlow;
+global using TeachingRecordSystem.WebCommon.Validation;
 // GovUk.Questions and FormFlow both define Journey/JourneyInstanceId. While we migrate off
 // FormFlow, resolve the unqualified names to GovUk.Questions so new code needs no qualification;
 // remaining FormFlow usages are fully qualified. These aliases are intentionally kept even while

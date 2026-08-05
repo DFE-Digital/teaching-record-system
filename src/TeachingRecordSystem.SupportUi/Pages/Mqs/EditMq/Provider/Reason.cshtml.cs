@@ -88,7 +88,7 @@ public class ReasonModel(
         // with errors.
         await evidenceUploadManager.UploadAsync(Evidence);
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Mqs.EditMq.Provider.CheckAnswers(journey.InstanceId),

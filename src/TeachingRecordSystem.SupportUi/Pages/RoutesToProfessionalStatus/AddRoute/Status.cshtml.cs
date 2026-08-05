@@ -35,7 +35,7 @@ public class StatusModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

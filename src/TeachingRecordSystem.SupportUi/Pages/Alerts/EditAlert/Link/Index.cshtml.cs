@@ -60,7 +60,7 @@ public class IndexModel(
             return await CancelAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         // There was no link to begin with and the user doesn't want to add one, so there's nothing to
         // change; abandon the journey and return to the record.

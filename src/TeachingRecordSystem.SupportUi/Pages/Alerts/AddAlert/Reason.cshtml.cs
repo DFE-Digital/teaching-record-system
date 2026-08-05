@@ -81,7 +81,7 @@ public class ReasonModel(
             return await CancelAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         await evidenceUploadManager.UploadAsync(Evidence);
 

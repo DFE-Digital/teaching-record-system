@@ -76,12 +76,7 @@ public class StartDateModel(
             ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(WebConstants.DateDisplayFormat)}");
         }
 
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

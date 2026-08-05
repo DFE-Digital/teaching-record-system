@@ -50,7 +50,7 @@ public class IndexModel(
             return await CancelAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Mqs.EditMq.StartDate.Reason(journey.InstanceId),

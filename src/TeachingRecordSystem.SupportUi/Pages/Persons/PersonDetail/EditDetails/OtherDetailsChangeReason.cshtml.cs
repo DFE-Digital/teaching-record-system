@@ -64,7 +64,7 @@ public class OtherDetailsChangeReasonModel(
         // with errors.
         await evidenceUploadManager.UploadAsync(Evidence);
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceToNextQuestion(
             linkGenerator.Persons.PersonDetail.EditDetails.CheckAnswers(journey.InstanceId),

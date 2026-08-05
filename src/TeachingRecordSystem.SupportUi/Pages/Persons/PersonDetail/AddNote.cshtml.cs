@@ -44,7 +44,7 @@ public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerat
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         Guid? fileId = null;
         if (File is not null)

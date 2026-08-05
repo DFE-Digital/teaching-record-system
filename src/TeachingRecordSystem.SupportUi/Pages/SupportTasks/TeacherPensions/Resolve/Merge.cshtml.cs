@@ -164,12 +164,7 @@ public class MergeModel(
             ModelState.AddModelError(nameof(GenderSource), "Select a gender");
         }
 
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
         return Journey.AdvanceTo(
             linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Journey.InstanceId),

@@ -59,7 +59,7 @@ public class Index(DisconnectOneLoginJourneyCoordinator journey, SupportUiLinkGe
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Verified(journey.InstanceId),

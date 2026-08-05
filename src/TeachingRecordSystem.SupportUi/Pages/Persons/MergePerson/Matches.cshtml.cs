@@ -85,7 +85,7 @@ public class MatchesModel(
             return BadRequest();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.MergePerson.Merge(journey.InstanceId),

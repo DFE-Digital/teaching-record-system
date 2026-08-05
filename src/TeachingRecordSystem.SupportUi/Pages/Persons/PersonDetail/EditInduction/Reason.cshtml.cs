@@ -79,12 +79,7 @@ public class ReasonModel(
     public async Task<IActionResult> OnPostAsync()
     {
         await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

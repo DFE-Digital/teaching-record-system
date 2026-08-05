@@ -69,12 +69,7 @@ public class CompletedDateModel(
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be before the induction start date");
         }
 
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {

@@ -41,7 +41,7 @@ public class StatusModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         if (CompletingRoute) // if user has set the status to 'holds' from another status
         {

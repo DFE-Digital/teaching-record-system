@@ -28,7 +28,7 @@ public class InductionExemptionModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
         {

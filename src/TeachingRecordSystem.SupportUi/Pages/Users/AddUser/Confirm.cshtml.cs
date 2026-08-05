@@ -62,7 +62,7 @@ public class ConfirmModel(
             return BadRequest();
         }
 
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var processContext = new ProcessContext(ProcessType.UserAdding, timeProvider.UtcNow, User.GetUserId());
 

@@ -83,12 +83,7 @@ public class DeactivateModel(
         }
 
         await evidenceUploadManager.ValidateAndUploadAsync<DeactivateModel>(m => m.Evidence, ViewData);
-        _validator.ValidateAndThrow(this);
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
         var processContext = new ProcessContext(ProcessType.UserDeactivating, timeProvider.UtcNow, User.GetUserId());
 

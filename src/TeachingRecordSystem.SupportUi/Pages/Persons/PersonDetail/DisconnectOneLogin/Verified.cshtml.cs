@@ -41,7 +41,7 @@ public class Verified(DisconnectOneLoginJourneyCoordinator journey, SupportUiLin
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(journey.InstanceId),

@@ -99,7 +99,7 @@ public class PersonalDetailsModel(
             return BadRequest();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.AddPerson.Reason(journey.InstanceId),

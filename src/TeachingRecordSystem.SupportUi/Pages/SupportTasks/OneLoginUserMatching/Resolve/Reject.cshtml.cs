@@ -46,7 +46,7 @@ public class Reject(
             return Redirect(journey.State.CompletionUrl);
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmReject(journey.InstanceId),

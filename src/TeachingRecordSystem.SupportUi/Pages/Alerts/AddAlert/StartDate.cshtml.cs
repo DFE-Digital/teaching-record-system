@@ -48,7 +48,7 @@ public class StartDateModel(
             return await CancelAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.Alerts.AddAlert.Reason(journey.InstanceId),

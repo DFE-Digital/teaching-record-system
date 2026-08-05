@@ -53,7 +53,7 @@ public class TypeModel(
             return await CancelAsync();
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var selectedType = AlertTypes!.Single(t => t.AlertTypeId == AlertTypeId);
 

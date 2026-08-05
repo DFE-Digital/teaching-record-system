@@ -28,7 +28,7 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var email = Email!;
         if (!email.Contains('@'))

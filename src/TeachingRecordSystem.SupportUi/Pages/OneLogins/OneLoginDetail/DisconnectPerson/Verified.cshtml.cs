@@ -43,7 +43,7 @@ public class Verified(
             return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
         }
 
-        await _validator.ValidateAndThrowAsync(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         return journey.AdvanceTo(
             linkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswers(journey.InstanceId),

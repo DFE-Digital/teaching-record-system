@@ -32,7 +32,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, TimeProvider timeP
 
     public async Task<IActionResult> OnPostAsync()
     {
-        _validator.ValidateAndThrow(this);
+        await this.ThrowIfInvalidAsync(_validator);
 
         var processContext = new ProcessContext(ProcessType.ApplicationUserCreating, timeProvider.UtcNow, User.GetUserId());
 
