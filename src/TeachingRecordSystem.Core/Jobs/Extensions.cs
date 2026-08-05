@@ -96,27 +96,15 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<BackfillDqtReportingQualificationsJob>(
-                nameof(BackfillDqtReportingQualificationsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillDqtReportingQualificationsJob");
 
-            recurringJobManager.AddOrUpdate<BackfillDqtReportingWorkforceDataJob>(
-                nameof(BackfillDqtReportingWorkforceDataJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillDqtReportingWorkforceDataJob");
 
-            recurringJobManager.AddOrUpdate<BackfillDqtReportingPersonsJob>(
-                nameof(BackfillDqtReportingPersonsJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillDqtReportingPersonsJob");
 
             recurringJobManager.RemoveIfExists("ExportWorkforceDataJob");
 
-            recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypesJob>(
-                nameof(BackfillDqtReportingAlertTypesJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillDqtReportingAlertTypesJob");
 
             recurringJobManager.AddOrUpdate<EwcWalesImportJob>(
                 nameof(EwcWalesImportJob),
@@ -166,10 +154,7 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<BackfillDqtReportingSupportTasksJob>(
-                nameof(BackfillDqtReportingSupportTasksJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillDqtReportingSupportTasksJob");
 
             recurringJobManager.RemoveIfExists("AllocateTrnsToOverseasNpqApplicantsJob");
 
@@ -183,10 +168,7 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<BackfillTrnRequestMetadataInReportingDb>(
-                nameof(BackfillTrnRequestMetadataInReportingDb),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillTrnRequestMetadataInReportingDb");
 
             recurringJobManager.AddOrUpdate<BackfillNormalizePersonNamesJob>(
                 $"{nameof(BackfillNormalizePersonNamesJob)} (dry-run)",
@@ -198,10 +180,7 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<BackfillUsersInReportingDb>(
-                nameof(BackfillUsersInReportingDb),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillUsersInReportingDb");
 
             recurringJobManager.AddOrUpdate<BackfillUserProcessesJob>(
                 $"{nameof(BackfillUserProcessesJob)} (dry-run)",
@@ -253,10 +232,7 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<BackfillSupportTasksInReportingDb>(
-                nameof(BackfillSupportTasksInReportingDb),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillSupportTasksInReportingDb");
 
             recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob (dry-run)");
             recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob");
@@ -296,10 +272,7 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(professionalStatusEmailJobOptions.JobSchedule));
 
-            recurringJobManager.AddOrUpdate<BackfillAlertsInReportingDb>(
-                nameof(BackfillAlertsInReportingDb),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("BackfillAlertsInReportingDb");
 
             recurringJobManager.AddOrUpdate<BackfillAuthzRegistrationTokenJob>(
                 nameof(BackfillAuthzRegistrationTokenJob),

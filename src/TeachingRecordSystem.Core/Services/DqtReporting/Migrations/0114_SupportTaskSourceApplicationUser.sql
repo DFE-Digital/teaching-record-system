@@ -1,1 +1,0 @@
-alter table trs_support_tasks add source_application_user_id uniqueidentifier

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
@@ -48,11 +47,6 @@ public static class Extensions
             services
                 .AddPublishApi(configuration)
                 .AddBackgroundJobs(configuration, environment);
-        }
-
-        if (configuration.GetValue<bool>("DqtReporting:RunService"))
-        {
-            services.AddDqtReporting(configuration);
         }
 
         return services;
