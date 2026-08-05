@@ -1087,7 +1087,7 @@
         "dependencies": {
           "AngleSharp": "[1.5.2, )",
           "Azure.Storage.Blobs": "[12.29.1, )",
-          "Azure.Storage.Files.DataLake": "[12.24.0, )",
+          "Azure.Storage.Files.DataLake": "[12.27.1, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.9.0, )",
           "CsvHelper": "[33.1.0, )",
@@ -1154,6 +1154,7 @@
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.3, )",
+          "Azure.Storage.Files.DataLake": "[12.27.1, )",
           "DfeAnalytics.EFCore": "[0.6.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
           "Hangfire.AspNetCore": "[1.8.24, )",
@@ -1223,13 +1224,13 @@
       },
       "Azure.Storage.Files.DataLake": {
         "type": "CentralTransitive",
-        "requested": "[12.24.0, )",
-        "resolved": "12.24.0",
-        "contentHash": "b1i4LL10EBXfBb9pOO9Q0C9lo2CvHkcPeLWw26dyOEZO3cNlNejAbAVYDW1Ct3aG8g1unm2/mSs9MTfyC1IZaw==",
+        "requested": "[12.27.1, )",
+        "resolved": "12.27.1",
+        "contentHash": "NVSGDPoK65WgPosYe/MuMbR1Je/+6LFue272zHty2rkE4a+N12PijYgBAfPp5tzU+Eo1MV7o515ApXH+lfOKsg==",
         "dependencies": {
-          "Azure.Core": "1.47.3",
-          "Azure.Storage.Blobs": "12.26.0",
-          "Azure.Storage.Common": "12.25.0"
+          "Azure.Core": "1.55.0",
+          "Azure.Storage.Blobs": "12.29.1",
+          "Azure.Storage.Common": "12.28.0"
         }
       },
       "Castle.Core": {
