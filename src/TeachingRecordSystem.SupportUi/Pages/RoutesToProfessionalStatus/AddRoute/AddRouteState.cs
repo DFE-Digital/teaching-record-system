@@ -1,15 +1,7 @@
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-public class AddRouteState : IRegisterJourney
+public class AddRouteState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.AddRouteToProfessionalStatus,
-        typeof(AddRouteState),
-        requestDataKeys: ["personId"],
-        appendUniqueKey: true);
-
-    public bool Initialized { get; set; }
-
     public Guid? RouteToProfessionalStatusId { get; set; }
     public RouteToProfessionalStatusStatus? Status { get; set; }
     public DateOnly? HoldsFrom { get; set; }
@@ -25,62 +17,4 @@ public class AddRouteState : IRegisterJourney
     public Guid? DegreeTypeId { get; set; }
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; init; } = new();
-
-    public bool IsComplete(AddRoutePage page)
-    {
-        return page switch
-        {
-            AddRoutePage.Route =>
-                RouteToProfessionalStatusId != null,
-            AddRoutePage.Status =>
-                Status != null,
-            AddRoutePage.StartAndEndDate =>
-                TrainingStartDate != null &&
-                TrainingEndDate != null,
-            AddRoutePage.HoldsFrom =>
-                HoldsFrom != null,
-            AddRoutePage.InductionExemption =>
-                IsExemptFromInduction != null,
-            AddRoutePage.TrainingProvider =>
-                TrainingProviderId != null,
-            AddRoutePage.DegreeType =>
-                DegreeTypeId != null,
-            AddRoutePage.Country =>
-                TrainingCountryId != null,
-            AddRoutePage.AgeRangeSpecialism =>
-                TrainingAgeSpecialismType is TrainingAgeSpecialismType type &&
-                (type != Core.Models.TrainingAgeSpecialismType.Range ||
-                (TrainingAgeSpecialismRangeFrom != null && TrainingAgeSpecialismRangeTo != null)),
-            AddRoutePage.SubjectSpecialisms =>
-                TrainingSubjectIds.Length != 0,
-            AddRoutePage.ChangeReason =>
-                ChangeReason != null &&
-                ChangeReasonDetail.IsComplete,
-            AddRoutePage.CheckAnswers => false,
-            _ => throw new ArgumentOutOfRangeException(nameof(page))
-        };
-    }
-
-    public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
-    {
-        if (Initialized)
-        {
-            return;
-        }
-
-        RouteToProfessionalStatusId = professionalStatusInfo.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId;
-        Status = professionalStatusInfo.RouteToProfessionalStatus.Status;
-        HoldsFrom = professionalStatusInfo.RouteToProfessionalStatus.HoldsFrom;
-        TrainingStartDate = professionalStatusInfo.RouteToProfessionalStatus.TrainingStartDate;
-        TrainingEndDate = professionalStatusInfo.RouteToProfessionalStatus.TrainingEndDate;
-        TrainingSubjectIds = professionalStatusInfo.RouteToProfessionalStatus.TrainingSubjectIds;
-        TrainingAgeSpecialismType = professionalStatusInfo.RouteToProfessionalStatus.TrainingAgeSpecialismType;
-        TrainingAgeSpecialismRangeFrom = professionalStatusInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom;
-        TrainingAgeSpecialismRangeTo = professionalStatusInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo;
-        TrainingCountryId = professionalStatusInfo.RouteToProfessionalStatus.TrainingCountryId;
-        TrainingProviderId = professionalStatusInfo.RouteToProfessionalStatus.TrainingProviderId;
-        IsExemptFromInduction = professionalStatusInfo.RouteToProfessionalStatus.ExemptFromInduction;
-        DegreeTypeId = professionalStatusInfo.RouteToProfessionalStatus.DegreeTypeId;
-        Initialized = true;
-    }
 }

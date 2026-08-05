@@ -3,14 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.AddRouteToProfessionalStatus), StartsJourney]
+public class IndexModel(AddRouteJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public Guid PersonId { get; set; }
-
-    public IActionResult OnGet() => Redirect(linkGenerator.RoutesToProfessionalStatus.AddRoute.Route(PersonId, JourneyInstance!.InstanceId));
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.RoutesToProfessionalStatus.AddRoute.Route(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }
-

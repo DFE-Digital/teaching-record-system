@@ -1,54 +1,58 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class DegreeTypeModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : AddRoutePostStatusPageModel(AddRoutePage.DegreeType, linkGenerator, referenceDataCache, evidenceUploadManager)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class DegreeTypeModel(AddRouteJourneyCoordinator journey, ReferenceDataCache referenceDataCache) : PageModel
 {
+    private readonly InlineValidator<DegreeTypeModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.DegreeTypeId)
+            .NotNull().WithMessage("Select a degree type")
+            .When(m => m.DegreeTypeRequired)
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
     public DegreeType[] DegreeTypes { get; set; } = [];
+
+    public bool DegreeTypeRequired { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public Guid? DegreeTypeId { get; set; }
 
-    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteType.DegreeTypeRequired, Status.GetDegreeTypeRequirement())
-        == FieldRequirement.Mandatory;
-
     public void OnGet()
     {
-        DegreeTypeId = JourneyInstance!.State.DegreeTypeId;
+        DegreeTypeId = journey.State.DegreeTypeId;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (DegreeTypeRequired && DegreeTypeId is null)
+        if (Cancel)
         {
-            ModelState.AddModelError("DegreeTypeId", "Select a degree type");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.DegreeTypeId = DegreeTypeId;
-        });
-
-        return await ContinueAsync();
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.DegreeType, state => state.DegreeTypeId = DegreeTypeId);
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        DegreeTypeRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.DegreeType);
+        DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
 
-        DegreeTypes = await ReferenceDataCache.GetDegreeTypesAsync();
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

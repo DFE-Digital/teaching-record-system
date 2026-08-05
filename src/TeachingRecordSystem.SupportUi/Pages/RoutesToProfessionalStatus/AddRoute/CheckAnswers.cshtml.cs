@@ -1,111 +1,152 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
 public class CheckAnswersModel(
+    AddRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager,
-    RoutesToProfessionalStatusService routesToProfessionalStatusService)
-    : AddRoutePostStatusPageModel(AddRoutePage.CheckAnswers, linkGenerator, referenceDataCache, evidenceUploadManager)
+    RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
-    public RouteDetailViewModel RouteDetail { get; set; } = null!;
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    // The URL a change link brings the user back to once they've answered the question again.
+    public string ReturnUrl { get; set; } = null!;
+
+    public RouteToProfessionalStatusType RouteType { get; set; } = null!;
+
+    public RouteToProfessionalStatusStatus Status => journey.Status;
+
+    public DateOnly? TrainingStartDate { get; set; }
+
+    public DateOnly? TrainingEndDate { get; set; }
+
+    public DateOnly? HoldsFrom { get; set; }
+
+    public bool? IsExemptFromInduction { get; set; }
+
+    public bool HasImplicitExemption { get; set; }
+
+    public string? TrainingProvider { get; set; }
+
+    public string? DegreeType { get; set; }
+
+    public string? TrainingCountry { get; set; }
+
+    public TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
+
+    public int? TrainingAgeSpecialismRangeFrom { get; set; }
+
+    public int? TrainingAgeSpecialismRangeTo { get; set; }
+
+    public string? TrainingAgeSpecialismRange =>
+        TrainingAgeSpecialismRangeFrom is not null && TrainingAgeSpecialismRangeTo is not null
+            ? $"From {TrainingAgeSpecialismRangeFrom} to {TrainingAgeSpecialismRangeTo}"
+            : null;
+
+    public string[]? TrainingSubjects { get; set; }
 
     public ChangeReasonOption? ChangeReason { get; set; }
+
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingStartDateRequired, Status.GetStartDateRequirement());
+    public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement());
+    public FieldRequirement HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType.HoldsFromRequired, Status.GetHoldsFromDateRequirement());
+    public FieldRequirement InductionExemptionRequired => QuestionDriverHelper.FieldRequired(RouteType.InductionExemptionRequired, Status.GetInductionExemptionRequirement());
+    public FieldRequirement TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
+    public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteType.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
+    public FieldRequirement TrainingCountryRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingCountryRequired, Status.GetCountryRequirement());
+    public FieldRequirement AgeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement());
+    public FieldRequirement TrainingSubjectsRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingSubjectsRequired, Status.GetSubjectsRequirement());
+
+    public void OnGet()
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        var pagesInOrder = Enum.GetValues<AddRoutePage>()
-            .Except([AddRoutePage.Route, AddRoutePage.Status, AddRoutePage.CheckAnswers])
-            .OrderBy(p => p);
-
-        foreach (var page in pagesInOrder)
-        {
-            var pageRequired = page.FieldRequirementForPage(RouteType, Status);
-
-            if (pageRequired == FieldRequirement.Mandatory &&
-                !JourneyInstance!.State.IsComplete(page) &&
-                // if the route has an implicit exemption, don't show the induction exemption page
-                (page != AddRoutePage.InductionExemption ||
-                 RouteType.InductionExemptionReason is null ||
-                 !RouteType.InductionExemptionReason.RouteImplicitExemption))
-            {
-                context.Result = Redirect(LinkGenerator.RoutesToProfessionalStatus.AddRoute.AddRoutePage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
-                return;
-            }
-        }
-
-        var hasImplicitExemption = RouteType.InductionExemptionReason?.RouteImplicitExemption ?? false;
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
-        RouteDetail = new RouteDetailViewModel
-        {
-            RouteToProfessionalStatusType = RouteType,
-            Status = Status,
-            HoldsFrom = JourneyInstance!.State.HoldsFrom,
-            TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
-            TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
-            TrainingSubjectIds = JourneyInstance!.State.TrainingSubjectIds,
-            TrainingAgeSpecialismType = JourneyInstance!.State.TrainingAgeSpecialismType,
-            TrainingAgeSpecialismRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom,
-            TrainingAgeSpecialismRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
-            TrainingCountryId = JourneyInstance!.State.TrainingCountryId,
-            TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
-            DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
-            HasImplicitExemption = hasImplicitExemption,
-            IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
-            FromCheckAnswers = true,
-            JourneyInstanceId = JourneyInstance!.InstanceId,
-            PersonId = PersonId
-        };
-    }
-
-    public async Task OnGetAsync()
-    {
-        RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
-        RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await ReferenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
-        RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await ReferenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
-        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await ReferenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
-        RouteDetail.TrainingSubjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(RouteDetail.TrainingSubjectIds, ReferenceDataCache);
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
+        var state = journey.State;
+
         await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
             new CreateRouteToProfessionalStatusOptions
             {
-                PersonId = PersonId,
+                PersonId = journey.PersonId,
                 RouteToProfessionalStatusTypeId = RouteType.RouteToProfessionalStatusTypeId,
-                Status = Status,
+                Status = journey.Status,
                 CreatedBy = User.GetUserId(),
-                HoldsFrom = JourneyInstance!.State.HoldsFrom,
-                TrainingStartDate = JourneyInstance.State.TrainingStartDate,
-                TrainingEndDate = JourneyInstance.State.TrainingEndDate,
-                TrainingSubjectIds = JourneyInstance.State.TrainingSubjectIds,
-                TrainingAgeSpecialismType = JourneyInstance.State.TrainingAgeSpecialismType,
-                TrainingAgeSpecialismRangeFrom = JourneyInstance.State.TrainingAgeSpecialismRangeFrom,
-                TrainingAgeSpecialismRangeTo = JourneyInstance.State.TrainingAgeSpecialismRangeTo,
-                TrainingCountryId = JourneyInstance.State.TrainingCountryId,
-                TrainingProviderId = JourneyInstance.State.TrainingProviderId,
-                DegreeTypeId = JourneyInstance.State.DegreeTypeId,
-                IsExemptFromInduction = JourneyInstance.State.IsExemptFromInduction,
-                ChangeReason = JourneyInstance.State.ChangeReason?.GetDisplayName(),
-                ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail,
-                EvidenceFile = JourneyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-                AdditionalInformation = JourneyInstance.State.ChangeReasonDetail.AdditionalInformation
+                HoldsFrom = state.HoldsFrom,
+                TrainingStartDate = state.TrainingStartDate,
+                TrainingEndDate = state.TrainingEndDate,
+                TrainingSubjectIds = state.TrainingSubjectIds,
+                TrainingAgeSpecialismType = state.TrainingAgeSpecialismType,
+                TrainingAgeSpecialismRangeFrom = state.TrainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = state.TrainingAgeSpecialismRangeTo,
+                TrainingCountryId = state.TrainingCountryId,
+                TrainingProviderId = state.TrainingProviderId,
+                DegreeTypeId = state.DegreeTypeId,
+                IsExemptFromInduction = state.IsExemptFromInduction,
+                ChangeReason = state.ChangeReason?.GetDisplayName(),
+                ChangeReasonDetail = state.ChangeReasonDetail.ChangeReasonDetail,
+                EvidenceFile = state.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                AdditionalInformation = state.ChangeReasonDetail.AdditionalInformation
             });
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
 
         TempData.SetFlashNotificationBanner("Route to professional status added");
 
-        return await ContinueAsync();
+        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(journey.PersonId));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        ReturnUrl = linkGenerator.RoutesToProfessionalStatus.AddRoute.CheckAnswers(journey.InstanceId);
+
+        var state = journey.State;
+
+        RouteType = await journey.GetRouteTypeAsync();
+        HasImplicitExemption = RouteType.InductionExemptionReason?.RouteImplicitExemption ?? false;
+        TrainingStartDate = state.TrainingStartDate;
+        TrainingEndDate = state.TrainingEndDate;
+        HoldsFrom = state.HoldsFrom;
+        IsExemptFromInduction = state.IsExemptFromInduction;
+        TrainingAgeSpecialismType = state.TrainingAgeSpecialismType;
+        TrainingAgeSpecialismRangeFrom = state.TrainingAgeSpecialismRangeFrom;
+        TrainingAgeSpecialismRangeTo = state.TrainingAgeSpecialismRangeTo;
+        ChangeReason = state.ChangeReason;
+        ChangeReasonDetail = state.ChangeReasonDetail;
+
+        TrainingProvider = state.TrainingProviderId is Guid trainingProviderId
+            ? (await referenceDataCache.GetTrainingProviderByIdAsync(trainingProviderId))?.Name
+            : null;
+        TrainingCountry = state.TrainingCountryId is string trainingCountryId
+            ? (await referenceDataCache.GetTrainingCountryByIdAsync(trainingCountryId))?.Name
+            : null;
+        DegreeType = state.DegreeTypeId is Guid degreeTypeId
+            ? (await referenceDataCache.GetDegreeTypeByIdAsync(degreeTypeId))?.Name
+            : null;
+        TrainingSubjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(state.TrainingSubjectIds, referenceDataCache);
+
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

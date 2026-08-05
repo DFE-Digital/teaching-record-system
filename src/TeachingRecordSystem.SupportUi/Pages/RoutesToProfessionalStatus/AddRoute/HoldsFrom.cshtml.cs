@@ -1,50 +1,57 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(
-    TimeProvider timeProvider,
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : AddRoutePostStatusPageModel(AddRoutePage.HoldsFrom, linkGenerator, referenceDataCache, evidenceUploadManager)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class HoldsFromModel(AddRouteJourneyCoordinator journey, TimeProvider timeProvider) : PageModel
 {
+    private readonly InlineValidator<HoldsFromModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.HoldsFrom)
+            .NotNull().WithMessage("Enter the date they first held this professional status")
+            .When(m => m.HoldsFromRequired),
+        v => v.RuleFor(m => m.HoldsFrom)
+            .Must(holdsFrom => !(holdsFrom > timeProvider.Today))
+                .WithMessage("The date they first held this professional status must not be in the future")
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "The date they first held this professional status")]
+    public bool Cancel { get; set; }
+
+    [BindProperty]
     public DateOnly? HoldsFrom { get; set; }
 
-    public bool HoldsFromRequired => QuestionDriverHelper.FieldRequired(RouteType!.HoldsFromRequired, Status.GetHoldsFromDateRequirement())
-        == FieldRequirement.Mandatory;
+    public bool HoldsFromRequired { get; set; }
 
     public void OnGet()
     {
-        HoldsFrom = JourneyInstance!.State.HoldsFrom;
+        HoldsFrom = journey.State.HoldsFrom;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (HoldsFromRequired && HoldsFrom is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(HoldsFrom), "Enter the date they first held this professional status");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (HoldsFrom > timeProvider.Today)
-        {
-            ModelState.AddModelError(nameof(HoldsFrom), "The date they first held this professional status must not be in the future");
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.HoldsFrom, state => state.HoldsFrom = HoldsFrom);
+    }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.HoldsFrom = HoldsFrom;
-        });
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        HoldsFromRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.HoldsFrom);
 
-        return await ContinueAsync();
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

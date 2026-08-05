@@ -1,16 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StatusModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : AddRouteCommonPageModel(AddRoutePage.Status, linkGenerator, referenceDataCache, evidenceController)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class StatusModel(AddRouteJourneyCoordinator journey) : PageModel
 {
     private readonly InlineValidator<StatusModel> _validator = new()
     {
@@ -18,47 +14,50 @@ public class StatusModel(
             .NotNull().WithMessage("Select a route status")
     };
 
-    public override AddRoutePage? NextPage => PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckAnswers;
-    public override AddRoutePage? PreviousPage => AddRoutePage.Route;
+    public string PageCaption => journey.PageCaption;
 
-    public RouteToProfessionalStatusType Route { get; set; } = null!;
+    public string? BackLink { get; set; }
+
+    public RouteToProfessionalStatusType RouteType { get; set; } = null!;
 
     public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public RouteToProfessionalStatusStatus? Status { get; set; }
 
     public void OnGet()
     {
-        Status = JourneyInstance!.State.Status;
+        Status = journey.State.Status;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.Status, state =>
         {
             state.Status = Status;
             state.IsExemptFromInduction = Status is RouteToProfessionalStatusStatus.Holds
-                ? Route.InductionExemptionReason?.RouteImplicitExemption
+                ? RouteType.InductionExemptionReason?.RouteImplicitExemption
                 : null;
         });
-
-        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
-        {
-            context.Result = BadRequest();
-            return;
-        }
-
+        RouteType = await journey.GetRouteTypeAsync();
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache, EvidenceUploadManager evidenceUploadManager)
-    : AddRoutePostStatusPageModel(AddRoutePage.ChangeReason, linkGenerator, referenceDataCache, evidenceUploadManager)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class ReasonModel(AddRouteJourneyCoordinator journey, EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -16,7 +17,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCach
             .NotEmpty().WithMessage("Enter a reason")
             .When(m => m.ChangeReason == ChangeReasonOption.AnotherReason),
         v => v.RuleFor(m => m.ProvideAdditionalInformation)
-            .NotNull().WithMessage("Select yes if you want to add more information about why you\u2019re adding this route"),
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re adding this route"),
         v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
@@ -25,6 +26,13 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCach
             .When(m => m.ProvideAdditionalInformation == ProvideMoreInformationOption.Yes),
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public ChangeReasonOption? ChangeReason { get; set; }
@@ -43,19 +51,27 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCach
 
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ProvideAdditionalInformation = JourneyInstance.State.ChangeReasonDetail.ProvideAdditionalInformation;
-        AdditionalInformation = JourneyInstance.State.ChangeReasonDetail.AdditionalInformation;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail;
-        Evidence = JourneyInstance.State.ChangeReasonDetail.Evidence;
+        ChangeReason = journey.State.ChangeReason;
+        ProvideAdditionalInformation = journey.State.ChangeReasonDetail.ProvideAdditionalInformation;
+        AdditionalInformation = journey.State.ChangeReasonDetail.AdditionalInformation;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail.ChangeReasonDetail;
+        Evidence = journey.State.ChangeReasonDetail.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.ChangeReason, state =>
         {
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
@@ -63,7 +79,12 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator, ReferenceDataCach
             state.ChangeReasonDetail.AdditionalInformation = AdditionalInformation;
             state.ChangeReasonDetail.Evidence = Evidence;
         });
+    }
 
-        return await ContinueAsync();
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        BackLink = journey.GetBackLink();
+
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

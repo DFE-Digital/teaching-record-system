@@ -1,17 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class SubjectSpecialismsModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : AddRoutePostStatusPageModel(AddRoutePage.SubjectSpecialisms, linkGenerator, referenceDataCache, evidenceController)
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
+public class SubjectSpecialismsModel(AddRouteJourneyCoordinator journey, ReferenceDataCache referenceDataCache) : PageModel
 {
+    private readonly InlineValidator<SubjectSpecialismsModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.SubjectId1)
+            .Must((m, _) => m.SubjectId1 is not null || m.SubjectId2 is not null || m.SubjectId3 is not null)
+                .WithMessage("Enter a subject")
+            .When(m => m.SubjectSpecialismRequired)
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
     public DisplayInfo[] Subjects { get; set; } = [];
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public Guid? SubjectId1 { get; set; }
@@ -20,48 +31,42 @@ public class SubjectSpecialismsModel(
     [BindProperty]
     public Guid? SubjectId3 { get; set; }
 
-    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingSubjectsRequired, Status.GetSubjectsRequirement())
-        == FieldRequirement.Mandatory;
+    public bool SubjectSpecialismRequired { get; set; }
 
     public void OnGet()
     {
-        SubjectId1 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(0);
-        SubjectId2 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(1);
-        SubjectId3 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(2);
+        SubjectId1 = journey.State.TrainingSubjectIds.ElementAtOrDefault(0);
+        SubjectId2 = journey.State.TrainingSubjectIds.ElementAtOrDefault(1);
+        SubjectId3 = journey.State.TrainingSubjectIds.ElementAtOrDefault(2);
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (SubjectSpecialismRequired && SubjectId1 is null && SubjectId2 is null && SubjectId3 is null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(SubjectId1), "Enter a subject");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        Guid[] subjects = new Guid?[] { SubjectId1, SubjectId2, SubjectId3 }.Where(s => s.HasValue).Select(s => s!.Value).ToArray();
+        var subjects = new Guid?[] { SubjectId1, SubjectId2, SubjectId3 }.Where(s => s.HasValue).Select(s => s!.Value).ToArray();
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.TrainingSubjectIds = subjects;
-        });
-
-        return await ContinueAsync();
+        return await journey.AnswerAndAdvanceAsync(AddRoutePage.SubjectSpecialisms, state => state.TrainingSubjectIds = subjects);
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync())
+        SubjectSpecialismRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.SubjectSpecialisms);
+        Subjects = (await referenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
             {
                 Id = s.TrainingSubjectId,
                 DisplayName = $"{s.Reference} - {s.Name}"
             })
             .ToArray();
+
+        BackLink = journey.GetBackLink();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

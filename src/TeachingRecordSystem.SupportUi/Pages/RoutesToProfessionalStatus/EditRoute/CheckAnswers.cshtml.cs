@@ -42,7 +42,7 @@ public class CheckYourAnswersModel(
 
         foreach (var page in pagesInOrder)
         {
-            var pageRequired = page.FieldRequirementForPage(route, status);
+            var pageRequired = AddRouteJourneyCoordinator.GetFieldRequirementForPage(page, route, status);
 
             if (pageRequired == FieldRequirement.Mandatory &&
                 !JourneyInstance!.State.IsComplete(page) &&

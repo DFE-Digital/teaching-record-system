@@ -1,23 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.AddRouteToProfessionalStatus)]
 public class RouteModel(
+    AddRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : AddRouteCommonPageModel(AddRoutePage.Route, linkGenerator, referenceDataCache, evidenceController)
+    ReferenceDataCache referenceDataCache) : PageModel
 {
-    public override AddRoutePage? NextPage => AddRoutePage.Status;
-    public override AddRoutePage? PreviousPage => null;
+    private readonly InlineValidator<RouteModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.RouteId)
+            .Cascade(CascadeMode.Stop)
+            .Must((m, routeId) => routeId is not null || m.ArchivedRouteId is not null)
+                .WithMessage("Enter a route type")
+            .Must((m, routeId) => routeId is null || m.ArchivedRouteId is null)
+                .WithMessage("Enter only one route type")
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
 
     public RouteToProfessionalStatusType[] Routes { get; set; } = [];
 
     public RouteToProfessionalStatusType[] ArchivedRoutes { get; set; } = [];
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public Guid? RouteId { get; set; }
@@ -27,7 +40,7 @@ public class RouteModel(
 
     public void OnGet()
     {
-        var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+        var preselectedRouteId = journey.State.RouteToProfessionalStatusId;
 
         if (Routes.Any(r => r.RouteToProfessionalStatusTypeId == preselectedRouteId))
         {
@@ -41,34 +54,26 @@ public class RouteModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (RouteId == null && ArchivedRouteId == null)
+        if (Cancel)
         {
-            ModelState.AddModelError(nameof(RouteId), "Enter a route type");
-        }
-        else if (RouteId is not null && ArchivedRouteId is not null)
-        {
-            ModelState.AddModelError(nameof(RouteId), "Enter only one route type");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.RouteToProfessionalStatusId = RouteId ?? ArchivedRouteId!.Value;
-        });
-
-        return await ContinueAsync();
+        return await journey.AnswerAndAdvanceAsync(
+            AddRoutePage.Route,
+            state => state.RouteToProfessionalStatusId = RouteId ?? ArchivedRouteId!.Value);
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        var allRoutes = await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
+        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         Routes = allRoutes.Where(r => r.IsActive).ToArray();
         ArchivedRoutes = allRoutes.Where(r => !r.IsActive).ToArray();
+
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(journey.PersonId);
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
