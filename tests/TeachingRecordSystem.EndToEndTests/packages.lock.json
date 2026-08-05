@@ -1732,7 +1732,7 @@
       "teachingrecordsystem.authorizeaccess": {
         "type": "Project",
         "dependencies": {
-          "AspNetCore.SassCompiler": "[1.99.0, )",
+          "AspNetCore.SassCompiler": "[1.102.0, )",
           "DfeAnalytics.AspNetCore": "[0.6.1, )",
           "GovUk.Frontend.AspNetCore": "[4.4.0, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
@@ -1804,7 +1804,7 @@
       "teachingrecordsystem.supportui": {
         "type": "Project",
         "dependencies": {
-          "AspNetCore.SassCompiler": "[1.99.0, )",
+          "AspNetCore.SassCompiler": "[1.102.0, )",
           "GovUk.Frontend.AspNetCore": "[4.4.0, )",
           "GovUk.Questions.AspNetCore": "[1.0.3, )",
           "Htmx": "[1.12.0, )",
@@ -1887,9 +1887,9 @@
       },
       "AspNetCore.SassCompiler": {
         "type": "CentralTransitive",
-        "requested": "[1.99.0, )",
-        "resolved": "1.99.0",
-        "contentHash": "a1cIh5KPiZoZ9lVqKLVX/koskE6LAiIB61sbh6mWW3R2mJanzziatiSHk+fd+leu2XGNdaTfy9VG5k8F6VhyKA==",
+        "requested": "[1.102.0, )",
+        "resolved": "1.102.0",
+        "contentHash": "zmqa5nN5NqYBQlYWDhicimoEd4iGFW2o3UpN5bhbqwjjHBo5C/mGzsYwpeZreXcH/hOPqjqNwN8Q78xKOj82hw==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "3.1.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.0",
