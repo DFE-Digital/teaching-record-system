@@ -66,29 +66,22 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: userRole));
 
-        JourneyInstance journey = journeyName switch
+        // Edit Route is still on FormFlow, so the two journeys are seeded differently.
+        var journeyQueryParameter = journeyName switch
         {
-            JourneyNames.EditRouteToProfessionalStatus => await CreateJourneyInstance(
-                JourneyNames.EditRouteToProfessionalStatus,
-                new EditRouteStateBuilder()
-                    .WithRouteToProfessionalStatusId(_route!.RouteToProfessionalStatusTypeId)
-                    .WithStatus(_status)
-                    .Build(),
-                new KeyValuePair<string, object>("qualificationId", _qualificationId)),
+            JourneyNames.EditRouteToProfessionalStatus =>
+                (await CreateJourneyInstance(
+                    JourneyNames.EditRouteToProfessionalStatus,
+                    new EditRouteStateBuilder()
+                        .WithRouteToProfessionalStatusId(_route!.RouteToProfessionalStatusTypeId)
+                        .WithStatus(_status)
+                        .Build(),
+                    new KeyValuePair<string, object>("qualificationId", _qualificationId))).GetUniqueIdQueryParameter(),
 
-            _ => await CreateJourneyInstance(
-                JourneyNames.DeleteRouteToProfessionalStatus,
-                new DeleteRouteState
-                {
-                    ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
-                    ChangeReasonDetail = new ChangeReasonStateBuilder()
-                        .WithValidChangeReasonDetail()
-                        .Build()
-                },
-                new KeyValuePair<string, object>("qualificationId", _qualificationId))
+            _ => (await CreateDeleteRouteJourneyInstanceAsync()).GetUniqueIdQueryParameter()
         };
 
-        var page = string.Format(pageFormat, _qualificationId, journey.GetUniqueIdQueryParameter(), _personId);
+        var page = string.Format(pageFormat, _qualificationId, journeyQueryParameter, _personId);
         var request = new HttpRequestMessage(HttpMethod.Get, page);
 
         // Act
@@ -104,6 +97,25 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
     }
+
+    // Seeds the whole path so that every Delete Route page is reachable.
+    private Task<DeleteRouteJourneyCoordinator> CreateDeleteRouteJourneyInstanceAsync() =>
+        JourneyHelper.CreateInstanceAsync<DeleteRouteJourneyCoordinator>(
+            JourneyNames.DeleteRouteToProfessionalStatus,
+            new RouteValueDictionary { ["qualificationId"] = _qualificationId },
+            _ => Task.FromResult<object>(new DeleteRouteState
+            {
+                ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+                ChangeReasonDetail = new ChangeReasonStateBuilder()
+                    .WithValidChangeReasonDetail()
+                    .Build()
+            }),
+            pathUrls:
+            [
+                $"/routes/{_qualificationId}/delete/reason",
+                $"/routes/{_qualificationId}/delete/check-answers"
+            ],
+            coordinatorFactory: CreateJourneyCoordinator<DeleteRouteJourneyCoordinator>);
 
     public static (string JourneyName, string PageFormat, string? UserRole, bool CanViewPage)[] GetData()
     {

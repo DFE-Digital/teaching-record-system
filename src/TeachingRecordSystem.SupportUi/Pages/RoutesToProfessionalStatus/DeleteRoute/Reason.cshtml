@@ -1,4 +1,4 @@
-@page "/routes/{qualificationId}/delete/reason/{handler?}"
+@page "/routes/{qualificationId}/delete/reason"
 @using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute.ReasonModel
 @{
@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
-            <span class="govuk-caption-l">Delete route - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
                     @ViewBag.Title
@@ -54,9 +54,8 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.ReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
 </div>
-

@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class ReasonModel(SupportUiLinkGenerator linkGenerator,
+[Journey(JourneyNames.DeleteRouteToProfessionalStatus)]
+public class ReasonModel(
+    DeleteRouteJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
@@ -19,7 +20,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
             .NotEmpty().WithMessage("Enter a reason")
             .When(m => m.ChangeReason == ChangeReasonOption.AnotherReason),
         v => v.RuleFor(m => m.ProvideAdditionalInformation)
-            .NotNull().WithMessage("Select yes if you want to add more information about why you\u2019re deleting this route"),
+            .NotNull().WithMessage("Select yes if you want to add more information about why you’re deleting this route"),
         v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
@@ -29,15 +30,12 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
-    public string? PersonName { get; set; }
-    public Guid PersonId { get; private set; }
-    public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
+    public string PageCaption => journey.PageCaption;
 
-    [FromQuery]
-    public bool? FromCheckAnswers { get; set; }
+    public string? BackLink { get; set; }
 
-    [FromRoute]
-    public Guid QualificationId { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public ChangeReasonOption? ChangeReason { get; set; }
@@ -49,56 +47,50 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    public EvidenceUploadModel Evidence { get; set; } = new();
-
-    [BindProperty]
     public string? AdditionalInformation { get; set; }
 
-    public string NextPage => linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId);
-
-    public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
-
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-
-        return next();
-    }
+    [BindProperty]
+    public EvidenceUploadModel Evidence { get; set; } = new();
 
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ProvideAdditionalInformation = JourneyInstance.State.ChangeReasonDetail.ProvideAdditionalInformation;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail.ChangeReasonDetail;
-        Evidence = JourneyInstance.State.ChangeReasonDetail.Evidence;
-        AdditionalInformation = JourneyInstance.State.ChangeReasonDetail.AdditionalInformation;
+        ChangeReason = journey.State.ChangeReason;
+        ProvideAdditionalInformation = journey.State.ChangeReasonDetail.ProvideAdditionalInformation;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail.ChangeReasonDetail;
+        AdditionalInformation = journey.State.ChangeReasonDetail.AdditionalInformation;
+        Evidence = journey.State.ChangeReasonDetail.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
         await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ChangeReason = ChangeReason;
-            state.ChangeReasonDetail.ProvideAdditionalInformation = ProvideAdditionalInformation;
-            state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
-            state.ChangeReasonDetail.Evidence = Evidence;
-            state.ChangeReasonDetail.AdditionalInformation = AdditionalInformation;
-        });
-
-        return Redirect(NextPage);
+        return journey.AdvanceTo(
+            linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(journey.InstanceId),
+            state =>
+            {
+                state.ChangeReason = ChangeReason;
+                state.ChangeReasonDetail.ProvideAdditionalInformation = ProvideAdditionalInformation;
+                state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
+                state.ChangeReasonDetail.AdditionalInformation = AdditionalInformation;
+                state.ChangeReasonDetail.Evidence = Evidence;
+            });
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
+        // The reason is the journey's first step, so there's nothing within the journey to go back to.
+        BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Qualifications(journey.PersonId);
+
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

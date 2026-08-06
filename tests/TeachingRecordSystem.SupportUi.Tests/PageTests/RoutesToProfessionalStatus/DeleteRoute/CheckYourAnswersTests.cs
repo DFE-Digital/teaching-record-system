@@ -1,14 +1,13 @@
-using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.DeleteRoute;
 
-public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixture)
 {
     [Fact]
-    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
@@ -16,7 +15,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -25,29 +24,55 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", response.Headers.Location?.OriginalString);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+
+        await WithDbContextAsync(async dbContext =>
+            Assert.NotNull(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
+    }
+
+    [Fact]
+    public async Task Get_BackLinkReturnsToReason()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var deleteRouteState = new DeleteRouteState
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Equal(
+            $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}",
+            doc.GetElementByTestId("back-link")!.GetAttribute("href"));
     }
 
     [Fact]
@@ -59,7 +84,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -68,12 +93,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -111,7 +133,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithInductionExemption(true)));
 
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -120,12 +142,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -154,7 +173,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -163,12 +182,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -183,8 +199,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
-    public async Task Post_Confirm_DeletesRecordCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_DeletesRecordCreatesEventDeletesJourneyAndRedirectsWithFlashMessage()
     {
+        // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).SingleRandom();
 
         var person = await TestData.CreatePersonAsync(p => p
@@ -202,10 +219,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -221,27 +235,25 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         await WithDbContextAsync(async dbContext => Assert.Null(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
 
-        var RaisedBy = GetCurrentUserId();
-
         EventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
 
             Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
-            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), deletedEvent.DeletionReason);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedEvent.DeletionReasonDetail);
+            Assert.Equal(deleteRouteState.ChangeReason!.GetDisplayName(), deletedEvent.DeletionReason);
+            Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, deletedEvent.DeletionReasonDetail);
             Assert.Null(deletedEvent.EvidenceFile);
             Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.None, deletedEvent.Changes);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
     public async Task Post_Confirm_WithHoldsQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
     {
+        // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .SingleRandom();
@@ -263,10 +275,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -277,12 +286,12 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Null(updatedPerson.QtsDate);
 
-        var RaisedByUserId = GetCurrentUserId();
+        var raisedByUserId = GetCurrentUserId();
 
         EventObserver.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(RaisedByUserId, deletedEvent.RaisedBy.UserId);
+            Assert.Equal(raisedByUserId, deletedEvent.RaisedBy.UserId);
             Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
             Assert.Equal(qtsDate, deletedEvent.OldPersonAttributes.QtsDate);
@@ -290,13 +299,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.True(deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate));
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Fact]
     public async Task Post_Confirm_WithHoldsQtsRouteType_UpdatesPersonQtsDateWithOlderRouteDateAndHasChangesInEvent()
     {
+        // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .SingleRandom();
@@ -314,7 +323,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         EventObserver.Clear();
 
         var qualificationIdEarliestDate = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single(p => p.HoldsFrom == holdsFromEarliest).QualificationId;
-        var qualificationIdLatestDate = person.Qualifications!.OfType<RouteToProfessionalStatus>().Single(p => p.HoldsFrom == holdsFromLatest).QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -323,10 +331,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationIdEarliestDate,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationIdEarliestDate, deleteRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationIdEarliestDate}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -347,8 +352,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
         });
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.Completed);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -367,7 +371,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var deleteRouteState = new DeleteRouteState
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -376,12 +380,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
-        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -389,10 +390,4 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private Task<JourneyInstance<DeleteRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteRouteState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.DeleteRouteToProfessionalStatus,
-            state ?? new DeleteRouteState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }
