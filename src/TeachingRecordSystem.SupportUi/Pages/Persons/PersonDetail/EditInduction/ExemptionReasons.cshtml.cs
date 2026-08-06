@@ -1,20 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.InductionExemptions;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.EditInduction), StartsJourney]
 public class ExemptionReasonsModel(
-    SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    EvidenceUploadManager evidenceController,
-    InductionExemptionService inductionExemptionService)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EditInductionJourneyCoordinator journey,
+    InductionExemptionService inductionExemptionService) : PageModel
 {
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public Guid[] ExemptionReasonIds { get; set; } = [];
 
@@ -26,86 +29,33 @@ public class ExemptionReasonsModel(
         RoutesWithInductionExemptions?
             .Any(r => InductionExemptionService.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)) ?? false;
 
-    public string[]? InductionExemptionFromRoutesMessages
+    public string[]? InductionExemptionFromRoutesMessages =>
+        RoutesWithInductionExemptions is null || !RoutesWithInductionExemptions.Any()
+            ? null
+            : RoutesWithInductionExemptions
+                .Select(r => $"This person has an induction exemption \"{r.InductionExemptionReasonName}\" on the \"{r.RouteToProfessionalStatusName}\" route.")
+                .ToArray();
+
+    public string[]? InductionExemptionReasonNotAvailableMessages =>
+        !ShowInductionExemptionReasonNotAvailableMessage
+            ? null
+            : RoutesWithInductionExemptions!
+                .Where(r => InductionExemptionService.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId))
+                .Select(r => $"To add/remove the induction exemption reason of: \"{r.InductionExemptionReasonName}\" please modify the \"{r.RouteToProfessionalStatusName}\" route.")
+                .ToArray();
+
+    public void OnGet()
     {
-        get
-        {
-            if (RoutesWithInductionExemptions is null || !RoutesWithInductionExemptions.Any())
-            {
-                return null;
-            }
-            else
-            {
-                List<string> messages = [];
-                foreach (var route in RoutesWithInductionExemptions!)
-                {
-                    messages.Add($"This person has an induction exemption \"{route.InductionExemptionReasonName}\" on the \"{route.RouteToProfessionalStatusName}\" route.");
-                }
-                return messages.ToArray();
-            }
-        }
-    }
-
-    public string[]? InductionExemptionReasonNotAvailableMessages
-    {
-        get
-        {
-            if (!ShowInductionExemptionReasonNotAvailableMessage)
-            {
-                return null;
-            }
-            else
-            {
-                List<string> messages = [];
-                foreach (var route in RoutesWithInductionExemptions!
-                    .Where(r => InductionExemptionService.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)))
-                {
-                    messages.Add($"To add/remove the induction exemption reason of: \"{route.InductionExemptionReasonName}\" please modify the \"{route.RouteToProfessionalStatusName}\" route.");
-                }
-                return messages.ToArray();
-            }
-        }
-    }
-
-
-    public InductionJourneyPage NextPage
-    {
-        get
-        {
-            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
-            {
-                return InductionJourneyPage.CheckAnswers;
-            }
-            return InductionJourneyPage.ChangeReasons;
-        }
-    }
-
-    public string BackLink
-    {
-        get
-        {
-            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
-            {
-                return GetPageLink(InductionJourneyPage.CheckAnswers);
-            }
-            return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.ExemptionReason
-                ? LinkGenerator.Persons.PersonDetail.Induction(PersonId)
-                : GetPageLink(InductionJourneyPage.Status);
-        }
-    }
-
-    public IActionResult OnGet()
-    {
-        if (JourneyInstance!.State.ExemptionReasonIds != null)
-        {
-            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
-        }
-
-        return Page();
+        ExemptionReasonIds = journey.State.ExemptionReasonIds;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         if (ExemptionReasonIds.Length == 0)
         {
             ModelState.AddModelError(nameof(ExemptionReasonIds), "Select the reason for a teacher’s exemption to induction");
@@ -116,29 +66,28 @@ public class ExemptionReasonsModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ExemptionReasonIds = ExemptionReasonIds;
-        });
+        journey.UpdateState(state => state.ExemptionReasonIds = ExemptionReasonIds);
 
-        return Redirect(GetPageLink(NextPage));
+        return Redirect(journey.ContinueTo(journey.ReasonUrl()));
     }
 
-    protected override InductionJourneyPage StartPage => InductionJourneyPage.ExemptionReason;
-
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        if (JourneyInstance!.State.InductionStatus != InductionStatus.Exempt)
+        // Reachable as the journey's first step for a person whose status doesn't ask this question,
+        // since a request can name the page directly. Once the journey is under way a status that
+        // stops asking it truncates the path, so path validation is what turns the user away.
+        if (journey.Status != InductionStatus.Exempt)
         {
-            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
+            context.Result = Redirect(journey.InductionUrl);
             return;
         }
 
-        var response = await inductionExemptionService.GetExemptionReasonsAsync(PersonId);
+        BackLink = journey.GetBackLink() ?? journey.InductionUrl;
 
+        var response = await inductionExemptionService.GetExemptionReasonsAsync(journey.PersonId);
         RoutesWithInductionExemptions = response.RoutesWithInductionExemptions;
         ExemptionReasons = response.ExemptionReasonCategories;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

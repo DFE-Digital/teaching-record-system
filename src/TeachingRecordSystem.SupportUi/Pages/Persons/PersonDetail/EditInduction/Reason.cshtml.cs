@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), RequireJourneyInstance]
+[Journey(JourneyNames.EditInduction)]
 public class ReasonModel(
-    SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    EditInductionJourneyCoordinator journey,
+    EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
     {
@@ -30,6 +29,13 @@ public class ReasonModel(
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public PersonInductionChangeReason? ChangeReason { get; set; }
 
@@ -45,51 +51,45 @@ public class ReasonModel(
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
-
-    public InductionJourneyPage NextPage => InductionJourneyPage.CheckAnswers;
-
-    public string BackLink
-    {
-        get
-        {
-            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
-            {
-                return GetPageLink(InductionJourneyPage.CheckAnswers);
-            }
-            return InductionStatus switch
-            {
-                _ when InductionStatus.RequiresCompletedDate() => GetPageLink(InductionJourneyPage.CompletedDate),
-                _ when InductionStatus.RequiresStartDate() => GetPageLink(InductionJourneyPage.StartDate),
-                _ when InductionStatus.RequiresExemptionReasons() => GetPageLink(InductionJourneyPage.ExemptionReason),
-                _ => GetPageLink(InductionJourneyPage.Status)
-            };
-        }
-    }
-
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ProvideAdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReason == PersonInductionChangeReason.AnotherReason ? JourneyInstance.State.ChangeReasonDetail : null;
-        AdditionalInformation = JourneyInstance.State.ProvideAdditionalInformation == true ? JourneyInstance.State.AdditionalInformation : null;
-        Evidence = JourneyInstance.State.Evidence;
+        ChangeReason = journey.State.ChangeReason;
+        ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
+        ChangeReasonDetail = journey.State.ChangeReason == PersonInductionChangeReason.AnotherReason ? journey.State.ChangeReasonDetail : null;
+        AdditionalInformation = journey.State.ProvideAdditionalInformation == true ? journey.State.AdditionalInformation : null;
+        Evidence = journey.State.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await EvidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.ChangeReason = ChangeReason;
-            state.ProvideAdditionalInformation = ProvideAdditionalInformation;
-            state.AdditionalInformation = ProvideAdditionalInformation is true ? AdditionalInformation : null;
-            state.ChangeReasonDetail = ChangeReason == PersonInductionChangeReason.AnotherReason ? ChangeReasonDetail : null;
-            state.Evidence = Evidence;
-        });
+        journey.UpdateState(
+            state =>
+            {
+                state.ChangeReason = ChangeReason;
+                state.ProvideAdditionalInformation = ProvideAdditionalInformation;
+                state.AdditionalInformation = ProvideAdditionalInformation is true ? AdditionalInformation : null;
+                state.ChangeReasonDetail = ChangeReason == PersonInductionChangeReason.AnotherReason ? ChangeReasonDetail : null;
+                state.Evidence = Evidence;
+            });
 
-        return Redirect(GetPageLink(NextPage));
+        return Redirect(journey.ContinueTo(journey.CheckAnswersUrl()));
+    }
+
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        BackLink = journey.GetBackLink() ?? journey.InductionUrl;
+
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

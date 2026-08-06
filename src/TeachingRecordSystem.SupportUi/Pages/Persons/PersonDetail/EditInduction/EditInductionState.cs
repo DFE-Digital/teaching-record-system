@@ -1,63 +1,29 @@
-using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-public class EditInductionState : IRegisterJourney
+public class EditInductionState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.EditInduction,
-        typeof(EditInductionState),
-        requestDataKeys: ["personId"],
-        appendUniqueKey: true);
-
-    public InductionJourneyPage? JourneyStartPage { get; set; }
     public InductionStatus InductionStatus { get; set; }
+
+    // The status the person holds now, which decides whether the status question warns that
+    // induction is managed by CPD.
     public InductionStatus CurrentInductionStatus { get; set; }
+
     public DateOnly? StartDate { get; set; }
+
     public DateOnly? CompletedDate { get; set; }
-    public Guid[]? ExemptionReasonIds { get; set; } = [];
+
+    public Guid[] ExemptionReasonIds { get; set; } = [];
+
     public PersonInductionChangeReason? ChangeReason { get; set; }
+
     public bool? ProvideAdditionalInformation { get; set; }
+
     public string? ChangeReasonDetail { get; set; }
+
     public string? AdditionalInformation { get; set; }
+
     public EvidenceUploadModel Evidence { get; set; } = new();
-
-    public bool Initialized { get; set; }
-
-    [JsonIgnore]
-    public bool IsComplete =>
-        InductionStatus != InductionStatus.None &&
-        (!InductionStatus.RequiresStartDate() || StartDate.HasValue) &&
-        (!InductionStatus.RequiresCompletedDate() || CompletedDate.HasValue) &&
-        (!InductionStatus.RequiresExemptionReasons() || (ExemptionReasonIds != null && ExemptionReasonIds.Length != 0)) &&
-        ChangeReason.HasValue &&
-        (ChangeReason == PersonInductionChangeReason.AnotherReason && !string.IsNullOrEmpty(ChangeReasonDetail) ||
-         ChangeReason != PersonInductionChangeReason.AnotherReason && string.IsNullOrEmpty(ChangeReasonDetail)) &&
-        ProvideAdditionalInformation is bool proveAdditionalInfo &&
-        (proveAdditionalInfo == true && !string.IsNullOrEmpty(AdditionalInformation) ||
-         proveAdditionalInfo == false && string.IsNullOrEmpty(AdditionalInformation)) &&
-        Evidence.IsComplete;
-
-    public void EnsureInitialized(Person person, InductionJourneyPage startPage)
-    {
-        if (Initialized)
-        {
-            return;
-        }
-
-        CurrentInductionStatus = person.InductionStatus;
-        JourneyStartPage = startPage;
-        StartDate = person.InductionStartDate;
-        CompletedDate = person.InductionCompletedDate;
-        ExemptionReasonIds = person.InductionExemptionReasonIds;
-        if (InductionStatus == InductionStatus.None)
-        {
-            InductionStatus = CurrentInductionStatus;
-        }
-
-        Initialized = true;
-    }
 }
