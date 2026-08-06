@@ -1,19 +1,9 @@
-using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-public class EditRouteState : IRegisterJourney
+public class EditRouteState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.EditRouteToProfessionalStatus,
-        typeof(EditRouteState),
-        requestDataKeys: ["qualificationId"],
-        appendUniqueKey: true);
-
-    public bool Initialized { get; set; }
-
-    public EditRouteStatusState? EditStatusState { get; set; } // store temp data while completing a route (moving it to 'holds')
+    // Holds the answers for a route being moved to 'holds' until they've all been given.
+    public EditRouteStatusState? EditStatusState { get; set; }
 
     public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }
@@ -31,67 +21,13 @@ public class EditRouteState : IRegisterJourney
     public bool? IsExemptFromInduction { get; set; }
     public Guid? DegreeTypeId { get; set; }
 
+    // Whether the journey was started from the person's induction, which is where cancelling and the
+    // detail page's back link return to.
+    public bool FromInductions { get; set; }
+
+    // The questions this route and status ask. Kept here so that step validation stays synchronous.
+    public EditRoutePage[] AvailablePages { get; set; } = [];
+
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
-
-    [JsonIgnore]
-    public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to 'holds'
-
-    public bool IsComplete(AddRoutePage page)
-    {
-        return page switch
-        {
-            AddRoutePage.Route => true,
-            AddRoutePage.Status => true,
-            AddRoutePage.StartAndEndDate =>
-                TrainingStartDate != null &&
-                TrainingEndDate != null,
-            AddRoutePage.HoldsFrom =>
-                HoldsFrom != null,
-            AddRoutePage.InductionExemption =>
-                IsExemptFromInduction != null,
-            AddRoutePage.TrainingProvider =>
-                TrainingProviderId != null,
-            AddRoutePage.DegreeType =>
-                DegreeTypeId != null,
-            AddRoutePage.Country =>
-                TrainingCountryId != null,
-            AddRoutePage.AgeRangeSpecialism =>
-                TrainingAgeSpecialismType is TrainingAgeSpecialismType type &&
-                (type != Core.Models.TrainingAgeSpecialismType.Range ||
-                (TrainingAgeSpecialismRangeFrom != null && TrainingAgeSpecialismRangeTo != null)),
-            AddRoutePage.SubjectSpecialisms =>
-                TrainingSubjectIds.Length != 0,
-            AddRoutePage.ChangeReason =>
-                ChangeReason != null &&
-                ChangeReasonDetail.IsComplete,
-            AddRoutePage.CheckAnswers => false,
-            _ => throw new ArgumentOutOfRangeException(nameof(page))
-        };
-    }
-
-    public void EnsureInitialized(RouteToProfessionalStatus routeToProfessionalStatus)
-    {
-        if (Initialized)
-        {
-            return;
-        }
-
-        QualificationType = routeToProfessionalStatus.QualificationType;
-        RouteToProfessionalStatusId = routeToProfessionalStatus.RouteToProfessionalStatusTypeId;
-        CurrentStatus = routeToProfessionalStatus.Status;
-        Status = routeToProfessionalStatus.Status;
-        HoldsFrom = routeToProfessionalStatus.HoldsFrom;
-        TrainingStartDate = routeToProfessionalStatus.TrainingStartDate;
-        TrainingEndDate = routeToProfessionalStatus.TrainingEndDate;
-        TrainingSubjectIds = routeToProfessionalStatus.TrainingSubjectIds;
-        TrainingAgeSpecialismType = routeToProfessionalStatus.TrainingAgeSpecialismType;
-        TrainingAgeSpecialismRangeFrom = routeToProfessionalStatus.TrainingAgeSpecialismRangeFrom;
-        TrainingAgeSpecialismRangeTo = routeToProfessionalStatus.TrainingAgeSpecialismRangeTo;
-        TrainingCountryId = routeToProfessionalStatus.TrainingCountryId;
-        TrainingProviderId = routeToProfessionalStatus.TrainingProviderId;
-        IsExemptFromInduction = routeToProfessionalStatus.ExemptFromInduction;
-        DegreeTypeId = routeToProfessionalStatus.DegreeTypeId;
-        Initialized = true;
-    }
 }

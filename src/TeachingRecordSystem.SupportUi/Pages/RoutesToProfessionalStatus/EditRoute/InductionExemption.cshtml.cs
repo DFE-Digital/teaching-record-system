@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class InductionExemptionModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceUploadManager)
-    : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceUploadManager)
+    EditRouteJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<InductionExemptionModel> _validator = new()
     {
@@ -18,53 +15,60 @@ public class InductionExemptionModel(
             .NotNull().WithMessage("Select yes if this route provides an induction exemption")
     };
 
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public bool? IsExemptFromInduction { get; set; }
 
     public void OnGet()
     {
-        IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
+        IsExemptFromInduction = journey.State.IsExemptFromInduction;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
+        var detailUrl = linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
+
+        // This is always the last question asked when a route is being completed.
+        if (journey.IsCompletingRoute)
         {
-            // this is definitely the final page of the data collection for a 'holds' status
-            await JourneyInstance!.UpdateStateAsync(s =>
+            journey.CompleteRoute(state =>
             {
-                s.Status = s.EditStatusState!.Status;
-                s.HoldsFrom = s.EditStatusState.HoldsFrom;
-                s.IsExemptFromInduction = IsExemptFromInduction;
-                s.EditStatusState = null;
+                state.HoldsFrom = state.EditStatusState!.HoldsFrom;
+                state.IsExemptFromInduction = IsExemptFromInduction;
             });
-        }
-        else // user is simply editing the induction exemption question
-        {
-            await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
+
+            await journey.RefreshAvailablePagesAsync();
+
+            return Redirect(detailUrl);
         }
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
+        journey.UpdateState(state => state.IsExemptFromInduction = IsExemptFromInduction);
+
+        return Redirect(journey.GetReturnUrlOrDefault(detailUrl));
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        // A route that doesn't ask about an induction exemption isn't a step the journey allows, so
+        // there's nothing to guard against here.
+        BackLink = journey.GetReturnUrlOrDefault(
+            journey.IsCompletingRoute
+                ? linkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(journey.InstanceId)
+                : linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId));
 
-        if (RouteType!.InductionExemptionRequired == FieldRequirement.NotApplicable ||
-            RouteType.InductionExemptionReason is not null && RouteType.InductionExemptionReason.RouteImplicitExemption)
-        {
-            context.Result = new BadRequestResult();
-        }
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
-
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
-        JourneyInstance!.State.IsCompletingRoute ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
 }

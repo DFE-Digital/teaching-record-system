@@ -1,10 +1,9 @@
-using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class AgeRangeSpecialismTests(HostFixture hostFixture) : EditRouteTestBase(hostFixture)
 {
     [Theory]
     [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false, true)]
@@ -41,25 +40,20 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithTrainingCountryId(country.CountryId)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var builder = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithHoldsFrom(holdsFrom)
-            .WithTrainingSubjectIds(subjects)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithDegreeTypeId(degreeType.DegreeTypeId)
-            .WithTrainingCountryId(country.CountryId);
-
-        if (statusEditedDuringCurrentJourney)
+        var editRouteState = new EditRouteState
         {
-            builder = builder.WithEditRouteStatusState(builder => builder
-                .WithStatus(status)
-                .WithEndDate(endDate));
-        }
-
-        var editRouteState = builder.Build();
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            CurrentStatus = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            TrainingStartDate = startDate,
+            TrainingEndDate = endDate,
+            HoldsFrom = holdsFrom,
+            TrainingSubjectIds = subjects,
+            TrainingProviderId = trainingProvider.TrainingProviderId,
+            DegreeTypeId = degreeType.DegreeTypeId,
+            TrainingCountryId = country.CountryId,
+            EditStatusState = statusEditedDuringCurrentJourney ? new() { Status = status } : null
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -118,25 +112,20 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithTrainingCountryId(country.CountryId)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var builder = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithHoldsFrom(holdsFrom)
-            .WithTrainingSubjectIds(subjects)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithDegreeTypeId(degreeType.DegreeTypeId)
-            .WithTrainingCountryId(country.CountryId);
-
-        if (statusEditedDuringCurrentJourney)
+        var editRouteState = new EditRouteState
         {
-            builder = builder.WithEditRouteStatusState(builder => builder
-                .WithStatus(status)
-                .WithEndDate(endDate));
-        }
-
-        var editRouteState = builder.Build();
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            CurrentStatus = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            TrainingStartDate = startDate,
+            TrainingEndDate = endDate,
+            HoldsFrom = holdsFrom,
+            TrainingSubjectIds = subjects,
+            TrainingProviderId = trainingProvider.TrainingProviderId,
+            DegreeTypeId = degreeType.DegreeTypeId,
+            TrainingCountryId = country.CountryId,
+            EditStatusState = statusEditedDuringCurrentJourney ? new() { Status = status } : null
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -174,10 +163,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -195,9 +185,8 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(ageFrom, journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-        Assert.Equal(ageTo, journeyInstance.State.TrainingAgeSpecialismRangeTo);
+        Assert.Equal(ageFrom, GetJourneyInstanceState(journeyInstance)!.TrainingAgeSpecialismRangeFrom);
+        Assert.Equal(ageTo, GetJourneyInstanceState(journeyInstance)!.TrainingAgeSpecialismRangeTo);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -218,10 +207,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -237,8 +227,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(TrainingAgeSpecialismType.KeyStage4, journeyInstance.State.TrainingAgeSpecialismType);
+        Assert.Equal(TrainingAgeSpecialismType.KeyStage4, GetJourneyInstanceState(journeyInstance)!.TrainingAgeSpecialismType);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -263,10 +252,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -311,10 +301,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -338,13 +329,12 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-        Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeTo);
+        Assert.Null(GetJourneyInstanceState(journeyInstance)!.TrainingAgeSpecialismRangeFrom);
+        Assert.Null(GetJourneyInstanceState(journeyInstance)!.TrainingAgeSpecialismRangeTo);
     }
 
     [Fact]
-    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToQualifications()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -359,31 +349,27 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -409,10 +395,11 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             await dbContext.SaveChangesAsync();
         });
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, editRouteState);
 
@@ -424,11 +411,5 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
-        CreateJourneyInstance(
-           JourneyNames.EditRouteToProfessionalStatus,
-           state ?? new EditRouteState(),
-           new KeyValuePair<string, object>("qualificationId", qualificationId));
 
 }

@@ -1,58 +1,71 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class CountryModel(
+    EditRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
+    ReferenceDataCache referenceDataCache) : PageModel
 {
+    private readonly InlineValidator<CountryModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.TrainingCountryId)
+            .NotNull().WithMessage("Enter a country")
+            .When(m => m.CountryRequired)
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string BackLink => journey.GetReturnUrlOrDefault(DetailUrl);
+
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
+
+    public bool CountryRequired { get; set; }
+
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public string? TrainingCountryId { get; set; }
 
-    public bool CountryRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingCountryRequired, Status.GetCountryRequirement())
-        == FieldRequirement.Mandatory;
+
+    private string DetailUrl => linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 
     public void OnGet()
     {
-        TrainingCountryId = JourneyInstance!.State.TrainingCountryId;
+        TrainingCountryId = journey.State.TrainingCountryId;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (CountryRequired && TrainingCountryId is null)
+        if (Cancel)
         {
-            ModelState.AddModelError("TrainingCountryId", "Enter a country");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
+        journey.UpdateState(state => state.TrainingCountryId = TrainingCountryId);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
+        return Redirect(journey.GetReturnUrlOrDefault(DetailUrl));
     }
 
-    public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        TrainingCountries = (await ReferenceDataCache.GetTrainingCountriesAsync())
-            .Select(r => new CountryDisplayInfo()
+        CountryRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.Country);
+        TrainingCountries = (await referenceDataCache.GetTrainingCountriesAsync())
+            .Select(c => new CountryDisplayInfo()
             {
-                Id = r.CountryId,
-                DisplayName = $"{r.CountryId} - {r.Name}"
+                Id = c.CountryId,
+                DisplayName = $"{c.CountryId} - {c.Name}"
             })
             .ToArray();
+
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

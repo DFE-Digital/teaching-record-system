@@ -1,73 +1,82 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class StartAndEndDateModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
+    EditRouteJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<StartAndEndDateModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.TrainingStartDate)
+            .NotNull().WithMessage("Enter a start date")
+            .When(m => m.StartAndEndDatesRequired),
+        v => v.RuleFor(m => m.TrainingEndDate)
+            .NotNull().WithMessage("Enter an end date")
+            .When(m => m.StartAndEndDatesRequired),
+        v => v.RuleFor(m => m.TrainingEndDate)
+            .Must((m, endDate) => !(m.TrainingStartDate >= endDate))
+                .WithMessage("End date must be after start date")
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string BackLink => journey.GetReturnUrlOrDefault(DetailUrl);
+
+    public bool StartAndEndDatesRequired { get; set; }
+
+
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Start date")]
+    public bool Cancel { get; set; }
+
+    [BindProperty]
     public DateOnly? TrainingStartDate { get; set; }
 
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "End date")]
     public DateOnly? TrainingEndDate { get; set; }
 
-    public bool StartAndEndDatesRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingEndDateRequired, Status.GetEndDateRequirement())
-        == FieldRequirement.Mandatory;
+
+    private string DetailUrl => linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 
     public void OnGet()
     {
-        TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
-        TrainingEndDate = JourneyInstance!.State.TrainingEndDate;
+        TrainingStartDate = journey.State.TrainingStartDate;
+        TrainingEndDate = journey.State.TrainingEndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartAndEndDatesRequired)
+        if (Cancel)
         {
-            if (TrainingStartDate is null)
-            {
-                ModelState.AddModelError(nameof(TrainingStartDate), "Enter a start date");
-            }
-
-            if (TrainingEndDate is null)
-            {
-                ModelState.AddModelError(nameof(TrainingEndDate), "Enter an end date");
-            }
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (TrainingStartDate >= TrainingEndDate)
-        {
-            ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");
-        }
+        await this.ThrowIfInvalidAsync(_validator);
 
-        if (!ModelState.IsValid)
+        journey.UpdateState(state =>
         {
-            return this.PageWithErrors();
-        }
-
-        await JourneyInstance!.UpdateStateAsync(s =>
-        {
-            s.TrainingStartDate = TrainingStartDate;
-            s.TrainingEndDate = TrainingEndDate;
+            state.TrainingStartDate = TrainingStartDate;
+            state.TrainingEndDate = TrainingEndDate;
         });
 
-        return Redirect(JourneyInstance!.State.IsCompletingRoute ?
-            NextCompletingRoutePage() :
-            FromCheckAnswers ?
-                LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
-                LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
+        // The dates are asked for part way through completing a route, which carries on to the date it
+        // was first held.
+        if (journey.IsCompletingRoute)
+        {
+            return Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(journey.InstanceId));
+        }
+
+        return Redirect(journey.GetReturnUrlOrDefault(DetailUrl));
     }
 
-    private string NextCompletingRoutePage()
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        return LinkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(QualificationId, JourneyInstance!.InstanceId);
+        StartAndEndDatesRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.StartAndEndDate);
+
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
-

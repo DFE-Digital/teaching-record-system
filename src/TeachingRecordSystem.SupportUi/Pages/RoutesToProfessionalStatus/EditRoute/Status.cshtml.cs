@@ -2,14 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class StatusModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+    EditRouteJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<StatusModel> _validator = new()
     {
@@ -17,97 +16,79 @@ public class StatusModel(
             .IsInEnum().WithMessage("Select a route status")
     };
 
-    public string? PersonName { get; set; }
-    public Guid PersonId { get; private set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+    public string PageCaption => journey.PageCaption;
+
+    public string BackLink => journey.GetReturnUrlOrDefault(DetailUrl);
 
     public RouteToProfessionalStatusType Route { get; set; } = null!;
 
     public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
 
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromRoute]
-    public Guid QualificationId { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public RouteToProfessionalStatusStatus Status { get; set; }
 
+    public bool NotCompletedRoute => Status is not RouteToProfessionalStatusStatus.Holds;
+
+    private string DetailUrl => linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
+
+    // The user is completing the route if they're moving it to 'holds' from something else.
+    private bool CompletingRoute =>
+        Status is RouteToProfessionalStatusStatus.Holds && journey.State.CurrentStatus is not RouteToProfessionalStatusStatus.Holds;
+
     public void OnGet()
     {
-        Status = JourneyInstance!.State.EditStatusState is null ? JourneyInstance!.State.Status : JourneyInstance!.State.EditStatusState.Status;
+        Status = journey.Status;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        if (CompletingRoute) // if user has set the status to 'holds' from another status
+        if (CompletingRoute)
         {
-            // if the route has an implicit exemption it needs to be set now
+            // A route that comes with an induction exemption of its own has it set now rather than asking.
             var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
 
-            // initialise a temporary part of journey state for the data collection for a completing route
-            if (JourneyInstance!.State.EditStatusState is null)
-            {
-                await JourneyInstance!.UpdateStateAsync(
-                    s =>
-                    {
-                        s.EditStatusState = new EditRouteStatusState
-                        {
-                            Status = Status,
-                            RouteImplicitExemption = hasImplicitExemption,
-                            InductionExemption = hasImplicitExemption ? true : null
-                        };
-                    });
-            }
-            else
-            {
-                await JourneyInstance!.UpdateStateAsync(
-                    s => s.EditStatusState!.Status = Status);
-            }
+            journey.UpdateState(state => state.EditStatusState = state.EditStatusState is EditRouteStatusState editStatusState
+                ? editStatusState with { Status = Status }
+                : new EditRouteStatusState
+                {
+                    Status = Status,
+                    RouteImplicitExemption = hasImplicitExemption,
+                    InductionExemption = hasImplicitExemption ? true : null
+                });
+
+            await journey.RefreshAvailablePagesAsync();
+
+            return Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(journey.InstanceId));
         }
-        else // the status has been changed to something other than 'holds'
+
+        journey.UpdateState(state =>
         {
-            await JourneyInstance!.UpdateStateAsync(s =>
-            {
-                s.HoldsFrom = null; // clear any previous 'holds' date and exemption
-                s.IsExemptFromInduction = null;
-                s.Status = Status;
-            });
-        }
+            // Any date and exemption the route held before no longer apply.
+            state.HoldsFrom = null;
+            state.IsExemptFromInduction = null;
+            state.Status = Status;
+        });
 
-        return Redirect(CompletingRoute ?
-            linkGenerator.RoutesToProfessionalStatus.EditRoute.HoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
-            FromCheckAnswers ?
-                linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance.InstanceId) :
-                linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance.InstanceId));
-    }
+        await journey.RefreshAvailablePagesAsync();
 
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
+        return Redirect(journey.GetReturnUrlOrDefault(DetailUrl));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
-        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
+        Route = await journey.GetRouteTypeAsync();
 
-        await next();
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
-
-    public string BackLink =>
-         FromCheckAnswers ?
-            linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
-
-    private bool CompletingRoute => Status is RouteToProfessionalStatusStatus.Holds && (JourneyInstance!.State.CurrentStatus is not RouteToProfessionalStatusStatus.Holds);
-
-    public bool NotCompletedRoute => Status is not RouteToProfessionalStatusStatus.Holds;
 }

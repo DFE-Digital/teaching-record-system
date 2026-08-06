@@ -1,4 +1,4 @@
-@page "/routes/{qualificationId}/edit/start-and-end-date/{handler?}"
+@page "/routes/{qualificationId}/edit/start-and-end-date"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.StartAndEndDateModel
 @{
     ViewBag.Title = "Enter the route start and end dates"
@@ -6,7 +6,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(Model.QualificationId, Model.JourneyInstance!.InstanceId) : LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -35,7 +35,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StartAndEndDateCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

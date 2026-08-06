@@ -1,49 +1,71 @@
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
 public class AgeRangeSpecialismModel(
-    SupportUiLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController)
-    : EditRouteCommonPageModel(linkGenerator, referenceDataCache, evidenceController)
+    EditRouteJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator) : PageModel
 {
+    private readonly InlineValidator<AgeRangeSpecialismModel> _validator = new()
+    {
+        v => v.RuleFor(m => m.TrainingAgeSpecialism.AgeRangeType)
+            .NotNull().WithMessage("Enter an age range specialism")
+            .When(m => m.AgeRangeSpecialismRequired)
+    };
+
+    public string PageCaption => journey.PageCaption;
+
+    public string BackLink => journey.GetReturnUrlOrDefault(DetailUrl);
+
+    public bool AgeRangeSpecialismRequired { get; set; }
+
+
+    [BindProperty]
+    public bool Cancel { get; set; }
+
     [BindProperty]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
-    public bool AgeRangeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement())
-        == FieldRequirement.Mandatory;
+
+    private string DetailUrl => linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 
     public void OnGet()
     {
-        TrainingAgeSpecialism.AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom;
-        TrainingAgeSpecialism.AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo;
-        TrainingAgeSpecialism.AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType;
+        TrainingAgeSpecialism = new AgeRange
+        {
+            AgeRangeFrom = journey.State.TrainingAgeSpecialismRangeFrom,
+            AgeRangeTo = journey.State.TrainingAgeSpecialismRangeTo,
+            AgeRangeType = journey.State.TrainingAgeSpecialismType
+        };
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (AgeRangeSpecialismRequired && TrainingAgeSpecialism.AgeRangeType is null)
+        if (Cancel)
         {
-            ModelState.AddModelError($"{nameof(TrainingAgeSpecialism)}.{nameof(TrainingAgeSpecialism.AgeRangeType)}", "Enter an age range specialism");
+            return Redirect(await journey.CancelAsync());
         }
 
-        if (!ModelState.IsValid)
+        await this.ThrowIfInvalidAsync(_validator);
+
+        journey.UpdateState(state =>
         {
-            return this.PageWithErrors();
-        }
+            state.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism.AgeRangeFrom;
+            state.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism.AgeRangeTo;
+            state.TrainingAgeSpecialismType = TrainingAgeSpecialism.AgeRangeType;
+        });
 
-        await JourneyInstance!.UpdateStateAsync(s =>
-            {
-                s.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
-                s.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
-                s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
-            });
+        return Redirect(journey.GetReturnUrlOrDefault(DetailUrl));
+    }
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId));
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        AgeRangeSpecialismRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.AgeRangeSpecialism);
+
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

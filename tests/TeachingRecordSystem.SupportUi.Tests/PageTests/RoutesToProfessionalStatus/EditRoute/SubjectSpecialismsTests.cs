@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public partial class SubjectSpecialismsTests(HostFixture hostFixture) : EditRouteTestBase(hostFixture)
 {
     [Theory]
     [InlineData("Apply for Qualified Teacher Status in England", RouteToProfessionalStatusStatus.Holds, false, true)]
@@ -40,25 +40,20 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithTrainingCountryId(country.CountryId)));
 
-        var builder = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithHoldsFrom(holdsFrom)
-            .WithTrainingSubjectIds(subjects)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithDegreeTypeId(degreeType.DegreeTypeId)
-            .WithTrainingCountryId(country.CountryId);
-
-        if (statusEditedDuringCurrentJourney)
+        var editRouteState = new EditRouteState
         {
-            builder = builder.WithEditRouteStatusState(builder => builder
-                .WithStatus(status)
-                .WithEndDate(endDate));
-        }
-
-        var editRouteState = builder.Build();
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            CurrentStatus = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            TrainingStartDate = startDate,
+            TrainingEndDate = endDate,
+            HoldsFrom = holdsFrom,
+            TrainingSubjectIds = subjects,
+            TrainingProviderId = trainingProvider.TrainingProviderId,
+            DegreeTypeId = degreeType.DegreeTypeId,
+            TrainingCountryId = country.CountryId,
+            EditStatusState = statusEditedDuringCurrentJourney ? new() { Status = status } : null
+        };
 
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
@@ -117,25 +112,20 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
                 .WithTrainingCountryId(country.CountryId)));
 
-        var builder = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithHoldsFrom(holdsFrom)
-            .WithTrainingSubjectIds(subjects)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithDegreeTypeId(degreeType.DegreeTypeId)
-            .WithTrainingCountryId(country.CountryId);
-
-        if (statusEditedDuringCurrentJourney)
+        var editRouteState = new EditRouteState
         {
-            builder = builder.WithEditRouteStatusState(builder => builder
-                .WithStatus(status)
-                .WithEndDate(endDate));
-        }
-
-        var editRouteState = builder.Build();
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            CurrentStatus = statusEditedDuringCurrentJourney ? RouteToProfessionalStatusStatus.Deferred : status,
+            TrainingStartDate = startDate,
+            TrainingEndDate = endDate,
+            HoldsFrom = holdsFrom,
+            TrainingSubjectIds = subjects,
+            TrainingProviderId = trainingProvider.TrainingProviderId,
+            DegreeTypeId = degreeType.DegreeTypeId,
+            TrainingCountryId = country.CountryId,
+            EditStatusState = statusEditedDuringCurrentJourney ? new() { Status = status } : null
+        };
 
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(qualificationid, editRouteState);
@@ -173,11 +163,13 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status,
+            CurrentStatus = status,
+            TrainingSubjectIds = subjects.Select(s => s.TrainingSubjectId).ToArray()
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
@@ -213,10 +205,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
@@ -239,8 +232,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), journeyInstance.State.TrainingSubjectIds);
+        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), GetJourneyInstanceState(journeyInstance)!.TrainingSubjectIds);
     }
 
     [Fact]
@@ -261,10 +253,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithStatus(status)
                 .WithTrainingSubjectIds(subjects)));
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
@@ -279,12 +272,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Empty(journeyInstance.State.TrainingSubjectIds);
+        Assert.Empty(GetJourneyInstanceState(journeyInstance)!.TrainingSubjectIds);
     }
 
     [Fact]
-    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToQualifications()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -299,34 +291,30 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await ReadContentAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -352,10 +340,11 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             await dbContext.SaveChangesAsync();
         });
         var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
+        var editRouteState = new EditRouteState
+        {
+            RouteToProfessionalStatusId = route.RouteToProfessionalStatusTypeId,
+            Status = status
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
@@ -386,10 +375,4 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var vht = errorElement!.GetElementsByTagName("span")[0];
         return errorElement.InnerHtml[vht.OuterHtml.Length..];
     }
-
-    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
-        CreateJourneyInstance(
-           JourneyNames.EditRouteToProfessionalStatus,
-           state ?? new EditRouteState(),
-           new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

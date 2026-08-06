@@ -1,19 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class IndexModel(SupportUiLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.EditRouteToProfessionalStatus), StartsJourney]
+public class IndexModel(EditRouteJourneyCoordinator journey, SupportUiLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    [FromQuery]
-    public bool FromInductions { get; set; }
-
-    public IActionResult OnGet() => Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId, FromInductions));
+    public IActionResult OnGet() =>
+        journey.AdvanceTo(
+            linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId),
+            new PushStepOptions { SetAsFirstStep = true });
 }

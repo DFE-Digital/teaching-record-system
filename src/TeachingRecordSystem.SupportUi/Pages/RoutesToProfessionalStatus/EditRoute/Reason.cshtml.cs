@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
-public class ReasonModel(SupportUiLinkGenerator linkGenerator,
+[Journey(JourneyNames.EditRouteToProfessionalStatus)]
+public class ReasonModel(
+    EditRouteJourneyCoordinator journey,
+    SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : PageModel
 {
     private readonly InlineValidator<ReasonModel> _validator = new()
@@ -19,7 +19,7 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
             .NotEmpty().WithMessage("Enter a reason")
             .When(m => m.ChangeReason == ChangeReasonOption.AnotherReason),
         v => v.RuleFor(m => m.ProvideAdditionalInformation)
-            .NotNull().WithMessage("Select yes if you want to add more information about why you’re editing this route"),
+            .NotNull().WithMessage("Select yes if you want to add more information about why you\u2019re editing this route"),
         v => v.RuleFor(m => m.AdditionalInformation)
             .MaximumLength(UiDefaults.ReasonDetailsMaxCharacterCount)
                 .WithMessage($"Additional detail {UiDefaults.ReasonDetailsMaxCharacterCountErrorMessage}"),
@@ -29,15 +29,12 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
         v => v.RuleFor(m => m.Evidence).Evidence()
     };
 
-    public string? PersonName { get; set; }
-    public Guid PersonId { get; private set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+    public string PageCaption => journey.PageCaption;
 
-    [FromQuery]
-    public bool? FromCheckAnswers { get; set; }
+    public string BackLink => journey.GetReturnUrlOrDefault(DetailUrl);
 
-    [FromRoute]
-    public Guid QualificationId { get; set; }
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     public ChangeReasonOption? ChangeReason { get; set; }
@@ -54,52 +51,39 @@ public class ReasonModel(SupportUiLinkGenerator linkGenerator,
     [BindProperty]
     public EvidenceUploadModel Evidence { get; set; } = new();
 
-    public string NextPage => linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId);
-
-    public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(QualificationId, JourneyInstance!.InstanceId);
-
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus);
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-
-        return next();
-    }
+    private string DetailUrl => linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 
     public void OnGet()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ProvideAdditionalInformation = JourneyInstance!.State.ChangeReasonDetail.ProvideAdditionalInformation;
-        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail.ChangeReasonDetail;
-        AdditionalInformation = JourneyInstance?.State.ChangeReasonDetail.AdditionalInformation;
-        Evidence = JourneyInstance!.State.ChangeReasonDetail.Evidence;
+        ChangeReason = journey.State.ChangeReason;
+        ProvideAdditionalInformation = journey.State.ChangeReasonDetail.ProvideAdditionalInformation;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail.ChangeReasonDetail;
+        AdditionalInformation = journey.State.ChangeReasonDetail.AdditionalInformation;
+        Evidence = journey.State.ChangeReasonDetail.Evidence;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
+        // Upload the evidence file before validating so that it's retained if the form is re-rendered
+        // with errors.
         await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        journey.UpdateState(state =>
         {
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail.ProvideAdditionalInformation = ProvideAdditionalInformation;
             state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
-            state.ChangeReasonDetail.Evidence = Evidence;
             state.ChangeReasonDetail.AdditionalInformation = AdditionalInformation;
+            state.ChangeReasonDetail.Evidence = Evidence;
         });
 
-        return Redirect(NextPage);
-    }
-
-    public async Task<IActionResult> OnPostCancelAsync()
-    {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
+        return Redirect(linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(journey.InstanceId));
     }
 }

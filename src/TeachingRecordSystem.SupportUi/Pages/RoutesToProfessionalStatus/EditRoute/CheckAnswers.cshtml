@@ -1,4 +1,4 @@
-@page "/routes/{qualificationId}/edit/check-answers/{handler?}"
+@page "/routes/{qualificationId}/edit/check-answers"
 @model CheckYourAnswersModel
 @{
     ViewBag.Title = "Check details before editing route";
@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
-            <span class="govuk-caption-l">Edit route - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
 
@@ -21,7 +21,7 @@
                     <key>Reason</key>
                     <value>@Model.ChangeReason?.GetDisplayName()</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.RouteDetail.InstanceId, Model.RouteDetail.ReturnUrl)"
                                                         visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
@@ -29,7 +29,7 @@
                     <key>Reason details</key>
                     <value use-empty-fallback>@Model.ChangeReasonDetail.ChangeReasonDetail</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.RouteDetail.InstanceId, Model.RouteDetail.ReturnUrl)"
                                 visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
@@ -37,7 +37,7 @@
                     <key>Additional information</key>
                     <value use-empty-fallback>@Model.ChangeReasonDetail.AdditionalInformation</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.RouteDetail.InstanceId, Model.RouteDetail.ReturnUrl)"
                                 visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
@@ -47,7 +47,7 @@
                         <vc:evidence-file-link evidence-file="@Model.ChangeReasonDetail.Evidence.UploadedEvidenceFile" />
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.Reason(Model.RouteDetail.InstanceId, Model.RouteDetail.ReturnUrl)"
                                                        visually-hidden-text="evidence">Change</action>
                     </row-actions>
 
@@ -55,7 +55,7 @@
             </govuk-summary-list>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">Confirm and update route</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -1,17 +1,17 @@
-@page "/routes/{qualificationId}/edit/status/{handler?}"
+@page "/routes/{qualificationId}/edit/status"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.StatusModel
 @{
     ViewBag.Title = "Select the route status";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.BackLink)">Back</govuk-back-link>
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
-            <span class="govuk-caption-l">Edit route - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for=@Model.Status data-testid="status">
                 <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true" >
                     @ViewBag.Title
@@ -23,7 +23,7 @@
             </govuk-radios>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.EditRoute.StatusCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
