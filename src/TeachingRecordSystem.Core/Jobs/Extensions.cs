@@ -144,10 +144,7 @@ public static class Extensions
             recurringJobManager.RemoveIfExists("DeletePersonAndChildRecordsWithoutATrnJob (dry-run)");
             recurringJobManager.RemoveIfExists("DeletePersonAndChildRecordsWithoutATrnJob");
 
-            recurringJobManager.AddOrUpdate<DeleteStaleJourneyStatesJob>(
-                nameof(DeleteStaleJourneyStatesJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                GetRecurringJobSchedule(DeleteStaleJourneyStatesJob.JobSchedule));
+            recurringJobManager.RemoveIfExists("DeleteStaleJourneyStatesJob");
 
             recurringJobManager.AddOrUpdate<BackfillPersonAttributesJob>(
                 nameof(BackfillPersonAttributesJob),

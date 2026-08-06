@@ -1,6 +1,4 @@
 using GovUk.Questions.AspNetCore.Testing;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -10,7 +8,6 @@ using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Infrastructure;
-using TeachingRecordSystem.WebCommon.FormFlow.State;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
@@ -73,60 +70,6 @@ public abstract class TestBase : IDisposable
         var scope = HostFixture.Services.CreateScope();
         _disposables.Add(scope);
         return ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider);
-    }
-
-    protected Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
-        string journeyName,
-        TState state,
-        params KeyValuePair<string, object>[] keys)
-        where TState : notnull
-    {
-        return CreateJourneyInstance(journeyName, _ => state, keys);
-    }
-
-    protected async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
-        string journeyName,
-        Func<JourneyInstanceId, TState> createState,
-        params KeyValuePair<string, object>[] keys)
-        where TState : notnull
-    {
-        await using var scope = HostFixture.Services.CreateAsyncScope();
-        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
-        var options = scope.ServiceProvider.GetRequiredService<IOptions<FormFlowOptions>>();
-
-        var journeyDescriptor = options.Value.JourneyRegistry.GetJourneyByName(journeyName) ??
-            throw new ArgumentException("Journey not found.", nameof(journeyName));
-
-        var keysDict = keys.ToDictionary(k => k.Key, k => new StringValues(k.Value.ToString()));
-
-        if (journeyDescriptor.AppendUniqueKey)
-        {
-            keysDict.Add(Constants.UniqueKeyQueryParameterName, new StringValues(Guid.NewGuid().ToString()));
-        }
-
-        var instanceId = new JourneyInstanceId(journeyDescriptor.JourneyName, keysDict);
-
-        var stateType = typeof(TState);
-        var state = createState(instanceId);
-
-        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state);
-        return (JourneyInstance<TState>)instance;
-    }
-
-    protected async Task<TState> CreateJourneyStateWithFactory<TFactory, TState>(Func<TFactory, Task<TState>> createState)
-        where TFactory : IJourneyStateFactory<TState>
-    {
-        await using var scope = HostFixture.Services.CreateAsyncScope();
-        var factory = ActivatorUtilities.CreateInstance<TFactory>(scope.ServiceProvider);
-        return await createState(factory);
-    }
-
-    protected async Task<JourneyInstance<TState>> ReloadJourneyInstance<TState>(JourneyInstance<TState> journeyInstance)
-    {
-        await using var scope = HostFixture.Services.CreateAsyncScope();
-        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
-        var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(TState));
-        return (JourneyInstance<TState>)reloadedInstance!;
     }
 
     protected Guid GetCurrentUserId() =>

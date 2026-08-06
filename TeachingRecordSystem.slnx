@@ -36,6 +36,5 @@
     <Project Path="tests/TeachingRecordSystem.SupportUi.Tests/TeachingRecordSystem.SupportUi.Tests.csproj" />
     <Project Path="tests/TeachingRecordSystem.TestCommon/TeachingRecordSystem.TestCommon.csproj" />
     <Project Path="tests/TeachingRecordSystem.UiTestCommon/TeachingRecordSystem.UiTestCommon.csproj" />
-    <Project Path="tests/TeachingRecordSystem.WebCommon.Tests/TeachingRecordSystem.WebCommon.Tests.csproj" />
   </Folder>
 </Solution>

@@ -40,8 +40,6 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
 
     public DbSet<InductionCompletedEmailsJobItem> InductionCompletedEmailsJobItems => Set<InductionCompletedEmailsJobItem>();
 
-    public DbSet<JourneyState> JourneyStates => Set<JourneyState>();
-
     public DbSet<User> Users => Set<User>();
 
     public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();

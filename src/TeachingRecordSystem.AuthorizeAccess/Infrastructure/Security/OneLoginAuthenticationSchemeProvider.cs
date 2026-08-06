@@ -175,7 +175,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         options.Events.OnRedirectToIdentityProviderForSignOut = context =>
         {
             // The standard sign out process will call Authenticate() on SignInScheme then try to extract the id_token from the Principal.
-            // That won't work in our case most of the time since sign out journeys won't have the FormFlow instance around that has the AuthenticationTicket.
+            // That won't work in our case most of the time since sign out journeys won't have the journey instance around that has the AuthenticationTicket.
             // Instead, we'll get it passed to us in explicitly in AuthenticationProperties.Items.
 
             if (context.ProtocolMessage.IdTokenHint is null &&

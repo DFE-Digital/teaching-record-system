@@ -1,20 +1,11 @@
-using Microsoft.AspNetCore.WebUtilities;
-
 namespace TeachingRecordSystem.SupportUi;
 
 public static class LinkGeneratorExtensions
 {
-    public static string GetRequiredPathByPage(this LinkGenerator linkGenerator, string page, string? handler = null, object? routeValues = null, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId = null)
+    public static string GetRequiredPathByPage(this LinkGenerator linkGenerator, string page, string? handler = null, object? routeValues = null)
     {
-        var url = NormalizePath(
+        return NormalizePath(
             linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found."));
-
-        if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
-        {
-            url = QueryHelpers.AddQueryString(url, WebCommon.FormFlow.Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
-        }
-
-        return url;
     }
 
     public static string GetJourneyPage(this LinkGenerator linkGenerator, string page, JourneyInstanceId journeyInstanceId, string? returnUrl = null)
