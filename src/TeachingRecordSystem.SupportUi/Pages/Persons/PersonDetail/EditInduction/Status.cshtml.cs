@@ -1,38 +1,39 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.EditInduction), StartsJourney]
 public class StatusModel(
-    SupportUiLinkGenerator linkGenerator,
+    EditInductionJourneyCoordinator journey,
     TrsDbContext dbContext,
-    TimeProvider timeProvider,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+    TimeProvider timeProvider) : PageModel
 {
     private bool _inductionStatusManagedByCpd;
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
+
     public InductionStatus CurrentInductionStatus { get; set; }
 
-    public IEnumerable<InductionStatusDescription> StatusChoices
-    {
-        get
-        {
-            return _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ?
-                InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
-                    .Append(InductionStatusRegistry.All.Single(i => i.InductionStatus == CurrentInductionStatus))
-                    .OrderBy(i => i.InductionStatus)
-                    .ToArray()
-                : InductionStatusRegistry.All.ToArray()[1..];
-        }
-    }
+    public IEnumerable<InductionStatusDescription> StatusChoices =>
+        _inductionStatusManagedByCpd && CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt
+            ? InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
+                .Append(InductionStatusRegistry.All.Single(i => i.InductionStatus == CurrentInductionStatus))
+                .OrderBy(i => i.InductionStatus)
+                .ToArray()
+            : InductionStatusRegistry.All.ToArray()[1..];
 
     public string InductionIsManagedByCpdWarning => CurrentInductionStatus switch
     {
@@ -43,73 +44,59 @@ public class StatusModel(
         _ => InductionWarnings.InductionIsManagedByCpdWarningOther
     };
 
-    public string? StatusWarningMessage => _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ? InductionIsManagedByCpdWarning : null;
-
-    public InductionJourneyPage NextPage =>
-        InductionStatus switch
-        {
-            _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
-            _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
-            _ => InductionJourneyPage.ChangeReasons
-        };
-
-    public string BackLink
-    {
-        get
-        {
-            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
-            {
-                return GetPageLink(InductionJourneyPage.CheckAnswers);
-            }
-            return LinkGenerator.Persons.PersonDetail.Induction(PersonId);
-        }
-    }
+    public string? StatusWarningMessage =>
+        _inductionStatusManagedByCpd && CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt
+            ? InductionIsManagedByCpdWarning
+            : null;
 
     public void OnGet()
     {
-        InductionStatus = JourneyInstance!.State.InductionStatus;
+        InductionStatus = journey.State.InductionStatus;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        return Redirect(journey.AnswerStatusAndAdvance(state =>
         {
             state.InductionStatus = InductionStatus;
+
+            // Drop the answers the new status doesn't ask for, so a journey that no longer shows them
+            // can't carry them through to the change.
             if (!InductionStatus.RequiresStartDate())
             {
                 state.StartDate = null;
             }
+
             if (!InductionStatus.RequiresCompletedDate())
             {
                 state.CompletedDate = null;
             }
+
             if (!InductionStatus.RequiresExemptionReasons())
             {
                 state.ExemptionReasonIds = [];
             }
-        });
-
-        return Redirect(GetPageLink(NextPage));
+        }));
     }
 
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
+        BackLink = journey.GetBackLink() ?? journey.InductionUrl;
+        CurrentInductionStatus = journey.State.CurrentInductionStatus;
 
-        var person = await DbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == PersonId);
-
-        if (person is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
-
+        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == journey.PersonId);
         _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(timeProvider.Today);
-        CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

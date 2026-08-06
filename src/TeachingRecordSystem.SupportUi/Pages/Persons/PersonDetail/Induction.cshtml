@@ -27,7 +27,7 @@
                 @if (Model.CanWrite)
                 {
                     <row-actions>
-                        <action data-testid="change-induction-status" href="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(person.PersonId, journeyInstanceId: null)" visually-hidden-text="status">Change</action>
+                        <action data-testid="change-induction-status" href="@LinkGenerator.Persons.PersonDetail.EditInduction.Status(person.PersonId)" visually-hidden-text="status">Change</action>
                     </row-actions>
                 }
             </row>
@@ -50,7 +50,7 @@
                     @if (Model.CanWrite)
                     {
                         <row-actions>
-                            <action data-testid="change-induction-exemption-reason" href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(person.PersonId, journeyInstanceId: null)" visually-hidden-text="exemption reason">Change</action>
+                            <action data-testid="change-induction-exemption-reason" href="@LinkGenerator.Persons.PersonDetail.EditInduction.ExemptionReasons(person.PersonId)" visually-hidden-text="exemption reason">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -64,7 +64,7 @@
                     @if (Model.CanWrite)
                     {
                         <row-actions>
-                            <action data-testid="change-induction-start-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="start date">Change</action>
+                            <action data-testid="change-induction-start-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.StartDate(person.PersonId)" visually-hidden-text="start date">Change</action>
                         </row-actions>
                     }
                 </row>
@@ -78,7 +78,7 @@
                     @if (Model.CanWrite)
                     {
                         <row-actions>
-                            <action data-testid="change-induction-completed-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="completed date">Change</action>
+                            <action data-testid="change-induction-completed-date" href="@LinkGenerator.Persons.PersonDetail.EditInduction.CompletedDate(person.PersonId)" visually-hidden-text="completed date">Change</action>
                         </row-actions>
                     }
                 </row>

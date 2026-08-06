@@ -2,11 +2,12 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.InductionExemptions;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_InvalidInductionStatusForPage_RedirectToStart()
@@ -15,9 +16,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.InProgress,
+                CurrentInductionStatus = InductionStatus.InProgress
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -57,9 +60,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
                 WithStatus(InductionStatus.Exempt)));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -96,9 +101,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
                 WithStatus(InductionStatus.Exempt)));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -140,9 +147,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
                 .WithInductionExemption(true)));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -191,9 +200,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
                 .WithInductionExemption(true)));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -245,9 +256,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
                 .WithInductionExemption(hasExemption)));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -278,10 +291,12 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .WithExemptionReasonIds(selectedExemptionReasonIds)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt,
+                ExemptionReasonIds = selectedExemptionReasonIds
+            });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -304,9 +319,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -328,9 +345,11 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new EditInductionStateBuilder()
-                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Build());
+            new EditInductionState
+            {
+                InductionStatus = InductionStatus.Exempt,
+                CurrentInductionStatus = InductionStatus.Exempt
+            });
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -343,13 +362,241 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(exemptionReasonIds, journeyInstance.State.ExemptionReasonIds);
+        var state = GetJourneyInstanceState(journeyInstance)!;
+        Assert.Equal(exemptionReasonIds, state.ExemptionReasonIds);
     }
 
-    private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
-    CreateJourneyInstance(
-        JourneyNames.EditInduction,
-        state ?? new EditInductionState(),
-        new KeyValuePair<string, object>("personId", personId));
+    [Theory]
+    [InlineData(InductionStatus.Exempt, "edit-induction/reason")]
+    public async Task Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string expectedNextPageUrl)
+    {
+        // Arrange
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(i => i.WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState
+            {
+                InductionStatus = inductionStatus,
+                CurrentInductionStatus = inductionStatus,
+                StartDate = TimeProvider.Today.AddYears(-2)
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(TimeProvider.Today.AddDays(-1))
+                .WithCompletedDate(TimeProvider.Today)
+                .WithChangeReason(PersonInductionChangeReason.IncompleteDetails)
+                .WithProvideAdditionalInformation(false)
+                .WithUploadEvidence(false)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/persons/{person.PersonId}/{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToInduction()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.Exempt;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(s => s.WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState
+            {
+                InductionStatus = inductionStatus,
+                CurrentInductionStatus = inductionStatus,
+                StartDate = TimeProvider.Today.AddYears(-2),
+                CompletedDate = TimeProvider.Today,
+                ChangeReason = PersonInductionChangeReason.AnotherReason,
+                ProvideAdditionalInformation = true,
+                AdditionalInformation = "Details",
+                Evidence = CreateEvidence(false)
+            });
+
+        // Act
+        // Cancelling is a field on the form rather than a handler of its own: a distinct URL would be
+        // an invalid step for the journey.
+        var response = await HttpClient.SendAsync(new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        });
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/induction", response.Headers.Location?.OriginalString);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.Exempt;
+        var evidenceFileId = Guid.NewGuid();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(s => s.WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState
+            {
+                InductionStatus = inductionStatus,
+                CurrentInductionStatus = inductionStatus,
+                StartDate = TimeProvider.Today.AddYears(-2),
+                CompletedDate = TimeProvider.Today,
+                ChangeReason = PersonInductionChangeReason.AnotherReason,
+                ProvideAdditionalInformation = true,
+                AdditionalInformation = "Details",
+                Evidence = CreateEvidence(true, evidenceFileId)
+            });
+
+        // Act
+        var response = await HttpClient.SendAsync(new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        });
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
+    }
+
+    [Theory]
+    [InlineData(StartPage.Status, InductionStatus.Exempt, "edit-induction/status")]
+    public async Task Get_BackLinkContainsExpected(StartPage startPage, InductionStatus inductionStatus, string expectedBackPage)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState
+            {
+                InductionStatus = inductionStatus,
+                CurrentInductionStatus = inductionStatus,
+                StartDate = TimeProvider.Today.AddYears(-2),
+                CompletedDate = TimeProvider.Today
+            },
+            startPage);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/persons/{person.PersonId}/{expectedBackPage}", backlink!.Href);
+    }
+
+    [Fact]
+    public async Task Get_FromCheckAnswers_BackLinkReturnsToCheckAnswers()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.Exempt;
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState
+            {
+                InductionStatus = inductionStatus,
+                CurrentInductionStatus = inductionStatus,
+                ExemptionReasonIds = exemptionReasonIds,
+                StartDate = new DateOnly(2000, 2, 2),
+                CompletedDate = new DateOnly(2002, 2, 2),
+                ChangeReason = PersonInductionChangeReason.AnotherReason
+            });
+
+        var checkAnswersUrl = $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/persons/{person.PersonId}/edit-induction/exemption-reasons?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/persons/{person.PersonId}/edit-induction/check-answers", backlink!.Href);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Exempt, "edit-induction/check-answers")]
+    public async Task Post_FromCheckAnswers_RedirectsToExpectedPage(InductionStatus inductionStatus, string expectedNextPageUrl)
+    {
+        // Arrange
+        var startDate = new DateOnly(2000, 2, 1);
+        var completedDate = new DateOnly(2002, 2, 2);
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(i => i.WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState
+            {
+                InductionStatus = inductionStatus,
+                CurrentInductionStatus = inductionStatus,
+                ExemptionReasonIds = exemptionReasonIds,
+                StartDate = startDate,
+                CompletedDate = completedDate,
+                ChangeReason = PersonInductionChangeReason.AnotherReason
+            });
+
+        var checkAnswersUrl = $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/persons/{person.PersonId}/edit-induction/exemption-reasons?returnUrl={Uri.EscapeDataString(checkAnswersUrl)}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithChangeReason(PersonInductionChangeReason.IncompleteDetails)
+                .WithProvideAdditionalInformation(false)
+                .WithUploadEvidence(false)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/persons/{person.PersonId}/{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
 }

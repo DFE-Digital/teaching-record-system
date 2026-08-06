@@ -1,18 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StartDateModel(
-    SupportUiLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
-    TimeProvider timeProvider,
-    EvidenceUploadManager evidenceController)
-    : CommonJourneyPage(dbContext, linkGenerator, evidenceController)
+[Journey(JourneyNames.EditInduction), StartsJourney]
+public class StartDateModel(EditInductionJourneyCoordinator journey, TimeProvider timeProvider) : PageModel
 {
     private readonly InlineValidator<StartDateModel> _validator = new()
     {
@@ -20,57 +14,34 @@ public class StartDateModel(
             .NotNull().WithMessage("Enter an induction start date")
     };
 
-    private InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    public string PageCaption => journey.PageCaption;
 
-    public DateOnly? CompletedDate => JourneyInstance!.State.CompletedDate;
+    public string? BackLink { get; set; }
+
+    [BindProperty]
+    public bool Cancel { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
     public DateOnly? StartDate { get; set; }
 
-    public string NextPage
-    {
-        get
-        {
-            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
-            {
-                if (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate)
-                {
-                    return GetPageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckAnswersPage.CheckAnswersToStartDate);
-                }
-                return GetPageLink(InductionJourneyPage.CheckAnswers);
-            }
-            return InductionStatus.RequiresCompletedDate()
-                ? GetPageLink(InductionJourneyPage.CompletedDate)
-                : GetPageLink(InductionJourneyPage.ChangeReasons);
-        }
-    }
-
-    public string BackLink
-    {
-        get
-        {
-            if (FromCheckAnswers == JourneyFromCheckAnswersPage.CheckAnswers)
-            {
-                return GetPageLink(InductionJourneyPage.CheckAnswers);
-            }
-            return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.StartDate
-            ? LinkGenerator.Persons.PersonDetail.Induction(PersonId)
-            : GetPageLink(InductionJourneyPage.Status);
-        }
-    }
-
     public void OnGet()
     {
-        StartDate = JourneyInstance!.State.StartDate;
+        StartDate = journey.State.StartDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         if (StartDate > timeProvider.Today)
         {
             ModelState.AddModelError(nameof(StartDate), "The induction start date cannot be in the future");
         }
+
         if (StartDate < Person.EarliestInductionStartDate)
         {
             ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(WebConstants.DateDisplayFormat)}");
@@ -78,24 +49,33 @@ public class StartDateModel(
 
         await this.ThrowIfInvalidAsync(_validator);
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.StartDate = StartDate!.Value;
-        });
+        journey.UpdateState(state => state.StartDate = StartDate);
 
-        return Redirect(NextPage);
+        // A start date that now falls after the completed date means the completed date has to be
+        // asked for again, even when the user came here from check answers to change this one answer.
+        if (journey.Status.RequiresCompletedDate() &&
+            journey.State.CompletedDate < StartDate &&
+            journey.ReturnUrl is string returnUrl)
+        {
+            return Redirect(journey.AdvanceToQuestion(journey.CompletedDateUrl(returnUrl)));
+        }
+
+        return Redirect(journey.ContinueTo(journey.NextQuestionAfterStartDate()));
     }
 
-    protected override InductionJourneyPage StartPage => InductionJourneyPage.StartDate;
-
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        if (!JourneyInstance!.State.InductionStatus.RequiresStartDate())
+        // Reachable as the journey's first step for a person whose status doesn't ask this question,
+        // since a request can name the page directly. Once the journey is under way a status that
+        // stops asking it truncates the path, so path validation is what turns the user away.
+        if (!journey.Status.RequiresStartDate())
         {
-            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
-            return;
+            context.Result = Redirect(journey.InductionUrl);
+            return Task.CompletedTask;
         }
+
+        BackLink = journey.GetBackLink() ?? journey.InductionUrl;
+
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }
