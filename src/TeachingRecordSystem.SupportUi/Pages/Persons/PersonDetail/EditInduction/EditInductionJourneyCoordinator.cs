@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 [JourneyCoordinator(JourneyNames.EditInduction, routeValueKeys: ["personId"])]
 public class EditInductionJourneyCoordinator(
-    IDbContextFactory<TrsDbContext> dbContextFactory,
+    TrsDbContext dbContext,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceUploadManager) : JourneyCoordinator<EditInductionState>
 {
@@ -21,10 +21,6 @@ public class EditInductionJourneyCoordinator(
 
     public override async Task<EditInductionState> GetStartingStateAsync()
     {
-        // The journey filter runs while the request-scoped DbContext is in use by the filters around
-        // it, so this takes its own context rather than sharing one mid-request.
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
         var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
 
         return new EditInductionState
