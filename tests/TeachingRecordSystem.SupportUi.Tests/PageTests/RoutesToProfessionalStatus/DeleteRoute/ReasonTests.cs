@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRout
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.DeleteRoute;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
@@ -26,10 +26,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
+
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -81,10 +79,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .Build()
         };
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId, deleteRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -113,6 +108,29 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_BackLinkReturnsToQualifications()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", doc.GetElementByTestId("back-link")!.GetAttribute("href"));
+    }
+
+    [Fact]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetailsAndRedirects()
     {
         // Arrange
@@ -125,11 +143,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -146,9 +161,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
-        Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail);
+        var state = GetJourneyInstanceState(journeyInstance);
+        Assert.Equal(changeReason.GetDisplayName(), state!.ChangeReason!.GetDisplayName());
+        Assert.Equal(changeReasonDetails, state.ChangeReasonDetail.ChangeReasonDetail);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/routes/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -163,11 +178,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -189,6 +201,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_AdditionalDetailYes_NoDetailAdded_ReturnsError()
     {
+        // Arrange
         var changeReason = ChangeReasonOption.CreatedInError;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Northern Irish Recognition").Single();
         var person = await TestData.CreatePersonAsync(p => p
@@ -196,11 +209,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -231,11 +241,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -266,11 +273,8 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            deleteRouteState
-            );
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -287,50 +291,37 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.ChangeReasonDetail.Evidence.UploadEvidence);
-        Assert.Equal(evidenceFileName, journeyInstance.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile!.FileName);
+        var state = GetJourneyInstanceState(journeyInstance);
+        Assert.True(state!.ChangeReasonDetail.Evidence.UploadEvidence);
+        Assert.Equal(evidenceFileName, state.ChangeReasonDetail.Evidence.UploadedEvidenceFile!.FileName);
     }
 
     [Fact]
-    public async Task Cancel_deletesJourneyAndRedirectsToExpectedPage()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
-        var status = ProfessionalStatusStatusRegistry.All
-            .SingleRandom()
-            .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-
-        // Act
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
-        Assert.Null(await ReloadJourneyInstance(journeyInstance));
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", response.Headers.Location?.OriginalString);
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
     [Theory]
@@ -340,9 +331,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .SingleRandom();
-        var status = ProfessionalStatusStatusRegistry.All
-            .SingleRandom()
-            .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -353,15 +341,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.Status = PersonStatus.Deactivated;
             await dbContext.SaveChangesAsync();
         });
-        var qualificationid = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
-        var deleteRouteState = new DeleteRouteState();
+        var qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
 
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            deleteRouteState
-            );
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
-        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationid}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(httpMethod, $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -369,10 +353,4 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
-
-    private Task<JourneyInstance<DeleteRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteRouteState? state = null) =>
-        CreateJourneyInstance(
-            JourneyNames.DeleteRouteToProfessionalStatus,
-            state ?? new DeleteRouteState(),
-            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

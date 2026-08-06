@@ -4,12 +4,10 @@ public class DeleteRouteLinkGenerator(LinkGenerator linkGenerator)
 {
     public string Index(Guid qualificationId) =>
         linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/Index", routeValues: new { qualificationId });
-    public string Reason(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/Reason", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string ReasonCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/Reason", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string CheckAnswers(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/CheckAnswers", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string CheckAnswersCancel(Guid qualificationId, TeachingRecordSystem.WebCommon.FormFlow.JourneyInstanceId? journeyInstanceId) =>
-        linkGenerator.GetRequiredPathByPage("/RoutesToProfessionalStatus/DeleteRoute/CheckAnswers", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string Reason(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/DeleteRoute/Reason", journeyInstanceId, returnUrl);
+
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId, string? returnUrl = null) =>
+        linkGenerator.GetJourneyPage("/RoutesToProfessionalStatus/DeleteRoute/CheckAnswers", journeyInstanceId, returnUrl);
 }

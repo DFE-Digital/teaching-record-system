@@ -2,78 +2,50 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-[TeachingRecordSystem.WebCommon.FormFlow.Journey(JourneyNames.DeleteRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.DeleteRouteToProfessionalStatus)]
 public class CheckAnswersModel(
+    DeleteRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
-    EvidenceUploadManager evidenceController,
     RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
-    public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
+    public JourneyInstanceId InstanceId => journey.InstanceId;
+
+    public string PageCaption => journey.PageCaption;
+
+    public string? BackLink { get; set; }
+
+    // The URL a change link brings the user back to once they've answered the question again.
+    public string ReturnUrl { get; set; } = null!;
 
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
-    public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
     public ChangeReasonOption? ChangeReason { get; set; }
-    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
-    public string BackLink => linkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(QualificationId, JourneyInstance!.InstanceId);
+    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    [BindProperty]
+    public bool Cancel { get; set; }
+
+    public void OnGet()
     {
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteDetail = new RouteDetailViewModel()
-        {
-            RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType!,
-            HoldsFrom = routeInfo.RouteToProfessionalStatus.HoldsFrom,
-            DegreeTypeId = routeInfo.RouteToProfessionalStatus.DegreeTypeId,
-            IsExemptFromInduction = routeInfo.RouteToProfessionalStatus.ExemptFromInduction,
-            Status = routeInfo.RouteToProfessionalStatus.Status,
-            QualificationId = routeInfo.RouteToProfessionalStatus.QualificationId,
-            TrainingAgeSpecialismType = routeInfo.RouteToProfessionalStatus.TrainingAgeSpecialismType,
-            TrainingAgeSpecialismRangeFrom = routeInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom,
-            TrainingAgeSpecialismRangeTo = routeInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo,
-            TrainingCountryId = routeInfo.RouteToProfessionalStatus.TrainingCountryId,
-            TrainingEndDate = routeInfo.RouteToProfessionalStatus.TrainingEndDate,
-            TrainingProviderId = routeInfo.RouteToProfessionalStatus.TrainingProviderId,
-            TrainingStartDate = routeInfo.RouteToProfessionalStatus.TrainingStartDate,
-            TrainingSubjectIds = routeInfo.RouteToProfessionalStatus.TrainingSubjectIds
-        };
-
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
-    }
-
-    public async Task OnGetAsync()
-    {
-        RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
-        RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
-        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
-        RouteDetail.TrainingSubjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(RouteDetail.TrainingSubjectIds, referenceDataCache);
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (Cancel)
+        {
+            return Redirect(await journey.CancelAsync());
+        }
+
         await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
@@ -85,17 +57,53 @@ public class CheckAnswersModel(
                 AdditionalInformation = ChangeReasonDetail.AdditionalInformation
             });
 
-        await JourneyInstance!.CompleteAsync();
+        journey.DeleteInstance();
 
         TempData.SetFlashNotificationBanner("Route to professional status deleted");
 
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await evidenceController.DeleteUploadedFileAsync(JourneyInstance!.State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
+        ReturnUrl = linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(journey.InstanceId);
+        BackLink = journey.GetBackLink();
+
+        PersonId = context.HttpContext.GetCurrentPersonFeature().PersonId;
+
+        var route = context.HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus;
+        RouteDetail = new RouteDetailViewModel()
+        {
+            RouteToProfessionalStatusType = route.RouteToProfessionalStatusType!,
+            HoldsFrom = route.HoldsFrom,
+            DegreeTypeId = route.DegreeTypeId,
+            IsExemptFromInduction = route.ExemptFromInduction,
+            Status = route.Status,
+            QualificationId = route.QualificationId,
+            TrainingAgeSpecialismType = route.TrainingAgeSpecialismType,
+            TrainingAgeSpecialismRangeFrom = route.TrainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = route.TrainingAgeSpecialismRangeTo,
+            TrainingCountryId = route.TrainingCountryId,
+            TrainingEndDate = route.TrainingEndDate,
+            TrainingProviderId = route.TrainingProviderId,
+            TrainingStartDate = route.TrainingStartDate,
+            TrainingSubjectIds = route.TrainingSubjectIds
+        };
+
+        RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is Guid trainingProviderId
+            ? (await referenceDataCache.GetTrainingProviderByIdAsync(trainingProviderId))?.Name
+            : null;
+        RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is string trainingCountryId
+            ? (await referenceDataCache.GetTrainingCountryByIdAsync(trainingCountryId))?.Name
+            : null;
+        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is Guid degreeTypeId
+            ? (await referenceDataCache.GetDegreeTypeByIdAsync(degreeTypeId))?.Name
+            : null;
+        RouteDetail.TrainingSubjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(RouteDetail.TrainingSubjectIds, referenceDataCache);
+
+        ChangeReason = journey.State.ChangeReason;
+        ChangeReasonDetail = journey.State.ChangeReasonDetail;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

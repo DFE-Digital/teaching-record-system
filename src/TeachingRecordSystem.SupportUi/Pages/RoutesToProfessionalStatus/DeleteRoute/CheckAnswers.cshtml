@@ -1,4 +1,4 @@
-@page "/routes/{qualificationId}/delete/check-answers/{handler?}"
+@page "/routes/{qualificationId}/delete/check-answers"
 @model CheckAnswersModel
 @{
     ViewBag.Title = "Check details before deleting route";
@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
-            <span class="govuk-caption-l">Delete route - @Model.PersonName</span>
+            <span class="govuk-caption-l">@Model.PageCaption</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <partial name="_RouteDetail" model="@Model.RouteDetail" />
 
@@ -21,22 +21,24 @@
                     <key>Reason</key>
                     <value>@Model.ChangeReason?.GetDisplayName()</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="reason">Change</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
+                                visually-hidden-text="reason">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Reason details</key>
                     <value use-empty-fallback>@Model.ChangeReasonDetail.ChangeReasonDetail</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"  visually-hidden-text="additional information">Change</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
+                                visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
                 <row>
                     <key>Additional information</key>
                     <value use-empty-fallback>@Model.ChangeReasonDetail.AdditionalInformation</value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"  visually-hidden-text="additional information">Change</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
+                                visually-hidden-text="additional information">Change</action>
                     </row-actions>
                 </row>
                 <row>
@@ -45,15 +47,14 @@
                         <vc:evidence-file-link evidence-file="@Model.ChangeReasonDetail.Evidence.UploadedEvidenceFile" />
                     </value>
                     <row-actions>
-                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
-                                                       visually-hidden-text="evidence">Change</action>
+                        <action href="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.Reason(Model.InstanceId, Model.ReturnUrl)"
+                                visually-hidden-text="evidence">Change</action>
                     </row-actions>
-
                 </row>
             </govuk-summary-list>
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit" data-testid="confirm-button">Confirm and delete route</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" name="Cancel" value="true" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

@@ -1,20 +1,8 @@
-using System.Text.Json.Serialization;
-
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-public class DeleteRouteState : IRegisterJourney
+public class DeleteRouteState
 {
-    public static JourneyDescriptor Journey => new(
-        JourneyNames.DeleteRouteToProfessionalStatus,
-        typeof(DeleteRouteState),
-        requestDataKeys: ["qualificationId"],
-        appendUniqueKey: true);
-
-    public bool Initialized { get; set; }
-
     public ChangeReasonOption? ChangeReason { get; set; }
-    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
-    [JsonIgnore]
-    public bool IsComplete => ChangeReason is not null && ChangeReasonDetail.IsComplete;
+    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 }
