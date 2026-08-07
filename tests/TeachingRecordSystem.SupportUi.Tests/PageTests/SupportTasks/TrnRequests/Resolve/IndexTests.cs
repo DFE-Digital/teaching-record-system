@@ -38,7 +38,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
     }
 
     [Fact]
-    public async Task Get_WithReturnUrl_JourneyCompletesToReturnUrl()
+    public async Task Post_Cancel_JourneyStartedWithLocalReturnUrl_RedirectsToReturnUrl()
     {
         // Arrange
         var returnUrl = "/support-tasks/active?keyword=test";
@@ -46,7 +46,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         var request = new HttpRequestMessage(HttpMethod.Post, matchesUrl)
         {
-            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+            Content = new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act
@@ -58,14 +58,14 @@ public class IndexTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
     }
 
     [Fact]
-    public async Task Get_WithNonLocalReturnUrl_JourneyCompletesToListPage()
+    public async Task Post_Cancel_JourneyStartedWithNonLocalReturnUrl_RedirectsToListPage()
     {
         // Arrange
         var matchesUrl = await StartJourneyAsync("https://evil.example.com/");
 
         var request = new HttpRequestMessage(HttpMethod.Post, matchesUrl)
         {
-            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+            Content = new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act

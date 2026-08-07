@@ -63,5 +63,7 @@ public enum ProcessType
     SupportTaskNoteCreating = 61,
     SupportTaskAllocating = 62,
     SupportTasksAssigning = 63,
-    SupportTaskZendeskUrlsUpdating = 64
+    SupportTaskZendeskUrlsUpdating = 64,
+    TrnRequestSupportTaskSaving = 65,
+    TeacherPensionsSupportTaskSaving = 66
 }

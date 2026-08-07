@@ -68,7 +68,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task Get_WithReturnUrl_JourneyCompletesToReturnUrl(bool isRecordMatchingOnlySupportTask)
+    public async Task Post_Cancel_JourneyStartedWithLocalReturnUrl_RedirectsToReturnUrl(bool isRecordMatchingOnlySupportTask)
     {
         // Arrange
         var returnUrl = "/support-tasks/active?keyword=test";
@@ -76,7 +76,7 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
 
         var request = new HttpRequestMessage(HttpMethod.Post, firstStepUrl)
         {
-            Content = new FormUrlEncodedContentBuilder { { "cancel", "true" } }
+            Content = isRecordMatchingOnlySupportTask ? new FormUrlEncodedContentBuilder { { "cancel", "True" } } : new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act
@@ -90,14 +90,14 @@ public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTe
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task Get_WithNonLocalReturnUrl_JourneyCompletesToListPage(bool isRecordMatchingOnlySupportTask)
+    public async Task Post_Cancel_JourneyStartedWithNonLocalReturnUrl_RedirectsToListPage(bool isRecordMatchingOnlySupportTask)
     {
         // Arrange
         var (supportTask, firstStepUrl) = await StartJourneyAsync("https://evil.example.com/", isRecordMatchingOnlySupportTask);
 
         var request = new HttpRequestMessage(HttpMethod.Post, firstStepUrl)
         {
-            Content = new FormUrlEncodedContentBuilder { { "cancel", "true" } }
+            Content = isRecordMatchingOnlySupportTask ? new FormUrlEncodedContentBuilder { { "cancel", "True" } } : new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act

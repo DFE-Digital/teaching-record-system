@@ -347,6 +347,83 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         return await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool supportTaskDashboardEnabled)
+    {
+        // Arrange
+        FeatureProvider.Features.Clear();
+        if (supportTaskDashboardEnabled)
+        {
+            FeatureProvider.Features.Add("SupportTaskDashboard");
+        }
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            new ResolveTrnRequestState
+            {
+                CompletionUrl = DefaultCompletionUrl,
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = false
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "action", "SaveAndComeBackLater" },
+                { "FirstNameSource", PersonAttributeSource.TrnRequest },
+                { "LastNameSource", PersonAttributeSource.TrnRequest }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        if (supportTaskDashboardEnabled)
+        {
+            Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", response.Headers.Location?.OriginalString);
+        }
+        else
+        {
+            Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
+        }
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            supportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+
+            Assert.NotNull(supportTask.ResolveJourneySavedState);
+            Assert.Equal("Merge", supportTask.ResolveJourneySavedState.PageName);
+            Assert.Contains(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp => kvp.Key == "FirstNameSource" && kvp.Value == PersonAttributeSource.TrnRequest.ToString());
+            Assert.Contains(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp => kvp.Key == "LastNameSource" && kvp.Value == PersonAttributeSource.TrnRequest.ToString());
+
+            var savedState = supportTask.ResolveJourneySavedState.GetState<ResolveTrnRequestState>();
+            Assert.NotNull(savedState);
+            Assert.Equal(matchedPerson.PersonId, savedState.PersonId);
+        });
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+
+        Events.AssertProcessesCreated(p => Assert.Equal(
+            ProcessType.TrnRequestSupportTaskSaving,
+            p.ProcessContext.ProcessType));
+    }
+
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
     {
@@ -368,7 +445,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             HttpMethod.Post,
             $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+            Content = new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act

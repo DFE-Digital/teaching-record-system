@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
@@ -10,11 +11,17 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Reso
 public class MatchesModel(
     ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator journey,
     TrsDbContext dbContext,
+    SupportTaskService supportTaskService,
+    TimeProvider timeProvider,
+    IFeatureProvider featureProvider,
     SupportUiLinkGenerator linkGenerator,
     EvidenceUploadManager evidenceController) : ResolveTeacherPensionsPotentialDuplicatePageModel(journey, dbContext)
 {
-    [BindProperty]
-    public bool Cancel { get; set; }
+    public static class Actions
+    {
+        public const string SaveAndComeBackLater = nameof(SaveAndComeBackLater);
+        public const string Cancel = nameof(Cancel);
+    }
 
     private readonly InlineValidator<MatchesModel> _validator = new()
     {
@@ -41,16 +48,22 @@ public class MatchesModel(
 
     public void OnGet()
     {
+        Journey.State.ApplySavedModelStateValues(nameof(MatchesModel), ModelState);
         PersonId = Journey.State.PersonId;
         OneLoginEmails = DbContext.OneLoginUsers.Where(x => x.PersonId == SupportTask!.PersonId).Select(x => x.EmailAddress!)
             .ToArray();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string? action)
     {
-        if (Cancel)
+        if (action is Actions.Cancel)
         {
             return await CancelAsync();
+        }
+
+        if (action is Actions.SaveAndComeBackLater)
+        {
+            return await HandleSaveAndReturnAsync();
         }
 
         // Verify the submitted ID is legit
@@ -70,6 +83,7 @@ public class MatchesModel(
         {
             var oldPersonId = state.PersonId;
             state.PersonId = PersonId;
+            state.ClearSavedModelStateValues(nameof(MatchesModel));
 
             if (oldPersonId != PersonId)
             {
@@ -83,6 +97,33 @@ public class MatchesModel(
                 state.TeachersPensionPersonId = SupportTask!.PersonId!;
             }
         });
+    }
+
+    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    {
+        var savedJourneyState = this.CreateSavedJourneyState(
+            nameof(MatchesModel),
+            Journey.State,
+            excludeKeys: ["Action", nameof(SupportTaskReference)]);
+
+        var processContext = new ProcessContext(ProcessType.TeacherPensionsSupportTaskSaving, timeProvider.UtcNow, User.GetUserId());
+
+        await supportTaskService.SaveProgressAsync(
+            new()
+            {
+                SupportTaskReference = SupportTask!.SupportTaskReference,
+                SavedJourneyState = savedJourneyState
+            },
+            processContext);
+
+        Journey.DeleteInstance();
+
+        if (featureProvider.IsEnabled("SupportTaskDashboard"))
+        {
+            return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(SupportTask.SupportTaskReference));
+        }
+
+        return Redirect(Journey.State.CompletionUrl);
     }
 
     private async Task<IActionResult> CancelAsync()

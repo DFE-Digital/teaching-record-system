@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.StaticFiles;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -11,22 +13,30 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 public class VerifyModel(
     ResolveOneLoginUserMatchingJourneyCoordinator journey,
     ISafeFileService safeFileService,
-    SupportUiLinkGenerator linkGenerator) : PageModel
+    SupportUiLinkGenerator linkGenerator,
+    SupportTaskService supportTaskService,
+    TimeProvider timeProvider,
+    IFeatureProvider featureProvider) : PageModel
 {
+    public static class Actions
+    {
+        public const string SaveAndComeBackLater = nameof(SaveAndComeBackLater);
+        public const string Cancel = nameof(Cancel);
+    }
+
     private readonly InlineValidator<VerifyModel> _validator = new()
     {
         v => v.RuleFor(m => m.Verified)
             .NotNull().WithMessage("Select yes if you can verify this person’s identity")
     };
 
+    private SupportTask? _supportTask;
+
     [FromRoute]
-    public required string SupportTaskReference { get; set; }
+    public required string SupportTaskReference { get; init; }
 
     [BindProperty]
     public bool? Verified { get; set; }
-
-    [BindProperty]
-    public bool Cancel { get; set; }
 
     public string? BackLink { get; set; }
 
@@ -40,15 +50,21 @@ public class VerifyModel(
     public void OnGet()
     {
         Verified = journey.State.Verified;
+        journey.State.ApplySavedModelStateValues(nameof(VerifyModel), ModelState);
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(string? action)
     {
-        if (Cancel)
+        if (action is Actions.Cancel)
         {
             journey.DeleteInstance();
 
             return Redirect(journey.State.CompletionUrl);
+        }
+
+        if (action is Actions.SaveAndComeBackLater)
+        {
+            return await HandleSaveAndReturnAsync();
         }
 
         await this.ThrowIfInvalidAsync(_validator);
@@ -61,11 +77,46 @@ public class VerifyModel(
             resolveLinkGenerator.NoMatches(journey.InstanceId) :
             resolveLinkGenerator.Matches(journey.InstanceId);
 
-        return journey.AdvanceTo(nextStepUrl, state => state.Verified = Verified);
+        return journey.AdvanceTo(nextStepUrl, state =>
+        {
+            state.Verified = Verified;
+            state.ClearSavedModelStateValues(nameof(VerifyModel));
+        });
+    }
+
+    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    {
+        var savedJourneyState = this.CreateSavedJourneyState(
+            nameof(VerifyModel),
+            journey.State,
+            excludeKeys: ["Action", nameof(SupportTaskReference)]);
+
+        var processContext = new ProcessContext(
+            ProcessType.OneLoginUserIdVerificationSupportTaskSaving,
+            timeProvider.UtcNow,
+            User.GetUserId());
+
+        await supportTaskService.SaveProgressAsync(
+            new()
+            {
+                SupportTaskReference = _supportTask!.SupportTaskReference,
+                SavedJourneyState = savedJourneyState
+            },
+            processContext);
+
+        journey.DeleteInstance();
+
+        if (featureProvider.IsEnabled("SupportTaskDashboard"))
+        {
+            return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(_supportTask.SupportTaskReference));
+        }
+
+        return Redirect(linkGenerator.SupportTasks.OneLoginUserMatching.IdVerification());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
 
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;

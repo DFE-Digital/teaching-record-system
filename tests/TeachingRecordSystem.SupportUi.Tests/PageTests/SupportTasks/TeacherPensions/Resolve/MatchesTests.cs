@@ -597,6 +597,140 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         Assert.Equal(Guid.Empty, journeyState!.PersonId);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool supportTaskDashboardEnabled)
+    {
+        // Arrange
+        FeatureProvider.Features.Clear();
+        if (supportTaskDashboardEnabled)
+        {
+            FeatureProvider.Features.Add("SupportTaskDashboard");
+        }
+
+        var fileName = "test.txt";
+        long integrationTransactionId = 1;
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
+                s.WithLastName(person.LastName);
+                s.WithFirstName(person.FirstName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
+                s.WithSupportTaskData(fileName, integrationTransactionId);
+                s.WithCreatedOn(TimeProvider.UtcNow);
+            });
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [PersonMatchedAttribute.FirstName, PersonMatchedAttribute.LastName])]);
+
+        var chosenPersonId = duplicatePerson1.PersonId;
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "action", "SaveAndComeBackLater" },
+                { "PersonId", chosenPersonId.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        if (supportTaskDashboardEnabled)
+        {
+            Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", response.Headers.Location?.OriginalString);
+        }
+        else
+        {
+            Assert.Equal("/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
+        }
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            supportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+            Assert.NotNull(supportTask.ResolveJourneySavedState);
+
+            Assert.Equal("MatchesModel", supportTask.ResolveJourneySavedState.PageName);
+
+            Assert.Collection(
+                 supportTask.ResolveJourneySavedState.ModelStateValues,
+                 kvp =>
+                 {
+                     Assert.Equal("PersonId", kvp.Key);
+                     Assert.Equal(chosenPersonId.ToString(), kvp.Value);
+                 });
+
+            var savedState = supportTask.ResolveJourneySavedState.GetState<ResolveTeacherPensionsPotentialDuplicateState>();
+            Assert.NotNull(savedState);
+            Assert.NotNull(savedState.MatchedPersons);
+        });
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+
+        Events.AssertProcessesCreated(p => Assert.Equal(
+            ProcessType.TeacherPensionsSupportTaskSaving,
+            p.ProcessContext.ProcessType));
+    }
+
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
+    {
+        // Arrange
+        var fileName = "test.txt";
+        long integrationTransactionId = 1;
+        var person = await TestData.CreatePersonAsync(x => x.WithNationalInsuranceNumber());
+        var duplicatePerson1 = await TestData.CreatePersonAsync(x => x.WithFirstName(person.FirstName).WithLastName(person.LastName).WithNationalInsuranceNumber(person.NationalInsuranceNumber!));
+        var user = await TestData.CreateUserAsync();
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            user.UserId,
+            s =>
+            {
+                s.WithMatchedPersons(duplicatePerson1.PersonId);
+                s.WithLastName(person.LastName);
+                s.WithFirstName(person.FirstName);
+                s.WithNationalInsuranceNumber(person.NationalInsuranceNumber);
+                s.WithDateOfBirth(person.DateOfBirth!.Value);
+                s.WithSupportTaskData(fileName, integrationTransactionId);
+                s.WithCreatedOn(TimeProvider.UtcNow);
+            });
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            [new MatchPersonsResultPerson(duplicatePerson1.PersonId, [PersonMatchedAttribute.FirstName, PersonMatchedAttribute.LastName])]);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/teacher-pensions/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
     private void AssertMatchRowHasExpectedHighlight(IElement matchDetails, string summaryListKey, bool expectHighlight)
     {
         var valueElement = matchDetails.GetSummaryListValueElementByKey(summaryListKey);

@@ -1170,7 +1170,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
             HttpMethod.Post,
             $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+            Content = new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act
@@ -1181,5 +1181,86 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool supportTaskDashboardEnabled)
+    {
+        // Arrange
+        FeatureProvider.Features.Clear();
+        if (supportTaskDashboardEnabled)
+        {
+            FeatureProvider.Features.Add("SupportTaskDashboard");
+        }
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var (supportTask, _, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask,
+            matchedPersonIds.Select(
+                p => new MatchPersonsResultPerson(
+                    p,
+                    [
+                        PersonMatchedAttribute.FirstName,
+                        PersonMatchedAttribute.LastName,
+                        PersonMatchedAttribute.DateOfBirth
+                    ]
+                )).ToArray());
+
+        var chosenPersonId = matchedPersonIds[0];
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "action", "SaveAndComeBackLater" },
+                { "PersonId", chosenPersonId.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        if (supportTaskDashboardEnabled)
+        {
+            Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", response.Headers.Location?.OriginalString);
+        }
+        else
+        {
+            Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
+        }
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            supportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+            Assert.NotNull(supportTask.ResolveJourneySavedState);
+
+            Assert.Equal("Matches", supportTask.ResolveJourneySavedState.PageName);
+
+            Assert.Collection(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp =>
+                {
+                    Assert.Equal("PersonId", kvp.Key);
+                    Assert.Equal(chosenPersonId.ToString(), kvp.Value);
+                });
+
+            var savedState = supportTask.ResolveJourneySavedState.GetState<ResolveTrnRequestState>();
+            Assert.NotNull(savedState);
+        });
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+
+        Events.AssertProcessesCreated(p => Assert.Equal(
+            ProcessType.TrnRequestSupportTaskSaving,
+            p.ProcessContext.ProcessType));
     }
 }
