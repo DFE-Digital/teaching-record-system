@@ -14,7 +14,6 @@ using Microsoft.Identity.Web;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
-using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages;
@@ -98,10 +97,7 @@ public static class Extensions
 
         services
             .AddAzureActiveDirectory(environment)
-            .AddFormFlow()
-            .AddFormFlowJourneyDescriptors(typeof(Program).Assembly)
             .AddTransient<SupportUiLinkGenerator>()
-            .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
             .AddTransient<CheckMandatoryQualificationExistsFilter>()
             .AddTransient<CheckUserExistsFilter>()
             .AddTransient<RequireClosedAlertFilter>()

@@ -10,8 +10,6 @@ using TeachingRecordSystem.AuthorizeAccess.Tests;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.TestCommon.Infrastructure;
-using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
-using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
 
@@ -84,7 +82,6 @@ public class HostFixture : InitializeDbFixture
                 services
                     .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>()
-                    .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                     .AddSingleton(GetMockFileService())
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
                     .AddGovUkQuestionsTestingServices();

@@ -10,8 +10,6 @@ using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Tests;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
-using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
-using TeachingRecordSystem.WebCommon.FormFlow.State;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
@@ -95,7 +93,6 @@ public class HostFixture : InitializeDbFixture
                     .AddSingleton(DbHelper.Instance)
                     .AddSingleton<CurrentUserProvider>()
                     .AddSingleton<TestData>()
-                    .AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>()
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
                     .AddStartupTask<AddTestRouteTypesStartupTask>()
