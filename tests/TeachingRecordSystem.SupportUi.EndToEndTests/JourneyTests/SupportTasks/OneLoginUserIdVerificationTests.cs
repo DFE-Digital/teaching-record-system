@@ -29,11 +29,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
-        await page.ClickRadioByLabelAsync("Yes, find a matching record");
-        await page.ClickContinueButtonAsync();
-
-        await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
-        await page.ClickRadioByLabelAsync("Connect it to Record A", exact: false);
+        await page.ClickRadioByLabelAsync("Yes, verify and find a matching record (if applicable)");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-connect");
@@ -60,7 +56,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
-        await page.ClickRadioByLabelAsync("Yes, find a matching record");
+        await page.ClickRadioByLabelAsync("Yes, verify and find a matching record (if applicable)");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/no-matches");
@@ -72,16 +68,21 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
     [Fact]
     public async Task VerifyAndNotConnecting()
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+        var matchedPerson1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+        await TestData.CreatePersonAsync(p => p
+            .WithFirstName(matchedPerson1.FirstName)
+            .WithLastName(matchedPerson1.LastName)
+            .WithDateOfBirth(matchedPerson1.DateOfBirth!.Value)
+            .WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber!));
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject, t => t
-                .WithStatedFirstName(matchedPerson.FirstName)
-                .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
-                .WithStatedTrn(matchedPerson.Trn));
+                .WithStatedFirstName(matchedPerson1.FirstName)
+                .WithStatedLastName(matchedPerson1.LastName)
+                .WithStatedDateOfBirth(matchedPerson1.DateOfBirth!.Value)
+                .WithStatedTrn(matchedPerson1.Trn));
         var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
         var firstName = taskData.StatedFirstName;
         var lastName = taskData.StatedLastName;
@@ -94,20 +95,11 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
-        await page.ClickRadioByLabelAsync("Yes, find a matching record");
+        await page.ClickRadioByLabelAsync("Yes, verify and find a matching record (if applicable)");
         await page.ClickContinueButtonAsync();
 
-        await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
-        await page.ClickRadioByLabelAsync("Do not connect it to a record");
-        await page.ClickContinueButtonAsync();
-
-        await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/not-connecting");
-        await page.ClickRadioByLabelAsync("There is no matching record");
-        await page.ClickContinueButtonAsync();
-
-        await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-not-connecting");
-        await page.ClickButtonAsync("Confirm and continue");
-
+        await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-connect");
+        await page.ClickButtonAsync("Cancel");
         await page.WaitForUrlPathAsync("/support-tasks/one-login-user-matching/id-verification");
     }
 
@@ -144,16 +136,21 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
     [Fact]
     public async Task StartVerifyAndComeBackLater()
     {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+        var matchedPerson1 = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+        await TestData.CreatePersonAsync(p => p.WithFirstName(matchedPerson1.FirstName).WithLastName(matchedPerson1.LastName).WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber!));
+        await TestData.CreatePersonAsync(p => p
+            .WithFirstName(matchedPerson1.FirstName)
+            .WithLastName(matchedPerson1.LastName)
+            .WithDateOfBirth(matchedPerson1.DateOfBirth!.Value)
+            .WithNationalInsuranceNumber(matchedPerson1.NationalInsuranceNumber!));
 
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
 
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject, t => t
-                .WithStatedFirstName(matchedPerson.FirstName)
-                .WithStatedLastName(matchedPerson.LastName)
-                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
-                .WithStatedTrn(matchedPerson.Trn));
+                .WithStatedFirstName(matchedPerson1.FirstName)
+                .WithStatedLastName(matchedPerson1.LastName)
+                .WithStatedDateOfBirth(matchedPerson1.DateOfBirth!.Value));
         var taskData = supportTask.GetData<OneLoginUserIdVerificationData>();
         var firstName = taskData.StatedFirstName;
         var lastName = taskData.StatedLastName;
@@ -166,7 +163,7 @@ public class OneLoginUserIdVerificationTests(HostFixture hostFixture) : TestBase
         await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify");
 
-        await page.ClickRadioByLabelAsync("Yes, find a matching record");
+        await page.ClickRadioByLabelAsync("Yes, verify and find a matching record (if applicable)");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
