@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 
 public enum ResolveOneLoginUserMatchingVerifyOption
 {
-    [Display(Name = "Yes, find a matching record")]
+    [Display(Name = "Yes, verify and find a matching record (if applicable)")]
     Verified,
     [Display(Name = "No, reject this request")]
     NotVerified,

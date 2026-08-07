@@ -71,16 +71,36 @@ public class VerifyModel(
 
         var resolveLinkGenerator = linkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
 
-        var nextStepUrl = Verified is false ?
-            resolveLinkGenerator.Reject(journey.InstanceId) :
-            string.IsNullOrWhiteSpace(Trn) || journey.State.MatchedPersons.Count == 0 ?
-            resolveLinkGenerator.NoMatches(journey.InstanceId) :
-            resolveLinkGenerator.Matches(journey.InstanceId);
+        // if verification is false Move to reject screen
+        // if there is only one definite match Move to confirm screen
+        // if there is 0 matches Move to no matches screen
+        // else move to matches screen
+        string nextStepUrl;
+        if (Verified is false)
+        {
+            nextStepUrl = resolveLinkGenerator.Reject(journey.InstanceId);
+        }
+        else if (journey.State.DefiniteMatch)
+        {
+            nextStepUrl = resolveLinkGenerator.ConfirmConnect(journey.InstanceId);
+        }
+        else if (string.IsNullOrWhiteSpace(Trn) || journey.State.MatchedPersons.Count == 0)
+        {
+            nextStepUrl = resolveLinkGenerator.NoMatches(journey.InstanceId);
+        }
+        else
+        {
+            nextStepUrl = resolveLinkGenerator.Matches(journey.InstanceId);
+        }
 
         return journey.AdvanceTo(nextStepUrl, state =>
         {
             state.Verified = Verified;
             state.ClearSavedModelStateValues(nameof(VerifyModel));
+            if (Verified is true && state.DefiniteMatch)
+            {
+                state.MatchedPersonId = journey.State.MatchedPersons.Single().PersonId;
+            }
         });
     }
 

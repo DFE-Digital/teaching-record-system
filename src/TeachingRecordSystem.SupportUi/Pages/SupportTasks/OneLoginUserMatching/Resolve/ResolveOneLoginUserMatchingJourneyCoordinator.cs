@@ -53,6 +53,7 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
         var emailAddress = supportTask.OneLoginUser!.EmailAddress;
 
         IReadOnlyCollection<MatchPersonResult> suggestedMatches;
+        var definiteMatch = false;
 
         if (string.IsNullOrWhiteSpace(requestData.StatedTrn))
         {
@@ -73,6 +74,7 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
             var matchResult = oneLoginService.MatchPerson(matchOptions, suggestedMatches);
             if (matchResult is not null)
             {
+                definiteMatch = true;
                 suggestedMatches = [matchResult];
             }
         }
@@ -81,12 +83,14 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
             existingState with
             {
                 MatchedPersons = suggestedMatches,
+                DefiniteMatch = definiteMatch,
                 CompletionUrl = completionUrl,
                 SavedJourneyState = supportTask.ResolveJourneySavedState
             } :
             new ResolveOneLoginUserMatchingState
             {
                 MatchedPersons = suggestedMatches,
+                DefiniteMatch = definiteMatch,
                 CompletionUrl = completionUrl,
                 Verified = supportTask.SupportTaskType is SupportTaskType.OneLoginUserRecordMatching ? true : null
             };
