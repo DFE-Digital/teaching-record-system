@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
@@ -12,6 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 [AllowClosedSupportTask]
 public class Index(
     SupportTaskService supportTaskService,
+    ChangeHistoryService changeHistoryService,
     TrsDbContext dbContext,
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) :
@@ -63,6 +66,8 @@ public class Index(
     public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
 
     public Guid CurrentUserId => User.GetUserId();
+
+    public IReadOnlyCollection<ChangeHistoryEntryViewModel>? ChangeHistory { get; set; }
 
     public void OnGet()
     {
@@ -135,6 +140,20 @@ public class Index(
 
         BackLink = this.GetReturnUrlOrDefault(
             IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
+
+        var changeHistoryContext = ChangeHistoryContext.ForSupportTask(SupportTaskReference);
+        ChangeHistory = (await changeHistoryService.GetChangeHistoryBySupportTaskAsync(SupportTaskReference))
+            .Select(e => new ChangeHistoryEntryViewModel
+            {
+                Context = changeHistoryContext,
+                Timestamp = e.Process.CreatedOn,
+                UserName = e.RaisedByUser.Name,
+                ProcessId = e.Process.ProcessId,
+                ProcessType = e.Process.ProcessType,
+                ChangeReason = e.Process.ChangeReason,
+                Events = e.Process.Events!.Select(v => v.Payload).AsReadOnly()
+            })
+            .AsReadOnly();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

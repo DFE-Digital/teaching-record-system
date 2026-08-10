@@ -193,7 +193,7 @@
             </govuk-button-link>
         </div>
 
-        @if (FeatureProvider.IsEnabled("SupportTaskDashboard"))
+        @if (FeatureProvider.IsEnabled(FeatureNames.SupportTaskChangeHistory))
         {
             <div class="govuk-grid-column-full trs-task-detail__section">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-2">History</h2>
@@ -201,7 +201,12 @@
                 <govuk-details>
                     <govuk-details-summary>View activity</govuk-details-summary>
                     <govuk-details-text>
-                        TODO
+                        <div class="moj-timeline">
+                            @foreach (var entry in Model.ChangeHistory!)
+                            {
+                                <vc:change-history-entry model="@entry" />
+                            }
+                        </div>
                     </govuk-details-text>
                 </govuk-details>
             </div>
@@ -255,11 +260,15 @@
                 </row>
             </govuk-summary-list>
 
-            @if (FeatureProvider.IsEnabled("SupportTaskDashboard"))
+            @if (FeatureProvider.IsEnabled(FeatureNames.SupportTaskChangeHistory))
             {
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Task history</h2>
 
                 <div class="moj-timeline">
+                    @foreach (var entry in Model.ChangeHistory!)
+                    {
+                        <vc:change-history-entry model="@entry" />
+                    }
                 </div>
             }
             else

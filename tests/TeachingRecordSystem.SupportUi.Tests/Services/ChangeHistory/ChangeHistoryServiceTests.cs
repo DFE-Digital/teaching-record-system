@@ -287,9 +287,144 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         }
     }
 
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_SupportTaskHasNoProcesses_ReturnsEmptyCollection()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_MapsProcessToEntry()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var process = await CreateNoteCreatingProcessAsync(supportTask.SupportTaskReference, user.UserId, "Some note");
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+
+        // Assert
+        var entry = Assert.Single(result);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.SupportTaskNoteCreating, entry.Process.ProcessType);
+        Assert.Equal(user.Name, entry.RaisedByUser.Name);
+        Assert.Equal("Some note", entry.GetEvent<SupportTaskNoteCreatedEvent>().SupportTaskNote.Content);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_ProcessRaisedByDqtUser_UsesDqtUserName()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+
+        await CreateNoteCreatingProcessAsync(supportTask.SupportTaskReference, userId: null, dqtUserName: "Some DQT User");
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+
+        // Assert
+        var entry = Assert.Single(result);
+        Assert.Equal("Some DQT User", entry.RaisedByUser.Name);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_DoesNotReturnProcessesForOtherSupportTasks()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+        var otherSupportTask = await CreateSupportTaskAsync();
+        var user = await TestData.CreateUserAsync();
+
+        await CreateNoteCreatingProcessAsync(otherSupportTask.SupportTaskReference, user.UserId);
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_ReturnsEveryProcessForSupportTask()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var processIds = new List<Guid>();
+        for (var i = 0; i < 3; i++)
+        {
+            processIds.Add((await CreateNoteCreatingProcessAsync(supportTask.SupportTaskReference, user.UserId)).ProcessId);
+            TimeProvider.Advance();
+        }
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+
+        // Assert
+        Assert.Equal(
+            processIds.OrderBy(id => id),
+            result.Select(e => e.Process.ProcessId).OrderBy(id => id));
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_ProcessReferencesMultipleSupportTasks_IsReturnedForEachSupportTask()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+        var otherSupportTask = await CreateSupportTaskAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var process = await CreateAssigningProcessAsync(user.UserId, supportTask, otherSupportTask);
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+        var otherResult = await GetChangeHistoryBySupportTaskAsync(otherSupportTask.SupportTaskReference);
+
+        // Assert
+        Assert.Equal(process.ProcessId, Assert.Single(result).Process.ProcessId);
+        Assert.Equal(process.ProcessId, Assert.Single(otherResult).Process.ProcessId);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryBySupportTaskAsync_OrdersProcessesByCreatedOnDescending()
+    {
+        // Arrange
+        var supportTask = await CreateSupportTaskAsync();
+        var user = await TestData.CreateUserAsync();
+
+        await CreateNoteCreatingProcessAsync(supportTask.SupportTaskReference, user.UserId, "Oldest");
+        TimeProvider.Advance();
+        await CreateNoteCreatingProcessAsync(supportTask.SupportTaskReference, user.UserId, "Middle");
+        TimeProvider.Advance();
+        await CreateNoteCreatingProcessAsync(supportTask.SupportTaskReference, user.UserId, "Newest");
+
+        // Act
+        var result = await GetChangeHistoryBySupportTaskAsync(supportTask.SupportTaskReference);
+
+        // Assert
+        Assert.Equal(["Newest", "Middle", "Oldest"], GetNoteContents(result));
+    }
+
     private Task<ResultPage<TimelineItem>> GetChangeHistoryByPersonAsync(Guid personId, ClaimsPrincipal user, PaginationOptions paginationOptions) =>
         WithServiceAsync<ChangeHistoryService, ResultPage<TimelineItem>>(service =>
             service.GetChangeHistoryByPersonAsync(personId, user, paginationOptions));
+
+    private Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(string supportTaskReference) =>
+        WithServiceAsync<ChangeHistoryService, IReadOnlyCollection<ProcessChangeHistoryEntry>>(service =>
+            service.GetChangeHistoryBySupportTaskAsync(supportTaskReference));
+
+    private Task<SupportTask> CreateSupportTaskAsync() =>
+        TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
 
     private async Task<ClaimsPrincipal> CreatePrincipalAsync(string? role = UserRoles.Administrator)
     {
@@ -361,6 +496,77 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
                 }
             });
 
+    // Creates the process directly rather than going via TestData so that the DQT user columns can be populated
+    private Task<Process> CreateNoteCreatingProcessAsync(
+        string supportTaskReference,
+        Guid? userId,
+        string content = "Some note",
+        string? dqtUserName = null) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            IEvent @event = new SupportTaskNoteCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskNote = new EventModels.SupportTaskNote
+                {
+                    SupportTaskNoteId = Guid.NewGuid(),
+                    SupportTaskReference = supportTaskReference,
+                    Content = content
+                }
+            };
+
+            var process = new Process
+            {
+                ProcessId = Guid.NewGuid(),
+                ProcessType = ProcessType.SupportTaskNoteCreating,
+                CreatedOn = TimeProvider.UtcNow,
+                UpdatedOn = TimeProvider.UtcNow,
+                UserId = userId,
+                DqtUserId = dqtUserName is not null ? Guid.NewGuid() : null,
+                DqtUserName = dqtUserName,
+                PersonIds = [],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [.. @event.SupportTaskReferences],
+                ChangeReason = null
+            };
+
+            dbContext.Processes.Add(process);
+
+            dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+            {
+                ProcessEventId = @event.EventId,
+                ProcessId = process.ProcessId,
+                EventName = @event.GetType().Name,
+                Payload = @event,
+                PersonIds = @event.PersonIds,
+                OneLoginUserSubjects = @event.OneLoginUserSubjects,
+                SupportTaskReferences = @event.SupportTaskReferences,
+                CreatedOn = TimeProvider.UtcNow
+            });
+
+            await dbContext.SaveChangesAsync();
+
+            return process;
+        });
+
+    private Task<Process> CreateAssigningProcessAsync(Guid userId, params SupportTask[] supportTasks) =>
+        TestData.CreateProcessAsync(
+            ProcessType.SupportTasksAssigning,
+            userId,
+            changeReason: null,
+            supportTasks
+                .Select(t => (IEvent)new SupportTaskUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    SupportTaskReference = t.SupportTaskReference,
+                    Changes = SupportTaskUpdatedEventChanges.AssignedToUserId,
+                    SupportTask = EventModels.SupportTask.FromModel(t),
+                    OldSupportTask = EventModels.SupportTask.FromModel(t),
+                    Comments = null,
+                    RejectionReason = null
+                })
+                .ToArray());
+
     private Task<Process> CreateReactivatingProcessAsync(Guid personId, Guid userId) =>
         TestData.CreateProcessAsync(
             ProcessType.PersonReactivatingInDqt,
@@ -384,6 +590,11 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
             NationalInsuranceNumber = null,
             Gender = null
         };
+
+    private static string[] GetNoteContents(IReadOnlyCollection<ProcessChangeHistoryEntry> entries) =>
+        entries
+            .Select(e => e.GetEvent<SupportTaskNoteCreatedEvent>().SupportTaskNote.Content)
+            .ToArray();
 
     private static string[] GetLastNames(ResultPage<TimelineItem> page) =>
         page
