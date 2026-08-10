@@ -4,7 +4,6 @@
 @{
     ViewBag.Title = "Check details before merging records";
     var changeLink = LinkGenerator.SupportTasks.TeacherPensions.Resolve.Matches(Model.InstanceId, returnUrl: Request.GetEncodedPathAndQuery());
-    var confirmButtonLabel = "Confirm and merge records";
 }
 
 @section BeforeContent {
@@ -14,8 +13,7 @@
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-l">Third-party tasks</span>
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <vc:support-task-header page-header="@ViewBag.Title" />
         </div>
     </div>
 
@@ -84,7 +82,7 @@
                 </row>
             </govuk-summary-list>
             <div class="govuk-button-group">
-                <govuk-button type="submit" data-testid="submit">@confirmButtonLabel</govuk-button>
+                <govuk-button type="submit" data-testid="submit">Confirm and merge records</govuk-button>
                 <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
             </div>
         </div>

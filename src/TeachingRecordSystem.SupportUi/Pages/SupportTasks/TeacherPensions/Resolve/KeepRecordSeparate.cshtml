@@ -12,8 +12,8 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
             <govuk-radios for="KeepSeparateReason">
-                <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
-                    @ViewBag.Title
+                <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l">
+                    <vc:support-task-header page-header="@ViewBag.Title" />
                 </govuk-radios-fieldset-legend>
                 <govuk-radios-item value="@KeepingRecordSeparateReason.RecordDoesNotMatch">
                     The records do not match

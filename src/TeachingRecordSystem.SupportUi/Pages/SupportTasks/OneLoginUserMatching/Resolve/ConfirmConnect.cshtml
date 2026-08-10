@@ -11,8 +11,7 @@
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-l">Record management</span>
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <vc:support-task-header page-header="@ViewBag.Title" />
 
             <govuk-inset-text>
                 We’ll send @Model.MatchedPersonName an email confirming their GOV.UK One Login has been connected to their teaching record.

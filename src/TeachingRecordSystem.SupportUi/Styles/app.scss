@@ -618,3 +618,13 @@ tr:has([data-selects-row]):has(:checked) {
 body:not(.js-enabled) .trs-requires-js {
   @extend .govuk-visually-hidden;
 }
+
+.trs-support-task-header__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  > * {
+    margin: 0;
+  }
+}

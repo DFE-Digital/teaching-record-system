@@ -8,8 +8,7 @@
     <govuk-back-link href="@Model.BackLink" />
 }
 
-<span class="govuk-caption-l" data-testid="heading-caption">Record management</span>
-<h1 class="govuk-heading-l">@(Model.ChangeType == SupportTaskType.ChangeNameRequest ? "Name change request" : "Date of birth change request")</h1>
+<vc:support-task-header />
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">

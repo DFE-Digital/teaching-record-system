@@ -5,7 +5,7 @@
 @using static ResolveTeacherPensionsPotentialDuplicateState
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve.MergeModel
 @{
-    ViewBag.Title = $"Potential duplicates via Teachers&rsquo; Pensions";
+    ViewBag.Title = "Select the details to keep in merged record";
 }
 
 @section BeforeContent {
@@ -42,8 +42,7 @@
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-l">Third-party tasks</span>
-            <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Select the details to keep in merged record</h1>
+            <vc:support-task-header page-header="@ViewBag.Title" />
         </div>
     </div>
 

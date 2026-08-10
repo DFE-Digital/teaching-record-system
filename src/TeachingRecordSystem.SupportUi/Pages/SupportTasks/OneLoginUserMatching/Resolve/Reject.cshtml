@@ -12,11 +12,9 @@
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-l">Record management</span>
-
             <govuk-radios for="Reason">
                 <govuk-radios-fieldset-legend>
-                    <h1 class="govuk-fieldset__legend--l govuk-!-margin-top-0">@ViewBag.Title</h1>
+                    <vc:support-task-header page-header="@ViewBag.Title" />
                     <div class="govuk-hint">We’ll email the person with the reason you select</div>
                 </govuk-radios-fieldset-legend>
                 <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest">
