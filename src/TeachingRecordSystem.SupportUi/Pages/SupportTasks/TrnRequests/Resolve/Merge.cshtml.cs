@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
@@ -9,10 +11,19 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 public class Merge(
     ResolveTrnRequestJourneyCoordinator journey,
     TrsDbContext dbContext,
+    SupportTaskService supportTaskService,
+    TimeProvider timeProvider,
+    IFeatureProvider featureProvider,
     SupportUiLinkGenerator linkGenerator) : ResolveTrnRequestPageModel(journey, dbContext)
 {
-    [BindProperty]
-    public bool Cancel { get; set; }
+    public static class Actions
+    {
+        public const string SaveAndComeBackLater = nameof(SaveAndComeBackLater);
+        public const string Cancel = nameof(Cancel);
+    }
+
+    private SupportTask? _supportTask;
+
 
     public string? SourceApplicationUserName { get; set; }
 
@@ -56,6 +67,7 @@ public class Merge(
 
     public void OnGet()
     {
+        Journey.State.ApplySavedModelStateValues(nameof(Merge), ModelState);
         FirstNameSource = Journey.State.FirstNameSource;
         MiddleNameSource = Journey.State.MiddleNameSource;
         LastNameSource = Journey.State.LastNameSource;
@@ -66,13 +78,18 @@ public class Merge(
         Comments = Journey.State.Comments;
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync(string? action)
     {
-        if (Cancel)
+        if (action is Actions.Cancel)
         {
             Journey.DeleteInstance();
 
             return Redirect(Journey.State.CompletionUrl);
+        }
+
+        if (action is Actions.SaveAndComeBackLater)
+        {
+            return await HandleSaveAndReturnAsync();
         }
 
         if (FirstName!.Different && FirstNameSource is null)
@@ -128,11 +145,41 @@ public class Merge(
                 state.GenderSource = GenderSource;
                 state.PersonAttributeSourcesSet = true;
                 state.Comments = Comments;
+                state.ClearSavedModelStateValues(nameof(Merge));
             });
+    }
+
+    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    {
+        var savedJourneyState = this.CreateSavedJourneyState(
+            nameof(Merge),
+            Journey.State,
+            excludeKeys: ["Action"]);
+
+        var processContext = new ProcessContext(ProcessType.TrnRequestSupportTaskSaving, timeProvider.UtcNow, User.GetUserId());
+
+        await supportTaskService.SaveProgressAsync(
+            new()
+            {
+                SupportTaskReference = _supportTask!.SupportTaskReference,
+                SavedJourneyState = savedJourneyState
+            },
+            processContext);
+
+        Journey.DeleteInstance();
+
+        if (featureProvider.IsEnabled("SupportTaskDashboard"))
+        {
+            return Redirect(linkGenerator.SupportTasks.SupportTaskDetail.Index(_supportTask.SupportTaskReference));
+        }
+
+        return Redirect(Journey.State.CompletionUrl);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
+
         var requestData = GetRequestData();
         var state = Journey.State;
         var personId = state.PersonId!.Value;

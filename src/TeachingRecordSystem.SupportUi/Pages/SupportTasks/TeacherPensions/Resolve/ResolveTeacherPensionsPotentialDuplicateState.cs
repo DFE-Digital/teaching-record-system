@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
 
-public class ResolveTeacherPensionsPotentialDuplicateState
+public record ResolveTeacherPensionsPotentialDuplicateState : IJourneyWithSavedState
 {
     /// <summary>
     /// The value the Matches page submits for "keep the records separate" rather than picking a record.
@@ -19,6 +19,7 @@ public class ResolveTeacherPensionsPotentialDuplicateState
     /// </summary>
     public required string CompletionUrl { get; init; }
 
+    public SavedJourneyState? SavedJourneyState { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }

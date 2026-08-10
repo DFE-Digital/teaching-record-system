@@ -347,6 +347,83 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         return await CreateJourneyInstanceAsync(supportTask.SupportTaskReference, state);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool supportTaskDashboardEnabled)
+    {
+        // Arrange
+        FeatureProvider.Features.Clear();
+        if (supportTaskDashboardEnabled)
+        {
+            FeatureProvider.Features.Add("SupportTaskDashboard");
+        }
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            new ResolveTrnRequestState
+            {
+                CompletionUrl = DefaultCompletionUrl,
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = false
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "action", "SaveAndComeBackLater" },
+                { "FirstNameSource", PersonAttributeSource.TrnRequest },
+                { "LastNameSource", PersonAttributeSource.TrnRequest }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        if (supportTaskDashboardEnabled)
+        {
+            Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", response.Headers.Location?.OriginalString);
+        }
+        else
+        {
+            Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
+        }
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            supportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+
+            Assert.NotNull(supportTask.ResolveJourneySavedState);
+            Assert.Equal("Merge", supportTask.ResolveJourneySavedState.PageName);
+            Assert.Contains(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp => kvp.Key == "FirstNameSource" && kvp.Value == PersonAttributeSource.TrnRequest.ToString());
+            Assert.Contains(
+                supportTask.ResolveJourneySavedState.ModelStateValues,
+                kvp => kvp.Key == "LastNameSource" && kvp.Value == PersonAttributeSource.TrnRequest.ToString());
+
+            var savedState = supportTask.ResolveJourneySavedState.GetState<ResolveTrnRequestState>();
+            Assert.NotNull(savedState);
+            Assert.Equal(matchedPerson.PersonId, savedState.PersonId);
+        });
+
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+
+        Events.AssertProcessesCreated(p => Assert.Equal(
+            ProcessType.TrnRequestSupportTaskSaving,
+            p.ProcessContext.ProcessType));
+    }
+
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirectsToListPage()
     {
@@ -368,7 +445,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
             HttpMethod.Post,
             $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder { { "Cancel", "True" } }
+            Content = new FormUrlEncodedContentBuilder { { "action", "Cancel" } }
         };
 
         // Act
@@ -379,5 +456,96 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         Assert.Equal("/support-tasks/trn-requests", response.Headers.Location?.OriginalString);
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAttributesAndFieldsData))]
+    public async Task Get_SavedJourneyStateWithSelectedSource_RestoresRadioButtonSelection(
+        PersonMatchedAttribute _,
+        string fieldName)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+
+        // Create initial journey and save progress with selected sources
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            new ResolveTrnRequestState
+            {
+                CompletionUrl = DefaultCompletionUrl,
+                MatchedPersons = [new MatchPersonsResultPerson(matchedPerson.PersonId, [])],
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = false
+            });
+
+        var saveRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "action", "SaveAndComeBackLater" },
+                { "FirstNameSource", PersonAttributeSource.TrnRequest },
+                { "MiddleNameSource", PersonAttributeSource.ExistingRecord },
+                { "LastNameSource", PersonAttributeSource.TrnRequest },
+                { "DateOfBirthSource", PersonAttributeSource.ExistingRecord },
+                { "EmailAddressSource", PersonAttributeSource.TrnRequest },
+                { "NationalInsuranceNumberSource", PersonAttributeSource.ExistingRecord },
+                { "GenderSource", PersonAttributeSource.TrnRequest },
+                { "Comments", "Test comment" }
+            }
+        };
+
+        var saveResponse = await HttpClient.SendAsync(saveRequest);
+        Assert.Equal(StatusCodes.Status302Found, (int)saveResponse.StatusCode);
+
+        // Reload the support task and extract the saved state
+        ResolveTrnRequestState savedState = null!;
+        await WithDbContextAsync(async dbContext =>
+        {
+            var reloadedSupportTask = (await dbContext.SupportTasks.FindAsync(supportTask.SupportTaskReference))!;
+            savedState = reloadedSupportTask.ResolveJourneySavedState!.GetState<ResolveTrnRequestState>()! with
+            {
+                // The SavedJourneyState property must be populated for ApplySavedModelStateValues to work
+                SavedJourneyState = reloadedSupportTask.ResolveJourneySavedState
+            };
+        });
+
+        // Re-open the task using the saved state
+        journeyInstance = await CreateJourneyInstanceAsync(
+            supportTask.SupportTaskReference,
+            savedState);
+
+        var getRequest = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/trn-requests/{supportTask.SupportTaskReference}/resolve/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(getRequest);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var radios = doc.GetElementsByName(fieldName);
+
+        // Determine which radio should be checked based on the field name
+        var expectedSource = fieldName switch
+        {
+            "FirstNameSource" => PersonAttributeSource.TrnRequest,
+            "MiddleNameSource" => PersonAttributeSource.ExistingRecord,
+            "LastNameSource" => PersonAttributeSource.TrnRequest,
+            "DateOfBirthSource" => PersonAttributeSource.ExistingRecord,
+            "EmailAddressSource" => PersonAttributeSource.TrnRequest,
+            "NationalInsuranceNumberSource" => PersonAttributeSource.ExistingRecord,
+            "GenderSource" => PersonAttributeSource.TrnRequest,
+            _ => throw new ArgumentException($"Unexpected field name: {fieldName}")
+        };
+
+        var expectedIndex = expectedSource == PersonAttributeSource.TrnRequest ? 0 : 1;
+
+        Assert.Collection(
+            radios,
+            leftRadio => Assert.Equal(expectedIndex == 0, leftRadio.IsChecked()),
+            rightRadio => Assert.Equal(expectedIndex == 1, rightRadio.IsChecked()));
     }
 }

@@ -37,8 +37,15 @@
             </govuk-radios>
 
             <div class="govuk-button-group">
-                <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button type="submit" name="Cancel" value="true" class="govuk-button--secondary">Cancel</govuk-button>
+                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+
+                <govuk-button type="submit" name="action" value="@NotConnecting.Actions.SaveAndComeBackLater" class="govuk-button--secondary">
+                    Save and come back later
+                </govuk-button>
+
+                <govuk-button type="submit" name="action" value="@NotConnecting.Actions.Cancel" data-testid="cancel-button" class="govuk-button--secondary">
+                    Cancel
+                </govuk-button>
             </div>
         </div>
     </div>

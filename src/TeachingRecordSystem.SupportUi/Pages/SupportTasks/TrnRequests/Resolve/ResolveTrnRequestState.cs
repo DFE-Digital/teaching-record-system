@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TrnRequests.Resolve;
 
-public class ResolveTrnRequestState
+public record ResolveTrnRequestState : IJourneyWithSavedState
 {
     public static Guid CreateNewRecordPersonIdSentinel => Guid.Empty;
 
@@ -15,6 +15,7 @@ public class ResolveTrnRequestState
     /// </summary>
     public required string CompletionUrl { get; init; }
 
+    public SavedJourneyState? SavedJourneyState { get; set; }
     public MatchPersonsResultOutcome MatchOutcome { get; set; }
     public Guid? PersonId { get; set; }
     public bool PersonAttributeSourcesSet { get; set; }

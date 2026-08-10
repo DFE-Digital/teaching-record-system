@@ -28,16 +28,24 @@ public class ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator(
         var requestData = supportTask.TrnRequestMetadata!;
 
         var matchResult = await trnRequestService.MatchPersonsAsync(requestData, excludePersonIds: supportTask.PersonId!.Value);
-
-        return new ResolveTeacherPensionsPotentialDuplicateState
+        var matchedPersons = matchResult.Outcome switch
         {
-            CompletionUrl = completionUrl,
-            MatchedPersons = matchResult.Outcome switch
-            {
-                MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],
-                MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
-                _ => []
-            }
+            MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],
+            MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
+            _ => []
         };
+
+        return supportTask.ResolveJourneySavedState?.GetState<ResolveTeacherPensionsPotentialDuplicateState>() is { } existingState ?
+            existingState with
+            {
+                MatchedPersons = matchedPersons,
+                CompletionUrl = completionUrl,
+                SavedJourneyState = supportTask.ResolveJourneySavedState
+            } :
+            new ResolveTeacherPensionsPotentialDuplicateState
+            {
+                MatchedPersons = matchedPersons,
+                CompletionUrl = completionUrl
+            };
     }
 }
