@@ -1741,7 +1741,7 @@
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.10, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.22.0, )",
-          "Microsoft.Web.LibraryManager.Build": "[3.0.71, )",
+          "Microsoft.Web.LibraryManager.Build": "[3.0.114, )",
           "OpenIddict.AspNetCore": "[7.6.0, )",
           "OpenIddict.EntityFrameworkCore": "[7.6.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -2446,9 +2446,9 @@
       },
       "Microsoft.Web.LibraryManager.Build": {
         "type": "CentralTransitive",
-        "requested": "[3.0.71, )",
-        "resolved": "3.0.71",
-        "contentHash": "uO0RegM2P5ZZhQDJQ+YSiugXJgNnh4gmjMd3VofeoE9MSu60zYoR3meA9SAm6PVJW2t//SzICXQf4+JtfUTJQA=="
+        "requested": "[3.0.114, )",
+        "resolved": "3.0.114",
+        "contentHash": "9E7B1ixZR2to7ZTPZKIcTfQwGKuBu11F7tFykmi2X+icjTy6bJY9N/LLJ9tAW7PhaAmgM15o3t7P9aBg0kbUxw=="
       },
       "Mime-Detective": {
         "type": "CentralTransitive",
