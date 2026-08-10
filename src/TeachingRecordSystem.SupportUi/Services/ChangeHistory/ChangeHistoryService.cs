@@ -179,6 +179,21 @@ public class ChangeHistoryService(
         return new ResultPage<TimelineItem>(items, pageNumber, paginationOptions.PageSize, allResults.Length);
     }
 
+    public async Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(
+        string supportTaskReference)
+    {
+        return await dbContext.Processes
+            .Where(p => p.SupportTaskReferences.Contains(supportTaskReference))
+            .Include(p => p.User)
+            .Include(p => p.Events).AsSplitQuery()
+            .OrderByDescending(p => p.CreatedOn)
+            .Select(process =>
+                new ProcessChangeHistoryEntry(
+                    process,
+                    new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
+            .ToArrayAsync();
+    }
+
     private TimelineItem MapLegacyEvent(EventWithUser eventWithUser, Guid personId)
     {
         var @event = LegacyEvents.EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);

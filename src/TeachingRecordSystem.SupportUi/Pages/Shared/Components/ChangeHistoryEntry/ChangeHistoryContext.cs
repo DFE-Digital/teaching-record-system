@@ -10,6 +10,12 @@ public sealed record ChangeHistoryContext
         PersonId = personId
     };
 
+    public static ChangeHistoryContext ForSupportTask(string supportTaskReference) => new()
+    {
+        ContextType = ChangeHistoryContextType.SupportTask,
+        SupportTaskReference = supportTaskReference
+    };
+
     public ChangeHistoryContextType ContextType { get; private set; }
 
     public Guid PersonId
@@ -17,6 +23,15 @@ public sealed record ChangeHistoryContext
         get => ContextType is ChangeHistoryContextType.Person
             ? field
             : throw new InvalidOperationException($"{nameof(ContextType)} does not have a {nameof(PersonId)}.");
+        private set;
+    }
+
+    public string SupportTaskReference
+    {
+        get => ContextType is ChangeHistoryContextType.SupportTask
+            ? field!
+            : throw new InvalidOperationException(
+                $"{nameof(ContextType)} does not have a {nameof(SupportTaskReference)}.");
         private set;
     }
 }
