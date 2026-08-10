@@ -35,7 +35,10 @@ public sealed class SavedJourneyState : IEquatable<SavedJourneyState>
         _stateTypeName = stateTypeName;
     }
 
-    internal static JsonSerializerOptions SerializerOptions { get; } = new(JsonSerializerDefaults.Web);
+    internal static JsonSerializerOptions SerializerOptions { get; } = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
 
     public string PageName => _pageName;
 

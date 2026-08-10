@@ -1,5 +1,18 @@
 @model ChoosePersonAttributeViewModel
 
+@{
+    // Follow ASP.NET Core's model binding precedence: ModelState.AttemptedValue takes precedence over property value
+    object? effectiveSelectedValue = Model.SelectedValue;
+    if (ViewData.ModelState.TryGetValue(Model.Name, out var modelStateEntry) && modelStateEntry.AttemptedValue != null)
+    {
+        // Parse the attempted value back to the enum type
+        if (Enum.TryParse(typeof(TeachingRecordSystem.Core.Models.SupportTasks.PersonAttributeSource), modelStateEntry.AttemptedValue, out var parsedValue))
+        {
+            effectiveSelectedValue = parsedValue;
+        }
+    }
+}
+
 <tr class="govuk-table__row">
     <td class="govuk-table__cell">
         <govuk-radios name="@Model.Name" class="govuk-!-margin-bottom-0" radios-class="trs-radios--inline-two-column">
@@ -13,14 +26,14 @@
                 </govuk-radios-error-message>
             }
             <govuk-radios-item value="@Model.LeftValue"
-                               checked="@(Model.SelectedValue?.Equals(Model.LeftValue))"
+                               checked="@(effectiveSelectedValue?.Equals(Model.LeftValue))"
                                disabled="@(!Model.Different)"
                                highlight="@(Model.Highlight)"
                                use-empty-fallback>
                 @Model.LeftLabel
             </govuk-radios-item>
             <govuk-radios-item value="@Model.RightValue"
-                               checked="@(Model.SelectedValue?.Equals(Model.RightValue))"
+                               checked="@(effectiveSelectedValue?.Equals(Model.RightValue))"
                                disabled="@(!Model.Different)"
                                highlight="@(Model.Highlight)"
                                use-empty-fallback>
