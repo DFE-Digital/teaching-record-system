@@ -38,6 +38,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(TrnHelper.NormalizeTrn(requestData.StatedTrn), doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(CoreNationalInsuranceNumber.Normalize(requestData.StatedNationalInsuranceNumber), doc.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Contains("Yes, verify and find a matching record (if applicable)", doc.Body!.TextContent);
         if (evidenceIsPdf)
         {
             Assert.NotNull(doc.GetElementByTestId($"pdf-{requestData.EvidenceFileId}"));
@@ -225,11 +226,11 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
     }
 
     [Fact]
-    public async Task Post_VerifiedIsTrueAndMatches_UpdatesStateAndRedirectsToMatchesPage()
+    public async Task Post_VerifiedIsTrueAndOneDefiniteMatch_UpdatesStateAndRedirectsToConfirmConnectPage()
     {
         // Arrange
         var matchedPerson = await TestData.CreatePersonAsync();
-        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject, t => t
                 .WithStatedFirstName(matchedPerson.FirstName)
@@ -239,7 +240,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
 
         var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
             supportTask,
-            configureState: null,
+            state => state.DefiniteMatch = true,
             new MatchPersonResult(
                 matchedPerson.PersonId,
                 matchedPerson.Trn,
@@ -265,10 +266,118 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/confirm-connect?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.True(journeyState!.Verified);
+        Assert.True(journeyState.DefiniteMatch);
+        Assert.Equal(matchedPerson.PersonId, journeyState.MatchedPersonId);
+    }
+
+    [Fact]
+    public async Task Post_VerifiedIsTrueAndOneNonDefiniteMatch_UpdatesStateAndRedirectsToMatchesPage()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithStatedFirstName(matchedPerson.FirstName)
+                .WithStatedLastName(matchedPerson.LastName)
+                .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
+                .WithStatedTrn(matchedPerson.Trn!));
+
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
+            configureState: null,
+            new MatchPersonResult(
+                matchedPerson.PersonId,
+                matchedPerson.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
+                ]));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Verified", "True" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         var journeyState = GetJourneyInstanceState(journeyInstance);
         Assert.True(journeyState!.Verified);
+        Assert.False(journeyState.DefiniteMatch);
+        Assert.Null(journeyState.MatchedPersonId);
+    }
+
+    [Fact]
+    public async Task Post_VerifiedIsTrueAndMultipleMatches_UpdatesStateAndRedirectsToMatchesPage()
+    {
+        // Arrange
+        var matchedPerson1 = await TestData.CreatePersonAsync();
+        var matchedPerson2 = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithStatedFirstName(matchedPerson1.FirstName)
+                .WithStatedLastName(matchedPerson1.LastName)
+                .WithStatedDateOfBirth(matchedPerson1.DateOfBirth!.Value)
+                .WithStatedTrn(matchedPerson1.Trn!));
+
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
+            configureState: null,
+            new MatchPersonResult(
+                matchedPerson1.PersonId,
+                matchedPerson1.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson1.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson1.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson1.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson1.Trn)
+                ]),
+            new MatchPersonResult(
+                matchedPerson2.PersonId,
+                matchedPerson2.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson2.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson2.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson2.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson2.Trn)
+                ]));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Verified", "True" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        var journeyState = GetJourneyInstanceState(journeyInstance);
+        Assert.True(journeyState!.Verified);
+        Assert.Null(journeyState.MatchedPersonId);
     }
 
     [Theory]

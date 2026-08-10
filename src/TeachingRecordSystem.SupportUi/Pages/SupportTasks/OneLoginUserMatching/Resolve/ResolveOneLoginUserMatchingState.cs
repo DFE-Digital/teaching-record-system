@@ -8,6 +8,7 @@ public record ResolveOneLoginUserMatchingState : IJourneyWithSavedState
     public static Guid NotMatchedPersonIdSentinel => Guid.Empty;
 
     public required IReadOnlyCollection<MatchPersonResult> MatchedPersons { get; init; }
+    public bool DefiniteMatch { get; set; }
     public string CompletionUrl { get; init; } = null!;  // Work-around persisted states without CompletionUrl set
 
     public SavedJourneyState? SavedJourneyState { get; set; }
