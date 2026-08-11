@@ -7,9 +7,9 @@
 <div class="govuk-caption-m">@Model.Type.GetTitle()</div>
 <div class="govuk-caption-l">@Model.SupportTaskReference</div>
 
-<h1 class="govuk-heading-l">@Model.PageHeader</h1>
+<h1 class="govuk-heading-l govuk-!-margin-bottom-2">@Model.PageHeader</h1>
 
-<div class="trs-support-task-header__status govuk-!-margin-bottom-4">
+<div class="trs-support-task-header__status govuk-!-margin-bottom-2">
     <support-task-status-tag status="@Model.Status" />
     <span class="govuk-body-s">
         @(Model.AssignedToUserName is string assignedToUserName ? $"Assigned to {assignedToUserName}" : "Unassigned")
