@@ -1,6 +1,22 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@inject SupportUiLinkGenerator LinkGenerator
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
+}
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+<timeline-entry title="Change of Name request rejected" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="change-request-context">
+        Request to change name rejected.
+    </p>
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (Model.Context.ContextType is ChangeHistoryContextType.Person)
+    {
+        <p class="govuk-body" data-testid="support-task-closed-message">
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Task</a>
+            <text> is now closed.</text>
+        </p>
+    }
 </timeline-entry>

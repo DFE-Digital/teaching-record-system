@@ -1,6 +1,15 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Models.SupportTasks
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskCreatedEvent = Model.GetEvent<SupportTaskCreatedEvent>();
+    var changeRequestData = supportTaskCreatedEvent.SupportTask.Data as ChangeNameRequestData
+        ?? throw new InvalidOperationException($"Expected {nameof(ChangeNameRequestData)} for {Model.ProcessType}.");
+    var requestedName = string.JoinNonEmpty(' ', changeRequestData.FirstName, changeRequestData.MiddleName, changeRequestData.LastName);
+}
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
-
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Change of Name request created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="change-request-context">
+        Request to change name to <strong>@requestedName</strong>.
+    </p>
 </timeline-entry>

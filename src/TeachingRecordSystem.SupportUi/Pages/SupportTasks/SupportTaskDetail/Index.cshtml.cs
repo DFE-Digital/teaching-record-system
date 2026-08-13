@@ -151,7 +151,7 @@ public class Index(
                 ProcessId = e.Process.ProcessId,
                 ProcessType = e.Process.ProcessType,
                 ChangeReason = e.Process.ChangeReason,
-                Events = e.Process.Events!.Select(v => v.Payload).AsReadOnly()
+                Events = e.Process.Events!.Select(v => v.Payload).AsReadOnly(),
             })
             .AsReadOnly();
 
