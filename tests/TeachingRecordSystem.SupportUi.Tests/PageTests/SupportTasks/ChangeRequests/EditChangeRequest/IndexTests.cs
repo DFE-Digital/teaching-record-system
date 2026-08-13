@@ -117,7 +117,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"Name change request", doc.GetElementsByTagName("h1")!.First().TrimmedText());
+        Assert.Equal(supportTask.GetSubject(), doc.GetElementsByTagName("h1")!.First().TrimmedText());
+        Assert.Equal("Change name request", doc.QuerySelector(".govuk-caption-m")!.TrimmedText());
+        Assert.Equal(supportTask.SupportTaskReference, doc.QuerySelector(".govuk-caption-l")!.TrimmedText());
 
         var firstNameRow = doc.GetElementByTestId("first-name");
         if (hasNewFirstName)
@@ -207,7 +209,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"Date of birth change request", doc.GetElementsByTagName("h1")!.First().TrimmedText());
+        Assert.Equal(supportTask.GetSubject(), doc.GetElementsByTagName("h1")!.First().TrimmedText());
+        Assert.Equal("Change date of birth request", doc.QuerySelector(".govuk-caption-m")!.TrimmedText());
+        Assert.Equal(supportTask.SupportTaskReference, doc.QuerySelector(".govuk-caption-l")!.TrimmedText());
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);

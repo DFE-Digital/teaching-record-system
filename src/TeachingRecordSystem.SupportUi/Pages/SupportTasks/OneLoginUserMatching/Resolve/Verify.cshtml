@@ -11,8 +11,7 @@
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-l">Record management</span>
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <vc:support-task-header />
 
             <h2 class="govuk-heading-m">Request details</h2>
             <govuk-summary-list>
@@ -48,7 +47,7 @@
                             }
                             else
                             {
-                                <img src="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference)" alt="@Model.Evidence.FileName" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="image-@Model.Evidence!.FileId" />
+                                <img src="@LinkGenerator.SupportTasks.OneLoginUserMatching.Resolve.Evidence(Model.SupportTaskReference)" alt="@Model.Evidence.FileName" class="govuk-!-width-three-quarters govuk-!-margin-top-1" data-testid="image-@Model.Evidence!.FileId"/>
                             }
                         </div>
                     </value>
