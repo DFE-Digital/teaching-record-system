@@ -1151,6 +1151,8 @@
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[10.0.11, )",
+          "Microsoft.EntityFrameworkCore.Design": "[10.0.11, )",
+          "Microsoft.EntityFrameworkCore.InMemory": "[10.0.11, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
           "Mime-Detective": "[25.8.1, )",
           "NSign.Client": "[1.2.4, )",
