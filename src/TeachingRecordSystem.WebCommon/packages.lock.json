@@ -52,6 +52,15 @@
           "FluentValidation.DependencyInjectionExtensions": "11.11.0"
         }
       },
+      "FluentValidation.DependencyInjectionExtensions": {
+        "type": "Direct",
+        "requested": "[12.1.1, )",
+        "resolved": "12.1.1",
+        "contentHash": "D0VXh4dtjjX2aQizuaa0g6R8X3U1JaVqJPfGCvLwZX9t/O2h7tkpbitbadQMfwcgSPdDbI2vDxuwRMv/Uf9dHA==",
+        "dependencies": {
+          "FluentValidation": "12.1.1"
+        }
+      },
       "Hangfire.AspNetCore": {
         "type": "Direct",
         "requested": "[1.8.24, )",
@@ -262,14 +271,6 @@
         "type": "Transitive",
         "resolved": "6.0.6",
         "contentHash": "iG8qvidAzVn3J8I90inFyZi+Z1KXvKYRlfe2Df8xC6EPa1jc7lX33+O258LYkNmbCFt6E5Pa1OdXHLyYiyarlA=="
-      },
-      "FluentValidation.DependencyInjectionExtensions": {
-        "type": "Transitive",
-        "resolved": "11.11.0",
-        "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
-        "dependencies": {
-          "FluentValidation": "11.11.0"
-        }
       },
       "Google.Api.Gax": {
         "type": "Transitive",
