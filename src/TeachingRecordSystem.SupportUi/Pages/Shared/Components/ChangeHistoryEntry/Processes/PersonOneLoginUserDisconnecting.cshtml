@@ -1,0 +1,52 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@inject PersonInfoCache PersonInfoCache
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<OneLoginUserUpdatedEvent>();
+    var oneLoginUser = updatedEvent.OldOneLoginUser;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+    var personInfo = oneLoginUser.PersonId is not null ? await PersonInfoCache.GetPersonInfoAsync(oneLoginUser.PersonId.Value) : null;
+    var personLinkText = personInfo is not null ? $"{personInfo.FirstName} {personInfo.LastName}" : "record";
+}
+
+<timeline-entry title="Record manually disconnected from GOV.UK One Login" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body">
+        @if (Model.Context.ContextType == ChangeHistoryContextType.Person)
+        {
+            @:Record disconnected from GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginUser.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+        }
+        else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+        {
+            <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a> @:disconnected from GOV.UK One Login.
+        }
+        else
+        {
+            @* SupportTask context - link to both *@
+            <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a> @:disconnected from GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginUser.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+        }
+    </p>
+
+    @if (changeReason is not null)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason details</key>
+                        <value use-empty-fallback>
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
+                        </value>
+                    </row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+</timeline-entry>
