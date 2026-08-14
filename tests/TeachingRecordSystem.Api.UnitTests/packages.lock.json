@@ -204,15 +204,6 @@
         "resolved": "6.0.6",
         "contentHash": "iG8qvidAzVn3J8I90inFyZi+Z1KXvKYRlfe2Df8xC6EPa1jc7lX33+O258LYkNmbCFt6E5Pa1OdXHLyYiyarlA=="
       },
-      "FluentValidation.DependencyInjectionExtensions": {
-        "type": "Transitive",
-        "resolved": "11.11.0",
-        "contentHash": "viTKWaMbL3yJYgGI0DiCeavNbE9UPMWFVK2XS9nYXGbm3NDMd0/L5ER4wBzmTtW3BYh3SrlSXm9RACiKZ6stlA==",
-        "dependencies": {
-          "FluentValidation": "11.11.0",
-          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
-        }
-      },
       "Google.Api.Gax": {
         "type": "Transitive",
         "resolved": "4.0.0",
@@ -1185,6 +1176,7 @@
         "type": "Project",
         "dependencies": {
           "FluentValidation.AspNetCore": "[11.3.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.11, )",
@@ -1272,6 +1264,7 @@
           "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.3, )",
           "DfeAnalytics.EFCore": "[0.6.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "Hangfire.AspNetCore": "[1.8.24, )",
           "Humanizer.Core": "[3.0.10, )",
           "JetBrains.Annotations": "[2026.2.0, )",
@@ -1456,6 +1449,16 @@
         "dependencies": {
           "FluentValidation": "11.11.0",
           "FluentValidation.DependencyInjectionExtensions": "11.11.0"
+        }
+      },
+      "FluentValidation.DependencyInjectionExtensions": {
+        "type": "CentralTransitive",
+        "requested": "[12.1.1, )",
+        "resolved": "12.1.1",
+        "contentHash": "D0VXh4dtjjX2aQizuaa0g6R8X3U1JaVqJPfGCvLwZX9t/O2h7tkpbitbadQMfwcgSPdDbI2vDxuwRMv/Uf9dHA==",
+        "dependencies": {
+          "FluentValidation": "12.1.1",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
         }
       },
       "GovukNotify": {

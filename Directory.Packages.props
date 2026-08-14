@@ -26,6 +26,9 @@
     <PackageVersion Include="Faker.Net" Version="2.0.163" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <!-- FluentValidation.AspNetCore 11.3.1 pulls in 11.11.0, whose nuspec misspells its
+         Microsoft.Extensions.DependencyInjection.Abstractions dependency and breaks restore. -->
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.4.3" />
     <PackageVersion Include="GovUk.Questions.AspNetCore" Version="1.0.4" />
     <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="1.0.4" />
