@@ -58,7 +58,7 @@ public class WebhookMessageFactory(
             Type? mapperType = null;
             Type? dataType = null;
 
-            foreach (var v in VersionRegistry.AllV3MinorVersions.TakeUntil(e => e == version).Reverse())
+            foreach (var v in VersionRegistry.GetV3MinorVersionsUpToAndIncluding(version))
             {
                 mapperType = eventMapperRegistry.GetMapperType(@event.GetType(), cloudEventType, v, out dataType);
 

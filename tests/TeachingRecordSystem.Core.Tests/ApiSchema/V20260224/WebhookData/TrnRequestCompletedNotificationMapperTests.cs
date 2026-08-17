@@ -1,7 +1,7 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 using CoreTrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
-using DtoTrnRequestStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestStatus;
+using DtoTrnRequestStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestCompletedNotificationTrnRequestStatus;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20260224.WebhookData;
 

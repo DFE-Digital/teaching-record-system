@@ -7,19 +7,21 @@ public record TrnRequestCompletedNotification : IWebhookMessageData
 {
     public static string CloudEventType { get; } = "trn_request.completed";
 
-    public required TrnRequestInfo TrnRequest { get; init; }
+    public required TrnRequestCompletedNotificationTrnRequestInfo TrnRequest { get; init; }
 }
 
-public record TrnRequestInfo
+// These are named after the notification rather than the thing they describe so that they don't collide with the
+// same-named endpoint DTOs when both are generated into a version's OpenAPI document.
+public record TrnRequestCompletedNotificationTrnRequestInfo
 {
     public required string RequestId { get; init; }
     public required string? Trn { get; init; }
-    public required TrnRequestStatus Status { get; init; }
+    public required TrnRequestCompletedNotificationTrnRequestStatus Status { get; init; }
     public required bool PotentialDuplicate { get; init; }
     public required string? AccessYourTeachingQualificationsLink { get; init; }
 }
 
-public enum TrnRequestStatus
+public enum TrnRequestCompletedNotificationTrnRequestStatus
 {
     Pending = 0,
     Completed = 1,
@@ -56,11 +58,11 @@ public class TrnRequestCompletedNotificationMapper(
 
         return new TrnRequestCompletedNotification
         {
-            TrnRequest = new TrnRequestInfo
+            TrnRequest = new TrnRequestCompletedNotificationTrnRequestInfo
             {
                 RequestId = @event.RequestId,
                 Trn = trn,
-                Status = TrnRequestStatus.Completed,
+                Status = TrnRequestCompletedNotificationTrnRequestStatus.Completed,
                 PotentialDuplicate = @event.TrnRequest.PotentialDuplicate ?? false,
                 AccessYourTeachingQualificationsLink = aytqLink
             }

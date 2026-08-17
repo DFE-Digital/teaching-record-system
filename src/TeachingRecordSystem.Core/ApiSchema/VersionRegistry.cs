@@ -35,6 +35,11 @@ public static class VersionRegistry
 
     public static string DefaultV3MinorVersion => V3MinorVersions.V20240101;
 
+    // Returns the given minor version and every version before it, most recent first.
+    // Callers use this to find the newest definition of something at or before a given version.
+    public static IEnumerable<string> GetV3MinorVersionsUpToAndIncluding(string minorVersion) =>
+        AllV3MinorVersions.TakeUntil(v => v == minorVersion).Reverse();
+
     public static IReadOnlyCollection<(int Version, string? MinorVersion)> GetAllVersions(IConfiguration configuration)
     {
         return Core().AsReadOnly();
