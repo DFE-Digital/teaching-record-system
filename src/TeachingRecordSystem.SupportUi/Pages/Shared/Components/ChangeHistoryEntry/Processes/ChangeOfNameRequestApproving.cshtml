@@ -1,6 +1,28 @@
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@using TeachingRecordSystem.Core.Events
+@inject SupportUiLinkGenerator LinkGenerator
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var personDetailsUpdatedEvent = Model.GetEvent<PersonDetailsUpdatedEvent>();
+    var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
+}
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+<timeline-entry title="Change of Name request accepted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @{
+        var currentName = string.JoinNonEmpty(' ', personDetailsUpdatedEvent.PersonDetails.FirstName, personDetailsUpdatedEvent.PersonDetails.MiddleName, personDetailsUpdatedEvent.PersonDetails.LastName);
+        var oldName = string.JoinNonEmpty(' ', personDetailsUpdatedEvent.OldPersonDetails.FirstName, personDetailsUpdatedEvent.OldPersonDetails.MiddleName, personDetailsUpdatedEvent.OldPersonDetails.LastName);
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+        <p class="govuk-body" data-testid="change-request-context">
+            Name changed from <strong>@oldName</strong> to <strong>@currentName</strong>.
+        </p>
+    }
+
+    @if (Model.Context.ContextType is ChangeHistoryContextType.Person)
+    {
+        <p class="govuk-body" data-testid="support-task-closed-message">
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Task</a>
+            <text> closed.</text>
+        </p>
+    }
 </timeline-entry>

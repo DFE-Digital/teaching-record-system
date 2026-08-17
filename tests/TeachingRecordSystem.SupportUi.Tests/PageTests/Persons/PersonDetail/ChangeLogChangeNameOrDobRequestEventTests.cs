@@ -112,9 +112,19 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
+        Assert.Equal("Change of Name request accepted", title?.TrimmedText());
 
-        item.AssertSummaryListRowValue("details", "Name", v => Assert.Equal(newName, v.TrimmedText()));
-        item.AssertSummaryListRowValue("previous-details", "Name", v => Assert.Equal(oldName, v.TrimmedText()));
+        Assert.Equal($"Name changed from {oldName} to {newName}.", item.GetElementByTestId("change-request-context")?.TrimmedText());
+
+        var supportTaskLink = item.GetElementByTestId("support-task-link");
+        Assert.NotNull(supportTaskLink);
+        Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink?.GetAttribute("href"));
+        Assert.Equal("Task", supportTaskLink?.TrimmedText());
+        Assert.Equal(
+            "Task closed.",
+            string.Join(
+                " ",
+                item.GetElementByTestId("support-task-closed-message")?.TextContent.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries) ?? []));
     }
 
     [Fact]
@@ -303,9 +313,16 @@ public class ChangeLogChangeNameOrDobRequestEventTests(HostFixture hostFixture) 
 
         var title = item.QuerySelector(".moj-timeline__title");
         Assert.NotNull(title);
+        Assert.Equal("Change of date of birth request accepted", title?.TrimmedText());
 
-        item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(requestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
-        item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+        Assert.Equal(
+            $"Date of birth changed from {person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat)} to {requestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat)}.",
+            item.GetElementByTestId("change-request-context")?.TrimmedText());
+
+        var supportTaskLink = item.GetElementByTestId("support-task-link");
+        Assert.NotNull(supportTaskLink);
+        Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink?.GetAttribute("href"));
+        Assert.Equal("Task", supportTaskLink?.TrimmedText());
     }
 
     [Fact]
