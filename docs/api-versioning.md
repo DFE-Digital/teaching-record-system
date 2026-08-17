@@ -9,8 +9,7 @@ The decision to version the V3 API this way is recorded in [ADR 0002](adr/0002-a
 There are two levels of versioning:
 
 - **Major versions** (`v1`, `v2`, `v3`) are part of the URL — e.g. `GET /v3/persons/<trn>`. A major version is an
-  entirely separate API surface; consumers have historically been slow to migrate between them, so we no longer
-  create new ones for routine changes.
+  entirely separate API surface. The background for each of these versions is provided in [History](#History).
 - **Minor versions** apply to V3 only. They are date-stamped (`20240101`, `20250627`, `20260612`, …) and are selected
   per request with the `X-Api-Version` header:
 
@@ -30,6 +29,8 @@ method. This is done by
 which walks forward from each declared endpoint and attaches an action constraint listing every version it should
 answer for. The consequence is that a new minor version only has to contain the things that actually changed.
 
+This approach was inspired by [Stripe's approach to API versioning](https://stripe.com/blog/api-versioning).
+
 Endpoints are bound to a version by their namespace, not by an attribute.
 [`ApiVersionConvention`](../src/TeachingRecordSystem.Api/Infrastructure/ApplicationModel/ApiVersionConvention.cs)
 derives the major version from the first namespace segment (`TeachingRecordSystem.Api.V3.…`) and the minor version
@@ -43,6 +44,9 @@ Each version also gets its own OpenAPI document, named `v3_<minor version>` and 
 
 Published versions are immutable. Once a minor version has been released, the shape of its requests, responses and
 webhook payloads must not change — consumers pin to a version precisely so that it stays still.
+
+> [!IMPORTANT]
+> There are consumers of the API that *will* break if additional properties are added to a response message.
 
 A change needs a new minor version if it alters what a consumer can send or what they receive. That includes:
 
@@ -94,23 +98,14 @@ with no changelog entry is invisible to the people who have to migrate onto it.
 
 `VNext` (the literal version string `Next`) is where changes are staged before they are given a date and released.
 It behaves like a normal minor version — its own namespaces, its own test folder, its own entry in
-`AllV3MinorVersions` — with one difference: it is only exposed where `AllowVNextEndpoints` is set.
-
-| Environment | `AllowVNextEndpoints` |
-| --- | --- |
-| Local development | `true` |
-| Tests | `true` |
-| `dev` | `true` |
-| `pre-production` | `true` |
-| `production`, `pentest`, `tps-sandbox` | not set (`false`) |
-
-Where it's disabled, `ApiVersionConvention` removes VNext controllers from the application model entirely and
-`VersionRegistry.GetAllVersions` omits it, so there is no `v3_Next` OpenAPI document and requests carrying
-`X-Api-Version: Next` 404.
+`AllV3MinorVersions` — with one difference: it is not exposed in production.
 
 This lets a schema change be merged, deployed and exercised against dev and pre-production before it is committed
 to. Because `VNext` sorts last in `AllV3MinorVersions`, it also inherits from the most recent dated version in the
 usual way.
+
+`VNext` is useful when there are multiple changes that are developed separately that should be released together.
+It can also be used in non-production environments to test a new endpoint before committing to its shape.
 
 ### Releasing `vNext`
 
@@ -169,3 +164,16 @@ which resolves them through `EventMapperRegistry` using the same rule as deliver
 not reuse a type name that the endpoint DTOs at that version already use — both are generated into one document
 and schema ids are just the type name. Name types after the notification when there's any doubt, as
 `PersonDeactivatedNotificationPersonInfo` does.
+
+## History
+
+TRS is the replacement for DQT, the Database of Qualified Teachers.
+This codebase started life as an API over DQT and was later renamed and extended to create TRS.
+The V1 and V2 versions of the API were created over DQT and as such are heavily influenced by DQT's data model.
+
+This is the reason that the API is in its own project and sits on a different domain to the rest of TRS.
+
+V3 was created at TRS' conception and needed to be built in a way that could support the iterative approach
+that was used for migrating away from DQT.
+The minor versioning scheme was added for this reason; with each new minor version the API became less coupled to DQT
+and more in line with TRS' data model.
