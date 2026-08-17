@@ -22,15 +22,17 @@ public sealed class DbHelper : IAsyncDisposable
 
     private readonly IServiceProvider _serviceProvider;
     private readonly PostgreSqlContainer? _postgresContainer;
+    private readonly string _connectionString;
 
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema;
 
-    private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer)
+    private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer, string connectionString)
     {
         _serviceProvider = serviceProvider;
         _postgresContainer = postgresContainer;
+        _connectionString = connectionString;
     }
 
     public static DbHelper Instance { get; } = CreateInstance();
@@ -64,7 +66,7 @@ public sealed class DbHelper : IAsyncDisposable
         services.AddDatabase(connectionString);
         var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
-        return new DbHelper(serviceProvider, postgresContainer);
+        return new DbHelper(serviceProvider, postgresContainer, connectionString);
     }
 
     public async Task InitializeAsync()
@@ -124,10 +126,11 @@ public sealed class DbHelper : IAsyncDisposable
 
         var connection = dbContext.Database.GetDbConnection();
 
-        var connectionString = dbContext.Database.GetConnectionString()!;
         var currentDbVersion = GetDbVersion(dbContext, GetRepositoryRootPath());
 
-        if (currentDbVersion == await GetStoredDbVersionAsync(connectionString))
+        // Deliberately the connection string we were configured with rather than the one EF hands back, which has had
+        // the password stripped out of it and so can't be used to open a connection of our own.
+        if (currentDbVersion == await GetStoredDbVersionAsync(_connectionString))
         {
             return;
         }
