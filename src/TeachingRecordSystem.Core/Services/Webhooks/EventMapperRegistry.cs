@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.ApiSchema.V3;
 
 namespace TeachingRecordSystem.Core.Services.Webhooks;
@@ -21,6 +22,26 @@ public class EventMapperRegistry
 
         dataType = null;
         return null;
+    }
+
+    // Returns the message data type for every cloud event type an endpoint on the given API version can receive,
+    // resolved the same way WebhookMessageFactory resolves mappers when a message is sent.
+    public IReadOnlyCollection<Type> GetDataTypesForApiVersion(string apiVersion)
+    {
+        var dataTypesByCloudEventType = new Dictionary<string, Type>();
+
+        foreach (var version in VersionRegistry.GetV3MinorVersionsUpToAndIncluding(apiVersion))
+        {
+            foreach (var (key, value) in _mappers)
+            {
+                if (key.ApiVersion == version)
+                {
+                    dataTypesByCloudEventType.TryAdd(key.CloudEventType, value.DataType);
+                }
+            }
+        }
+
+        return dataTypesByCloudEventType.Values;
     }
 
     private static Dictionary<MapperKey, MapperValue> DiscoverMappers()

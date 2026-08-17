@@ -57,7 +57,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             Assert.NotNull(notification);
             Assert.Equal(trnRequest.RequestId, notification.TrnRequest.RequestId);
             Assert.Equal(person.Trn, notification.TrnRequest.Trn);
-            Assert.Equal(Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestStatus.Completed, notification.TrnRequest.Status);
+            Assert.Equal(Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestCompletedNotificationTrnRequestStatus.Completed, notification.TrnRequest.Status);
             Assert.True(notification.TrnRequest.PotentialDuplicate);
             Assert.NotNull(notification.TrnRequest.AccessYourTeachingQualificationsLink);
         });
@@ -109,7 +109,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             Assert.NotNull(notification);
             Assert.Equal(trnRequest.RequestId, notification.TrnRequest.RequestId);
             Assert.Equal(person.Trn, notification.TrnRequest.Trn);
-            Assert.Equal(Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestStatus.Completed, notification.TrnRequest.Status);
+            Assert.Equal(Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestCompletedNotificationTrnRequestStatus.Completed, notification.TrnRequest.Status);
             Assert.True(notification.TrnRequest.PotentialDuplicate);
             Assert.NotNull(notification.TrnRequest.AccessYourTeachingQualificationsLink);
         });
