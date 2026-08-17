@@ -137,7 +137,9 @@ To set up the initial TRS database schema run:
 > just cli add-trn-range --from 1000000 --to 9999999
 ```
 
-The trs_tests database will be created automatically when running the tests.
+The databases for the tests will be created automatically when running them. Each test project gets one of its own, named
+`trs_<hash of the repository root>_<project>`; the connection string above supplies the server and the credentials only, so its
+database name isn't used. That keeps test projects — and worktrees sharing a server — from clearing each other's data down.
 
 #### Database migrations
 
@@ -160,7 +162,7 @@ In order for the local `trs` database to pick up the change, the migrate recipe 
 > just ef database update
 ```
 
-The trs_tests database for the tests should be migrated automatically when running the tests.
+The databases for the tests should be migrated automatically when running the tests.
 
 #### Downgrading the local database
 To rollback a series of migrations, add an additional argument to the `ef database update` command to indicate the name of a migration to end on
@@ -170,18 +172,19 @@ To rollback a series of migrations, add an additional argument to the `ef databa
 > just ef database update <BeforeAddingUserRoleColumn>
 ```
 
-#### Rebuilding the test database
+#### Rebuilding a test database
 
-The trs_tests database for the tests should be migrated automatically: the version of the schema it was built from is recorded as a comment
-on the database, and the tests rebuild it whenever that doesn't match the current model and seed data. If it ever does get stuck and the
+The databases for the tests should be migrated automatically: the version of the schema each was built from is recorded as a comment
+on the database, and the tests rebuild it whenever that doesn't match the current model and seed data. If one ever does get stuck and the
 tests fail with the message:
 ```
 Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving the entity changes. See the inner exception for details.
 ---- Npgsql.PostgresException : <some Postgres error, e.g. missing table or column>
 ```
-drop the database and run the tests again to have it rebuilt from scratch:
+drop that project's database and run the tests again to have it rebuilt from scratch:
 ```shell
-> dropdb -h localhost -U postgres trs_tests
+> psql -h localhost -U postgres -c "\l trs_*"
+> dropdb -h localhost -U postgres <the database for the project>
 ```
 
 

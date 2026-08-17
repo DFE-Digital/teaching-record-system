@@ -28,24 +28,21 @@ Assert.IsType<ArgumentException>(exception);
 
 Assume that dependencies for running tests (a local postgres database, Playwright etc.) are already configured.
 
-### Running tests in a git worktree
+### Test databases
 
-Each worktree must use its own test database; sharing one with other worktrees will cause tests to interfere with each other.
-When working in a git worktree, set the following environment variables before running tests:
+Each test project uses a database of its own, named `trs_<hash of the repository root>_<project>`. Whatever connection string is
+configured — from user secrets, the environment, or a testcontainer — supplies the server and the credentials only; the database name
+always comes from the tests. That means test projects can run at the same time, and worktrees can share a postgres server, without
+clearing each other's data down mid-run. Nothing needs setting up per worktree.
 
-- `UseTestContainers` to `true`, so the tests spin up their own postgres container.
-- `TestContainersPostgresPort` to a random free port, so the container doesn't clash with the ones other worktrees are using.
-
-These two are sufficient — when `UseTestContainers` is set the container's connection string (database `trs` on
-`TestContainersPostgresPort`) overrides any `ConnectionStrings:DefaultConnection` from user secrets or the environment, so don't
-set `ConnectionStrings__DefaultConnection` as well.
+Set `UseTestContainers` to `true` to run against a postgres container instead of a configured server. `TestContainersPostgresPort`
+overrides the port it binds to, which is only needed if something else is already using the default.
 
 ### Resetting the database schema and data
 
 The version of the schema a test database was built from is recorded as a comment on the database itself, so the schema and data are
 recreated automatically whenever they don't match the current model and seed data — including when the database has been dropped or
-replaced behind the tests' back. To force a rebuild, drop the test database (or delete the testcontainers container) and run the tests
-again.
+replaced behind the tests' back. To force a rebuild, drop the project's test database and run the tests again.
 
 ### Boolean Expressions
 
