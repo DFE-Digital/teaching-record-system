@@ -187,6 +187,11 @@ drop that project's database and run the tests again to have it rebuilt from scr
 > dropdb -h localhost -U postgres <the database for the project>
 ```
 
+To drop all of them at once, including any left behind by worktrees that no longer exist, there's a `just` recipe:
+```shell
+> just drop-test-databases
+```
+
 
 ### Admin user setup
 

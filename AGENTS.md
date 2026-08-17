@@ -38,6 +38,13 @@ clearing each other's data down mid-run. Nothing needs setting up per worktree.
 Set `UseTestContainers` to `true` to run against a postgres container instead of a configured server. `TestContainersPostgresPort`
 overrides the port it binds to, which is only needed if something else is already using the default.
 
+These databases build up as worktrees and branches come and go. To drop them — including any left behind by worktrees that no longer
+exist, but skipping any that are in use — run:
+
+```shell
+just drop-test-databases
+```
+
 ### Resetting the database schema and data
 
 The version of the schema a test database was built from is recorded as a comment on the database itself, so the schema and data are
