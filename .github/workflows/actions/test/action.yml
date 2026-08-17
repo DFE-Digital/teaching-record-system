@@ -27,7 +27,7 @@ runs:
 
         cd $PROJECT_PATH
 
-        dotnet test --blame-hang-timeout 10m --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
+        dotnet test --configuration Release --hangdump --hangdump-timeout 10m --report-xunit-trx ${{ inputs.dotnet_test_args }}
       shell: bash
       env:
         PROJECT_PATH: ${{ inputs.test_project_path }}

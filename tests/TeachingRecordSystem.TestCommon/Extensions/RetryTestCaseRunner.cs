@@ -20,7 +20,10 @@ public class RetryTestCaseRunner :
         string displayName,
         string? skipReason,
         ExplicitOption explicitOption,
-        object?[] constructorArguments)
+        ParallelMode parallelMode,
+        ExecutionScheduler scheduler,
+        object?[] constructorArguments,
+        FixtureMappingManager methodFixtureMappings)
     {
         // This code comes from XunitRunnerHelper.RunXunitTestCase, and it's centralized
         // here just so we don't have to duplicate it in both RetryTestCase and
@@ -51,7 +54,7 @@ public class RetryTestCaseRunner :
             }
         }
 
-        await using var ctxt = new RetryTestCaseRunnerContext(maxRetries, testCase, tests, messageBus, aggregator, cancellationTokenSource, displayName, skipReason, explicitOption, constructorArguments);
+        await using var ctxt = new RetryTestCaseRunnerContext(maxRetries, testCase, tests, explicitOption, messageBus, aggregator, displayName, skipReason, cancellationTokenSource, parallelMode, scheduler, constructorArguments, methodFixtureMappings);
         await ctxt.InitializeAsync();
 
         return await Run(ctxt);
@@ -82,7 +85,10 @@ public class RetryTestCaseRunner :
                 ctxt.ExplicitOption,
                 aggregator,
                 ctxt.CancellationTokenSource,
-                ctxt.BeforeAfterTestAttributes
+                ctxt.ParallelMode,
+                ctxt.Scheduler,
+                ctxt.BeforeAfterTestAttributes,
+                ctxt.CaseFixtureMappings
             );
 
             if (!(aggregator.HasExceptions || result.Failed != 0) || ++runCount >= maxRetries)
@@ -101,14 +107,17 @@ public class RetryTestCaseRunnerContext(
     int maxRetries,
     IXunitTestCase testCase,
     IReadOnlyCollection<IXunitTest> tests,
+    ExplicitOption explicitOption,
     IMessageBus messageBus,
     ExceptionAggregator aggregator,
-    CancellationTokenSource cancellationTokenSource,
     string displayName,
     string? skipReason,
-    ExplicitOption explicitOption,
-    object?[] constructorArguments) :
-    XunitTestCaseRunnerBaseContext<IXunitTestCase, IXunitTest>(testCase, tests, messageBus, aggregator, cancellationTokenSource, displayName, skipReason, explicitOption, constructorArguments)
+    CancellationTokenSource cancellationTokenSource,
+    ParallelMode parallelMode,
+    ExecutionScheduler scheduler,
+    object?[] constructorArguments,
+    FixtureMappingManager methodFixtureMappings) :
+    XunitTestCaseRunnerBaseContext<IXunitTestCase, IXunitTest>(testCase, tests, explicitOption, messageBus, aggregator, displayName, skipReason, cancellationTokenSource, parallelMode, scheduler, constructorArguments, methodFixtureMappings)
 {
     public int MaxRetries { get; } = maxRetries;
 }
