@@ -56,7 +56,7 @@ public class CheckAnswers(
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence()
         {
-            Reason = Reason?.GetDisplayName(),
+            Reason = journey.State.DisconnectReason?.GetDisplayName(),
             Details = journey.State.DisconnectReason == DisconnectOneLoginReason.AnotherReason
                 ? journey.State.Detail
                 : null,
