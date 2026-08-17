@@ -194,7 +194,15 @@ public sealed class DbHelper : IAsyncDisposable
         return Convert.ToHexString(hash.GetHashAndReset());
     }
 
-    private async Task EnsureRespawnerAsync(DbConnection connection) =>
+    // Creating a Respawner interrogates the schema to work out what to delete and in what order, which is worth doing
+    // once rather than before every test; the schema doesn't change again once it's been reset.
+    private async Task EnsureRespawnerAsync(DbConnection connection)
+    {
+        if (_respawner is not null)
+        {
+            return;
+        }
+
         _respawner = await Respawner.CreateAsync(
             connection,
             new RespawnerOptions()
@@ -202,6 +210,7 @@ public sealed class DbHelper : IAsyncDisposable
                 DbAdapter = DbAdapter.Postgres,
                 TablesToIgnore = GetTablesToIgnore()
             });
+    }
 
     private Table[] GetTablesToIgnore()
     {
