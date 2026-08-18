@@ -3,5 +3,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEn
 public enum ChangeHistoryContextType
 {
     Person,
-    SupportTask
+    SupportTask,
+    OneLogin
 }

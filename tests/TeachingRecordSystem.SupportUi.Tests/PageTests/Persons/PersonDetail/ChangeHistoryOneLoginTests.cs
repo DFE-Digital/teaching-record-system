@@ -42,12 +42,9 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "OneLogin Connected",
+            "Record manually connected to a GOV.UK One Login",
             user.Name,
-            process.Now,
-            [
-                ("Event Type", "Manual Connection")
-            ]);
+            process.Now);
     }
 
     [Fact]
@@ -78,13 +75,9 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "OneLogin Disconnected",
+            "Record manually disconnected from GOV.UK One Login",
             user.Name,
-            process.Now,
-            [
-                ("Event Type", "OneLogin Disconnected"),
-                ("Reason", reason.Details)
-            ]);
+            process.Now);
     }
 
     [Fact]
@@ -184,5 +177,76 @@ public partial class ChangeHistoryTests
             [
                 ("Event Type", "Task Connection")
             ]);
+    }
+
+    [Fact]
+    public async Task Get_OneLoginUserPersonConnecting_RendersExpectedEntry()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true, email: Option.Some(matchedPerson.EmailAddress));
+        var user = await TestData.CreateUserAsync();
+        var process = new ProcessContext(ProcessType.OneLoginUserPersonConnecting, TimeProvider.UtcNow, user.UserId);
+
+        await OneLoginService.SetUserMatchedAsync(
+            new SetUserMatchedOptions
+            {
+                OneLoginUserSubject = oneLoginUser.Subject,
+                MatchedPersonId = matchedPerson.PersonId,
+                MatchRoute = OneLoginUserMatchRoute.SupportUi,
+                MatchedAttributes = [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd"))
+                ]
+            },
+            process);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{matchedPerson.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "GOV.UK One Login manually connected to a record",
+            user.Name,
+            process.Now);
+    }
+
+    [Fact]
+    public async Task Get_OneLoginUserPersonDisconnecting_RendersExpectedEntry()
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber().WithEmailAddress());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(matchedPerson);
+        var user = await TestData.CreateUserAsync();
+        var reason = new ChangeReasonWithDetailsAndEvidence()
+        {
+            Details = "these are details",
+            EvidenceFile = null,
+            Reason = "this is the reason",
+            AdditionalInformation = null
+        };
+        var process = new ProcessContext(ProcessType.OneLoginUserPersonDisconnecting, TimeProvider.UtcNow, user.UserId, reason);
+
+        await OneLoginService.SetUserUnmatchedAsync(oneLoginUser.Subject, process);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{matchedPerson.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "GOV.UK One Login manually disconnected from a record",
+            user.Name,
+            process.Now);
     }
 }

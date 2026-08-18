@@ -16,6 +16,12 @@ public sealed record ChangeHistoryContext
         SupportTaskReference = supportTaskReference
     };
 
+    public static ChangeHistoryContext ForOneLoginUser(string oneLoginUserSubject) => new()
+    {
+        ContextType = ChangeHistoryContextType.OneLogin,
+        OneLoginUserSubject = oneLoginUserSubject
+    };
+
     public ChangeHistoryContextType ContextType { get; private set; }
 
     public Guid PersonId
@@ -32,6 +38,15 @@ public sealed record ChangeHistoryContext
             ? field!
             : throw new InvalidOperationException(
                 $"{nameof(ContextType)} does not have a {nameof(SupportTaskReference)}.");
+        private set;
+    }
+
+    public string OneLoginUserSubject
+    {
+        get => ContextType is ChangeHistoryContextType.OneLogin
+            ? field!
+            : throw new InvalidOperationException(
+                $"{nameof(ContextType)} does not have a {nameof(OneLoginUserSubject)}.");
         private set;
     }
 }
