@@ -1,0 +1,26 @@
+@page "/one-logins/{OneLoginUserSubject}/change-history"
+@model TeachingRecordSystem.SupportUi.Pages.OneLogins.OneLoginDetail.ChangeHistoryModel
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = OneLoginDetailSubNavigationTab.ChangeHistory;
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.OneLogins.OneLoginDetail.Index(Model.OneLoginUserSubject)">Back to GOV.UK One Login</govuk-back-link>
+}
+
+@if (Model.ChangeHistory!.Count == 0)
+{
+    <p class="govuk-body" data-testid="no-changes">No changes</p>
+}
+else
+{
+    <div class="moj-timeline">
+        @foreach (var entry in Model.ChangeHistory!)
+        {
+            <vc:change-history-entry model="@entry" />
+        }
+    </div>
+
+    <partial name="_Pagination" model=@Model.Pagination />
+}

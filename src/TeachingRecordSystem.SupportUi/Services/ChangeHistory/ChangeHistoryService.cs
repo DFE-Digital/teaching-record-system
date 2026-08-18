@@ -196,6 +196,41 @@ public class ChangeHistoryService(
             .ToArrayAsync();
     }
 
+    public async Task<ResultPage<ProcessChangeHistoryEntry>> GetChangeHistoryByOneLoginUserAsync(
+        string oneLoginUserSubject,
+        PaginationOptions paginationOptions)
+    {
+        var processTypesToQuery = new[]
+        {
+            ProcessType.PersonOneLoginUserConnecting,
+            ProcessType.PersonOneLoginUserDisconnecting,
+            ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,
+            ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
+            ProcessType.OneLoginUserPersonConnecting,
+            ProcessType.OneLoginUserPersonDisconnecting
+        };
+
+        var allResults = await dbContext.Processes
+            .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject) && processTypesToQuery.Contains(p.ProcessType))
+            .Include(p => p.User)
+            .Include(p => p.Events).AsSplitQuery()
+            .OrderByDescending(p => p.CreatedOn)
+            .Select(process =>
+                new ProcessChangeHistoryEntry(
+                    process,
+                    new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
+            .ToArrayAsync();
+
+        var pageNumber = paginationOptions.PageNumber ?? 1;
+
+        var items = allResults
+            .Skip((pageNumber - 1) * paginationOptions.PageSize)
+            .Take(paginationOptions.PageSize)
+            .ToArray();
+
+        return new ResultPage<ProcessChangeHistoryEntry>(items, pageNumber, paginationOptions.PageSize, allResults.Length);
+    }
+
     private TimelineItem MapLegacyEvent(EventWithUser eventWithUser, Guid personId)
     {
         var @event = LegacyEvents.EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);
