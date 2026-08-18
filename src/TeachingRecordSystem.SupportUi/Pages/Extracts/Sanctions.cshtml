@@ -1,26 +1,82 @@
 @page "/extracts"
 @model TeachingRecordSystem.SupportUi.Pages.Extracts.Sanctions
 @{
-	ViewBag.Title = "Sanctions Export";
+	ViewBag.Title = "Extracts Export";
 }
 
 
 <div class="govuk-grid-row">
-	<div class="govuk-grid-column-full">
-		<h1 class="govuk-heading-l">@ViewBag.Title</h1>
-		<ul class="govuk-list">
-			<li>
-				<a asp-page-handler="NewSanctions"
-				   class="govuk-link">
-					New Sanctions
-				</a>
-			</li>
-			<li>
-				<a asp-page-handler="SpentSanctions"
-				   class="govuk-link">
-					Spent Sanctions
-				</a>
-			</li>
-		</ul>
-	</div>
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        <ul class="govuk-list">
+            <li>
+                <a asp-page-handler="NewSanctions"
+                    class="govuk-link">
+                    New Sanctions
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="SpentSanctions"
+                   class="govuk-link">
+                    Spent Sanctions
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="AuditAlerts"
+                   class="govuk-link">
+                    Auditing Alerts Data Query
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="DupSanctions"
+                   class="govuk-link">
+                    DQ-S01 Dup Sanctions
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="DqS07DuplicationRecordsWithAlerts"
+                   class="govuk-link">
+                    DQ-S07 Duplication Records With Alerts
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="DqS08IpoWithAlertDetails"
+                   class="govuk-link">
+                    DQ-S08-IPO With Alert Details
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="DqS10SoSNoProhibitionsActivePast2YearDate"
+                   class="govuk-link">
+                    DQ-S10 SoS No Prohibitions Active Past 2 Year Date
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="DqS11FailedInductionNoAlerts"
+                   class="govuk-link">
+                    DQ-S11 Failed Induction No Alerts
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="DqS12DeletedAlertMonthly"
+                   class="govuk-link">
+                    DQ-S12 Deleted Alert Monthly
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="MonthlyTmuAlertReconciliation"
+                   class="govuk-link">
+                    Monthly TMU Alert Reconciliation
+                </a>
+            </li>
+            <li>
+                <a asp-page-handler="MonthlyTmuAlertReconciliationKpiProcess"
+                   class="govuk-link">
+                    Monthly TMU Alert Reconciliation KPI Process
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>
+
+
