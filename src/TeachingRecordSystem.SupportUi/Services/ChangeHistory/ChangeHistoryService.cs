@@ -210,25 +210,20 @@ public class ChangeHistoryService(
             ProcessType.OneLoginUserPersonDisconnecting
         };
 
-        var allResults = await dbContext.Processes
+        var query = dbContext.Processes
             .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject) && processTypesToQuery.Contains(p.ProcessType))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
-            .OrderByDescending(p => p.CreatedOn)
+            .OrderByDescending(p => p.CreatedOn);
+
+        var totalCount = await query.CountAsync();
+
+        return await query
             .Select(process =>
                 new ProcessChangeHistoryEntry(
                     process,
                     new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
-            .ToArrayAsync();
-
-        var pageNumber = paginationOptions.PageNumber ?? 1;
-
-        var items = allResults
-            .Skip((pageNumber - 1) * paginationOptions.PageSize)
-            .Take(paginationOptions.PageSize)
-            .ToArray();
-
-        return new ResultPage<ProcessChangeHistoryEntry>(items, pageNumber, paginationOptions.PageSize, allResults.Length);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount);
     }
 
     private TimelineItem MapLegacyEvent(EventWithUser eventWithUser, Guid personId)
