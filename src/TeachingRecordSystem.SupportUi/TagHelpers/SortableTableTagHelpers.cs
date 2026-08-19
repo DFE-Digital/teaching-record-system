@@ -1,3 +1,6 @@
+using System.Net;
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.WebUtilities;
@@ -100,7 +103,7 @@ public class SortableTableColumnTagHelper : TagHelper
 
             foreach (var attr in output.Attributes.Where(a => a.Name.StartsWith("hx-")).ToArray())
             {
-                button.Attributes.Add(attr.Name, attr.Value.ToString());
+                button.Attributes.Add(attr.Name, GetAttributeText(attr));
                 output.Attributes.RemoveAll(attr.Name);
             }
         }
@@ -113,6 +116,22 @@ public class SortableTableColumnTagHelper : TagHelper
         output.Attributes.SetAttribute("aria-sort", ariaSort);
 
         output.Content.SetHtmlContent(form);
+    }
+
+    // Razor hands us the value of an attribute written as an expression (e.g. hx-include="@Selector")
+    // as HTML that's already been encoded, whereas a literal value arrives as plain text. TagBuilder
+    // encodes everything we put in its Attributes dictionary, so decode the already-encoded values
+    // back to text before copying them over - otherwise they end up encoded twice.
+    private static string? GetAttributeText(TagHelperAttribute attribute)
+    {
+        if (attribute.Value is not IHtmlContent html)
+        {
+            return attribute.Value?.ToString();
+        }
+
+        using var writer = new StringWriter();
+        html.WriteTo(writer, HtmlEncoder.Default);
+        return WebUtility.HtmlDecode(writer.ToString());
     }
 }
 

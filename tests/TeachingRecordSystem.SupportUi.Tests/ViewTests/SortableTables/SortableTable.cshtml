@@ -1,0 +1,25 @@
+@using TeachingRecordSystem.SupportUi
+@model SortDirection?
+@addTagHelper *, TeachingRecordSystem.SupportUi
+@{
+    Layout = null;
+
+    // Written as an expression rather than a literal so Razor hands the tag helper an already-encoded
+    // value - that's the case where the value used to get encoded a second time on the way to the button
+    var include = "[name='SupportTaskReference']";
+}
+
+<table sortable>
+    <thead>
+        <tr>
+            <th sort-direction="@Model"
+                link-template="@(direction => $"/_sortable-table?sortDirection={direction}")"
+                use-htmx="true"
+                hx-select="main"
+                hx-include="@include">
+                Task
+            </th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
