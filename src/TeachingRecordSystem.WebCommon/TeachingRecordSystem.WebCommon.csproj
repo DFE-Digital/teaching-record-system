@@ -25,6 +25,7 @@
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.Extensions.Azure" />
     <PackageReference Include="NSign.Client" />
     <PackageReference Include="NSign.SignatureProviders" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
