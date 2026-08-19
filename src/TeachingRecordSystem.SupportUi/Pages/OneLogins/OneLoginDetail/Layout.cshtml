@@ -30,6 +30,12 @@
                 <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == OneLoginDetailSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserSubject)">General</a>
                 </li>
+                @if (FeatureProvider.IsEnabled(FeatureNames.SupportTaskChangeHistory))
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == OneLoginDetailSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator.OneLogins.OneLoginDetail.ChangeHistory(oneLoginUserSubject)">Change history</a>
+                    </li>
+                }
             </ul>
         </nav>
         @RenderBody()
