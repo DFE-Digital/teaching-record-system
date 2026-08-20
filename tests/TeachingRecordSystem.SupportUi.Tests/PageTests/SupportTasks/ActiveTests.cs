@@ -149,6 +149,90 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_AssignedToFilterOptions_IncludeUsersWithTasksAssignedWhateverTheirRoleOrStatus()
+    {
+        // Arrange
+        var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
+        var inactiveRecordManager = await TestData.CreateUserAsync(active: false, name: "Inactive Record Manager", role: UserRoles.RecordManager);
+        var viewer = await TestData.CreateUserAsync(name: "Viewer", role: UserRoles.Viewer);
+        var viewerWithoutTasks = await TestData.CreateUserAsync(name: "Viewer Without Tasks", role: UserRoles.Viewer);
+
+        await AssignToUserAsync(await TestData.CreateChangeNameRequestSupportTaskAsync(), inactiveRecordManager.UserId);
+        await AssignToUserAsync(await TestData.CreateChangeNameRequestSupportTaskAsync(), viewer.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var optionValues = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
+            .Options
+            .Select(o => o.Value)
+            .ToArray();
+
+        Assert.Contains(inactiveRecordManager.UserId.ToString(), optionValues);
+        Assert.Contains(viewer.UserId.ToString(), optionValues);
+        Assert.DoesNotContain(viewerWithoutTasks.UserId.ToString(), optionValues);
+        Assert.Contains(currentUser.UserId.ToString(), optionValues);
+    }
+
+    [Fact]
+    public async Task Get_CurrentUserIsNotAssignable_AssignedToFilterOptionsDoNotIncludeMyself()
+    {
+        // Arrange
+        SupportTaskAssignmentOptions.IncludeAdministrators = false;
+
+        var currentUser = await TestData.CreateUserAsync(name: "Current User", role: UserRoles.Administrator);
+        SetCurrentUser(currentUser);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
+            .Options
+            .Select(o => (o.Value, Text: o.TrimmedText()))
+            .ToArray();
+
+        Assert.DoesNotContain(options, o => o.Text == "Myself");
+        Assert.DoesNotContain(options, o => o.Value == currentUser.UserId.ToString());
+    }
+
+    [Fact]
+    public async Task Get_IncludeAdministratorsIsFalse_AssignedToFilterOptionsDoNotIncludeAdministrators()
+    {
+        // Arrange
+        SupportTaskAssignmentOptions.IncludeAdministrators = false;
+
+        await CreateAndSetCurrentUserAsync(name: "Current User");
+        var administrator = await TestData.CreateUserAsync(name: "Administrator", role: UserRoles.Administrator);
+        var recordManager = await TestData.CreateUserAsync(name: "Record Manager", role: UserRoles.RecordManager);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var optionValues = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
+            .Options
+            .Select(o => o.Value)
+            .ToArray();
+
+        Assert.DoesNotContain(administrator.UserId.ToString(), optionValues);
+        Assert.Contains(recordManager.UserId.ToString(), optionValues);
+    }
+
+    [Fact]
     public async Task Get_FilterByUnassignedUserId_ShowsOnlyTasksThatAreNotAssigned()
     {
         // Arrange

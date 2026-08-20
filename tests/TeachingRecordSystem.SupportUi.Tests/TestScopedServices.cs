@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -37,6 +38,7 @@ public class TestScopedServices
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         TrnRequestOptions = new TrnRequestOptions();
+        SupportTaskAssignmentOptions = new SupportTaskAssignmentOptions();
         BackgroundJobScheduler = new(serviceProvider);
         CurrentUserProvider = new();
     }
@@ -50,6 +52,7 @@ public class TestScopedServices
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
             .AddTestScoped(tss => tss.BlobStorageSafeFileServiceMock.Object)
             .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
+            .AddTestScoped(tss => Options.Create(tss.SupportTaskAssignmentOptions))
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler)
             .AddTestScoped(tss => tss.CurrentUserProvider)
             .AddTestScoped(tss => tss.Events)
@@ -83,6 +86,8 @@ public class TestScopedServices
     public Mock<ISafeFileService> BlobStorageSafeFileServiceMock { get; }
 
     public TrnRequestOptions TrnRequestOptions { get; }
+
+    public SupportTaskAssignmentOptions SupportTaskAssignmentOptions { get; }
 
     public DeferredExecutionBackgroundJobScheduler BackgroundJobScheduler { get; }
 

@@ -79,7 +79,10 @@
                     <govuk-select for="AssignedToUserId">
                         <govuk-select-label>Assigned to</govuk-select-label>
                         <govuk-select-item value="@Model.UnassignedUserId">Unassigned</govuk-select-item>
-                        <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
+                        @if (Model.ShowMyselfOption)
+                        {
+                            <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
+                        }
                         @foreach (var option in Model.AssignToOptions!)
                         {
                             <govuk-select-item value="@option.UserId">@option.UserName</govuk-select-item>

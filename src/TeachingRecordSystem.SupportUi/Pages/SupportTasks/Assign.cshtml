@@ -68,7 +68,10 @@
         <govuk-select-label class="govuk-label--s govuk-!-margin-bottom-2">Who do you want to assign these tasks to?</govuk-select-label>
         <govuk-select-item value=""></govuk-select-item>
         <govuk-select-item value="@Model.UnassignedUserId">Unassigned</govuk-select-item>
-        <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
+        @if (Model.ShowMyselfOption)
+        {
+            <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
+        }
         @foreach (var assignOption in Model.AssignToOptions!)
         {
             <govuk-select-item value="@assignOption.UserId">@assignOption.UserName</govuk-select-item>

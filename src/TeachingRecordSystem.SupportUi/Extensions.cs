@@ -109,6 +109,7 @@ public static class Extensions
             .AddTransient<EvidenceUploadManager>()
             .AddSingleton<PersonChangeableAttributesService>()
             .AddSupportTaskSearchService()
+            .AddSupportTaskAssignmentOptions(configuration)
             .AddOneLoginSearchService()
             .AddChangeHistoryService();
 

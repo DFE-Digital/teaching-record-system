@@ -7,12 +7,30 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
 public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 {
-    public async Task<IReadOnlyCollection<AssignableUserInfo>> GetAssignableUsersAsync()
+    public async Task<IReadOnlyCollection<AssignableUserInfo>> GetAssignableUsersAsync(
+        bool includeAdministrators,
+        bool includeCurrentAssignees)
     {
         return await dbContext.Users
-            .Where(u => u.Role == UserRoles.AccessManager || u.Role == UserRoles.RecordManager || u.Role == UserRoles.Administrator)
+            .Where(u =>
+                (u.Active &&
+                    (u.Role == UserRoles.AccessManager ||
+                        u.Role == UserRoles.RecordManager ||
+                        (includeAdministrators && u.Role == UserRoles.Administrator))) ||
+                // Users with tasks already assigned to them are included whatever their role or status,
+                // so that those tasks can still be found and reassigned.
+                (includeCurrentAssignees && dbContext.SupportTasks.Any(t => t.AssignedToUserId == u.UserId)))
             .OrderBy(u => u.Name)
             .Select(u => new AssignableUserInfo(u.UserId, u.Name))
+            .ToArrayAsync();
+    }
+
+    public async Task<IReadOnlyCollection<CompletedByUserInfo>> GetCompletedByUsersAsync()
+    {
+        return await dbContext.Users
+            .Where(u => dbContext.SupportTasks.Any(t => t.CompletedByUserId == u.UserId))
+            .OrderBy(u => u.Name)
+            .Select(u => new CompletedByUserInfo(u.UserId, u.Name))
             .ToArrayAsync();
     }
 
@@ -366,3 +384,5 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 }
 
 public record AssignableUserInfo(Guid UserId, string UserName);
+
+public record CompletedByUserInfo(Guid UserId, string UserName);

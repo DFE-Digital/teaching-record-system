@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.SupportTasks;
@@ -14,6 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.SupportTaskDetail;
 [AllowClosedSupportTask]
 public class Index(
     SupportTaskService supportTaskService,
+    IOptions<SupportTaskAssignmentOptions> assignmentOptions,
     ChangeHistoryService changeHistoryService,
     TrsDbContext dbContext,
     TimeProvider timeProvider,
@@ -63,6 +65,8 @@ public class Index(
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
+    public bool ShowMyselfOption { get; set; }
+
     public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
 
     public Guid CurrentUserId => User.GetUserId();
@@ -83,7 +87,8 @@ public class Index(
         }
 
         // Belt & braces check that status and user assignments are valid
-        var validAssignmentIds = AssignToOptions!.Select(u => u.UserId).Concat([CurrentUserId, UnassignedUserId]);
+        Guid[] extraAssignmentIds = ShowMyselfOption ? [CurrentUserId, UnassignedUserId] : [UnassignedUserId];
+        var validAssignmentIds = AssignToOptions!.Select(u => u.UserId).Concat(extraAssignmentIds);
         if ((Status is not SupportTaskStatus.InProgress and not SupportTaskStatus.Open) ||
             (AssignedToUserId is not null && !validAssignmentIds.Contains(AssignedToUserId.Value)))
         {
@@ -134,7 +139,13 @@ public class Index(
 
         ZendeskTickets = _supportTask.ZendeskTickets;
 
-        AssignToOptions = (await supportTaskService.GetAssignableUsersAsync())
+        var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
+            includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
+            includeCurrentAssignees: false);
+
+        ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
+
+        AssignToOptions = assignableUsers
             .Where(u => u.UserId != CurrentUserId)
             .AsReadOnly();
 
