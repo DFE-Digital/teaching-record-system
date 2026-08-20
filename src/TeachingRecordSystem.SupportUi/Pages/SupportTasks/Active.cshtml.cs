@@ -1,3 +1,4 @@
+using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -168,9 +169,10 @@ public class Active(
 
         // Keep the address bar in step with the selection. Ticking a checkbox doesn't otherwise touch
         // the URL, and the URL is what the page gets rebuilt from when the user navigates back to it.
-        Response.Headers["HX-Replace-Url"] = QueryHelpers.AddQueryString(
+        Response.Htmx(headers => headers.ReplaceUrl(
+            QueryHelpers.AddQueryString(
             ClearSelectionUrl,
-            new Dictionary<string, StringValues> { { SelectedTaskInputName, selectedTaskReferences } });
+            new Dictionary<string, StringValues> { { SelectedTaskInputName, selectedTaskReferences } })));
 
         return Partial("_SelectedActiveSupportTasks", new SelectionViewModel(selectedTaskReferences.Length, ClearSelectionUrl));
     }
