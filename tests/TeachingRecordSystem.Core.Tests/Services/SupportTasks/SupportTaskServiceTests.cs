@@ -895,6 +895,25 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
     }
 
     [Fact]
+    public async Task GetAssignableUsersAsync_WithIncludeUserId_IncludesThatUserWhateverTheirRoleOrStatus()
+    {
+        // Arrange
+        var inactiveRecordManager = await TestData.CreateUserAsync(active: false, role: UserRoles.RecordManager);
+        var viewer = await TestData.CreateUserAsync(role: UserRoles.Viewer);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<AssignableUserInfo>>(
+            service => service.GetAssignableUsersAsync(
+                includeAdministrators: true,
+                includeCurrentAssignees: false,
+                includeUserId: inactiveRecordManager.UserId));
+
+        // Assert
+        Assert.Contains(result, u => u.UserId == inactiveRecordManager.UserId && u.UserName == inactiveRecordManager.Name);
+        Assert.DoesNotContain(result, u => u.UserId == viewer.UserId);
+    }
+
+    [Fact]
     public async Task GetCompletedByUsersAsync_ReturnsUsersWhoCompletedTasksOrderedByNameWhateverTheirRoleOrStatus()
     {
         // Arrange

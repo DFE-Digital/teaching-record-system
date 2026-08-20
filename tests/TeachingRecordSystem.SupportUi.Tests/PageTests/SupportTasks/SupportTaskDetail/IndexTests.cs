@@ -160,6 +160,91 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_TaskAssignedToUserWhoIsNotAssignable_AssignToOptionsIncludeThatUserAndKeepThemSelected()
+    {
+        // Arrange
+        SupportTaskAssignmentOptions.IncludeAdministrators = false;
+
+        var administrator = await TestData.CreateUserAsync(name: "Assigned Administrator", role: UserRoles.Administrator);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignToUserAsync(supportTask, administrator.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var assignedToSelect = (IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!;
+
+        Assert.Contains(
+            assignedToSelect.Options,
+            o => o.Value == administrator.UserId.ToString() && o.TrimmedText() == administrator.Name);
+        Assert.Equal(administrator.UserId.ToString(), assignedToSelect.Value);
+    }
+
+    [Fact]
+    public async Task Get_TaskAssignedToCurrentUserWhoIsNotAssignable_AssignToOptionsIncludeMyself()
+    {
+        // Arrange
+        SupportTaskAssignmentOptions.IncludeAdministrators = false;
+
+        var currentUser = await TestData.CreateUserAsync(name: "Current User", role: UserRoles.Administrator);
+        SetCurrentUser(currentUser);
+
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignToUserAsync(supportTask, currentUser.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var assignedToSelect = (IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!;
+
+        Assert.Contains(
+            assignedToSelect.Options,
+            o => o.Value == currentUser.UserId.ToString() && o.TrimmedText() == "Myself");
+        Assert.Equal(currentUser.UserId.ToString(), assignedToSelect.Value);
+    }
+
+    [Fact]
+    public async Task Post_TaskAssignedToUserWhoIsNotAssignable_CanKeepItAssignedToThem()
+    {
+        // Arrange
+        SupportTaskAssignmentOptions.IncludeAdministrators = false;
+
+        var administrator = await TestData.CreateUserAsync(name: "Assigned Administrator", role: UserRoles.Administrator);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignToUserAsync(supportTask, administrator.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/{supportTask.SupportTaskReference}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+                .Add("AssignedToUserId", administrator.UserId)
+                .Add("Status", SupportTaskStatus.InProgress)
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            Assert.Equal(administrator.UserId, dbTask.AssignedToUserId);
+        });
+    }
+
+    [Fact]
     public async Task Get_OutstandingTask_DisplaysNotesInDescendingCreatedOrder()
     {
         // Arrange
@@ -553,4 +638,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         return (supportTask, completedByUser);
     }
+
+    private Task AssignToUserAsync(Core.DataStore.Postgres.Models.SupportTask task, Guid userId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == task.SupportTaskReference);
+            dbTask.AssignedToUserId = userId;
+            await dbContext.SaveChangesAsync();
+        });
 }
