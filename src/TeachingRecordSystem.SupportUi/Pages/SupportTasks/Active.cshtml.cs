@@ -85,7 +85,7 @@ public class Active(
     // The back link sits outside main, so an ordinary htmx swap has to update it out of band. Not on
     // a history restore though: that replaces the whole body, and htmx lifts out of band elements out
     // of the response before swapping it in, which would leave the restored page without one.
-    public bool SwapBackLinkOutOfBand => Request.Headers["HX-History-Restore-Request"] != "true";
+    public bool SwapBackLinkOutOfBand => !Request.IsHtmxHistoryRestoreRequest();
 
     // Where the 'clear selection' link in the selection banner goes: this page, same filters, no
     // selection. The banner is rendered both with the page and on its own by OnGetSelectionBanner.
