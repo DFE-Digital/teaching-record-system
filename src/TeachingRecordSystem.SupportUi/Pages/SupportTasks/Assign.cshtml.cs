@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
@@ -9,6 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks;
 
 public class Assign(
     SupportTaskService supportTaskService,
+    IOptions<SupportTaskAssignmentOptions> assignmentOptions,
     TrsDbContext dbContext,
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator) :
@@ -29,6 +31,8 @@ public class Assign(
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
+    public bool ShowMyselfOption { get; set; }
+
     public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
 
     public Guid CurrentUserId => User.GetUserId();
@@ -47,7 +51,8 @@ public class Assign(
         await this.ThrowIfInvalidAsync(_validator);
 
         // Belt & braces check that user assignment is valid
-        var validAssignmentIds = AssignToOptions!.Select(u => u.UserId).Concat([CurrentUserId, UnassignedUserId]);
+        Guid[] extraAssignmentIds = ShowMyselfOption ? [CurrentUserId, UnassignedUserId] : [UnassignedUserId];
+        var validAssignmentIds = AssignToOptions!.Select(u => u.UserId).Concat(extraAssignmentIds);
         if (!validAssignmentIds.Contains(AssignToUserId!.Value))
         {
             return BadRequest();
@@ -106,7 +111,13 @@ public class Assign(
             return;
         }
 
-        AssignToOptions = (await supportTaskService.GetAssignableUsersAsync())
+        var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
+            includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
+            includeCurrentAssignees: false);
+
+        ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
+
+        AssignToOptions = assignableUsers
             .Where(u => u.UserId != CurrentUserId)
             .AsReadOnly();
 

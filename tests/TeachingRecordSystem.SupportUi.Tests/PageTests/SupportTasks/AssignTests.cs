@@ -77,6 +77,33 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_CurrentUserIsNotAssignable_AssignToOptionsDoNotIncludeMyself()
+    {
+        // Arrange
+        SupportTaskAssignmentOptions.IncludeAdministrators = false;
+
+        var currentUser = await TestData.CreateUserAsync(name: "Current User", role: UserRoles.Administrator);
+        SetCurrentUser(currentUser);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetAssignUrl(supportTask.SupportTaskReference));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var options = doc.GetElementById("AssignToUserId")!
+            .QuerySelectorAll("option")
+            .Select(o => (Value: o.GetAttribute("value"), Text: o.TrimmedText()))
+            .ToArray();
+
+        Assert.DoesNotContain(options, o => o.Text == "Myself");
+        Assert.DoesNotContain(options, o => o.Value == currentUser.UserId.ToString());
+    }
+
+    [Fact]
     public async Task Get_ShowsTasksInTheOrderTheyWereSelected()
     {
         // Arrange

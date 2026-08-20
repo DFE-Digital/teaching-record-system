@@ -7,7 +7,11 @@ using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks;
 
-public class Completed(SupportTaskSearchService searchService, SupportTaskService supportTaskService, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Completed(
+    SupportTaskSearchService searchService,
+    SupportTaskService supportTaskService,
+    SupportUiLinkGenerator linkGenerator) :
+    PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -37,7 +41,7 @@ public class Completed(SupportTaskSearchService searchService, SupportTaskServic
 
     public ResultPage<CompletedTasksSearchResultItem>? Results { get; set; }
 
-    public IReadOnlyCollection<AssignableUserInfo>? CompletedByOptions { get; set; }
+    public IReadOnlyCollection<CompletedByUserInfo>? CompletedByOptions { get; set; }
 
     public string? OrderedByLabel { get; set; }
 
@@ -59,7 +63,7 @@ public class Completed(SupportTaskSearchService searchService, SupportTaskServic
             Results,
             pageNumber => linkGenerator.SupportTasks.Completed(Search, Type, CompletedByUserId, sortBy, sortDirection, pageNumber));
 
-        CompletedByOptions = await supportTaskService.GetAssignableUsersAsync();
+        CompletedByOptions = await supportTaskService.GetCompletedByUsersAsync();
 
         OrderedByLabel = sortBy switch
         {

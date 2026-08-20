@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 using TeachingRecordSystem.SupportUi.Services;
@@ -7,7 +8,12 @@ using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks;
 
-public class Active(SupportTaskSearchService searchService, SupportTaskService supportTaskService, SupportUiLinkGenerator linkGenerator) : PageModel
+public class Active(
+    SupportTaskSearchService searchService,
+    SupportTaskService supportTaskService,
+    IOptions<SupportTaskAssignmentOptions> assignmentOptions,
+    SupportUiLinkGenerator linkGenerator) :
+    PageModel
 {
     private const int TasksPerPage = 20;
 
@@ -39,6 +45,8 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
+    public bool ShowMyselfOption { get; set; }
+
     public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
 
     public Guid CurrentUserId => User.GetUserId();
@@ -64,7 +72,13 @@ public class Active(SupportTaskSearchService searchService, SupportTaskService s
             Results,
             pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
 
-        AssignToOptions = (await supportTaskService.GetAssignableUsersAsync())
+        var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
+            includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
+            includeCurrentAssignees: true);
+
+        ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
+
+        AssignToOptions = assignableUsers
             .Where(u => u.UserId != CurrentUserId)
             .AsReadOnly();
 

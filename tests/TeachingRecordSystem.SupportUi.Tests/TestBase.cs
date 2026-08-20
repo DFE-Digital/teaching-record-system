@@ -7,6 +7,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
@@ -58,6 +59,8 @@ public abstract class TestBase : IDisposable
     protected Mock<IFileService> FileServiceMock => TestScopedServices.GetCurrent().BlobStorageFileServiceMock;
 
     protected TrnRequestOptions TrnRequestOptions => TestScopedServices.GetCurrent().TrnRequestOptions;
+
+    protected SupportTaskAssignmentOptions SupportTaskAssignmentOptions => TestScopedServices.GetCurrent().SupportTaskAssignmentOptions;
 
     public virtual void Dispose()
     {

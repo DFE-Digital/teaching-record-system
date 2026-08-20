@@ -111,6 +111,52 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_CompletedByFilterOptions_IncludeUsersWhoCompletedTasksWhateverTheirRoleOrStatus()
+    {
+        // Arrange
+        var inactiveRecordManager = await TestData.CreateUserAsync(active: false, name: "Inactive Record Manager", role: UserRoles.RecordManager);
+        var viewer = await TestData.CreateUserAsync(name: "Viewer", role: UserRoles.Viewer);
+        var recordManagerWithoutCompletedTasks = await TestData.CreateUserAsync(name: "Record Manager", role: UserRoles.RecordManager);
+
+        var completedByInactiveRecordManager = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+            .WithStatus(SupportTaskStatus.Closed));
+        await SetCompletedTaskPropertiesAsync(
+            completedByInactiveRecordManager,
+            inactiveRecordManager.UserId,
+            new DateTime(2025, 1, 25),
+            SupportTaskOutcome.ChangeNameRequest_Approved);
+
+        var completedByViewer = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+            .WithStatus(SupportTaskStatus.Closed));
+        await SetCompletedTaskPropertiesAsync(
+            completedByViewer,
+            viewer.UserId,
+            new DateTime(2025, 1, 26),
+            SupportTaskOutcome.ChangeNameRequest_Approved);
+
+        // Having a task assigned isn't enough on its own
+        await AssignToUserAsync(await TestData.CreateChangeNameRequestSupportTaskAsync(), recordManagerWithoutCompletedTasks.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/completed");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        // There's a hidden input with the same id earlier in the page, so select the element by tag name too
+        var optionValues = ((IHtmlSelectElement)doc.QuerySelector("select#CompletedByUserId")!)
+            .Options
+            .Select(o => o.Value)
+            .ToArray();
+
+        Assert.Contains(inactiveRecordManager.UserId.ToString(), optionValues);
+        Assert.Contains(viewer.UserId.ToString(), optionValues);
+        Assert.DoesNotContain(recordManagerWithoutCompletedTasks.UserId.ToString(), optionValues);
+    }
+
+    [Fact]
     public async Task Get_FilterByCompletedByUserId_ShowsOnlyTasksCompletedByGivenUser()
     {
         // Arrange
@@ -454,6 +500,14 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Single(GetResultTaskReferences(doc));
     }
+
+    private Task AssignToUserAsync(Core.DataStore.Postgres.Models.SupportTask task, Guid userId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var dbTask = await dbContext.SupportTasks.FindAsync(task.SupportTaskReference);
+            dbTask!.AssignedToUserId = userId;
+            await dbContext.SaveChangesAsync();
+        });
 
     private Task SetCompletedTaskPropertiesAsync(
         Core.DataStore.Postgres.Models.SupportTask task,

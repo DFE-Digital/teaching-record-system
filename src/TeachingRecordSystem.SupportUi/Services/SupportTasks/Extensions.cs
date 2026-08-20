@@ -8,4 +8,14 @@ public static class Extensions
 
         return services;
     }
+
+    public static IServiceCollection AddSupportTaskAssignmentOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<SupportTaskAssignmentOptions>()
+            .Bind(configuration.GetSection("SupportTaskAssignment"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        return services;
+    }
 }

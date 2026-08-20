@@ -811,8 +811,11 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         Events.AssertNoEventsPublished();
     }
 
-    [Fact]
-    public async Task GetAssignableUsersAsync_ReturnsAccessManagersRecordManagersAndAdministratorsOrderedByNameAndExcludesOtherRoles()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task GetAssignableUsersAsync_ReturnsAccessManagersAndRecordManagersOrderedByNameAndExcludesOtherRoles(
+        bool includeAdministrators)
     {
         // Arrange
         var accessManager = await TestData.CreateUserAsync(name: "ZZZ Assignable AccessManager", role: UserRoles.AccessManager);
@@ -822,20 +825,124 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
 
         // Act
         var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<AssignableUserInfo>>(
-            service => service.GetAssignableUsersAsync());
+            service => service.GetAssignableUsersAsync(includeAdministrators, includeCurrentAssignees: false));
 
         // Assert
         Assert.Contains(result, u => u.UserId == accessManager.UserId && u.UserName == accessManager.Name);
         Assert.Contains(result, u => u.UserId == recordManager.UserId && u.UserName == recordManager.Name);
-        Assert.Contains(result, u => u.UserId == administrator.UserId && u.UserName == administrator.Name);
         Assert.DoesNotContain(result, u => u.UserId == viewer.UserId);
+
+        if (includeAdministrators)
+        {
+            Assert.Contains(result, u => u.UserId == administrator.UserId && u.UserName == administrator.Name);
+        }
+        else
+        {
+            Assert.DoesNotContain(result, u => u.UserId == administrator.UserId);
+        }
+
+        Guid[] expectedOrder = includeAdministrators
+            ? [recordManager.UserId, administrator.UserId, accessManager.UserId]
+            : [recordManager.UserId, accessManager.UserId];
 
         var createdUsersInResult = result
             .Where(u => u.UserId == accessManager.UserId || u.UserId == recordManager.UserId || u.UserId == administrator.UserId)
             .Select(u => u.UserId)
             .ToArray();
-        Assert.Equal(new[] { recordManager.UserId, administrator.UserId, accessManager.UserId }, createdUsersInResult);
+        Assert.Equal(expectedOrder, createdUsersInResult);
     }
+
+    [Fact]
+    public async Task GetAssignableUsersAsync_WithIncludeCurrentAssigneesFalse_ExcludesInactiveUsersAndUsersWithAssignedTasks()
+    {
+        // Arrange
+        var inactiveRecordManager = await TestData.CreateUserAsync(active: false, role: UserRoles.RecordManager);
+        var viewerWithAssignedTask = await TestData.CreateUserAsync(role: UserRoles.Viewer);
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignSupportTaskToUserAsync(supportTask.SupportTaskReference, viewerWithAssignedTask.UserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<AssignableUserInfo>>(
+            service => service.GetAssignableUsersAsync(includeAdministrators: true, includeCurrentAssignees: false));
+
+        // Assert
+        Assert.DoesNotContain(result, u => u.UserId == inactiveRecordManager.UserId);
+        Assert.DoesNotContain(result, u => u.UserId == viewerWithAssignedTask.UserId);
+    }
+
+    [Fact]
+    public async Task GetAssignableUsersAsync_WithIncludeCurrentAssigneesTrue_IncludesUsersWithAssignedTasksWhateverTheirRoleOrStatus()
+    {
+        // Arrange
+        var inactiveRecordManager = await TestData.CreateUserAsync(active: false, role: UserRoles.RecordManager);
+        var inactiveRecordManagerTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignSupportTaskToUserAsync(inactiveRecordManagerTask.SupportTaskReference, inactiveRecordManager.UserId);
+
+        var viewerWithAssignedTask = await TestData.CreateUserAsync(role: UserRoles.Viewer);
+        var viewerTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignSupportTaskToUserAsync(viewerTask.SupportTaskReference, viewerWithAssignedTask.UserId);
+
+        var viewerWithoutAssignedTask = await TestData.CreateUserAsync(role: UserRoles.Viewer);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<AssignableUserInfo>>(
+            service => service.GetAssignableUsersAsync(includeAdministrators: true, includeCurrentAssignees: true));
+
+        // Assert
+        Assert.Contains(result, u => u.UserId == inactiveRecordManager.UserId);
+        Assert.Contains(result, u => u.UserId == viewerWithAssignedTask.UserId);
+        Assert.DoesNotContain(result, u => u.UserId == viewerWithoutAssignedTask.UserId);
+    }
+
+    [Fact]
+    public async Task GetCompletedByUsersAsync_ReturnsUsersWhoCompletedTasksOrderedByNameWhateverTheirRoleOrStatus()
+    {
+        // Arrange
+        var inactiveRecordManager = await TestData.CreateUserAsync(active: false, name: "ZZZ Completed By RecordManager", role: UserRoles.RecordManager);
+        var viewer = await TestData.CreateUserAsync(name: "AAA Completed By Viewer", role: UserRoles.Viewer);
+        var recordManagerWithoutCompletedTasks = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
+
+        var inactiveRecordManagerTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await SetSupportTaskCompletedByUserAsync(inactiveRecordManagerTask.SupportTaskReference, inactiveRecordManager.UserId);
+
+        var viewerTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await SetSupportTaskCompletedByUserAsync(viewerTask.SupportTaskReference, viewer.UserId);
+
+        // Having a task assigned isn't enough on its own
+        var assignedTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        await AssignSupportTaskToUserAsync(assignedTask.SupportTaskReference, recordManagerWithoutCompletedTasks.UserId);
+
+        // Act
+        var result = await WithServiceAsync<SupportTaskService, IReadOnlyCollection<CompletedByUserInfo>>(
+            service => service.GetCompletedByUsersAsync());
+
+        // Assert
+        Assert.Contains(result, u => u.UserId == inactiveRecordManager.UserId && u.UserName == inactiveRecordManager.Name);
+        Assert.Contains(result, u => u.UserId == viewer.UserId && u.UserName == viewer.Name);
+        Assert.DoesNotContain(result, u => u.UserId == recordManagerWithoutCompletedTasks.UserId);
+
+        var createdUsersInResult = result
+            .Where(u => u.UserId == inactiveRecordManager.UserId || u.UserId == viewer.UserId)
+            .Select(u => u.UserId)
+            .ToArray();
+        Assert.Equal(new[] { viewer.UserId, inactiveRecordManager.UserId }, createdUsersInResult);
+    }
+
+    private Task SetSupportTaskCompletedByUserAsync(string supportTaskReference, Guid userId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var supportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTaskReference);
+            supportTask.CompletedByUserId = userId;
+            await dbContext.SaveChangesAsync();
+        });
+
+    private Task AssignSupportTaskToUserAsync(string supportTaskReference, Guid userId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var supportTask = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTaskReference);
+            supportTask.AssignedToUserId = userId;
+            await dbContext.SaveChangesAsync();
+        });
 
     private record DummyJourneyState;
 }
