@@ -8,7 +8,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@Html.Raw(Model.BackLinkUrl)"
+    <govuk-back-link href="@Model.BackLinkUrl"
                      id="back-link"
                      hx-swap-oob="true"
                      hx-boost="@(Model.BackLinkUsesHtmx ? "true" : "false")"
