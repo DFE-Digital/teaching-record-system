@@ -1093,7 +1093,7 @@
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
-          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.3, )",
+          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.4, )",
           "DfeAnalytics.EFCore": "[0.6.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
@@ -1147,11 +1147,11 @@
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
-        "requested": "[1.5.3, )",
-        "resolved": "1.5.3",
-        "contentHash": "owDEPihK2GwyOUWsj6Ae1M5dXqcJyKTWwPx1kYb7FWemMLB4Iox3xrcb2ev6dBTSQjpQWcsVFwpIuAGmOD8RXw==",
+        "requested": "[1.5.4, )",
+        "resolved": "1.5.4",
+        "contentHash": "5D9McHLGA7riU1z2Mtpt3nPq9rAcsc11hIm3Cb/In+wB2w+Osyvd03EjAS08c3UqiNIFOsAXCo37srPT6NH8uA==",
         "dependencies": {
-          "Azure.Core": "1.55.0",
+          "Azure.Core": "1.61.0",
           "Azure.Storage.Blobs": "12.26.0"
         }
       },

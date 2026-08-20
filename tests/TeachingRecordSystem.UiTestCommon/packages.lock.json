@@ -233,27 +233,27 @@
       },
       "Microsoft.AspNetCore.Cryptography.Internal": {
         "type": "Transitive",
-        "resolved": "10.0.7",
-        "contentHash": "unTeI3bPmzsl5Xo2Irg7jW8osCjo/H2rBT5sTqopUUI0gbLyTYuTjDyxoKjykjS/nS2jUdAKVFWFoGF1s1g4HQ=="
+        "resolved": "10.0.10",
+        "contentHash": "T/kOT3kAVZU1B0QlpRxASpdbAJ/o5DLFW7bWS6vyE44uMqPmojEcaFENt6ww1xaLH++ZNwsEJ1YUOwPK050lNQ=="
       },
       "Microsoft.AspNetCore.DataProtection": {
         "type": "Transitive",
-        "resolved": "10.0.7",
-        "contentHash": "ETphwQ9b2gvTK0ET6cYQY77StbIvSmYHZJdsEOf5AY4YNmol5uIncdqLCJzFgE/KEH1ukRdXTkwSC27hNnltOw==",
+        "resolved": "10.0.10",
+        "contentHash": "5sfrNrBShTlJeXvWNxjPS7ilLY4H6MICZPMZr/2vjoDoBH5Z8sQYJwbhulqfXh4yIpxIto0TcmOQHOElvpq+iQ==",
         "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.Internal": "10.0.7",
-          "Microsoft.AspNetCore.DataProtection.Abstractions": "10.0.7",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.7",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.7",
-          "Microsoft.Extensions.Options": "10.0.7",
-          "System.Security.Cryptography.Xml": "10.0.7"
+          "Microsoft.AspNetCore.Cryptography.Internal": "10.0.10",
+          "Microsoft.AspNetCore.DataProtection.Abstractions": "10.0.10",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options": "10.0.10",
+          "System.Security.Cryptography.Xml": "10.0.10"
         }
       },
       "Microsoft.AspNetCore.DataProtection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.7",
-        "contentHash": "SitkANPwiW0Z2w9bWAFwZ/MxFDDloBkNZCK+SfFJ+/IMUTMvrczBrHmy66+EdQTd2ybRzCm12aKAztQkDGyH6A=="
+        "resolved": "10.0.10",
+        "contentHash": "q2RNx0N/qrsU+JgbPE78I9pu5ekwguitAFVoeE1NCgxtkUTguvf7oTzBnn42zSQxuugJ4fmj0RSarob8Rvorrg=="
       },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Transitive",
@@ -1030,7 +1030,7 @@
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.Redis": "[9.0.0, )",
-          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.3, )",
+          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.5.4, )",
           "DfeAnalytics.EFCore": "[0.6.1, )",
           "FluentValidation.AspNetCore": "[11.3.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
@@ -1080,13 +1080,13 @@
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
-        "requested": "[1.5.3, )",
-        "resolved": "1.5.3",
-        "contentHash": "owDEPihK2GwyOUWsj6Ae1M5dXqcJyKTWwPx1kYb7FWemMLB4Iox3xrcb2ev6dBTSQjpQWcsVFwpIuAGmOD8RXw==",
+        "requested": "[1.5.4, )",
+        "resolved": "1.5.4",
+        "contentHash": "5D9McHLGA7riU1z2Mtpt3nPq9rAcsc11hIm3Cb/In+wB2w+Osyvd03EjAS08c3UqiNIFOsAXCo37srPT6NH8uA==",
         "dependencies": {
-          "Azure.Core": "1.55.0",
+          "Azure.Core": "1.61.0",
           "Azure.Storage.Blobs": "12.26.0",
-          "Microsoft.AspNetCore.DataProtection": "10.0.7"
+          "Microsoft.AspNetCore.DataProtection": "10.0.10"
         }
       },
       "Azure.Storage.Blobs": {
