@@ -194,6 +194,33 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task TickingEveryRowTicksTheHeaderCheckbox()
+    {
+        await using var createdTasks = await CreateSupportTasksAsync(3);
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GotoAsync(createdTasks.ActiveTasksUrl);
+
+        var selectAll = page.Locator("#select-all-tasks");
+        var rows = await page.Locator("[data-testid='results'] input[type=checkbox]").AllAsync();
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            await page.ClickAsync($"label[for='{await rows[i].GetAttributeAsync("id")}']");
+            await page.AssertSelectedTaskCountAsync(i + 1);
+
+            Assert.Equal(i == rows.Count - 1, await selectAll.IsCheckedAsync());
+        }
+
+        // And unticking any one of them clears it again
+        await page.ClickAsync($"label[for='{await rows[0].GetAttributeAsync("id")}']");
+        await page.AssertSelectedTaskCountAsync(rows.Count - 1);
+        Assert.False(await selectAll.IsCheckedAsync());
+    }
+
+    [Fact]
     public async Task SortingKeepsTheSelection()
     {
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);

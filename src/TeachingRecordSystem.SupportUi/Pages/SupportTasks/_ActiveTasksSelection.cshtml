@@ -1,0 +1,6 @@
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active.SelectionUpdateViewModel
+
+@* The banner is swapped into the live region; the header checkbox lives in the table, so it comes
+   along as an out of band swap to keep it in step with the rows. *@
+<partial name="_SelectedActiveSupportTasks" model="@Model.Selection" />
+<partial name="_SelectAllTasks" model="@Model.SelectAll" />

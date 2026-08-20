@@ -122,18 +122,8 @@ else
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header trs-!-width-35">
-                    <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox trs-select-row trs-requires-js">
-                        <input type="checkbox"
-                               class="govuk-checkboxes__input"
-                               id="select-all-tasks"
-                               data-testid="select-all-tasks"
-                               checked="@(Model.AllTasksOnPageSelected ? "checked" : null)"
-                               hx-get="@(Model.AllTasksOnPageSelected ? Model.ClearSelectionUrl : Model.SelectAllUrl)"
-                               hx-include="@(Model.AllTasksOnPageSelected ? Model.OffPageSelectedTaskInputsSelector : Model.SelectedTaskInputsSelector)"
-                               hx-select="main"
-                               hx-target="main"
-                               hx-swap="outerHTML"
-                               hx-push-url="true" />
+                    <div class="govuk-checkboxes__item govuk-checkboxes--small trs-select-row trs-requires-js">
+                        <partial name="_SelectAllTasks" model="@Model.GetSelectAllViewModel(swapOutOfBand: false)" />
                         <label for="select-all-tasks" class="govuk-label govuk-checkboxes__label">
                             <span class="govuk-visually-hidden">Select all tasks on this page</span>
                         </label>
@@ -217,7 +207,7 @@ else
 
                 <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                     <td class="govuk-table__cell">
-                        <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox trs-select-row">
+                        <div class="govuk-checkboxes__item govuk-checkboxes--small trs-select-row">
                             <input type="checkbox"
                                    class="govuk-checkboxes__input"
                                    id="AssignSupportTask-@(result.SupportTaskReference)"
@@ -227,7 +217,7 @@ else
                                    data-selects-row
                                    checked="@(isSelected ? "checked" : null)"
                                    hx-get="@Model.SelectionBannerUrl"
-                                   hx-include="@Model.SelectedTaskInputsSelector"
+                                   hx-include="@Model.RowCheckboxIncludeSelector"
                                    hx-target="#selected-tasks-banner"
                                    hx-swap="innerHTML" />
                             <label for="AssignSupportTask-@(result.SupportTaskReference)" class="govuk-label govuk-checkboxes__label">
@@ -286,6 +276,8 @@ else
         <govuk-button type="submit">Assign tasks</govuk-button>
     </noscript>
 </form>
+
+<input type="hidden" name="pageTaskReferences" value="@Model.PageTaskReferences">
 
 @* Boosting the pagination links swaps the results in place, and hx-include sends the selection up
    with the request so that changing page keeps it. *@

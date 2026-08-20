@@ -595,6 +595,10 @@ tr:has([data-selects-row]):has(:checked) {
 
 .trs-select-row {
   margin-left: 10px !important;
+
+  // The cell is narrower than the checkbox's 44px touch target, so the label - which holds nothing
+  // but visually hidden text - wraps underneath the input and pads the row out for no reason.
+  flex-wrap: nowrap;
 }
 
 .trs-zendesk-links-table {

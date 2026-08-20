@@ -780,7 +780,6 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var checkbox = GetResultRows(doc).Single().QuerySelector("input[type='checkbox']")!;
         Assert.Equal("/support-tasks/active/SelectionBanner?sortBy=Subject", checkbox.GetAttribute("hx-get"));
-        Assert.Equal("[name=SupportTaskReference]", checkbox.GetAttribute("hx-include"));
     }
 
     [Fact]
@@ -1004,6 +1003,65 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // It only does anything through htmx, unlike the checkbox on each row
         Assert.Contains("trs-requires-js", doc.GetElementByTestId("select-all-tasks")!.ParentElement!.ClassName!);
+
+        // Rendered in place, not out of band - otherwise a swap of main would lift it out of the table
+        Assert.Null(doc.GetElementByTestId("select-all-tasks")!.GetAttribute("hx-swap-oob"));
+    }
+
+    [Theory]
+    [InlineData("A,B", new[] { "A", "B" }, true)]
+    [InlineData("A,B", new[] { "A" }, false)]
+    [InlineData("A,B", new[] { "A", "B", "C" }, true)]
+    [InlineData("", new string[0], false)]
+    public async Task GetSelectionBanner_SendsBackTheHeaderCheckboxInStepWithTheRows(
+        string pageTaskReferences,
+        string[] selectedTaskReferences,
+        bool expectTicked)
+    {
+        // Arrange
+        var selection = string.Join("&", selectedTaskReferences.Select(r => $"SupportTaskReference={r}"));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active/SelectionBanner?pageTaskReferences={pageTaskReferences}&{selection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var selectAll = doc.GetElementByTestId("select-all-tasks");
+        Assert.NotNull(selectAll);
+        Assert.Equal(expectTicked, selectAll.HasAttribute("checked"));
+
+        // It lives in the table, not the banner being swapped in, so it has to come back out of band
+        Assert.Equal("true", selectAll.GetAttribute("hx-swap-oob"));
+    }
+
+    [Fact]
+    public async Task Get_RowCheckboxes_SendTheTasksOnThePageSoTheHeaderCheckboxCanKeepUp()
+    {
+        // Arrange
+        var firstTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20)));
+        var secondTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal(
+            $"{firstTask.SupportTaskReference},{secondTask.SupportTaskReference}",
+            doc.QuerySelector("input[name='pageTaskReferences']")?.GetAttribute("value"));
+
+        var checkbox = GetResultRows(doc).First().QuerySelector("input[type='checkbox']")!;
+        Assert.Equal(
+            "[name=SupportTaskReference], [name=pageTaskReferences]",
+            checkbox.GetAttribute("hx-include"));
     }
 
     // Creates enough tasks to fill two pages and returns the reference of a task on the first page

@@ -24,6 +24,8 @@ public class Active(
     // carry the tasks selected on other pages.
     private const string SelectedTaskInputName = "SupportTaskReference";
 
+    private const string PageTaskReferencesInputName = "pageTaskReferences";
+
     [BindProperty(SupportsGet = true)]
     public SupportTaskType? Type { get; set; }
 
@@ -74,6 +76,12 @@ public class Active(
         $"#assign-tasks-form input[type=hidden][name={SelectedTaskInputName}]";
 
     public bool AllTasksOnPageSelected { get; set; }
+
+    // The tasks shown on this page, sent up with a checkbox tick so the banner request can tell
+    // whether they're now all selected without having to run the search again.
+    public string PageTaskReferences => string.Join(",", Results?.Select(r => r.SupportTaskReference) ?? []);
+
+    public string RowCheckboxIncludeSelector => $"{SelectedTaskInputsSelector}, [name={PageTaskReferencesInputName}]";
 
     // This page's URL with every task on it added to the selection. Combined with the selection
     // already in the DOM it gives 'everything that was selected, plus this page'.
@@ -175,9 +183,18 @@ public class Active(
         OrderDirectionLabel = sortDirection is SupportUi.SortDirection.Ascending ? "ascending" : "descending";
     }
 
-    public IActionResult OnGetSelectionBanner([FromQuery(Name = SelectedTaskInputName)] string[] supportTaskReferences)
+    public IActionResult OnGetSelectionBanner(
+        [FromQuery(Name = SelectedTaskInputName)] string[] supportTaskReferences,
+        [FromQuery(Name = PageTaskReferencesInputName)] string? pageTaskReferences)
     {
         var selectedTaskReferences = supportTaskReferences.Distinct().ToArray();
+        var referencesOnPage = pageTaskReferences?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+        SelectedTaskReferenceLookup = selectedTaskReferences.ToHashSet();
+        AllTasksOnPageSelected = referencesOnPage.Length > 0 && referencesOnPage.All(SelectedTaskReferenceLookup.Contains);
+        SelectAllUrl = QueryHelpers.AddQueryString(
+            ClearSelectionUrl,
+            new Dictionary<string, StringValues> { { SelectedTaskInputName, referencesOnPage } });
 
         // Keep the address bar in step with the selection. Ticking a checkbox doesn't otherwise touch
         // the URL, and the URL is what the page gets rebuilt from when the user navigates back to it.
@@ -186,8 +203,19 @@ public class Active(
             ClearSelectionUrl,
             new Dictionary<string, StringValues> { { SelectedTaskInputName, selectedTaskReferences } })));
 
-        return Partial("_SelectedActiveSupportTasks", new SelectionViewModel(selectedTaskReferences.Length, ClearSelectionUrl));
+        return Partial(
+            "_ActiveTasksSelection",
+            new SelectionUpdateViewModel(
+                new SelectionViewModel(selectedTaskReferences.Length, ClearSelectionUrl),
+                GetSelectAllViewModel(swapOutOfBand: true)));
     }
+
+    public SelectAllViewModel GetSelectAllViewModel(bool swapOutOfBand) =>
+        new(
+            AllTasksOnPageSelected,
+            AllTasksOnPageSelected ? ClearSelectionUrl : SelectAllUrl!,
+            AllTasksOnPageSelected ? OffPageSelectedTaskInputsSelector : SelectedTaskInputsSelector,
+            swapOutOfBand);
 
     // Links away from this page come back to it via a return URL. The selected task references are
     // in the query string when the user has paged through the results; they'd be repeated in every
@@ -200,4 +228,8 @@ public class Active(
     }
 
     public record SelectionViewModel(int SelectedTaskCount, string ClearSelectionUrl);
+
+    public record SelectAllViewModel(bool AllTasksSelected, string Url, string IncludeSelector, bool SwapOutOfBand);
+
+    public record SelectionUpdateViewModel(SelectionViewModel Selection, SelectAllViewModel SelectAll);
 }
