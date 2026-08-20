@@ -1,6 +1,8 @@
+using Dfe.Analytics.EFCore;
 using Hangfire;
 using Htmx.TagHelpers;
 using Joonasw.AspNetCore.SecurityHeaders;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Endpoints;
 using TeachingRecordSystem.SupportUi.Infrastructure.Middleware;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -83,6 +85,8 @@ public class Program
         app.UseAuthorization();
 
         app.MapHtmxAntiforgeryScript();
+
+        app.MapDfeAnalyticsDbConfiguration<TrsDbContext>();
 
         app.MapRazorPages().WithStaticAssets();
         app.MapControllers().WithStaticAssets();
