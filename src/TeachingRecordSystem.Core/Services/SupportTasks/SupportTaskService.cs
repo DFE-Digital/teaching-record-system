@@ -9,7 +9,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 {
     public async Task<IReadOnlyCollection<AssignableUserInfo>> GetAssignableUsersAsync(
         bool includeAdministrators,
-        bool includeCurrentAssignees)
+        bool includeCurrentAssignees,
+        Guid? includeUserId = null)
     {
         return await dbContext.Users
             .Where(u =>
@@ -19,7 +20,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                         (includeAdministrators && u.Role == UserRoles.Administrator))) ||
                 // Users with tasks already assigned to them are included whatever their role or status,
                 // so that those tasks can still be found and reassigned.
-                (includeCurrentAssignees && dbContext.SupportTasks.Any(t => t.AssignedToUserId == u.UserId)))
+                (includeCurrentAssignees && dbContext.SupportTasks.Any(t => t.AssignedToUserId == u.UserId)) ||
+                (includeUserId != null && u.UserId == includeUserId))
             .OrderBy(u => u.Name)
             .Select(u => new AssignableUserInfo(u.UserId, u.Name))
             .ToArrayAsync();

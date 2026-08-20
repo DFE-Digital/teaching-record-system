@@ -139,9 +139,12 @@ public class Index(
 
         ZendeskTickets = _supportTask.ZendeskTickets;
 
+        // The user the task is already assigned to may not be assignable any more; include them anyway so the
+        // 'Assigned to' select shows who has it rather than falling back to 'Unassigned'.
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
-            includeCurrentAssignees: false);
+            includeCurrentAssignees: false,
+            includeUserId: _supportTask.AssignedToUserId);
 
         ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
 
