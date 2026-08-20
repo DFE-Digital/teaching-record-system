@@ -8,15 +8,17 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@Model.BackLinkUrl"
-                     id="back-link"
-                     hx-swap-oob="true"
-                     hx-boost="@(Model.BackLinkUsesHtmx ? "true" : "false")"
-                     hx-select="main"
-                     hx-target="main"
-                     hx-swap="outerHTML"
-                     hx-include="@Model.SelectedTaskInputsSelector"
-                     hx-push-url="true" />
+    @* Wrapped so the out of band attribute can be left off entirely - on a plain div a null value
+       omits it, where on the tag helper it would render bare and htmx would read it as a swap. *@
+    <div id="back-link" hx-swap-oob="@(Model.SwapBackLinkOutOfBand ? "true" : null)">
+        <govuk-back-link href="@Model.BackLinkUrl"
+                         hx-boost="@(Model.BackLinkUsesHtmx ? "true" : "false")"
+                         hx-select="main"
+                         hx-target="main"
+                         hx-swap="outerHTML"
+                         hx-include="@Model.SelectedTaskInputsSelector"
+                         hx-push-url="true" />
+    </div>
 }
 
 <span class="govuk-caption-m">Tasks overview</span>

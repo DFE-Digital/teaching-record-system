@@ -1,3 +1,5 @@
+using Microsoft.Playwright;
+
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.SupportTasks;
 
 public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -11,7 +13,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -41,7 +43,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -66,7 +68,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -95,7 +97,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -119,7 +121,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -134,7 +136,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -153,10 +155,15 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertSelectedTaskCountAsync(1);
         Assert.Equal(1, await page.Locator("[data-testid='results'] input[type='checkbox']:checked").CountAsync());
 
+        // The back link is rendered out of band, which a history restore has to be careful not to
+        // strip out of the response
+        Assert.Equal("/", await page.Locator(".govuk-back-link").GetAttributeAsync("href"));
+
         await page.GoForwardAsync();
 
         await page.AssertSelectedTaskCountAsync(2);
         Assert.Equal(1, await page.Locator("[data-testid='results'] input[type='checkbox']:checked").CountAsync());
+        Assert.Contains("pageNumber=1", await page.Locator(".govuk-back-link").GetAttributeAsync("href"));
     }
 
     [Fact]
@@ -165,7 +172,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -184,7 +191,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -210,7 +217,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var createdTasks = await CreateSupportTasksAsync(1);
 
         await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
+        var page = await CreatePageAsync(context);
 
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
@@ -221,6 +228,18 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForURLAsync(url => !url.Contains("assignedToUserId"));
 
         await page.AssertNoTasksSelectedAsync();
+    }
+
+    private static async Task<IPage> CreatePageAsync(IBrowserContext context)
+    {
+        var page = await context.NewPageAsync();
+
+        // The browser context has no fixed viewport, so the window size is whatever the machine
+        // running the tests gives us. Below about 1000px wide the sortable column headers overlap
+        // each other, which makes clicking one of them unreliable.
+        await page.SetViewportSizeAsync(1280, 800);
+
+        return page;
     }
 
     private async Task<CreatedSupportTasks> CreateSupportTasksAsync(int count)

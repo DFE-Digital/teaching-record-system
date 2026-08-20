@@ -905,7 +905,28 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("main", backLink?.GetAttribute("hx-target"));
 
         // It sits outside main, so it has to be swapped out of band to stay in step with the page
-        Assert.Equal("true", backLink?.GetAttribute("hx-swap-oob"));
+        Assert.Equal("true", doc.QuerySelector("#back-link")?.GetAttribute("hx-swap-oob"));
+    }
+
+    [Fact]
+    public async Task Get_HistoryRestoreRequest_DoesNotSwapTheBackLinkOutOfBand()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+        request.Headers.Add("HX-History-Restore-Request", "true");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        // A history restore replaces the whole body, and htmx lifts out of band elements out of the
+        // response before swapping it in - which would leave the restored page with no back link
+        Assert.Null(doc.QuerySelector("#back-link")?.GetAttribute("hx-swap-oob"));
+        Assert.NotNull(doc.QuerySelector(".govuk-back-link"));
     }
 
     // Creates enough tasks to fill two pages and returns the reference of a task on the first page
