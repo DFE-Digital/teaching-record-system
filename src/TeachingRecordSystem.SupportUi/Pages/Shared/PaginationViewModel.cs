@@ -1,10 +1,12 @@
 namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
-public class PaginationViewModel(int currentPage, int lastPage, Func<int, string> getPageLink)
+public class PaginationViewModel(int currentPage, int lastPage, Func<int, string> getPageLink, HtmxLinkOptions? htmx = null)
 {
     public int CurrentPage => currentPage;
     public int FirstPage => 1;
     public int LastPage => lastPage;
+
+    public HtmxLinkOptions? Htmx => htmx;
 
     public bool ShowPagination =>
         LastPage > 1;
@@ -35,8 +37,8 @@ public class PaginationViewModel(int currentPage, int lastPage, Func<int, string
 
     public string GetPageLink(int page) => getPageLink(page);
 
-    public static PaginationViewModel Create<T>(ResultPage<T> result, Func<int, string> getPageLink)
+    public static PaginationViewModel Create<T>(ResultPage<T> result, Func<int, string> getPageLink, HtmxLinkOptions? htmx = null)
     {
-        return new(result.CurrentPage, result.LastPage, getPageLink);
+        return new(result.CurrentPage, result.LastPage, getPageLink, htmx);
     }
 }

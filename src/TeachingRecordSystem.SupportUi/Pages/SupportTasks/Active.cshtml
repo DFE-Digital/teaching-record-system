@@ -1,15 +1,17 @@
 @page "/support-tasks/active/{handler?}"
-@using Microsoft.AspNetCore.Http.Extensions
 @using TeachingRecordSystem.SupportUi.Services.SupportTasks
 @model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active
 @{
     ViewBag.Title = "Active tasks";
 
-    var returnUrl = Request.GetEncodedPathAndQuery();
+    var returnUrl = Model.ReturnUrl;
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Index()" />
+    <govuk-back-link href="@Html.Raw(Model.BackLinkUrl)"
+                     htmx="@Model.BackLinkHtmx"
+                     id="back-link"
+                     hx-swap-oob="true" />
 }
 
 <span class="govuk-caption-m">Tasks overview</span>
@@ -117,6 +119,7 @@ else
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))"
                     use-htmx="true"
+                    hx-include="@Model.SelectedTaskInputsSelector"
                     hx-select="main"
                     hx-target="main"
                     hx-swap="outerHTML"
@@ -127,6 +130,7 @@ else
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.RequestedOn, direction))"
                     use-htmx="true"
+                    hx-include="@Model.SelectedTaskInputsSelector"
                     hx-select="main"
                     hx-target="main"
                     hx-swap="outerHTML"
@@ -137,6 +141,7 @@ else
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.TaskType ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))"
                     use-htmx="true"
+                    hx-include="@Model.SelectedTaskInputsSelector"
                     hx-select="main"
                     hx-target="main"
                     hx-swap="outerHTML"
@@ -147,6 +152,7 @@ else
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Status ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Status, direction))"
                     use-htmx="true"
+                    hx-include="@Model.SelectedTaskInputsSelector"
                     hx-select="main"
                     hx-target="main"
                     hx-swap="outerHTML"
@@ -157,6 +163,7 @@ else
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.AssignedTo ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.AssignedTo, direction))"
                     use-htmx="true"
+                    hx-include="@Model.SelectedTaskInputsSelector"
                     hx-select="main"
                     hx-target="main"
                     hx-swap="outerHTML"
@@ -167,6 +174,7 @@ else
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Source ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Source, direction))"
                     use-htmx="true"
+                    hx-include="@Model.SelectedTaskInputsSelector"
                     hx-select="main"
                     hx-target="main"
                     hx-swap="outerHTML"
@@ -181,6 +189,8 @@ else
         <tbody class="govuk-table__body" data-testid="results">
             @foreach (var result in Model.Results!)
             {
+                var isSelected = Model.IsSelected(result.SupportTaskReference);
+
                 <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                     <td class="govuk-table__cell">
                         <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox trs-select-row">
@@ -191,9 +201,9 @@ else
                                    name="SupportTaskReference"
                                    form="assign-tasks-form"
                                    data-selects-row
-                                   hx-get
-                                   hx-page-handler="SelectionBanner"
-                                   hx-include="[form='assign-tasks-form']"
+                                   checked="@(isSelected ? "checked" : null)"
+                                   hx-get="@Model.SelectionBannerUrl"
+                                   hx-include="@Model.SelectedTaskInputsSelector"
                                    hx-target="#selected-tasks-banner"
                                    hx-swap="innerHTML" />
                             <label for="AssignSupportTask-@(result.SupportTaskReference)" class="govuk-label govuk-checkboxes__label">
@@ -237,8 +247,17 @@ else
     </table>
 }
 
-<form id="assign-tasks-form" action="@LinkGenerator.SupportTasks.Assign()" method="get" asp-antiforgery="false">
+@* htmx snapshots innerHTML for its history cache, and clicking a checkbox sets the property but
+   never the attribute - so a restored snapshot would come back with the selection silently dropped.
+   Opting out of the cache makes back and forward re-request the URL, which does carry it. *@
+<form id="assign-tasks-form" action="@LinkGenerator.SupportTasks.Assign()" method="get" asp-antiforgery="false" hx-history="false">
     <input name="returnUrl" type="hidden" value="@returnUrl">
+    <input name="sortBy" type="hidden" value="@Model.SortBy">
+    <input name="sortDirection" type="hidden" value="@Model.SortDirection">
+    @foreach (var supportTaskReference in Model.SelectedTaskReferencesNotOnPage)
+    {
+        <input type="hidden" name="SupportTaskReference" value="@supportTaskReference">
+    }
     <noscript>
         <govuk-button type="submit">Assign tasks</govuk-button>
     </noscript>
@@ -246,7 +265,9 @@ else
 
 <partial name="_Pagination" model="@Model.Pagination" />
 
-<div id="selected-tasks-banner" aria-live="polite" aria-atomic="true"></div>
+<div id="selected-tasks-banner" aria-live="polite" aria-atomic="true">
+    <partial name="_SelectedActiveSupportTasks" model="@(new Active.SelectionViewModel(Model.SelectedTaskCount, Model.ClearSelectionUrl))" />
+</div>
 
 @section ContainerEnd {
     <div aria-atomic="true" aria-live="polite" role="status" id="status" class="govuk-visually-hidden" hx-swap-oob="innerHTML">

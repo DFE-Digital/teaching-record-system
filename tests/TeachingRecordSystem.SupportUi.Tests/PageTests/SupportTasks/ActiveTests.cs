@@ -518,6 +518,415 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Single(GetResultTaskReferences(doc));
     }
 
+    [Fact]
+    public async Task Get_TaskSelectedOnAnotherPage_IsCarriedOverAsHiddenInput()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/active?pageNumber=2&SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal([selectedReference], GetSelectionCarriedOverFromOtherPages(doc));
+        Assert.DoesNotContain(selectedReference, GetResultTaskReferences(doc));
+    }
+
+    [Fact]
+    public async Task Get_TaskSelectedOnThisPage_IsCheckedAndNotCarriedOverAsHiddenInput()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var selectedTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/active?SupportTaskReference={selectedTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal([selectedTask.SupportTaskReference], GetCheckedTaskReferences(doc));
+        Assert.Empty(GetSelectionCarriedOverFromOtherPages(doc));
+    }
+
+    [Fact]
+    public async Task Get_TasksSelectedOnThisPageAndAnother_ShowsCombinedCountInSelectionBanner()
+    {
+        // Arrange
+        var selectedOnFirstPage = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var secondPageResponse = await HttpClient.GetAsync("/support-tasks/active?pageNumber=2");
+        var selectedOnSecondPage = GetResultTaskReferences(await AssertEx.HtmlResponseAsync(secondPageResponse)).Single();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?pageNumber=2&SupportTaskReference={selectedOnFirstPage}&SupportTaskReference={selectedOnSecondPage}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal("2", doc.GetElementByTestId("selected-task-count")?.TrimmedText());
+    }
+
+    [Fact]
+    public async Task Get_NoTasksSelected_DoesNotShowSelectionBanner()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetElementByTestId("selected-task-count"));
+    }
+
+    [Fact]
+    public async Task Get_SelectedTaskRepeated_IsCountedOnce()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?pageNumber=2&SupportTaskReference={selectedReference}&SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal("1", doc.GetElementByTestId("selected-task-count")?.TrimmedText());
+        Assert.Equal([selectedReference], GetSelectionCarriedOverFromOtherPages(doc));
+    }
+
+    [Fact]
+    public async Task Get_PaginationLinks_RequestTheNewPageWithTheSelectionIncluded()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/active?SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var paginationLinks = doc.QuerySelectorAll(".govuk-pagination a").ToArray();
+        Assert.NotEmpty(paginationLinks);
+
+        foreach (var link in paginationLinks)
+        {
+            var href = link.GetAttribute("href");
+
+            // The previous and next links are boosted; the numbered links request their own href
+            var isBoosted = GetInheritedAttribute(link, "hx-boost") == "true";
+            Assert.True(isBoosted || link.GetAttribute("hx-get") == href, $"'{link.TrimmedText()}' does not make an htmx request");
+
+            // The URL that gets requested carries the selection, and that's what's pushed into
+            // history, so going back to it restores the page with the selection intact
+            Assert.Equal("true", GetInheritedAttribute(link, "hx-push-url"));
+            Assert.Equal("[name=SupportTaskReference]", GetInheritedAttribute(link, "hx-include"));
+            Assert.Equal("main", GetInheritedAttribute(link, "hx-target"));
+            Assert.Equal("main", GetInheritedAttribute(link, "hx-select"));
+            Assert.Equal("outerHTML", GetInheritedAttribute(link, "hx-swap"));
+        }
+    }
+
+    [Fact]
+    public async Task Get_PaginationLinks_DoNotIncludeTheSelection()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/active?SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var paginationLinks = doc.QuerySelectorAll(".govuk-pagination a").ToArray();
+        Assert.NotEmpty(paginationLinks);
+        Assert.All(paginationLinks, link => Assert.DoesNotContain("SupportTaskReference", link.GetAttribute("href")));
+    }
+
+    [Fact]
+    public async Task Get_ReturnUrlsForSelectedTasks_DoNotIncludeTheSelection()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?sortBy=Subject&SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var returnUrl = doc.QuerySelector("#assign-tasks-form input[name='returnUrl']")?.GetAttribute("value");
+        Assert.Equal("/support-tasks/active?sortBy=Subject", returnUrl);
+    }
+
+    [Fact]
+    public async Task GetSelectionBanner_WithSelectedTasks_ShowsDistinctCount()
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/support-tasks/active/SelectionBanner?SupportTaskReference=A&SupportTaskReference=B&SupportTaskReference=A");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal("2", doc.GetElementByTestId("selected-task-count")?.TrimmedText());
+    }
+
+    [Theory]
+    [InlineData(1, "1 task selected")]
+    [InlineData(2, "2 tasks selected")]
+    public async Task GetSelectionBanner_DescribesTheSelectedTasks(int selectedTaskCount, string expectedText)
+    {
+        // Arrange
+        var selection = string.Join(
+            "&",
+            Enumerable.Range(0, selectedTaskCount).Select(i => $"SupportTaskReference=TRS-{i}"));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/active/SelectionBanner?{selection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Contains(expectedText, doc.QuerySelector(".trs-tasks-selection__summary")!.TrimmedText());
+    }
+
+    [Fact]
+    public async Task Get_WithSelectedTasks_ClearSelectionLinkKeepsTheFiltersAndPage()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?sortBy=Subject&pageNumber=2&SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var clearSelectionLink = doc.GetElementByTestId("clear-selection");
+        Assert.NotNull(clearSelectionLink);
+        Assert.Equal("/support-tasks/active?sortBy=Subject&pageNumber=2", clearSelectionLink.GetAttribute("href"));
+        Assert.Equal(clearSelectionLink.GetAttribute("href"), clearSelectionLink.GetAttribute("hx-get"));
+
+        // The link does nothing without JavaScript, so it's hidden without it
+        Assert.Contains("trs-requires-js", clearSelectionLink.ClassName!);
+    }
+
+    [Fact]
+    public async Task GetSelectionBanner_ClearSelectionLinkKeepsTheFiltersAndPage()
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/support-tasks/active/SelectionBanner?sortBy=Subject&pageNumber=2&SupportTaskReference=A");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal("/support-tasks/active?sortBy=Subject&pageNumber=2", doc.GetElementByTestId("clear-selection")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_SelectionBannerRequest_CarriesTheFiltersAndPage()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active?sortBy=Subject");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var checkbox = GetResultRows(doc).Single().QuerySelector("input[type='checkbox']")!;
+        Assert.Equal("/support-tasks/active/SelectionBanner?sortBy=Subject", checkbox.GetAttribute("hx-get"));
+        Assert.Equal("[name=SupportTaskReference]", checkbox.GetAttribute("hx-include"));
+    }
+
+    [Fact]
+    public async Task Get_SortLinks_KeepTheSelection()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var sortButtons = doc.QuerySelectorAll("th[aria-sort] button").ToArray();
+        Assert.NotEmpty(sortButtons);
+
+        foreach (var button in sortButtons)
+        {
+            Assert.Equal("[name=SupportTaskReference]", button.GetAttribute("hx-include"));
+            Assert.Equal("true", button.GetAttribute("hx-push-url"));
+        }
+    }
+
+    [Fact]
+    public async Task Get_AssignForm_CarriesTheSortSoTheAssignPageCanMatchItsOrder()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active?sortBy=Subject&sortDirection=Descending");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal("Subject", doc.QuerySelector("#assign-tasks-form input[name='sortBy']")?.GetAttribute("value"));
+        Assert.Equal("Descending", doc.QuerySelector("#assign-tasks-form input[name='sortDirection']")?.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Get_OptsOutOfTheHtmxHistoryCache()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        // A cached snapshot would come back without the ticked checkboxes, since clicking one never
+        // sets its checked attribute
+        Assert.Equal("false", doc.QuerySelector("#assign-tasks-form")?.GetAttribute("hx-history"));
+    }
+
+    [Fact]
+    public async Task GetSelectionBanner_PutsTheSelectionInTheUrl()
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            "/support-tasks/active/SelectionBanner?sortBy=Subject&pageNumber=2&SupportTaskReference=A&SupportTaskReference=B");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(
+            "/support-tasks/active?sortBy=Subject&pageNumber=2&SupportTaskReference=A&SupportTaskReference=B",
+            response.Headers.GetValues("HX-Replace-Url").Single());
+    }
+
+    [Fact]
+    public async Task Get_FirstPage_BackLinkLeavesTheList()
+    {
+        // Arrange
+        await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var backLink = doc.QuerySelector(".govuk-back-link");
+        Assert.Equal("/", backLink?.GetAttribute("href"));
+        Assert.Null(backLink?.GetAttribute("hx-get"));
+    }
+
+    [Fact]
+    public async Task Get_LaterPage_BackLinkStepsBackAPageAndKeepsTheSelection()
+    {
+        // Arrange
+        var selectedReference = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?sortBy=Subject&pageNumber=2&SupportTaskReference={selectedReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var backLink = doc.QuerySelector(".govuk-back-link");
+        var expectedHref = "/support-tasks/active?sortBy=Subject&sortDirection=Ascending&pageNumber=1";
+
+        Assert.Equal(expectedHref, backLink?.GetAttribute("href"));
+        Assert.Equal(expectedHref, backLink?.GetAttribute("hx-get"));
+        Assert.Equal("[name=SupportTaskReference]", backLink?.GetAttribute("hx-include"));
+        Assert.Equal("main", backLink?.GetAttribute("hx-target"));
+
+        // It sits outside main, so it has to be swapped out of band to stay in step with the page
+        Assert.Equal("true", backLink?.GetAttribute("hx-swap-oob"));
+    }
+
+    // Creates enough tasks to fill two pages and returns the reference of a task on the first page
+    private async Task<string> CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync()
+    {
+        const int pageSize = 20;
+
+        for (var i = 0; i < pageSize + 1; i++)
+        {
+            await TestData.CreateChangeNameRequestSupportTaskAsync();
+        }
+
+        var response = await HttpClient.GetAsync("/support-tasks/active");
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        return GetResultTaskReferences(doc).First();
+    }
+
     private async Task<User> CreateAndSetCurrentUserAsync(string? name = null)
     {
         // The current user from HostFixture isn't in the database once it's been cleared,
@@ -549,5 +958,32 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
     private static string[] GetResultTaskKeys(IHtmlDocument document, SupportTaskLookup tasks) =>
         GetResultTaskReferences(document)
             .Select(tasks.GetKeyFor)
+            .ToArray();
+
+    private static string[] GetSelectionCarriedOverFromOtherPages(IHtmlDocument document) =>
+        document
+            .QuerySelectorAll("#assign-tasks-form input[type='hidden'][name='SupportTaskReference']")
+            .Select(input => input.GetAttribute("value")!)
+            .ToArray();
+
+    // htmx attributes are inherited from ancestor elements
+    private static string? GetInheritedAttribute(IElement element, string name)
+    {
+        for (var current = element; current is not null; current = current.ParentElement)
+        {
+            if (current.GetAttribute(name) is string value)
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private static string[] GetCheckedTaskReferences(IHtmlDocument document) =>
+        GetResultRows(document)
+            .Select(row => row.QuerySelector("input[type='checkbox']")!)
+            .Where(checkbox => checkbox.HasAttribute("checked"))
+            .Select(checkbox => checkbox.GetAttribute("value")!)
             .ToArray();
 }

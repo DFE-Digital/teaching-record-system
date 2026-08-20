@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Services.SupportTasks;
@@ -24,8 +26,19 @@ public class Assign(
             .WithMessage("Select who to assign the tasks to")
     };
 
-    [FromQuery(Name = "SupportTaskReference")]
+    private const string SupportTaskReferenceQueryParameterName = "SupportTaskReference";
+
+    [FromQuery(Name = SupportTaskReferenceQueryParameterName)]
     public string[]? SupportTaskReferences { get; set; }
+
+    // How the list the user picked from was sorted. The selection can span several pages, so the
+    // order the references arrive in isn't the order they were listed in - only re-applying the sort
+    // gets the tasks back into the order the user saw.
+    [FromQuery]
+    public SupportTasksSortByOption? SortBy { get; set; }
+
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
 
     public IReadOnlyCollection<TaskInfo>? Tasks { get; set; }
 
@@ -40,7 +53,13 @@ public class Assign(
     [BindProperty]
     public Guid? AssignToUserId { get; set; }
 
+    // Where the back and cancel links go: the task list the user came from, with their selection
+    // intact. They may have built it up over several pages, so dropping it would mean picking every
+    // task out again.
     public string? BackLink { get; set; }
+
+    // Where to go once the tasks have been assigned: the same list, but with nothing selected.
+    public string? ReturnUrl { get; set; }
 
     public void OnGet()
     {
@@ -75,7 +94,7 @@ public class Assign(
                 : $"{taskCountMessage} assigned to " +
                     $"{(AssignToUserId == CurrentUserId ? "you" : AssignToOptions!.Single(a => a.UserId == AssignToUserId).UserName)}");
 
-        return Redirect(BackLink!);
+        return Redirect(ReturnUrl!);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -90,7 +109,9 @@ public class Assign(
         var tasks = await dbContext.SupportTasks.FromSql(
                 $"select * from support_tasks where support_task_reference = any({SupportTaskReferences}) and deleted_on is null for update")
             .Where(t => t.IsOutstanding)  // Exclude any tasks that may have been Completed since the initial selection
-            .OrderBy(t => t.CreatedOn)
+            .OrderBySupportTasksSortOption(
+                SortBy ?? SupportTasksSortByOption.RequestedOn,
+                SortDirection ?? SupportUi.SortDirection.Ascending)
             .Select(t => new TaskInfo(
                 t.SupportTaskReference,
                 t.CreatedOn,
@@ -102,8 +123,7 @@ public class Assign(
                 t.SourceApplicationUser!.ShortName ?? t.SourceApplicationUser.Name))
             .ToArrayAsync();
 
-        // Re-order so that tasks are in the order they were specified in
-        Tasks = tasks.OrderBy(t => SupportTaskReferences.IndexOf(t.SupportTaskReference)).AsReadOnly();
+        Tasks = tasks.AsReadOnly();
 
         if (Tasks.Count == 0)
         {
@@ -121,7 +141,14 @@ public class Assign(
             .Where(u => u.UserId != CurrentUserId)
             .AsReadOnly();
 
-        BackLink = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.Active());
+        ReturnUrl = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.Active());
+
+        BackLink = QueryHelpers.AddQueryString(
+            ReturnUrl,
+            new Dictionary<string, StringValues>
+            {
+                { SupportTaskReferenceQueryParameterName, Tasks.Select(t => t.SupportTaskReference).ToArray() }
+            });
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

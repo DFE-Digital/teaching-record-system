@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 using TeachingRecordSystem.SupportUi.Services;
@@ -16,6 +18,10 @@ public class Active(
     PageModel
 {
     private const int TasksPerPage = 20;
+
+    // The name shared by the checkbox for every task on this page and by the hidden inputs that
+    // carry the tasks selected on other pages.
+    private const string SelectedTaskInputName = "SupportTaskReference";
 
     [BindProperty(SupportsGet = true)]
     public SupportTaskType? Type { get; set; }
@@ -37,6 +43,10 @@ public class Active(
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
+    // The tasks the user has selected, on this page and on any others they've paged through.
+    [BindProperty(SupportsGet = true, Name = SelectedTaskInputName)]
+    public string[] SelectedTaskReferences { get; set; } = [];
+
     public int? TotalTaskCount { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
@@ -55,6 +65,34 @@ public class Active(
 
     public string? OrderDirectionLabel { get; set; }
 
+    public string SelectedTaskInputsSelector => $"[name={SelectedTaskInputName}]";
+
+    // Selected tasks that aren't shown on this page. These are rendered as hidden inputs so that the
+    // selection survives a change of page and is submitted along with the checkboxes for the tasks
+    // that are shown. Tasks on this page are deliberately excluded - their checkbox is the only
+    // record of whether they're selected, so unticking one deselects it.
+    public IReadOnlyCollection<string> SelectedTaskReferencesNotOnPage { get; set; } = [];
+
+    public string? ReturnUrl { get; set; }
+
+    // Past the first page the back link steps back through the results rather than leaving the list,
+    // keeping the selection with it. On the first page there's nowhere left to step back to.
+    public string? BackLinkUrl { get; set; }
+
+    public HtmxLinkOptions? BackLinkHtmx { get; set; }
+
+    // Where the 'clear selection' link in the selection banner goes: this page, same filters, no
+    // selection. The banner is rendered both with the page and on its own by OnGetSelectionBanner.
+    public string ClearSelectionUrl => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, SortBy, SortDirection, PageNumber);
+
+    public string SelectionBannerUrl => linkGenerator.SupportTasks.ActiveSelectionBanner(Type, AssignedToUserId, Status, SortBy, SortDirection, PageNumber);
+
+    private HashSet<string> SelectedTaskReferenceLookup { get; set; } = [];
+
+    public int SelectedTaskCount => SelectedTaskReferenceLookup.Count;
+
+    public bool IsSelected(string supportTaskReference) => SelectedTaskReferenceLookup.Contains(supportTaskReference);
+
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
@@ -68,9 +106,36 @@ public class Active(
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
 
+        SelectedTaskReferences = SelectedTaskReferences.Distinct().ToArray();
+        SelectedTaskReferenceLookup = SelectedTaskReferences.ToHashSet();
+
+        var referencesOnPage = Results.Select(r => r.SupportTaskReference).ToHashSet();
+        SelectedTaskReferencesNotOnPage = SelectedTaskReferences.Where(r => !referencesOnPage.Contains(r)).AsReadOnly();
+
+        ReturnUrl = GetReturnUrl();
+
+        var htmxLinkOptions = new HtmxLinkOptions
+        {
+            Select = "main",
+            Target = "main",
+            Swap = "outerHTML",
+            Include = SelectedTaskInputsSelector
+        };
+
         Pagination = PaginationViewModel.Create(
             Results,
-            pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
+            pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber),
+            htmxLinkOptions);
+
+        if (Results.CurrentPage > 1)
+        {
+            BackLinkUrl = linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, Results.CurrentPage - 1);
+            BackLinkHtmx = htmxLinkOptions;
+        }
+        else
+        {
+            BackLinkUrl = linkGenerator.Index();
+        }
 
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
@@ -97,6 +162,28 @@ public class Active(
         OrderDirectionLabel = sortDirection is SupportUi.SortDirection.Ascending ? "ascending" : "descending";
     }
 
-    public IActionResult OnGetSelectionBanner([FromQuery(Name = "SupportTaskReference")] string[] supportTaskReferences) =>
-        Partial("_SelectedActiveSupportTasks", supportTaskReferences.Length);
+    public IActionResult OnGetSelectionBanner([FromQuery(Name = SelectedTaskInputName)] string[] supportTaskReferences)
+    {
+        var selectedTaskReferences = supportTaskReferences.Distinct().ToArray();
+
+        // Keep the address bar in step with the selection. Ticking a checkbox doesn't otherwise touch
+        // the URL, and the URL is what the page gets rebuilt from when the user navigates back to it.
+        Response.Headers["HX-Replace-Url"] = QueryHelpers.AddQueryString(
+            ClearSelectionUrl,
+            new Dictionary<string, StringValues> { { SelectedTaskInputName, selectedTaskReferences } });
+
+        return Partial("_SelectedActiveSupportTasks", new SelectionViewModel(selectedTaskReferences.Length, ClearSelectionUrl));
+    }
+
+    // Links away from this page come back to it via a return URL. The selected task references are
+    // in the query string when the user has paged through the results; they'd be repeated in every
+    // link on the page (and can get long enough to break them), so leave them out.
+    private string GetReturnUrl()
+    {
+        var query = QueryHelpers.ParseQuery(Request.QueryString.Value);
+        query.Remove(SelectedTaskInputName);
+        return QueryHelpers.AddQueryString(Request.Path, query);
+    }
+
+    public record SelectionViewModel(int SelectedTaskCount, string ClearSelectionUrl);
 }

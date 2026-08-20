@@ -574,11 +574,18 @@
 
     &__actions {
       float: right;
+      display: flex;
+      align-items: center;
+      gap: govuk-spacing(4);
 
         .govuk-button {
           margin-bottom: 0;
           font-size: 1rem;
         }
+    }
+
+    &__clear {
+      font-size: 1rem;
     }
 }
 
@@ -627,4 +634,8 @@ body:not(.js-enabled) .trs-requires-js {
   > * {
     margin: 0;
   }
+}
+
+.trs-tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
