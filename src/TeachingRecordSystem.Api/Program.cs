@@ -1,9 +1,7 @@
-using Dfe.Analytics.EFCore;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Api.Endpoints;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 
@@ -57,8 +55,6 @@ public class Program
         }
 
         app.MapWebhookJwks();
-
-        app.MapDfeAnalyticsDbConfiguration<TrsDbContext>();
 
         app.MapControllers();
 
