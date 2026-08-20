@@ -14,7 +14,10 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.HasQueryFilter(p => p.Status == PersonStatus.Active);
         builder.Property(p => p.PersonId).ConfigureAnalyticsSync(included: true, hidden: true);
         builder.HasIndex(p => p.DqtContactId).HasFilter("dqt_contact_id is not null").IsUnique();
-        builder.Property(p => p.DqtContactId);
+        builder.Property(p => p.CreatedOn).ConfigureAnalyticsSync(included: true, hidden: false);
+        builder.Property(p => p.UpdatedOn).ConfigureAnalyticsSync(included: true, hidden: false);
+        builder.Property(p => p.DeletedOn).ConfigureAnalyticsSync(included: true, hidden: false);
+        builder.Property(p => p.Status).ConfigureAnalyticsSync(included: true, hidden: false);
         builder.HasIndex(p => p.MergedWithPersonId).HasFilter("merged_with_person_id is not null");
         builder.Property(p => p.MergedWithPersonId).ConfigureAnalyticsSync(included: true, hidden: false);
         builder.HasIndex(p => p.Trn).HasFilter("trn is not null").IsUnique();
@@ -35,6 +38,8 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.Property(p => p.LastName)
             .HasMaxLength(Person.LastNameMaxLength)
             .UseCollation(Collations.CaseInsensitive)
+            .ConfigureAnalyticsSync(included: true, policyTag: PolicyTagNames.SensitiveHidden);
+        builder.Property(p => p.DateOfBirth)
             .ConfigureAnalyticsSync(included: true, policyTag: PolicyTagNames.SensitiveHidden);
         builder.Property(p => p.EmailAddress)
             .HasMaxLength(Person.EmailAddressMaxLength)
