@@ -38,7 +38,7 @@ public class TestScopedServices
             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
             .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
         TrnRequestOptions = new TrnRequestOptions();
-        SupportTaskAssignmentOptions = new SupportTaskAssignmentOptions();
+        SupportTaskAssignmentOptions = new SupportTaskAssignmentOptions { IncludeAdministrators = true };
         BackgroundJobScheduler = new(serviceProvider);
         CurrentUserProvider = new();
     }
