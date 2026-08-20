@@ -165,6 +165,35 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task SelectAllPicksUpEveryTaskOnThePageWithoutDisturbingTheOthers()
+    {
+        await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GotoAsync(createdTasks.ActiveTasksUrl);
+
+        await page.ToggleSelectAllAsync();
+        await page.AssertSelectedTaskCountAsync(TasksPerPage);
+        Assert.Equal(TasksPerPage, await page.Locator("[data-testid='results'] input[type=checkbox]:checked").CountAsync());
+
+        await page.ClickAsync(".govuk-pagination__next a");
+        await page.WaitForURLAsync(url => url.Contains("pageNumber=2"));
+
+        // The first page's tasks are still selected, and the one on this page isn't
+        await page.AssertSelectedTaskCountAsync(TasksPerPage);
+        Assert.False(await page.Locator("#select-all-tasks").IsCheckedAsync());
+
+        await page.ToggleSelectAllAsync();
+        await page.AssertSelectedTaskCountAsync(TasksPerPage + 1);
+
+        // Deselecting drops only the tasks on this page
+        await page.ToggleSelectAllAsync();
+        await page.AssertSelectedTaskCountAsync(TasksPerPage);
+    }
+
+    [Fact]
     public async Task SortingKeepsTheSelection()
     {
         await using var createdTasks = await CreateSupportTasksAsync(TasksPerPage + 1);

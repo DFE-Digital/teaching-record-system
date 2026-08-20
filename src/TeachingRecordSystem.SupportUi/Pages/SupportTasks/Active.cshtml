@@ -118,10 +118,27 @@
 }
 else
 {
-    <table class="govuk-table trs-table-layout-fixed" sortable data-module="moj-multi-select" data-id-prefix="AssignSupportTask-">
+    <table class="govuk-table trs-table-layout-fixed" sortable>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header trs-!-width-35"></th>
+                <th scope="col" class="govuk-table__header trs-!-width-35">
+                    <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox trs-select-row trs-requires-js">
+                        <input type="checkbox"
+                               class="govuk-checkboxes__input"
+                               id="select-all-tasks"
+                               data-testid="select-all-tasks"
+                               checked="@(Model.AllTasksOnPageSelected ? "checked" : null)"
+                               hx-get="@(Model.AllTasksOnPageSelected ? Model.ClearSelectionUrl : Model.SelectAllUrl)"
+                               hx-include="@(Model.AllTasksOnPageSelected ? Model.OffPageSelectedTaskInputsSelector : Model.SelectedTaskInputsSelector)"
+                               hx-select="main"
+                               hx-target="main"
+                               hx-swap="outerHTML"
+                               hx-push-url="true" />
+                        <label for="select-all-tasks" class="govuk-label govuk-checkboxes__label">
+                            <span class="govuk-visually-hidden">Select all tasks on this page</span>
+                        </label>
+                    </div>
+                </th>
                 <th scope="col" class="govuk-table__header"
                     sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
                     link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))"

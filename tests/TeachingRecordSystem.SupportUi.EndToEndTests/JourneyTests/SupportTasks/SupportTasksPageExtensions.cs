@@ -28,6 +28,10 @@ public static class SupportTasksPageExtensions
         return supportTaskReference!;
     }
 
+    // The checkbox itself sits underneath its label, which is stretched across the cell
+    public static Task ToggleSelectAllAsync(this IPage page) =>
+        page.ClickAsync("label[for='select-all-tasks']");
+
     public static Task AssertSelectedTaskCountAsync(this IPage page, int count) =>
         page.Locator($"[data-testid='selected-task-count']{TestBase.TextIsSelector(count.ToString())}").WaitForAsync();
 

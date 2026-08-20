@@ -68,6 +68,17 @@ public class Active(
 
     public string SelectedTaskInputsSelector => $"[name={SelectedTaskInputName}]";
 
+    // Just the tasks selected on other pages - the hidden inputs, not the checkboxes on this one.
+    // Deselecting everything on this page means sending the selection up without them.
+    public string OffPageSelectedTaskInputsSelector =>
+        $"#assign-tasks-form input[type=hidden][name={SelectedTaskInputName}]";
+
+    public bool AllTasksOnPageSelected { get; set; }
+
+    // This page's URL with every task on it added to the selection. Combined with the selection
+    // already in the DOM it gives 'everything that was selected, plus this page'.
+    public string? SelectAllUrl { get; set; }
+
     // Selected tasks that aren't shown on this page. These are rendered as hidden inputs so that the
     // selection survives a change of page and is submitted along with the checkboxes for the tasks
     // that are shown. Tasks on this page are deliberately excluded - their checkbox is the only
@@ -119,6 +130,15 @@ public class Active(
         SelectedTaskReferencesNotOnPage = SelectedTaskReferences.Where(r => !referencesOnPage.Contains(r)).AsReadOnly();
 
         ReturnUrl = GetReturnUrl();
+
+        AllTasksOnPageSelected = Results.Count > 0 && referencesOnPage.All(SelectedTaskReferenceLookup.Contains);
+
+        SelectAllUrl = QueryHelpers.AddQueryString(
+            ClearSelectionUrl,
+            new Dictionary<string, StringValues>
+            {
+                { SelectedTaskInputName, Results.Select(r => r.SupportTaskReference).ToArray() }
+            });
 
         Pagination = PaginationViewModel.Create(
             Results,

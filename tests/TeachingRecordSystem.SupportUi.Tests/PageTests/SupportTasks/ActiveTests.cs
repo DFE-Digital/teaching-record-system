@@ -929,6 +929,83 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.QuerySelector(".govuk-back-link"));
     }
 
+    [Fact]
+    public async Task Get_NotAllTasksOnPageSelected_SelectAllAddsThemToTheSelection()
+    {
+        // Arrange
+        var selectedTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var unselectedTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?SupportTaskReference={selectedTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var selectAll = doc.GetElementByTestId("select-all-tasks");
+        Assert.NotNull(selectAll);
+        Assert.False(selectAll.HasAttribute("checked"));
+
+        var url = selectAll.GetAttribute("hx-get")!;
+        Assert.Contains($"SupportTaskReference={selectedTask.SupportTaskReference}", url);
+        Assert.Contains($"SupportTaskReference={unselectedTask.SupportTaskReference}", url);
+
+        // Sent along with whatever is already selected, so it adds to the selection rather than
+        // replacing it
+        Assert.Equal("[name=SupportTaskReference]", selectAll.GetAttribute("hx-include"));
+    }
+
+    [Fact]
+    public async Task Get_AllTasksOnPageSelected_SelectAllRemovesThemFromTheSelection()
+    {
+        // Arrange
+        var firstTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var secondTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/active?SupportTaskReference={firstTask.SupportTaskReference}&SupportTaskReference={secondTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var selectAll = doc.GetElementByTestId("select-all-tasks");
+        Assert.NotNull(selectAll);
+        Assert.True(selectAll.HasAttribute("checked"));
+
+        // Back to this page with nothing on it selected, sending up only the tasks selected on other
+        // pages so those survive
+        Assert.Equal("/support-tasks/active", selectAll.GetAttribute("hx-get"));
+        Assert.Equal(
+            "#assign-tasks-form input[type=hidden][name=SupportTaskReference]",
+            selectAll.GetAttribute("hx-include"));
+    }
+
+    [Fact]
+    public async Task Get_SelectAll_IsHiddenWithoutJavaScript()
+    {
+        // Arrange
+        await TestData.CreateChangeNameRequestSupportTaskAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/active");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        // It only does anything through htmx, unlike the checkbox on each row
+        Assert.Contains("trs-requires-js", doc.GetElementByTestId("select-all-tasks")!.ParentElement!.ClassName!);
+    }
+
     // Creates enough tasks to fill two pages and returns the reference of a task on the first page
     private async Task<string> CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync()
     {
