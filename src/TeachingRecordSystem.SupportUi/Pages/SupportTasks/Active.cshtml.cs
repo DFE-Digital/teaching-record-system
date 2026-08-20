@@ -80,7 +80,7 @@ public class Active(
     // keeping the selection with it. On the first page there's nowhere left to step back to.
     public string? BackLinkUrl { get; set; }
 
-    public HtmxLinkOptions? BackLinkHtmx { get; set; }
+    public bool BackLinkUsesHtmx { get; set; }
 
     // Where the 'clear selection' link in the selection banner goes: this page, same filters, no
     // selection. The banner is rendered both with the page and on its own by OnGetSelectionBanner.
@@ -115,28 +115,15 @@ public class Active(
 
         ReturnUrl = GetReturnUrl();
 
-        var htmxLinkOptions = new HtmxLinkOptions
-        {
-            Select = "main",
-            Target = "main",
-            Swap = "outerHTML",
-            Include = SelectedTaskInputsSelector
-        };
-
         Pagination = PaginationViewModel.Create(
             Results,
-            pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber),
-            htmxLinkOptions);
+            pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
 
-        if (Results.CurrentPage > 1)
-        {
-            BackLinkUrl = linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, Results.CurrentPage - 1);
-            BackLinkHtmx = htmxLinkOptions;
-        }
-        else
-        {
-            BackLinkUrl = linkGenerator.Index();
-        }
+        BackLinkUsesHtmx = Results.CurrentPage > 1;
+
+        BackLinkUrl = BackLinkUsesHtmx
+            ? linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, Results.CurrentPage - 1)
+            : linkGenerator.Index();
 
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,

@@ -9,9 +9,14 @@
 
 @section BeforeContent {
     <govuk-back-link href="@Html.Raw(Model.BackLinkUrl)"
-                     htmx="@Model.BackLinkHtmx"
                      id="back-link"
-                     hx-swap-oob="true" />
+                     hx-swap-oob="true"
+                     hx-boost="@(Model.BackLinkUsesHtmx ? "true" : "false")"
+                     hx-select="main"
+                     hx-target="main"
+                     hx-swap="outerHTML"
+                     hx-include="@Model.SelectedTaskInputsSelector"
+                     hx-push-url="true" />
 }
 
 <span class="govuk-caption-m">Tasks overview</span>
@@ -263,7 +268,16 @@ else
     </noscript>
 </form>
 
-<partial name="_Pagination" model="@Model.Pagination" />
+@* Boosting the pagination links swaps the results in place, and hx-include sends the selection up
+   with the request so that changing page keeps it. *@
+<div hx-boost="true"
+     hx-select="main"
+     hx-target="main"
+     hx-swap="outerHTML"
+     hx-include="@Model.SelectedTaskInputsSelector"
+     hx-push-url="true">
+    <partial name="_Pagination" model="@Model.Pagination" />
+</div>
 
 <div id="selected-tasks-banner" aria-live="polite" aria-atomic="true">
     <partial name="_SelectedActiveSupportTasks" model="@(new Active.SelectionViewModel(Model.SelectedTaskCount, Model.ClearSelectionUrl))" />

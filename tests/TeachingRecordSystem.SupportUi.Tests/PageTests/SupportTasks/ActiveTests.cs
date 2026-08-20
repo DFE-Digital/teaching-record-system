@@ -633,11 +633,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         foreach (var link in paginationLinks)
         {
-            var href = link.GetAttribute("href");
-
-            // The previous and next links are boosted; the numbered links request their own href
-            var isBoosted = GetInheritedAttribute(link, "hx-boost") == "true";
-            Assert.True(isBoosted || link.GetAttribute("hx-get") == href, $"'{link.TrimmedText()}' does not make an htmx request");
+            Assert.Equal("true", GetInheritedAttribute(link, "hx-boost"));
 
             // The URL that gets requested carries the selection, and that's what's pushed into
             // history, so going back to it restores the page with the selection intact
@@ -881,7 +877,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var backLink = doc.QuerySelector(".govuk-back-link");
         Assert.Equal("/", backLink?.GetAttribute("href"));
-        Assert.Null(backLink?.GetAttribute("hx-get"));
+        Assert.Equal("false", backLink?.GetAttribute("hx-boost"));
     }
 
     [Fact]
@@ -904,7 +900,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedHref = "/support-tasks/active?sortBy=Subject&sortDirection=Ascending&pageNumber=1";
 
         Assert.Equal(expectedHref, backLink?.GetAttribute("href"));
-        Assert.Equal(expectedHref, backLink?.GetAttribute("hx-get"));
+        Assert.Equal("true", backLink?.GetAttribute("hx-boost"));
         Assert.Equal("[name=SupportTaskReference]", backLink?.GetAttribute("hx-include"));
         Assert.Equal("main", backLink?.GetAttribute("hx-target"));
 
