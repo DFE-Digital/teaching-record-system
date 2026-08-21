@@ -287,18 +287,24 @@ public class TpsEstablishmentRefresherTests(ServiceFixture fixture) : ServiceTes
         await refresher.RefreshEstablishmentsAsync(CancellationToken.None);
 
         // Assert
-        var nonGiasEstablishments = await dbContext.Establishments
-            .Where(e => e.EstablishmentSourceId == 2)
-            .ToListAsync();
+        // The database is seeded with non-GIAS establishments of its own, so look at the one for this scenario's local
+        // authority and establishment code rather than at every non-GIAS establishment there is
+        var scenarioTpsEstablishment = scenarioData.TpsEstablishments[0];
+
+        var nonGiasEstablishment = await dbContext.Establishments.SingleOrDefaultAsync(e =>
+            e.EstablishmentSourceId == 2 &&
+            e.LaCode == scenarioTpsEstablishment.LaCode &&
+            e.EstablishmentNumber == scenarioTpsEstablishment.EstablishmentCode);
+
         if (scenarioData.IsExpectedToGenerateEstablishment)
         {
-            var establishment = Assert.Single(nonGiasEstablishments);
-            Assert.Equal(scenarioData.ExpectedLaName, establishment.LaName);
-            Assert.Equal(scenarioData.ExpectedEstablishmentName, establishment.EstablishmentName);
+            Assert.NotNull(nonGiasEstablishment);
+            Assert.Equal(scenarioData.ExpectedLaName, nonGiasEstablishment.LaName);
+            Assert.Equal(scenarioData.ExpectedEstablishmentName, nonGiasEstablishment.EstablishmentName);
         }
         else
         {
-            Assert.Empty(nonGiasEstablishments);
+            Assert.Null(nonGiasEstablishment);
         }
     }
 }
