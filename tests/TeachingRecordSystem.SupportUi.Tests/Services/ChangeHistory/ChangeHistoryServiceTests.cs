@@ -227,7 +227,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
     [InlineData(false, null, false)]
     [InlineData(true, UserRoles.Viewer, false)]
     [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
-    public async Task GetChangeHistoryByPersonAsync_FiltersAlertEventsByAlertTypeReadPermission(bool isDbsAlertType, string? role, bool shouldInclude)
+    public async Task GetChangeHistoryByPersonAsync_FiltersDqtAlertProcessesByAlertTypeReadPermission(bool isDbsAlertType, string? role, bool shouldInclude)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -235,7 +235,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
             ? await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(AlertType.DbsAlertTypeId)
             : (await TestData.ReferenceDataCache.GetAlertTypesAsync()).First(t => !t.IsDbsAlertType);
 
-        await CreateAlertImportedEventAsync(person.PersonId, alertType.AlertTypeId);
+        await CreateAlertImportingIntoDqtProcessAsync(person.PersonId, alertType.AlertTypeId);
 
         var principal = await CreatePrincipalAsync(role);
 
@@ -246,7 +246,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         if (shouldInclude)
         {
             var item = Assert.Single(result);
-            Assert.Equal(TimelineItemType.LegacyEvent, item.ItemType);
+            Assert.Equal(TimelineItemType.Process, item.ItemType);
         }
         else
         {
@@ -453,14 +453,14 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
             await dbContext.SaveChangesAsync();
         });
 
-    private Task CreateAlertImportedEventAsync(Guid personId, Guid alertTypeId) =>
-        WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(new LegacyEvents.AlertDqtImportedEvent
+    private Task<Process> CreateAlertImportingIntoDqtProcessAsync(Guid personId, Guid alertTypeId) =>
+        TestData.CreateProcessAsync(
+            ProcessType.AlertImportingIntoDqt,
+            userId: null,
+            changeReason: null,
+            new AlertDqtImportedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = SystemUser.SystemUserId,
                 PersonId = personId,
                 Alert = new EventModels.Alert
                 {
@@ -473,8 +473,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
                 },
                 DqtState = 0
             });
-            await dbContext.SaveChangesAsync();
-        });
 
     private Task<Process> CreateAlertCreatingProcessAsync(Guid personId, Guid alertTypeId, Guid userId) =>
         TestData.CreateProcessAsync(

@@ -68,5 +68,9 @@ public enum ProcessType
     TeacherPensionsSupportTaskSaving = 66,
     WebhookEndpointCreating = 67,
     WebhookEndpointUpdating = 68,
-    WebhookEndpointDeleting = 69
+    WebhookEndpointDeleting = 69,
+    AlertDeactivatingInDqt = 70,
+    AlertImportingIntoDqt = 71,
+    AlertReactivatingInDqt = 72,
+    AlertMigratingFromDqt = 73
 }

@@ -1,0 +1,52 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var deactivatedEvent = Model.GetEvent<AlertDqtDeactivatedEvent>();
+    var alert = deactivatedEvent.Alert;
+}
+
+<timeline-entry title="Alert deactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-details class="govuk-!-margin-bottom-2">
+        <govuk-details-summary>Deactivated data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>DQT sanction code</key>
+                    <value use-empty-fallback>@alert.DqtSanctionCode?.Value</value>
+                </row>
+                <row>
+                    <key>DQT sanction name</key>
+                    <value use-empty-fallback>@alert.DqtSanctionCode?.Name</value>
+                </row>
+                <row>
+                    <key>Start date</key>
+                    <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Details</key>
+                    <value use-empty-fallback>@alert.Details</value>
+                </row>
+                <row>
+                    <key>External link</key>
+                    <value>
+                    @if (alert.ExternalLink is not null)
+                    {
+                        <a href="@alert.ExternalLink" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{alert.ExternalLink} (opens in new tab)")</a>
+                    }
+                    else
+                    {
+                        <span use-empty-fallback></span>
+                    }
+                    </value>
+                </row>
+                <row>
+                    <key>End date</key>
+                    <value use-empty-fallback>@alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>DQT spent</key>
+                    <value use-empty-fallback>@alert.DqtSpent</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>
