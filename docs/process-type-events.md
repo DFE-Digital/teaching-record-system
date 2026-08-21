@@ -575,3 +575,51 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `AlertMigratedEvent` | Always | — |
+
+### `InductionCreatingInDqt` (74)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInductionCreatedEvent` | Always | — |
+
+### `InductionUpdatingInDqt` (75)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInductionUpdatedEvent` | Always | — |
+
+### `InductionImportingIntoDqt` (76)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInductionImportedEvent` | Always | — |
+
+### `InductionDeactivatingInDqt` (77)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInductionDeactivatedEvent` | Always | — |
+
+### `InductionReactivatingInDqt` (78)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInductionReactivatedEvent` | Always | — |
+
+### `PersonInductionStatusChangingInDqt` (79)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtContactInductionStatusChangedEvent` | Always | — |
+
+### `InitialTeacherTrainingCreatingInDqt` (80)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInitialTeacherTrainingCreatedEvent` | Always | — |
+
+### `InitialTeacherTrainingUpdatingInDqt` (81)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInitialTeacherTrainingUpdatedEvent` | Always | — |

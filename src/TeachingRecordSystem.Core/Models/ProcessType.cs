@@ -72,5 +72,13 @@ public enum ProcessType
     AlertDeactivatingInDqt = 70,
     AlertImportingIntoDqt = 71,
     AlertReactivatingInDqt = 72,
-    AlertMigratingFromDqt = 73
+    AlertMigratingFromDqt = 73,
+    InductionCreatingInDqt = 74,
+    InductionUpdatingInDqt = 75,
+    InductionImportingIntoDqt = 76,
+    InductionDeactivatingInDqt = 77,
+    InductionReactivatingInDqt = 78,
+    PersonInductionStatusChangingInDqt = 79,
+    InitialTeacherTrainingCreatingInDqt = 80,
+    InitialTeacherTrainingUpdatingInDqt = 81
 }

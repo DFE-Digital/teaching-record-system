@@ -1,0 +1,39 @@
+@using Optional.Unsafe
+@model ChangeHistoryEntryViewModel
+@{
+    var createdEvent = Model.GetEvent<DqtInductionCreatedEvent>();
+    var induction = createdEvent.Induction;
+}
+
+<timeline-entry title="Induction created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        @if (induction.InductionStatus.HasValue)
+        {
+            <row>
+                <key>Induction status</key>
+                <value>@induction.InductionStatus.ValueOrDefault()</value>
+            </row>
+        }
+        @if (induction.InductionExemptionReason.HasValue)
+        {
+            <row>
+                <key>Exemption reason</key>
+                <value>@induction.InductionExemptionReason.ValueOrDefault()</value>
+            </row>
+        }
+        @if (induction.StartDate.HasValue)
+        {
+            <row>
+                <key>Started on</key>
+                <value>@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+        @if (induction.CompletionDate.HasValue)
+        {
+            <row>
+                <key>Completed on</key>
+                <value>@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+    </govuk-summary-list>
+</timeline-entry>

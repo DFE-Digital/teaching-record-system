@@ -1,0 +1,27 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<DqtInitialTeacherTrainingUpdatedEvent>();
+    var itt = updatedEvent.InitialTeacherTraining;
+    var oldItt = updatedEvent.OldInitialTeacherTraining;
+}
+
+<timeline-entry title="DQT initial teacher training updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        <row>
+            <key>Result</key>
+            <value use-empty-fallback>@itt?.Result</value>
+        </row>
+    </govuk-summary-list>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+        <govuk-details-summary>Previous data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Result</key>
+                    <value use-empty-fallback>@oldItt?.Result</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>
