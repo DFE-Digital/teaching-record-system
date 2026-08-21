@@ -65,5 +65,8 @@ public enum ProcessType
     SupportTasksAssigning = 63,
     SupportTaskZendeskUrlsUpdating = 64,
     TrnRequestSupportTaskSaving = 65,
-    TeacherPensionsSupportTaskSaving = 66
+    TeacherPensionsSupportTaskSaving = 66,
+    WebhookEndpointCreating = 67,
+    WebhookEndpointUpdating = 68,
+    WebhookEndpointDeleting = 69
 }

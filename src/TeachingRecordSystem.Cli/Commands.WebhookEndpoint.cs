@@ -1,10 +1,11 @@
 using System.CommandLine.Parsing;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Transactions;
+using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -47,6 +48,15 @@ public partial class Commands
 
         static string NormalizeApiVersion(string version) => version.StartsWith('V') ? version[1..] : version;
 
+        static ServiceProvider CreateServices(string connectionString) =>
+            new ServiceCollection()
+                .AddTimeProvider()
+                .AddDatabase(connectionString)
+                .AddMemoryCache()
+                .AddWebhookMessageFactory()
+                .AddEventPublisher()
+                .BuildServiceProvider();
+
         Command CreateCreateCommand()
         {
             var userIdOption = new Option<Guid>("--user-id") { Required = true };
@@ -84,10 +94,18 @@ public partial class Commands
                     var enabled = parseResult.GetValue(enabledOption);
                     var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
-                    await using var dbContext = TrsDbContext.Create(connectionString);
+                    await using var services = CreateServices(connectionString);
+
+                    using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+                    using var scope = services.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+                    var eventPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
+                    var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
+
+                    var now = timeProvider.UtcNow;
 
                     var webhookEndpointId = Guid.NewGuid();
-                    var now = DateTime.UtcNow;
 
                     var endpoint = new WebhookEndpoint()
                     {
@@ -102,22 +120,25 @@ public partial class Commands
                     };
 
                     dbContext.WebhookEndpoints.Add(endpoint);
-
-                    dbContext.AddEventWithoutBroadcast(new WebhookEndpointCreatedEvent
-                    {
-                        WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint),
-                        EventId = Guid.NewGuid(),
-                        CreatedUtc = now,
-                        RaisedBy = SystemUser.SystemUserId
-                    });
-
                     await dbContext.SaveChangesAsync();
+
+                    var processContext = new ProcessContext(ProcessType.WebhookEndpointCreating, now, SystemUser.SystemUserId);
+
+                    await eventPublisher.PublishSingleEventAsync(
+                        new WebhookEndpointCreatedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint)
+                        },
+                        processContext);
 
                     var printableEndpoint = await dbContext.WebhookEndpoints
                         .Where(e => e.WebhookEndpointId == webhookEndpointId)
                         .OrderBy(e => e.CreatedOn)
                         .Select(getEndpointOutputForDisplay)
                         .SingleAsync();
+
+                    transaction.Complete();
 
                     var output = JsonSerializer.Serialize(printableEndpoint, jsonSerializerOptions);
                     Console.WriteLine(output);
@@ -149,23 +170,34 @@ public partial class Commands
                     var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
                     var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
-                    await using var dbContext = TrsDbContext.Create(connectionString);
+                    await using var services = CreateServices(connectionString);
+
+                    using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+                    using var scope = services.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+                    var eventPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
+                    var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
+
+                    var now = timeProvider.UtcNow;
 
                     var endpoint = await dbContext.WebhookEndpoints
                         .SingleAsync(e => e.WebhookEndpointId == webhookEndpointId);
 
-                    var now = DateTime.UtcNow;
                     endpoint.DeletedOn = now;
-
-                    dbContext.AddEventWithoutBroadcast(new WebhookEndpointDeletedEvent
-                    {
-                        WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint),
-                        EventId = Guid.NewGuid(),
-                        CreatedUtc = now,
-                        RaisedBy = SystemUser.SystemUserId
-                    });
-
                     await dbContext.SaveChangesAsync();
+
+                    var processContext = new ProcessContext(ProcessType.WebhookEndpointDeleting, now, SystemUser.SystemUserId);
+
+                    await eventPublisher.PublishSingleEventAsync(
+                        new WebhookEndpointDeletedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint)
+                        },
+                        processContext);
+
+                    transaction.Complete();
                 });
 
             return command;
@@ -277,57 +309,67 @@ public partial class Commands
                     var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
                     var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
-                    await using var dbContext = TrsDbContext.Create(connectionString);
+                    await using var services = CreateServices(connectionString);
+
+                    using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+
+                    using var scope = services.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+                    var eventPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
+                    var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
 
                     var endpoint = await dbContext.WebhookEndpoints
                         .Include(e => e.ApplicationUser)
                         .SingleAsync(e => e.WebhookEndpointId == webhookEndpointId);
 
-                    var changes = WebhookEndpointUpdatedChanges.None;
+                    var changes = WebhookEndpointUpdatedEventChanges.None;
 
                     if (parseResult.GetValue(addressOption) is { } address)
                     {
                         endpoint.Address = address;
-                        changes |= WebhookEndpointUpdatedChanges.Address;
+                        changes |= WebhookEndpointUpdatedEventChanges.Address;
                     }
 
                     if (parseResult.GetResult(cloudEventTypesOption)?.Implicit is false &&
                         parseResult.GetValue(cloudEventTypesOption) is { } cloudEventTypes)
                     {
                         endpoint.CloudEventTypes = cloudEventTypes.Order().ToList();
-                        changes |= WebhookEndpointUpdatedChanges.CloudEventTypes;
+                        changes |= WebhookEndpointUpdatedEventChanges.CloudEventTypes;
                     }
 
                     if (parseResult.GetValue(apiVersionOption) is { } apiVersion)
                     {
                         endpoint.ApiVersion = apiVersion;
-                        changes |= WebhookEndpointUpdatedChanges.ApiVersion;
+                        changes |= WebhookEndpointUpdatedEventChanges.ApiVersion;
                     }
 
                     if (parseResult.GetValue(enabledOption) is { } enabled)
                     {
                         endpoint.Enabled = enabled;
-                        changes |= WebhookEndpointUpdatedChanges.Enabled;
+                        changes |= WebhookEndpointUpdatedEventChanges.Enabled;
                     }
 
-                    if (changes != WebhookEndpointUpdatedChanges.None)
+                    if (changes != WebhookEndpointUpdatedEventChanges.None)
                     {
-                        var now = DateTime.UtcNow;
+                        var now = timeProvider.UtcNow;
                         endpoint.UpdatedOn = now;
-
-                        dbContext.AddEventWithoutBroadcast(new WebhookEndpointUpdatedEvent
-                        {
-                            EventId = Guid.NewGuid(),
-                            CreatedUtc = now,
-                            RaisedBy = SystemUser.SystemUserId,
-                            WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint),
-                            Changes = changes
-                        });
-
                         await dbContext.SaveChangesAsync();
+
+                        var processContext = new ProcessContext(ProcessType.WebhookEndpointUpdating, now, SystemUser.SystemUserId);
+
+                        await eventPublisher.PublishSingleEventAsync(
+                            new WebhookEndpointUpdatedEvent
+                            {
+                                EventId = Guid.NewGuid(),
+                                WebhookEndpoint = EventModels.WebhookEndpoint.FromModel(endpoint),
+                                Changes = changes
+                            },
+                            processContext);
                     }
 
                     var printableEndpoint = new[] { endpoint }.AsQueryable().Select(getEndpointOutputForDisplay).Single();
+
+                    transaction.Complete();
 
                     var output = JsonSerializer.Serialize(printableEndpoint, jsonSerializerOptions);
                     Console.WriteLine(output);
