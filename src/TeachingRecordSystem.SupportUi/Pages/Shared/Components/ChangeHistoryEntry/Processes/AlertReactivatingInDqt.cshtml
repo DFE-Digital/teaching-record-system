@@ -1,0 +1,22 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var reactivatedEvent = Model.GetEvent<AlertDqtReactivatedEvent>();
+    var alert = reactivatedEvent.Alert;
+}
+
+<timeline-entry title="Alert reactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        <row>
+            <key>DQT sanction code</key>
+            <value use-empty-fallback>@alert.DqtSanctionCode?.Value</value>
+        </row>
+        <row>
+            <key>DQT sanction name</key>
+            <value use-empty-fallback>@alert.DqtSanctionCode?.Name</value>
+        </row>
+        <row>
+            <key>Start date</key>
+            <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    </govuk-summary-list>
+</timeline-entry>

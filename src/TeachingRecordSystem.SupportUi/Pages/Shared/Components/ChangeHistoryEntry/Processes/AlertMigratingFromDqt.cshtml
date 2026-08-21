@@ -1,0 +1,41 @@
+@inject ReferenceDataCache ReferenceDataCache
+@model ChangeHistoryEntryViewModel
+@{
+    var migratedEvent = Model.GetEvent<AlertMigratedEvent>();
+    var alert = migratedEvent.Alert;
+    var oldAlert = migratedEvent.OldAlert;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
+}
+
+<timeline-entry title="Alert migrated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        <row>
+            <key>Alert type</key>
+            <value use-empty-fallback>@alertType?.Name</value>
+        </row>
+        <row>
+            <key>Start date</key>
+            <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+    </govuk-summary-list>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+        <govuk-details-summary>Previous data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>DQT sanction code</key>
+                    <value use-empty-fallback>@oldAlert.DqtSanctionCode?.Value</value>
+                </row>
+                <row>
+                    <key>DQT sanction name</key>
+                    <value use-empty-fallback>@oldAlert.DqtSanctionCode?.Name</value>
+                </row>
+                <row>
+                    <key>DQT spent</key>
+                    <value use-empty-fallback>@oldAlert.DqtSpent</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

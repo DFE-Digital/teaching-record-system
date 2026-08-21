@@ -551,3 +551,27 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | --- | --- | --- |
 | `PersonDeactivatedEvent` | Always | — |
 | `PersonDeactivatedEvent` | Sometimes | The retained record's attributes are changed to values taken from the secondary record. |
+
+### `AlertDeactivatingInDqt` (70)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `AlertDqtDeactivatedEvent` | Always | — |
+
+### `AlertImportingIntoDqt` (71)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `AlertDqtImportedEvent` | Always | — |
+
+### `AlertReactivatingInDqt` (72)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `AlertDqtReactivatedEvent` | Always | — |
+
+### `AlertMigratingFromDqt` (73)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `AlertMigratedEvent` | Always | — |

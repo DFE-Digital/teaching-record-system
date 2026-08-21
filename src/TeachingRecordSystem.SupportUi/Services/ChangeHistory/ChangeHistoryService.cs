@@ -23,10 +23,6 @@ public class ChangeHistoryService(
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
             nameof(LegacyEvents.MandatoryQualificationDqtImportedEvent),
             nameof(LegacyEvents.MandatoryQualificationMigratedEvent),
-            nameof(LegacyEvents.AlertMigratedEvent),
-            nameof(LegacyEvents.AlertDqtDeactivatedEvent),
-            nameof(LegacyEvents.AlertDqtImportedEvent),
-            nameof(LegacyEvents.AlertDqtReactivatedEvent),
             nameof(LegacyEvents.DqtInductionImportedEvent),
             nameof(LegacyEvents.DqtInductionCreatedEvent),
             nameof(LegacyEvents.DqtInductionUpdatedEvent),
@@ -57,8 +53,6 @@ public class ChangeHistoryService(
             nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
             nameof(OneLoginUserUpdatedEvent)
         };
-
-        var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert", StringComparison.Ordinal)).ToArray();
 
         var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
             .ToAsyncEnumerableAsync()
@@ -106,13 +100,6 @@ public class ChangeHistoryService(
                         e.event_name <> {nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)}
                         OR (e.payload->> 'ChangeReason')::int != {LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept}
                     )
-
-                    -- Only return alerts that have an alert type (or DQT sanction code) that the user is authorized to Read
-                    AND (
-                        NOT (e.event_name = any({alertEventTypes}))
-                        OR (e.payload #>> Array['Alert','AlertTypeId'])::uuid = any({alertTypeIdsWithReadPermission})
-                        OR (e.payload #>> Array['Alert','DqtSanctionCode','Value']) = any({dqtSanctionCodesWithReadPermission})
-                    )
                 """)
             .ToListAsync();
 
@@ -127,6 +114,10 @@ public class ChangeHistoryService(
             ProcessType.AlertCreating,
             ProcessType.AlertUpdating,
             ProcessType.AlertDeleting,
+            ProcessType.AlertDeactivatingInDqt,
+            ProcessType.AlertImportingIntoDqt,
+            ProcessType.AlertReactivatingInDqt,
+            ProcessType.AlertMigratingFromDqt,
             ProcessType.MandatoryQualificationCreating,
             ProcessType.MandatoryQualificationUpdating,
             ProcessType.MandatoryQualificationDeleting,
@@ -145,7 +136,16 @@ public class ChangeHistoryService(
             .ToListAsync();
 
         // Filter alert processes by alert type permissions
-        var alertProcessTypes = new[] { ProcessType.AlertCreating, ProcessType.AlertUpdating, ProcessType.AlertDeleting };
+        var alertProcessTypes = new[]
+        {
+            ProcessType.AlertCreating,
+            ProcessType.AlertUpdating,
+            ProcessType.AlertDeleting,
+            ProcessType.AlertDeactivatingInDqt,
+            ProcessType.AlertImportingIntoDqt,
+            ProcessType.AlertReactivatingInDqt,
+            ProcessType.AlertMigratingFromDqt
+        };
         var filteredProcesses = processes.Where(p =>
         {
             if (!alertProcessTypes.Contains(p.ProcessType))
@@ -153,12 +153,18 @@ public class ChangeHistoryService(
                 return true;
             }
 
-            var alertEvent = p.Events!.First(e => e.Payload is AlertCreatedEvent or AlertUpdatedEvent or AlertDeletedEvent);
+            var alertEvent = p.Events!.First(e => e.Payload is
+                AlertCreatedEvent or AlertUpdatedEvent or AlertDeletedEvent or
+                AlertDqtDeactivatedEvent or AlertDqtImportedEvent or AlertDqtReactivatedEvent or AlertMigratedEvent);
             (Guid? alertTypeId, EventModels.AlertDqtSanctionCode? dqtSanctionCode) = alertEvent.Payload switch
             {
                 AlertCreatedEvent created => (created.Alert.AlertTypeId, created.Alert.DqtSanctionCode),
                 AlertUpdatedEvent updated => (updated.Alert.AlertTypeId, updated.Alert.DqtSanctionCode),
                 AlertDeletedEvent deleted => (deleted.Alert.AlertTypeId, deleted.Alert.DqtSanctionCode),
+                AlertDqtDeactivatedEvent deactivated => (deactivated.Alert.AlertTypeId, deactivated.Alert.DqtSanctionCode),
+                AlertDqtImportedEvent imported => (imported.Alert.AlertTypeId, imported.Alert.DqtSanctionCode),
+                AlertDqtReactivatedEvent reactivated => (reactivated.Alert.AlertTypeId, reactivated.Alert.DqtSanctionCode),
+                AlertMigratedEvent migrated => (migrated.Alert.AlertTypeId, migrated.Alert.DqtSanctionCode),
                 _ => (null, null)
             };
 
