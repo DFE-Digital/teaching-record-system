@@ -456,6 +456,31 @@ Support UI *Edit application user*; CLI `app-content`.
 
 ---
 
+## Webhook endpoints
+
+### `WebhookEndpointCreating` (67)
+CLI `webhook-endpoint create`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `WebhookEndpointCreatedEvent` | Always | — |
+
+### `WebhookEndpointUpdating` (68)
+CLI `webhook-endpoint update`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `WebhookEndpointUpdatedEvent` | Sometimes | Only when at least one field actually changes. |
+
+### `WebhookEndpointDeleting` (69)
+CLI `webhook-endpoint delete`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `WebhookEndpointDeletedEvent` | Always | — |
+
+---
+
 ## NPQ TRN requests (legacy)
 
 ### `NpqTrnRequestTaskCreating` (15)
