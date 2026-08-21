@@ -1,0 +1,82 @@
+@using Optional.Unsafe
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<DqtInductionUpdatedEvent>();
+    var induction = updatedEvent.Induction;
+    var oldInduction = updatedEvent.OldInduction;
+}
+
+<timeline-entry title="DQT induction updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.Status))
+        {
+            <row>
+                <key>Induction status</key>
+                <value use-empty-fallback>@induction.InductionStatus.ValueOrDefault()</value>
+            </row>
+        }
+
+        @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason))
+        {
+            <row>
+                <key>Exemption reason</key>
+                <value use-empty-fallback>@induction.InductionExemptionReason.ValueOrDefault()</value>
+            </row>
+        }
+
+        @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
+        {
+            <row>
+                <key>Started on</key>
+                <value use-empty-fallback>@induction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+
+        @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
+        {
+            <row>
+                <key>Completed on</key>
+                <value use-empty-fallback>@induction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+    </govuk-summary-list>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+        <govuk-details-summary>Previous data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.Status))
+                {
+                    <row>
+                        <key>Induction status</key>
+                        <value use-empty-fallback>@oldInduction.InductionStatus.ValueOrDefault()</value>
+                    </row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason))
+                {
+                    <row>
+                        <key>Exemption reason</key>
+                        <value use-empty-fallback>@oldInduction.InductionExemptionReason.ValueOrDefault()</value>
+                    </row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
+                {
+                    <row>
+                        <key>Started on</key>
+                        <value use-empty-fallback>@oldInduction.StartDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
+                    </row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
+                {
+                    <row>
+                        <key>Completed on</key>
+                        <value use-empty-fallback>@oldInduction.CompletionDate.ValueOrDefault()?.ToString(WebConstants.DateDisplayFormat)</value>
+                    </row>
+                }
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>
