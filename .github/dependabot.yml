@@ -4,46 +4,52 @@ updates:
   - package-ecosystem: nuget
     directory: /
     schedule:
-      interval: 'daily'
+      interval: "daily"
+    cooldown:
+      default-days: 3
     versioning-strategy: increase
     groups:
       dotnet:
         patterns:
-          - 'Microsoft.AspNetCore.*'
-          - 'Microsoft.EntityFrameworkCore.*'
-          - 'Microsoft.Extensions.*'
-          - 'System.Net.Http.Json'
+          - "Microsoft.AspNetCore.*"
+          - "Microsoft.EntityFrameworkCore.*"
+          - "Microsoft.Extensions.*"
+          - "System.Net.Http.Json"
       Serilog:
         patterns:
-          - 'Serilog.*'
+          - "Serilog.*"
       OpenIddict:
         patterns:
-          - 'OpenIddict.*'
+          - "OpenIddict.*"
       Hangfire:
         patterns:
-          - 'Hangfire.*'
+          - "Hangfire.*"
       Sentry:
         patterns:
-          - 'Sentry.*'
+          - "Sentry.*"
       NSign:
         patterns:
-          - 'NSign.*'
+          - "NSign.*"
       xunit:
         patterns:
-          - 'xunit.*'
+          - "xunit.*"
       DfeAnalytics:
         patterns:
-          - 'DfeAnalytics.*'
+          - "DfeAnalytics.*"
       Htmx:
         patterns:
-          - 'Htmx*'
+          - "Htmx*"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: 'daily'
+      interval: "daily"
+    cooldown:
+      default-days: 3
 
   - package-ecosystem: terraform
     directory: /terraform/
     schedule:
-      interval: 'daily'
+      interval: "daily"
+    cooldown:
+      default-days: 3
