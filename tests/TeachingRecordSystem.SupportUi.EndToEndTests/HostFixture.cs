@@ -50,7 +50,10 @@ public sealed class HostFixture : InitializeDbFixture
         return _browser.NewContextAsync(new()
         {
             BaseURL = BaseUrl,
-            ViewportSize = ViewportSize.NoViewport
+            // Pinned rather than left to the window size of whichever machine is running the tests.
+            // The pages aren't all width independent - the sortable column headers overlap each other
+            // below about 1000px, so a click on one lands on its neighbour.
+            ViewportSize = new ViewportSize { Width = 1280, Height = 800 }
         });
     }
 

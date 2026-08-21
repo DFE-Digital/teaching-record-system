@@ -104,25 +104,6 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ShowsTasksInTheOrderTheyWereSelected()
-    {
-        // Arrange
-        var olderTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20)));
-        var newerTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21)));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, GetAssignUrl(newerTask.SupportTaskReference, olderTask.SupportTaskReference));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        var references = doc.QuerySelectorAll("[data-testid=task-reference]").Select(e => e.TrimmedText()).ToArray();
-        Assert.Equal([newerTask.SupportTaskReference, olderTask.SupportTaskReference], references);
-    }
-
-    [Fact]
     public async Task Get_ExcludesTasksThatAreNoLongerOutstanding()
     {
         // Arrange
@@ -337,6 +318,102 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "1 task unassigned");
     }
 
+    [Theory]
+    [InlineData(SortDirection.Ascending, new[] { "Alice Apple", "Bob Banana", "Carol Cherry" })]
+    [InlineData(SortDirection.Descending, new[] { "Carol Cherry", "Bob Banana", "Alice Apple" })]
+    public async Task Get_ListsTasksInTheOrderTheyWereShownIn(SortDirection sortDirection, string[] expectedSubjects)
+    {
+        // Arrange
+        var carol = await CreateTaskForPersonAsync("Carol", "Cherry");
+        var alice = await CreateTaskForPersonAsync("Alice", "Apple");
+        var bob = await CreateTaskForPersonAsync("Bob", "Banana");
+
+        // Deliberately not in the sorted order - a selection made over several pages arrives in the
+        // order the inputs happen to sit in the form, not the order the tasks were listed in
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"{GetAssignUrl(carol, alice, bob)}&sortBy={SupportTasksSortByOption.Subject}&sortDirection={sortDirection}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var subjects = doc.QuerySelectorAll("[data-testid='task-name']").Select(e => e.TrimmedText()).ToArray();
+        Assert.Equal(expectedSubjects, subjects);
+    }
+
+    [Fact]
+    public async Task Get_NoSortSpecified_ListsTasksInRequestedOnOrder()
+    {
+        // Arrange
+        var second = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 2, 1)));
+        var first = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 1)));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            GetAssignUrl(second.SupportTaskReference, first.SupportTaskReference));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var references = doc.QuerySelectorAll("[data-testid='task-reference']").Select(e => e.TrimmedText()).ToArray();
+        Assert.Equal([first.SupportTaskReference, second.SupportTaskReference], references);
+    }
+
+    [Fact]
+    public async Task Get_BackAndCancelLinks_KeepTheSelectedTasks()
+    {
+        // Arrange
+        var firstTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var secondTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var returnUrl = "/support-tasks/active?sortBy=Subject&pageNumber=2";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"{GetAssignUrl(firstTask.SupportTaskReference, secondTask.SupportTaskReference)}&returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var expectedLink = $"{returnUrl}" +
+            $"&SupportTaskReference={firstTask.SupportTaskReference}" +
+            $"&SupportTaskReference={secondTask.SupportTaskReference}";
+
+        Assert.Equal(expectedLink, doc.QuerySelector(".govuk-back-link")?.GetAttribute("href"));
+        Assert.Equal(expectedLink, doc.QuerySelector("a.govuk-button--secondary")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_BackLink_LeavesOutTasksThatAreNoLongerOutstanding()
+    {
+        // Arrange
+        var outstandingTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var completedTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithStatus(SupportTaskStatus.Closed));
+        var returnUrl = "/support-tasks/active";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"{GetAssignUrl(outstandingTask.SupportTaskReference, completedTask.SupportTaskReference)}&returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal(
+            $"{returnUrl}?SupportTaskReference={outstandingTask.SupportTaskReference}",
+            doc.QuerySelector(".govuk-back-link")?.GetAttribute("href"));
+    }
+
     [Fact]
     public async Task Post_WithReturnUrl_RedirectsToReturnUrl()
     {
@@ -406,6 +483,14 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var user = await TestData.CreateUserAsync(name: name, role: UserRoles.RecordManager);
         SetCurrentUser(user);
         return user;
+    }
+
+    private async Task<string> CreateTaskForPersonAsync(string firstName, string lastName)
+    {
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            configurePerson: p => p.WithFirstName(firstName).WithMiddleName("").WithLastName(lastName));
+
+        return supportTask.SupportTaskReference;
     }
 
     private static string GetAssignUrl(params string[] supportTaskReferences)

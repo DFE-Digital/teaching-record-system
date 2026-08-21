@@ -1,14 +1,24 @@
-@model int
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active.SelectionViewModel
 
-@if (Model > 0)
+@if (Model.SelectedTaskCount > 0)
 {
     <div class="trs-tasks-selection">
         <div class="govuk-width-container">
             <div class="trs-tasks-selection__summary">
                 <strong>Selection</strong><br/>
-                @Model tasks selected
+                <span class="trs-tabular-nums" data-testid="selected-task-count">@Model.SelectedTaskCount</span> task@(Model.SelectedTaskCount is 1 ? "" : "s") selected
             </div>
             <div class="trs-tasks-selection__actions">
+                <a href="@Model.ClearSelectionUrl"
+                   hx-get="@Model.ClearSelectionUrl"
+                   hx-select="main"
+                   hx-target="main"
+                   hx-swap="outerHTML"
+                   hx-push-url="true"
+                   class="govuk-link govuk-link--inverse trs-tasks-selection__clear trs-requires-js"
+                   data-testid="clear-selection">
+                    Clear selection
+                </a>
                 <govuk-button form="assign-tasks-form" class="govuk-button--inverse">Assign selected tasks</govuk-button>
             </div>
         </div>
