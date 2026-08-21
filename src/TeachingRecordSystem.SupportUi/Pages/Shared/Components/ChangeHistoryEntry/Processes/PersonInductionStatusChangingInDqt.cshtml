@@ -1,0 +1,25 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var changedEvent = Model.GetEvent<DqtContactInductionStatusChangedEvent>();
+}
+
+<timeline-entry title="Person induction status updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        <row>
+            <key>Induction status</key>
+            <value use-empty-fallback>@changedEvent.InductionStatus</value>
+        </row>
+    </govuk-summary-list>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+        <govuk-details-summary>Previous data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Induction status</key>
+                    <value use-empty-fallback>@changedEvent.OldInductionStatus</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>
