@@ -14,7 +14,7 @@ public interface IEvent
     public static JsonSerializerOptions SerializerOptions => new()
     {
         AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
-        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.Events, Modifiers.SupportTaskData } }
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.Events, Modifiers.SupportTaskData, Modifiers.OptionProperties } }
     };
 
     protected static Guid[] CoalescePersonIds(params IEnumerable<Guid?> personIds) =>
