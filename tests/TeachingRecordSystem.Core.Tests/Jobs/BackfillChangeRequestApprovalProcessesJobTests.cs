@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -87,6 +88,12 @@ public class BackfillChangeRequestApprovalProcessesJobTests(JobFixture fixture) 
             Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation, emailSentEvent.Email.TemplateId);
             Assert.Equal(requestEmailAddress, emailSentEvent.Email.EmailAddress);
             Assert.Equal(newFirstName, emailSentEvent.Email.Personalization[ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey]);
+
+            // There was no email to match, so one was added.
+            var email = await dbContext.Emails.SingleAsync(e => e.EmailId == emailSentEvent.Email.EmailId);
+            Assert.Equal(EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation, email.TemplateId);
+            Assert.Equal(requestEmailAddress, email.EmailAddress);
+            Assert.Equal(legacyEvent.CreatedUtc, email.SentOn);
         });
     }
 
@@ -214,6 +221,99 @@ public class BackfillChangeRequestApprovalProcessesJobTests(JobFixture fixture) 
     }
 
     [Fact]
+    public async Task Execute_WithEmailSentAroundTheApproval_LinksToTheExistingEmail()
+    {
+        // Arrange
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var legacyEvent = await AddApprovedNameChangeEventAsync(emailAddress);
+
+        var existingEmail = await AddEmailAsync(
+            EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation,
+            emailAddress,
+            sentOn: legacyEvent.CreatedUtc.AddMinutes(2));
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestApprovalProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, legacyEvent.EventId);
+            Assert.Equal(existingEmail.EmailId, emailSentEvent.Email.EmailId);
+            Assert.Equal(emailAddress, emailSentEvent.Email.EmailAddress);
+
+            var emails = await dbContext.Emails.Where(e => e.EmailAddress == emailAddress).ToListAsync();
+            Assert.Equal(existingEmail.EmailId, Assert.Single(emails).EmailId);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_WithEmailSentLongBeforeTheApproval_AddsANewEmail()
+    {
+        // Arrange
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var legacyEvent = await AddApprovedNameChangeEventAsync(emailAddress);
+
+        var unrelatedEmail = await AddEmailAsync(
+            EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation,
+            emailAddress,
+            sentOn: legacyEvent.CreatedUtc.AddDays(-5));
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestApprovalProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, legacyEvent.EventId);
+            Assert.NotEqual(unrelatedEmail.EmailId, emailSentEvent.Email.EmailId);
+
+            var emails = await dbContext.Emails.Where(e => e.EmailAddress == emailAddress).ToListAsync();
+            Assert.Equal(2, emails.Count);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_WithEmailAnotherApprovalAlreadyLinksTo_AddsANewEmail()
+    {
+        // Arrange
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var legacyEvent = await AddApprovedNameChangeEventAsync(emailAddress);
+
+        var claimedEmail = await AddEmailAsync(
+            EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation,
+            emailAddress,
+            sentOn: legacyEvent.CreatedUtc.AddMinutes(2));
+
+        await TestData.CreateProcessAsync(
+            ProcessType.ChangeOfNameRequestApproving,
+            userId: null,
+            changeReason: null,
+            new EmailSentEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = null,
+                Email = EventModels.Email.FromModel(claimedEmail)
+            });
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestApprovalProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, legacyEvent.EventId);
+            Assert.NotEqual(claimedEmail.EmailId, emailSentEvent.Email.EmailId);
+
+            var emails = await dbContext.Emails.Where(e => e.EmailAddress == emailAddress).ToListAsync();
+            Assert.Equal(2, emails.Count);
+        });
+    }
+
+    [Fact]
     public async Task Execute_RunTwice_DoesNotBackfillTwice()
     {
         // Arrange
@@ -289,14 +389,54 @@ public class BackfillChangeRequestApprovalProcessesJobTests(JobFixture fixture) 
         });
     }
 
-    private async Task<LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent> AddApprovedNameChangeEventAsync()
+    private static async Task<EmailSentEvent> GetEmailSentEventAsync(TrsDbContext dbContext, Guid legacyEventId)
+    {
+        var supportTaskUpdatedProcessEvent = await dbContext.ProcessEvents
+            .SingleAsync(pe => pe.ProcessEventId == legacyEventId);
+
+        var processEvents = await dbContext.ProcessEvents
+            .Where(pe => pe.ProcessId == supportTaskUpdatedProcessEvent.ProcessId)
+            .ToListAsync();
+
+        return Assert.IsType<EmailSentEvent>(Assert.Single(processEvents, pe => pe.Payload is EmailSentEvent).Payload);
+    }
+
+    private async Task<Email> AddEmailAsync(string templateId, string emailAddress, DateTime sentOn)
+    {
+        var email = new Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = templateId,
+            EmailAddress = emailAddress,
+            Personalization = new Dictionary<string, string>(),
+            SentOn = sentOn
+        };
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Emails.Add(email);
+            await dbContext.SaveChangesAsync();
+        });
+
+        return email;
+    }
+
+    private async Task<LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent> AddApprovedNameChangeEventAsync(string? emailAddress = null)
     {
         var person = await TestData.CreatePersonAsync();
         var newLastName = TestData.GenerateChangedLastName(person.LastName);
 
         var dbSupportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
             person.PersonId,
-            b => b.WithLastName(newLastName));
+            b =>
+            {
+                b.WithLastName(newLastName);
+
+                if (emailAddress is not null)
+                {
+                    b.WithEmailAddress(emailAddress);
+                }
+            });
 
         var oldSupportTask = EventModels.SupportTask.FromModel(dbSupportTask);
 
