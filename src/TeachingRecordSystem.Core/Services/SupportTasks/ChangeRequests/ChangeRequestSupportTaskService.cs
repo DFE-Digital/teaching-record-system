@@ -139,7 +139,8 @@ public class ChangeRequestSupportTaskService(
                 new Dictionary<string, string>
                 {
                     { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, person.FirstName }
-                });
+                },
+                processContext.ProcessId);
         }
     }
 
@@ -175,7 +176,8 @@ public class ChangeRequestSupportTaskService(
                 {
                     [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = person.FirstName,
                     [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = GetRejectionReasonEmailText(options.RejectionReason)
-                });
+                },
+                processId: null);
         }
     }
 
@@ -190,7 +192,7 @@ public class ChangeRequestSupportTaskService(
     public Task CancelChangeRequestAsync(CancelChangeRequestSupportTaskOptions options, ProcessContext processContext) =>
         ResolveChangeRequestAsync(options.SupportTask, SupportRequestOutcome.Cancelled, rejectionReason: null, processContext);
 
-    private async Task SendEmailAsync(string templateId, string emailAddress, Dictionary<string, string> personalization)
+    private async Task SendEmailAsync(string templateId, string emailAddress, Dictionary<string, string> personalization, Guid? processId)
     {
         var email = new Email
         {
@@ -203,7 +205,14 @@ public class ChangeRequestSupportTaskService(
         dbContext.Emails.Add(email);
         await dbContext.SaveChangesAsync();
 
-        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
+        if (processId is Guid nonNullProcessId)
+        {
+            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, nonNullProcessId));
+        }
+        else
+        {
+            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
+        }
     }
 
     private Task ResolveChangeRequestAsync(

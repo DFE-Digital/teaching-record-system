@@ -268,8 +268,7 @@ Support UI *Change requests → accept* (name change).
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as approved. |
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when the approved name differs from the current record. |
-
-*The approval email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A confirmation email is sent when an email address is available. |
 
 ### `ChangeOfDateOfBirthRequestApproving` (31)
 Support UI *Change requests → accept* (date-of-birth change).
@@ -278,8 +277,7 @@ Support UI *Change requests → accept* (date-of-birth change).
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as approved. |
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when the approved date of birth differs from the current record. |
-
-*The approval email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A confirmation email is sent when an email address is available. |
 
 ### `ChangeOfNameRequestRejecting` (57)
 Support UI *Change requests → reject* (name change).

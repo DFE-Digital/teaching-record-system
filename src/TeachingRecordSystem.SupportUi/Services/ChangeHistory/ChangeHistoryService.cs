@@ -37,9 +37,7 @@ public class ChangeHistoryService(
             nameof(LegacyEvents.PersonsMergedEvent),
             nameof(LegacyEvents.TrnAllocatedEvent),
             nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
-            nameof(LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent),
             nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
-            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent),
             nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
             nameof(OneLoginUserUpdatedEvent)
         };
@@ -118,6 +116,8 @@ public class ChangeHistoryService(
             ProcessType.InitialTeacherTrainingUpdatingInDqt,
             ProcessType.QtsRegistrationCreatingInDqt,
             ProcessType.QtsRegistrationUpdatingInDqt,
+            ProcessType.ChangeOfNameRequestApproving,
+            ProcessType.ChangeOfDateOfBirthRequestApproving,
             ProcessType.MandatoryQualificationCreating,
             ProcessType.MandatoryQualificationUpdating,
             ProcessType.MandatoryQualificationDeleting,

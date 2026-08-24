@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests.EditChangeRequest;
@@ -130,6 +129,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         }
 
         EventObserver.Clear();
+        Events.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/accept")
         {
@@ -193,29 +193,36 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             }
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        EventObserver.AssertEventsSaved(e => Assert.IsType<LegacyEvents.EmailSentEvent>(e));
+
+        Events.AssertProcessesCreated(p =>
         {
-            if (isNameChange)
-            {
-                var actualEvent = Assert.IsType<ChangeNameRequestSupportTaskApprovedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-                Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
-                Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
-                Assert.Equal(person.PersonId, actualEvent.PersonId);
-                Assert.Equal(ChangeNameRequestSupportTaskApprovedEventChanges.NameChange, actualEvent.Changes);
-            }
-            else
-            {
-                var actualEvent = Assert.IsType<ChangeDateOfBirthRequestSupportTaskApprovedEvent>(e);
-                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-                Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
-                Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
-                Assert.Equal(ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.DateOfBirth, actualEvent.Changes);
-            }
-        },
-        e2 =>
-        {
-            var emailEvent = Assert.IsType<LegacyEvents.EmailSentEvent>(e2);
+            Assert.Equal(
+                isNameChange ? ProcessType.ChangeOfNameRequestApproving : ProcessType.ChangeOfDateOfBirthRequestApproving,
+                p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<SupportTaskUpdatedEvent, PersonDetailsUpdatedEvent, EmailSentEvent>(
+                supportTaskUpdatedEvent =>
+                {
+                    Assert.Equal(SupportTaskStatus.Open, supportTaskUpdatedEvent.OldSupportTask.Status);
+                    Assert.Equal(SupportTaskStatus.Closed, supportTaskUpdatedEvent.SupportTask.Status);
+                },
+                personDetailsUpdatedEvent =>
+                {
+                    Assert.Equal(person.PersonId, personDetailsUpdatedEvent.PersonId);
+                    Assert.Equal(
+                        isNameChange ? PersonDetailsUpdatedEventChanges.NameChange : PersonDetailsUpdatedEventChanges.DateOfBirth,
+                        personDetailsUpdatedEvent.Changes);
+                },
+                emailSentEvent =>
+                {
+                    Assert.Equal(person.PersonId, emailSentEvent.PersonId);
+                    Assert.Equal(
+                        isNameChange
+                            ? EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation
+                            : EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation,
+                        emailSentEvent.Email.TemplateId);
+                });
         });
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
