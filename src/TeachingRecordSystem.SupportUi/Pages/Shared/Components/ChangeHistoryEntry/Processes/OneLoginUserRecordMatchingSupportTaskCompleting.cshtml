@@ -1,6 +1,183 @@
+@using Microsoft.EntityFrameworkCore
+@using TeachingRecordSystem.Core.DataStore.Postgres
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Models
+@using TeachingRecordSystem.Core.Models.SupportTasks
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@inject PersonInfoCache PersonInfoCache
+@inject SupportUiLinkGenerator LinkGenerator
+@inject TrsDbContext DbContext
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
+    var supportTaskData = supportTaskUpdatedEvent.SupportTask.Data as OneLoginUserRecordMatchingData;
+    var outcome = supportTaskData?.Outcome;
+    var personId = supportTaskUpdatedEvent.SupportTask.PersonId;
+    var personInfo = personId is not null ? await PersonInfoCache.GetPersonInfoAsync(personId.Value) : null;
+    var hasEmailSentEvent = Model.TryGetEvent<EmailSentEvent>(out var emailSentEvent);
+    var hasOneLoginUpdatedEvent = Model.TryGetEvent<OneLoginUserUpdatedEvent>(out var oneLoginUpdatedEvent);
+    var hasTrnRequestUpdatedEvent = Model.TryGetEvent<TrnRequestUpdatedEvent>(out var trnRequestUpdatedEvent);
+    var hasPersonCreatedEvent = Model.TryGetEvent<PersonCreatedEvent>(out var personCreatedEvent);
+    var hasSupportTaskCreatedEvent = Model.TryGetEvent<SupportTaskCreatedEvent>(out var supportTaskCreatedEvent);
+    
+    var oneLoginEmail = hasOneLoginUpdatedEvent
+        ? oneLoginUpdatedEvent!.OneLoginUser.EmailAddress
+        : supportTaskData!.OneLoginUserEmail;
+    var oneLoginSubject = hasOneLoginUpdatedEvent
+        ? oneLoginUpdatedEvent!.OneLoginUser.Subject
+        : supportTaskData!.OneLoginUserSubject;
+}
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+<timeline-entry title="GOV.UK One Login record matching task completed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (outcome is not null)
+    {
+        <p class="govuk-body" data-testid="outcome-tag">
+            @if (outcome == OneLoginUserRecordMatchingOutcome.Connected)
+            {
+                <tag color="@TagColor.Green">Identity verified</tag>
+            }
+            else if (outcome == OneLoginUserRecordMatchingOutcome.NotConnecting)
+            {
+                <tag color="@TagColor.Red">Record not connected</tag>
+            }
+            else if (outcome == OneLoginUserRecordMatchingOutcome.NoMatches)
+            {
+                <tag color="@TagColor.Red">No matches found</tag>
+            }
+        </p>
+    }
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (outcome == OneLoginUserRecordMatchingOutcome.NotConnecting)
+    {
+        <p class="govuk-body" data-testid="not-connected-message">
+            @if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+            {
+                <text>GOV.UK One Login @oneLoginEmail could not be connected to a record.</text>
+            }
+            else
+            {
+                <text>GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> could not be connected to a record.</text>
+            }
+        </p>
+    }
+    else if (outcome == OneLoginUserRecordMatchingOutcome.NoMatches)
+    {
+        <p class="govuk-body" data-testid="no-matches-message">
+            @if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+            {
+                <text>No matches were found for GOV.UK One Login @oneLoginEmail.</text>
+            }
+            else
+            {
+                <text>No matches were found for GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a>.</text>
+            }
+        </p>
+    }
+
+    <p class="govuk-body" data-testid="task-closed-message">
+        @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
+        {
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
+                Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
+            </a>
+            <text> closed for @oneLoginEmail.</text>
+        }
+        else
+        {
+            <text>Task closed for @oneLoginEmail.</text>
+        }
+    </p>
+
+    @if (hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OneLoginUser.PersonId is not null)
+    {
+        var matchedPersonId = oneLoginUpdatedEvent.OneLoginUser.PersonId!.Value;
+        var matchedPersonInfo = await PersonInfoCache.GetPersonInfoAsync(matchedPersonId);
+        var matchedPersonLinkText = $"{matchedPersonInfo?.FirstName} {matchedPersonInfo?.LastName}";
+
+        <p class="govuk-body" data-testid="one-login-matched-message">
+            @if (Model.Context.ContextType == ChangeHistoryContextType.SupportTask)
+            {
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+            else if (Model.Context.ContextType == ChangeHistoryContextType.Person)
+            {
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to a record.
+            }
+            else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+            {
+                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+        </p>
+    }
+
+    @if (hasTrnRequestUpdatedEvent 
+        && trnRequestUpdatedEvent!.TrnRequest.ResolvedPersonId is not null
+        && trnRequestUpdatedEvent.TrnRequest.Status == TrnRequestStatus.Completed)
+    {
+        var wasPersonCreated = hasPersonCreatedEvent && personCreatedEvent!.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId;
+
+        <p class="govuk-body" data-testid="trn-request-resolved-message">
+            @if (wasPersonCreated)
+            {
+                var applicationUserId = trnRequestUpdatedEvent.SourceApplicationUserId;
+                var applicationUser = await DbContext.ApplicationUsers
+                    .Where(u => u.UserId == applicationUserId)
+                    .Select(u => new { u.ShortName })
+                    .SingleOrDefaultAsync();
+                var appShortName = applicationUser?.ShortName ?? "Application";
+
+                @($"{appShortName} TRN request resolved.")
+            }
+            else
+            {
+                @:TRN request matched to an existing record.
+            }
+        </p>
+    }
+
+    @if (hasPersonCreatedEvent)
+    {
+        var createdPersonId = personCreatedEvent!.PersonId;
+        var createdPersonDetails = personCreatedEvent.Details;
+        var createdPersonName = $"{createdPersonDetails.FirstName} {createdPersonDetails.LastName}";
+
+        <p class="govuk-body" data-testid="person-created-message">
+            @if (Model.Context.ContextType != ChangeHistoryContextType.Person)
+            {
+                @:Record created for <a href="@LinkGenerator.Persons.PersonDetail.Index(createdPersonId)" class="govuk-link" target="_blank" data-testid="created-person-link">@createdPersonName <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+            else
+            {
+                @:Record created for @createdPersonName.
+            }
+        </p>
+    }
+
+    @if (hasSupportTaskCreatedEvent)
+    {
+        var createdTaskReference = supportTaskCreatedEvent!.SupportTask.SupportTaskReference;
+        var createdTaskType = supportTaskCreatedEvent.SupportTask.SupportTaskType;
+        var taskTypeDescription = createdTaskType == SupportTaskType.TrnRequestManualChecksNeeded
+            ? "TRN request manual checks needed support task"
+            : "TRN request support task";
+
+        <p class="govuk-body" data-testid="support-task-created-message">
+            @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
+            {
+                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference <span class="govuk-visually-hidden">(opens in new tab)</span></a> was created.</text>
+            }
+            else
+            {
+                <text>@taskTypeDescription was created.</text>
+            }
+        </p>
+    }
+
+    @if (hasEmailSentEvent)
+    {
+        <p class="govuk-body" data-testid="email-sent-message">
+            We’ve sent them an email confirming the outcome of their request.
+        </p>
+    }
 </timeline-entry>
