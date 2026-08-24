@@ -2,6 +2,7 @@ using GovUk.Questions.AspNetCore.Testing;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
@@ -42,6 +43,8 @@ public abstract class TestBase : IDisposable
     protected OneLoginUserMatchingSupportTaskService OneLoginSupportTaskService => HostFixture.Services.GetRequiredService<OneLoginUserMatchingSupportTaskService>();
 
     protected OneLoginService OneLoginService => HostFixture.Services.GetRequiredService<OneLoginService>();
+
+    protected AlertService AlertService => HostFixture.Services.GetRequiredService<AlertService>();
 
     protected Mock<IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;
@@ -117,4 +120,3 @@ public abstract class TestBase : IDisposable
         return byteArrayContent;
     }
 }
-
