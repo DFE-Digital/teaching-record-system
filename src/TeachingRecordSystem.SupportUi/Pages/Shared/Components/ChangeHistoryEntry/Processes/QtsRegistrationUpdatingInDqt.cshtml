@@ -1,0 +1,81 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<DqtQtsRegistrationUpdatedEvent>();
+    var qts = updatedEvent.QtsRegistration;
+    var oldQts = updatedEvent.OldQtsRegistration;
+}
+
+<timeline-entry title="DQT QTS registration updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue))
+        {
+            <row>
+                <key>Teacher status name</key>
+                <value use-empty-fallback>@qts?.TeacherStatusName</value>
+            </row>
+        }
+
+        @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue))
+        {
+            <row>
+                <key>Early years status name</key>
+                <value use-empty-fallback>@qts?.EarlyYearsStatusName</value>
+            </row>
+        }
+
+        @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.QtsDate))
+        {
+            <row>
+                <key>QTS date</key>
+                <value use-empty-fallback>@qts?.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+
+        @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EytsDate))
+        {
+            <row>
+                <key>EYTS date</key>
+                <value use-empty-fallback>@qts?.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+    </govuk-summary-list>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+        <govuk-details-summary>Previous data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.TeacherStatusValue))
+                {
+                    <row>
+                        <key>Teacher status name</key>
+                        <value use-empty-fallback>@oldQts?.TeacherStatusName</value>
+                    </row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EarlyYearsStatusValue))
+                {
+                    <row>
+                        <key>Early years status name</key>
+                        <value use-empty-fallback>@oldQts?.EarlyYearsStatusName</value>
+                    </row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.QtsDate))
+                {
+                    <row>
+                        <key>QTS date</key>
+                        <value use-empty-fallback>@oldQts?.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                    </row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(DqtQtsRegistrationUpdatedEventChanges.EytsDate))
+                {
+                    <row>
+                        <key>EYTS date</key>
+                        <value use-empty-fallback>@oldQts?.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                    </row>
+                }
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

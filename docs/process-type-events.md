@@ -611,3 +611,27 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `DqtContactInductionStatusChangedEvent` | Always | — |
+
+### `InitialTeacherTrainingCreatingInDqt` (80)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInitialTeacherTrainingCreatedEvent` | Always | — |
+
+### `InitialTeacherTrainingUpdatingInDqt` (81)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtInitialTeacherTrainingUpdatedEvent` | Always | — |
+
+### `QtsRegistrationCreatingInDqt` (82)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtQtsRegistrationCreatedEvent` | Always | — |
+
+### `QtsRegistrationUpdatingInDqt` (83)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `DqtQtsRegistrationUpdatedEvent` | Always | — |
