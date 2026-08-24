@@ -507,23 +507,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
         var totalFilteredTaskCount = await tasks.CountAsync();
 
-        tasks = sortBy switch
-        {
-            SupportTasksSortByOption.Subject => tasks
-                .OrderBy(t => t.SubjectName ?? t.SubjectEmailAddress, sortDirection),
-            SupportTasksSortByOption.TaskType => tasks
-                .OrderBy(GetOrderByTypeExpression(), sortDirection),
-            SupportTasksSortByOption.Status => tasks
-                .OrderBy(t => t.Status, sortDirection),
-            SupportTasksSortByOption.AssignedTo => tasks
-                .OrderBy(t => t.AssignedTo!.Name, sortDirection),
-            SupportTasksSortByOption.RequestedOn => tasks
-                .OrderBy(t => t.CreatedOn, sortDirection),
-            SupportTasksSortByOption.Source => tasks
-                .OrderBy(t => t.SourceApplicationUser!.ShortName ?? t.SourceApplicationUser!.Name, sortDirection),
-            _ => tasks
-                .OrderBy(t => t.SupportTaskReference, sortDirection)
-        };
+        tasks = tasks.OrderBySupportTasksSortOption(sortBy, sortDirection);
 
         var searchResults = await tasks
             .Select(t => new SupportTasksSearchResultItem(
@@ -638,7 +622,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             CompletedTasksSortByOption.Subject => tasks
                 .OrderBy(t => t.SubjectName ?? t.SubjectEmailAddress, sortDirection),
             CompletedTasksSortByOption.TaskType => tasks
-                .OrderBy(GetOrderByTypeExpression(), sortDirection),
+                .OrderBy(SupportTasksSortExtensions.GetOrderByTypeExpression(), sortDirection),
             CompletedTasksSortByOption.Outcome => tasks
                 .OrderBy(GetOrderByOutcomeExpression(), sortDirection),
             CompletedTasksSortByOption.CompletedBy => tasks
@@ -668,31 +652,6 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             TotalTaskCount = totalFilteredTaskCount,
             SearchResults = searchResults
         };
-    }
-
-    private static Expression<Func<SupportTask, int>> GetOrderByTypeExpression()
-    {
-        var typesOrderedByTitle = SupportTaskTypeRegistry.GetAll()
-            .OrderBy(t => t.Title)
-            .Select(t => (int)t.SupportTaskType)
-            .ToArray();
-
-        var parameter = Expression.Parameter(typeof(SupportTask), "t");
-        var typeAsInt = Expression.Convert(
-            Expression.Property(parameter, nameof(SupportTask.SupportTaskType)),
-            typeof(int));
-
-        // Build a CASE expression that maps each task type to its position in typesOrderedByTitle.
-        Expression body = Expression.Constant(typesOrderedByTitle.Length);
-        for (var i = typesOrderedByTitle.Length - 1; i >= 0; i--)
-        {
-            body = Expression.Condition(
-                Expression.Equal(typeAsInt, Expression.Constant(typesOrderedByTitle[i])),
-                Expression.Constant(i),
-                body);
-        }
-
-        return Expression.Lambda<Func<SupportTask, int>>(body, parameter);
     }
 
     private static Expression<Func<SupportTask, int>> GetOrderByOutcomeExpression()

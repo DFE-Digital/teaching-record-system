@@ -574,11 +574,18 @@
 
     &__actions {
       float: right;
+      display: flex;
+      align-items: center;
+      gap: govuk-spacing(4);
 
         .govuk-button {
           margin-bottom: 0;
           font-size: 1rem;
         }
+    }
+
+    &__clear {
+      font-size: 1rem;
     }
 }
 
@@ -588,6 +595,10 @@ tr:has([data-selects-row]):has(:checked) {
 
 .trs-select-row {
   margin-left: 10px !important;
+
+  // The cell is narrower than the checkbox's 44px touch target, so the label - which holds nothing
+  // but visually hidden text - wraps underneath the input and pads the row out for no reason.
+  flex-wrap: nowrap;
 }
 
 .trs-zendesk-links-table {
@@ -627,4 +638,8 @@ body:not(.js-enabled) .trs-requires-js {
   > * {
     margin: 0;
   }
+}
+
+.trs-tabular-nums {
+  font-variant-numeric: tabular-nums;
 }

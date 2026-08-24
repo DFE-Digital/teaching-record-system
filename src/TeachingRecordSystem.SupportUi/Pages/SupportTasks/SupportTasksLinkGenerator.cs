@@ -32,6 +32,20 @@ public class SupportTasksLinkGenerator(LinkGenerator linkGenerator)
             "/SupportTasks/Active",
             routeValues: new { type, assignedToUserId, status = statuses, sortBy, sortDirection, pageNumber });
 
+    // The selection banner is re-rendered on its own as tasks are ticked and unticked, so the request
+    // for it carries the current filters - the banner links back to this page with the same filters.
+    public string ActiveSelectionBanner(
+        SupportTaskType? type,
+        Guid? assignedToUserId,
+        IEnumerable<SupportTaskStatus>? statuses,
+        SupportTasksSortByOption? sortBy,
+        SortDirection? sortDirection,
+        int? pageNumber = null) =>
+        linkGenerator.GetRequiredPathByPage(
+            "/SupportTasks/Active",
+            handler: "SelectionBanner",
+            routeValues: new { type, assignedToUserId, status = statuses, sortBy, sortDirection, pageNumber });
+
     public string Completed() => linkGenerator.GetRequiredPathByPage("/SupportTasks/Completed");
 
     public string Completed(string? search) =>

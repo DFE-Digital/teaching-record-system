@@ -1,6 +1,9 @@
+using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 using TeachingRecordSystem.SupportUi.Services;
@@ -16,6 +19,12 @@ public class Active(
     PageModel
 {
     private const int TasksPerPage = 20;
+
+    // The name shared by the checkbox for every task on this page and by the hidden inputs that
+    // carry the tasks selected on other pages.
+    private const string SelectedTaskInputName = "SupportTaskReference";
+
+    private const string PageTaskReferencesInputName = "pageTaskReferences";
 
     [BindProperty(SupportsGet = true)]
     public SupportTaskType? Type { get; set; }
@@ -37,6 +46,10 @@ public class Active(
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
+    // The tasks the user has selected, on this page and on any others they've paged through.
+    [BindProperty(SupportsGet = true, Name = SelectedTaskInputName)]
+    public string[] SelectedTaskReferences { get; set; } = [];
+
     public int? TotalTaskCount { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
@@ -55,6 +68,56 @@ public class Active(
 
     public string? OrderDirectionLabel { get; set; }
 
+    public string SelectedTaskInputsSelector => $"[name={SelectedTaskInputName}]";
+
+    // Just the tasks selected on other pages - the hidden inputs, not the checkboxes on this one.
+    // Deselecting everything on this page means sending the selection up without them.
+    public string OffPageSelectedTaskInputsSelector =>
+        $"#assign-tasks-form input[type=hidden][name={SelectedTaskInputName}]";
+
+    public bool AllTasksOnPageSelected { get; set; }
+
+    // The tasks shown on this page, sent up with a checkbox tick so the banner request can tell
+    // whether they're now all selected without having to run the search again.
+    public string PageTaskReferences => string.Join(",", Results?.Select(r => r.SupportTaskReference) ?? []);
+
+    public string RowCheckboxIncludeSelector => $"{SelectedTaskInputsSelector}, [name={PageTaskReferencesInputName}]";
+
+    // This page's URL with every task on it added to the selection. Combined with the selection
+    // already in the DOM it gives 'everything that was selected, plus this page'.
+    public string? SelectAllUrl { get; set; }
+
+    // Selected tasks that aren't shown on this page. These are rendered as hidden inputs so that the
+    // selection survives a change of page and is submitted along with the checkboxes for the tasks
+    // that are shown. Tasks on this page are deliberately excluded - their checkbox is the only
+    // record of whether they're selected, so unticking one deselects it.
+    public IReadOnlyCollection<string> SelectedTaskReferencesNotOnPage { get; set; } = [];
+
+    public string? ReturnUrl { get; set; }
+
+    // Past the first page the back link steps back through the results rather than leaving the list,
+    // keeping the selection with it. On the first page there's nowhere left to step back to.
+    public string? BackLinkUrl { get; set; }
+
+    public bool BackLinkUsesHtmx { get; set; }
+
+    // The back link sits outside main, so an ordinary htmx swap has to update it out of band. Not on
+    // a history restore though: that replaces the whole body, and htmx lifts out of band elements out
+    // of the response before swapping it in, which would leave the restored page without one.
+    public bool SwapBackLinkOutOfBand => !Request.IsHtmxHistoryRestoreRequest();
+
+    // Where the 'clear selection' link in the selection banner goes: this page, same filters, no
+    // selection. The banner is rendered both with the page and on its own by OnGetSelectionBanner.
+    public string ClearSelectionUrl => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, SortBy, SortDirection, PageNumber);
+
+    public string SelectionBannerUrl => linkGenerator.SupportTasks.ActiveSelectionBanner(Type, AssignedToUserId, Status, SortBy, SortDirection, PageNumber);
+
+    private HashSet<string> SelectedTaskReferenceLookup { get; set; } = [];
+
+    public int SelectedTaskCount => SelectedTaskReferenceLookup.Count;
+
+    public bool IsSelected(string supportTaskReference) => SelectedTaskReferenceLookup.Contains(supportTaskReference);
+
     public async Task OnGetAsync()
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
@@ -68,9 +131,32 @@ public class Active(
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
 
+        SelectedTaskReferences = SelectedTaskReferences.Distinct().ToArray();
+        SelectedTaskReferenceLookup = SelectedTaskReferences.ToHashSet();
+
+        var referencesOnPage = Results.Select(r => r.SupportTaskReference).ToHashSet();
+        SelectedTaskReferencesNotOnPage = SelectedTaskReferences.Where(r => !referencesOnPage.Contains(r)).AsReadOnly();
+
+        ReturnUrl = GetReturnUrl();
+
+        AllTasksOnPageSelected = Results.Count > 0 && referencesOnPage.All(SelectedTaskReferenceLookup.Contains);
+
+        SelectAllUrl = QueryHelpers.AddQueryString(
+            ClearSelectionUrl,
+            new Dictionary<string, StringValues>
+            {
+                { SelectedTaskInputName, Results.Select(r => r.SupportTaskReference).ToArray() }
+            });
+
         Pagination = PaginationViewModel.Create(
             Results,
             pageNumber => linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, pageNumber));
+
+        BackLinkUsesHtmx = Results.CurrentPage > 1;
+
+        BackLinkUrl = BackLinkUsesHtmx
+            ? linkGenerator.SupportTasks.Active(Type, AssignedToUserId, Status, sortBy, sortDirection, Results.CurrentPage - 1)
+            : linkGenerator.Index();
 
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
@@ -97,6 +183,53 @@ public class Active(
         OrderDirectionLabel = sortDirection is SupportUi.SortDirection.Ascending ? "ascending" : "descending";
     }
 
-    public IActionResult OnGetSelectionBanner([FromQuery(Name = "SupportTaskReference")] string[] supportTaskReferences) =>
-        Partial("_SelectedActiveSupportTasks", supportTaskReferences.Length);
+    public IActionResult OnGetSelectionBanner(
+        [FromQuery(Name = SelectedTaskInputName)] string[] supportTaskReferences,
+        [FromQuery(Name = PageTaskReferencesInputName)] string? pageTaskReferences)
+    {
+        var selectedTaskReferences = supportTaskReferences.Distinct().ToArray();
+        var referencesOnPage = pageTaskReferences?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+        SelectedTaskReferenceLookup = selectedTaskReferences.ToHashSet();
+        AllTasksOnPageSelected = referencesOnPage.Length > 0 && referencesOnPage.All(SelectedTaskReferenceLookup.Contains);
+        SelectAllUrl = QueryHelpers.AddQueryString(
+            ClearSelectionUrl,
+            new Dictionary<string, StringValues> { { SelectedTaskInputName, referencesOnPage } });
+
+        // Keep the address bar in step with the selection. Ticking a checkbox doesn't otherwise touch
+        // the URL, and the URL is what the page gets rebuilt from when the user navigates back to it.
+        Response.Htmx(headers => headers.ReplaceUrl(
+            QueryHelpers.AddQueryString(
+            ClearSelectionUrl,
+            new Dictionary<string, StringValues> { { SelectedTaskInputName, selectedTaskReferences } })));
+
+        return Partial(
+            "_ActiveTasksSelection",
+            new SelectionUpdateViewModel(
+                new SelectionViewModel(selectedTaskReferences.Length, ClearSelectionUrl),
+                GetSelectAllViewModel(swapOutOfBand: true)));
+    }
+
+    public SelectAllViewModel GetSelectAllViewModel(bool swapOutOfBand) =>
+        new(
+            AllTasksOnPageSelected,
+            AllTasksOnPageSelected ? ClearSelectionUrl : SelectAllUrl!,
+            AllTasksOnPageSelected ? OffPageSelectedTaskInputsSelector : SelectedTaskInputsSelector,
+            swapOutOfBand);
+
+    // Links away from this page come back to it via a return URL. The selected task references are
+    // in the query string when the user has paged through the results; they'd be repeated in every
+    // link on the page (and can get long enough to break them), so leave them out.
+    private string GetReturnUrl()
+    {
+        var query = QueryHelpers.ParseQuery(Request.QueryString.Value);
+        query.Remove(SelectedTaskInputName);
+        return QueryHelpers.AddQueryString(Request.Path, query);
+    }
+
+    public record SelectionViewModel(int SelectedTaskCount, string ClearSelectionUrl);
+
+    public record SelectAllViewModel(bool AllTasksSelected, string Url, string IncludeSelector, bool SwapOutOfBand);
+
+    public record SelectionUpdateViewModel(SelectionViewModel Selection, SelectAllViewModel SelectAll);
 }

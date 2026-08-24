@@ -1,0 +1,14 @@
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.Active.SelectAllViewModel
+
+<input type="checkbox"
+       class="govuk-checkboxes__input"
+       id="select-all-tasks"
+       data-testid="select-all-tasks"
+       checked="@(Model.AllTasksSelected ? "checked" : null)"
+       hx-swap-oob="@(Model.SwapOutOfBand ? "true" : null)"
+       hx-get="@Model.Url"
+       hx-include="@Model.IncludeSelector"
+       hx-select="main"
+       hx-target="main"
+       hx-swap="outerHTML"
+       hx-push-url="true" />
