@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      project_short_names: ${{ steps.get_test_projects.outputs.project_short_names }}
+      matrix: ${{ steps.get_test_projects.outputs.matrix }}
 
     steps:
       - uses: actions/checkout@v7
@@ -107,17 +107,49 @@ jobs:
           TARGET_BRANCH=main
           git fetch origin $TARGET_BRANCH --quiet
 
-          echo "project_short_names=$(dotnet run scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | sed 's/^TeachingRecordSystem.//' | jq -c --raw-input --slurp 'split("\n") | .[0:-1]')" >> $GITHUB_OUTPUT
+          projects=$(dotnet run scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | sed 's/^TeachingRecordSystem.//')
+
+          # Split long-running projects over several jobs, so the slowest project doesn't decide how long a
+          # PR takes to go green. The shard count comes from how many tests a project has, so suites that
+          # grow get more shards on their own - there is no per-project list here to keep up to date.
+          #
+          # MS_PER_TEST are measured averages per [Fact]/[Theory]: browser-driven tests cost far more each
+          # than the rest. TARGET_SHARD_SECONDS is deliberately close to the per-job build time - shards much
+          # shorter than that spend more time building than testing.
+          TARGET_SHARD_SECONDS=90
+          MAX_SHARDS=6
+
+          matrix='[]'
+
+          for project in $projects; do
+            tests=$(grep -rhoE --include='*.cs' '\[(Fact|Theory)' "tests/TeachingRecordSystem.$project" | wc -l | tr -d ' ')
+
+            case "$project" in
+              *EndToEndTests) ms_per_test=1350 ;;
+              *) ms_per_test=80 ;;
+            esac
+
+            shards=$(( (tests * ms_per_test / 1000 + TARGET_SHARD_SECONDS - 1) / TARGET_SHARD_SECONDS ))
+            [ "$shards" -lt 1 ] && shards=1
+            [ "$shards" -gt "$MAX_SHARDS" ] && shards=$MAX_SHARDS
+
+            echo "$project: $tests tests -> $shards shard(s)"
+
+            matrix=$(jq -c --arg p "$project" --argjson n "$shards" \
+              '. + [range(1; $n + 1) | { project: $p, shard: ., shards: $n }]' <<<"$matrix")
+          done
+
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   tests:
-    name: Tests
+    name: Tests (${{ matrix.entry.project }}${{ matrix.entry.shards > 1 && format(' {0}/{1}', matrix.entry.shard, matrix.entry.shards) || '' }})
     runs-on: ubuntu-latest
     needs: [get_affected_projects]
-    if: needs.get_affected_projects.outputs.project_short_names != '[]'
+    if: needs.get_affected_projects.outputs.matrix != '[]'
     strategy:
       fail-fast: false
       matrix:
-        project_short_name: ${{ fromJson(needs.get_affected_projects.outputs.project_short_names) }}
+        entry: ${{ fromJson(needs.get_affected_projects.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v7
@@ -157,22 +189,64 @@ jobs:
 
       - name: Build project
         run: dotnet build -c Release --no-restore
-        working-directory: tests/TeachingRecordSystem.${{ matrix.project_short_name }}
+        working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
 
       - name: Install Playwright if required
-        if: endsWith(matrix.project_short_name, 'EndToEndTests')
+        if: endsWith(matrix.entry.project, 'EndToEndTests')
         run: pwsh ./bin/Release/net10.0/playwright.ps1 install chromium
-        working-directory: tests/TeachingRecordSystem.${{ matrix.project_short_name }}
+        working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
         env:
-          PROJECT_NAME: ${{ matrix.project_short_name }}
+          PROJECT_NAME: ${{ matrix.entry.project }}
+
+      - name: Work out which classes this shard runs
+        if: matrix.entry.shards > 1
+        id: shard
+        run: |
+          set -eo pipefail
+
+          # Balance on the number of tests in each class rather than on class count, so one large class
+          # doesn't leave a shard with far more work than its siblings. Classes are fed in descending size
+          # order and each goes to whichever shard is currently lightest.
+          classes=$(./bin/Release/net10.0/TeachingRecordSystem.${{ matrix.entry.project }} -list methods/json \
+            | head -1 \
+            | jq -r '.[] | sub("\\.[^.]+$"; "")' \
+            | sort | uniq -c | sort -rn | awk '{ print $2, $1 }')
+
+          # Also emits the number of test methods in this shard, which is a valid lower bound on the number
+          # of tests it should run - a [Theory] expands to at least one. Passing that as
+          # --minimum-expected-tests turns "the filter matched nothing" into a failure rather than a green
+          # run of zero tests.
+          read -r methods filter < <(awk -v shards=${{ matrix.entry.shards }} -v me=${{ matrix.entry.shard }} '
+            { cls[NR] = $1; count[NR] = $2 }
+            END {
+              for (s = 1; s <= shards; s++) load[s] = 0
+
+              for (i = 1; i <= NR; i++) {
+                lightest = 1
+                for (s = 2; s <= shards; s++) if (load[s] < load[lightest]) lightest = s
+                load[lightest] += count[i]
+                if (lightest == me) { mine = mine " " cls[i]; methods += count[i] }
+              }
+
+              print methods mine
+            }' <<<"$classes")
+
+          if [ -z "$filter" ] || [ "${methods:-0}" -lt 1 ]; then
+            echo "::error::Shard ${{ matrix.entry.shard }} of ${{ matrix.entry.shards }} matched no test classes" >&2
+            exit 1
+          fi
+
+          echo "This shard runs $methods test methods across $(wc -w <<<"$filter") classes"
+          echo "filter=--filter-class $filter --minimum-expected-tests $methods" >> $GITHUB_OUTPUT
+        working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
 
       - name: Run tests
         uses: ./.github/workflows/actions/test
         with:
-          test_project_path: tests/TeachingRecordSystem.${{ matrix.project_short_name }}
-          report_name: "${{ matrix.project_short_name }} test results"
+          test_project_path: tests/TeachingRecordSystem.${{ matrix.entry.project }}
+          report_name: "${{ matrix.entry.project }}${{ matrix.entry.shards > 1 && format(' {0}/{1}', matrix.entry.shard, matrix.entry.shards) || '' }} test results"
           dotnet_test_args: >-
-            --no-build
+            --no-build ${{ steps.shard.outputs.filter }}
         timeout-minutes: 30
 
   check_test_results:
