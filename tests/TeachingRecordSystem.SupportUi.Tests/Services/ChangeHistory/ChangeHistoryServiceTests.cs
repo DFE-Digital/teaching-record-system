@@ -194,6 +194,46 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(user.Name, entry.RaisedByUser.Name);
     }
 
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesNotifyingTrnRecipientProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var email = new EventModels.Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = "template-123",
+            EmailAddress = "test@example.com",
+            Personalization = new Dictionary<string, string>(),
+            Metadata = new Dictionary<string, object>(),
+            SentOn = TimeProvider.UtcNow,
+            EmailReplyToId = null
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.NotifyingTrnRecipient,
+            changeReason: null,
+            events: new EmailSentEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Email = email
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.NotifyingTrnRecipient, entry.Process.ProcessType);
+    }
+
     [Theory]
     [InlineData(1, new[] { "Name0", "Name1" })]
     [InlineData(2, new[] { "Name2", "Name3" })]

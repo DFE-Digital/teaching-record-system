@@ -126,7 +126,8 @@ public class ChangeHistoryService(
             ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,
             ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
             ProcessType.OneLoginUserPersonConnecting,
-            ProcessType.OneLoginUserPersonDisconnecting
+            ProcessType.OneLoginUserPersonDisconnecting,
+            ProcessType.NotifyingTrnRecipient
         };
 
         var processes = await dbContext.Processes
