@@ -1,6 +1,5 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.ViewTests.ChangeHistoryEntries.Processes;
 
@@ -42,7 +41,7 @@ public class OneLoginUserIdVerificationSupportTaskCompletingTests(HostFixture ho
             configure: b => b.WithStatus(SupportTaskStatus.Closed));
 
         // Act
-        var entry = await PublishSupportTaskUpdatedEventAsync(supportTask, oneLoginUser: null, outcome: OneLoginUserIdVerificationOutcome.NotVerified);
+        var entry = await PublishSupportTaskUpdatedEventAsync(supportTask, oneLoginUser: null, outcome: SupportTaskOutcome.OneLoginUserIdVerification_NotVerified);
 
         // Assert
         AssertTitle(entry, "GOV.UK One Login ID verification task completed");
@@ -142,7 +141,7 @@ public class OneLoginUserIdVerificationSupportTaskCompletingTests(HostFixture ho
         SupportTask supportTask,
         OneLoginUser? oneLoginUser,
         bool includeEmailEvent = false,
-        OneLoginUserIdVerificationOutcome outcome = OneLoginUserIdVerificationOutcome.VerifiedAndConnected)
+        SupportTaskOutcome outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected)
     {
         var process = await CreateProcessAsync(supportTask, oneLoginUser, includeEmailEvent, outcome);
         return await GetEntryHtmlAsync(process.ProcessId);
@@ -152,16 +151,13 @@ public class OneLoginUserIdVerificationSupportTaskCompletingTests(HostFixture ho
         SupportTask supportTask,
         OneLoginUser? oneLoginUser,
         bool includeEmailEvent = false,
-        OneLoginUserIdVerificationOutcome outcome = OneLoginUserIdVerificationOutcome.VerifiedAndConnected)
+        SupportTaskOutcome outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected)
     {
         var oldSupportTask = EventModels.SupportTask.FromModel(supportTask);
         var supportTaskEventModel = oldSupportTask with
         {
             Status = SupportTaskStatus.Closed,
-            Data = (oldSupportTask.Data as OneLoginUserIdVerificationData)! with
-            {
-                Outcome = outcome
-            }
+            Outcome = outcome
         };
 
         var events = new List<IEvent>

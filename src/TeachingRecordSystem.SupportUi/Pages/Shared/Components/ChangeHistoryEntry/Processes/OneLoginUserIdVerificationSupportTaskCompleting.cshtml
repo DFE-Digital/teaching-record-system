@@ -1,7 +1,7 @@
 @using Microsoft.EntityFrameworkCore
 @using TeachingRecordSystem.Core.DataStore.Postgres
 @using TeachingRecordSystem.Core.Events
-@using TeachingRecordSystem.Core.Models.SupportTasks
+@using TeachingRecordSystem.Core.Models
 @using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
 @inject PersonInfoCache PersonInfoCache
 @inject SupportUiLinkGenerator LinkGenerator
@@ -10,8 +10,7 @@
 @{
     var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
     var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
-    var supportTaskData = supportTaskUpdatedEvent.SupportTask.Data as OneLoginUserIdVerificationData;
-    var outcome = supportTaskData?.Outcome;
+    var outcome = supportTaskUpdatedEvent.SupportTask.Outcome;
     var personId = supportTaskUpdatedEvent.SupportTask.PersonId;
     var personInfo = personId is not null ? await PersonInfoCache.GetPersonInfoAsync(personId.Value) : null;
     var hasEmailSentEvent = Model.TryGetEvent<EmailSentEvent>(out var emailSentEvent);
@@ -38,43 +37,37 @@
             oneLoginEmail = oneLoginUser?.EmailAddress;
         }
     }
-    
-    var isVerified = outcome is OneLoginUserIdVerificationOutcome.VerifiedOnlyWithMatches 
-        or OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches 
-        or OneLoginUserIdVerificationOutcome.VerifiedAndConnected;
+
+    var isVerified = outcome is SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches 
+        or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches 
+        or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected;
 }
 
 <timeline-entry title="GOV.UK One Login ID verification task completed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @if (outcome is not null)
-    {
-        <p class="govuk-body" data-testid="verification-outcome">
-            @if (isVerified)
-            {
-                <tag color="@TagColor.Green">Identity verified</tag>
-            }
-            else
-            {
-                <tag color="@TagColor.Red">Identity verification rejected</tag>
-            }
-        </p>
-    }
+    <p class="govuk-body" data-testid="verification-outcome">
+        @if (isVerified)
+        {
+            <tag color="@TagColor.Green">Identity verified</tag>
+        }
+        else
+        {
+            <tag color="@TagColor.Red">Identity verification rejected</tag>
+        }
+    </p>
 
-    @if (oneLoginEmail is not null)
-    {
-        <p class="govuk-body" data-testid="task-closed-message">
-            @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
-            {
-                <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
-                    Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
-                </a>
-                <text> closed for @oneLoginEmail.</text>
-            }
-            else
-            {
-                <text>Task closed for @oneLoginEmail.</text>
-            }
-        </p>
-    }
+    <p class="govuk-body" data-testid="task-closed-message">
+        @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
+        {
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
+                Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
+            </a>
+            <text> closed for @oneLoginEmail.</text>
+        }
+        else
+        {
+            <text>Task closed for @oneLoginEmail.</text>
+        }
+    </p>
 
     @if (hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OneLoginUser.PersonId is not null)
     {

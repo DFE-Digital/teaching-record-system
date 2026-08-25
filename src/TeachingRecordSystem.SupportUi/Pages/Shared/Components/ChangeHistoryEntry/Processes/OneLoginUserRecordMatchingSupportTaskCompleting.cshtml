@@ -11,8 +11,8 @@
 @{
     var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
     var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
-    var supportTaskData = supportTaskUpdatedEvent.SupportTask.Data as OneLoginUserRecordMatchingData;
-    var outcome = supportTaskData?.Outcome;
+    var supportTaskData = (OneLoginUserRecordMatchingData)supportTaskUpdatedEvent.SupportTask.Data;
+    var outcome = supportTaskUpdatedEvent.SupportTask.Outcome!;
     var personId = supportTaskUpdatedEvent.SupportTask.PersonId;
     var personInfo = personId is not null ? await PersonInfoCache.GetPersonInfoAsync(personId.Value) : null;
     var hasEmailSentEvent = Model.TryGetEvent<EmailSentEvent>(out var emailSentEvent);
@@ -30,25 +30,22 @@
 }
 
 <timeline-entry title="GOV.UK One Login record matching task completed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @if (outcome is not null)
-    {
-        <p class="govuk-body" data-testid="outcome-tag">
-            @if (outcome == OneLoginUserRecordMatchingOutcome.Connected)
-            {
-                <tag color="@TagColor.Green">Identity verified</tag>
-            }
-            else if (outcome == OneLoginUserRecordMatchingOutcome.NotConnecting)
-            {
-                <tag color="@TagColor.Red">Record not connected</tag>
-            }
-            else if (outcome == OneLoginUserRecordMatchingOutcome.NoMatches)
-            {
-                <tag color="@TagColor.Red">No matches found</tag>
-            }
-        </p>
-    }
+    <p class="govuk-body" data-testid="outcome-tag">
+        @if (outcome == SupportTaskOutcome.OneLoginUserRecordMatching_Connected)
+        {
+            <tag color="@TagColor.Green">Identity verified</tag>
+        }
+        else if (outcome == SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting)
+        {
+            <tag color="@TagColor.Red">Record not connected</tag>
+        }
+        else if (outcome == SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches)
+        {
+            <tag color="@TagColor.Red">No matches found</tag>
+        }
+    </p>
 
-    @if (outcome == OneLoginUserRecordMatchingOutcome.NotConnecting)
+    @if (outcome == SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting)
     {
         <p class="govuk-body" data-testid="not-connected-message">
             @if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
@@ -61,7 +58,7 @@
             }
         </p>
     }
-    else if (outcome == OneLoginUserRecordMatchingOutcome.NoMatches)
+    else if (outcome == SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches)
     {
         <p class="govuk-body" data-testid="no-matches-message">
             @if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)

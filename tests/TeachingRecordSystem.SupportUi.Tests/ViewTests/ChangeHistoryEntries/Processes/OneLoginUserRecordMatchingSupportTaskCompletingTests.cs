@@ -1,6 +1,5 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.ViewTests.ChangeHistoryEntries.Processes;
 
@@ -41,7 +40,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
             configure: b => b.WithStatus(SupportTaskStatus.Closed));
 
         // Act
-        var entry = await PublishSupportTaskUpdatedEventAsync(supportTask, OneLoginUserRecordMatchingOutcome.NotConnecting);
+        var entry = await PublishSupportTaskUpdatedEventAsync(supportTask, SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting);
 
         // Assert
         AssertTitle(entry, "GOV.UK One Login record matching task completed");
@@ -65,7 +64,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
             configure: b => b.WithStatus(SupportTaskStatus.Closed));
 
         // Act
-        var entry = await PublishSupportTaskUpdatedEventAsync(supportTask, OneLoginUserRecordMatchingOutcome.NoMatches);
+        var entry = await PublishSupportTaskUpdatedEventAsync(supportTask, SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches);
 
         // Assert
         AssertTitle(entry, "GOV.UK One Login record matching task completed");
@@ -301,7 +300,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
 
     private async Task<IHtmlElement> PublishSupportTaskUpdatedEventAsync(
         SupportTask supportTask,
-        OneLoginUserRecordMatchingOutcome outcome = OneLoginUserRecordMatchingOutcome.Connected,
+        SupportTaskOutcome outcome = SupportTaskOutcome.OneLoginUserRecordMatching_Connected,
         params IEvent[] additionalEvents)
     {
         var process = await CreateProcessAsync(supportTask, outcome, additionalEvents);
@@ -343,7 +342,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
             });
         }
 
-        return await PublishSupportTaskUpdatedEventAsync(supportTask, OneLoginUserRecordMatchingOutcome.Connected, events.ToArray());
+        return await PublishSupportTaskUpdatedEventAsync(supportTask, SupportTaskOutcome.OneLoginUserRecordMatching_Connected, events.ToArray());
     }
 
     private async Task<IHtmlElement> PublishSupportTaskWithTrnRequestUpdatedAsync(
@@ -392,7 +391,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
             });
         }
 
-        return await PublishSupportTaskUpdatedEventAsync(supportTask, OneLoginUserRecordMatchingOutcome.Connected, events.ToArray());
+        return await PublishSupportTaskUpdatedEventAsync(supportTask, SupportTaskOutcome.OneLoginUserRecordMatching_Connected, events.ToArray());
     }
 
     private async Task<IHtmlElement> PublishSupportTaskWithPersonCreatedAsync(
@@ -401,7 +400,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
     {
         return await PublishSupportTaskUpdatedEventAsync(
             supportTask,
-            OneLoginUserRecordMatchingOutcome.Connected,
+            SupportTaskOutcome.OneLoginUserRecordMatching_Connected,
             new PersonCreatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -417,7 +416,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
     {
         return await PublishSupportTaskUpdatedEventAsync(
             supportTask,
-            OneLoginUserRecordMatchingOutcome.Connected,
+            SupportTaskOutcome.OneLoginUserRecordMatching_Connected,
             new SupportTaskCreatedEvent
             {
                 EventId = Guid.NewGuid(),
@@ -427,17 +426,14 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
 
     private async Task<Process> CreateProcessAsync(
         SupportTask supportTask,
-        OneLoginUserRecordMatchingOutcome outcome = OneLoginUserRecordMatchingOutcome.Connected,
+        SupportTaskOutcome outcome = SupportTaskOutcome.OneLoginUserRecordMatching_Connected,
         params IEvent[] additionalEvents)
     {
         var oldSupportTask = EventModels.SupportTask.FromModel(supportTask);
         var supportTaskEventModel = oldSupportTask with
         {
             Status = SupportTaskStatus.Closed,
-            Data = (oldSupportTask.Data as OneLoginUserRecordMatchingData)! with
-            {
-                Outcome = outcome
-            }
+            Outcome = outcome
         };
 
         var events = new List<IEvent>
@@ -498,7 +494,7 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
             });
         }
 
-        return await CreateProcessAsync(supportTask, OneLoginUserRecordMatchingOutcome.Connected, events.ToArray());
+        return await CreateProcessAsync(supportTask, SupportTaskOutcome.OneLoginUserRecordMatching_Connected, events.ToArray());
     }
 }
 
