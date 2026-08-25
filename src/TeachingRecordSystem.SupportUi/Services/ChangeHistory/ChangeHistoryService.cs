@@ -260,7 +260,7 @@ public class ChangeHistoryService(
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.LegacyEvent, personId, timelineEvent.Event.CreatedUtc, timelineEvent)!;
     }
 
-    private async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults)
+    public async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults)
     {
         var allPersonIds = allResults
             .SelectMany(r =>
@@ -317,7 +317,7 @@ public class ChangeHistoryService(
 
     private record Result(Process Process, RaisedByUserInfo RaisedByUser);
 
-    private record ContextData(
+    public record ContextData(
         IReadOnlyDictionary<Guid, ChangeHistoryContext.PersonInfo> AllPersons,
         IReadOnlyDictionary<string, ChangeHistoryContext.OneLoginUserInfo> AllOneLoginUsers);
 }
