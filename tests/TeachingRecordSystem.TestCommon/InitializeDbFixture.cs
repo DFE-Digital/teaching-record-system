@@ -13,7 +13,5 @@ public class InitializeDbFixture : IAsyncLifetime
 
     protected Task InitializeDbAsync() => DbHelper.InitializeAsync();
 
-#pragma warning disable CA1816
     public virtual ValueTask DisposeAsync() => ValueTask.CompletedTask;
-#pragma warning restore CA1816
 }

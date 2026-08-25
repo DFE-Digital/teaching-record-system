@@ -4,6 +4,7 @@
     <IsTestProject>false</IsTestProject>
     <IsPublishable>false</IsPublishable>
     <UserSecretsId>TeachingRecordSystemTests</UserSecretsId>
+    <NoWarn>$(NoWarn);CA1816</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
