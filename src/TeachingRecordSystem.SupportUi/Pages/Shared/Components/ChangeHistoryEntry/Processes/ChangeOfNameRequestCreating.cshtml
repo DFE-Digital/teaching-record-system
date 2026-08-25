@@ -3,8 +3,7 @@
 @model ChangeHistoryEntryViewModel
 @{
     var supportTaskCreatedEvent = Model.GetEvent<SupportTaskCreatedEvent>();
-    var changeRequestData = supportTaskCreatedEvent.SupportTask.Data as ChangeNameRequestData
-        ?? throw new InvalidOperationException($"Expected {nameof(ChangeNameRequestData)} for {Model.ProcessType}.");
+    var changeRequestData = (ChangeNameRequestData)supportTaskCreatedEvent.SupportTask.Data;
     var requestedName = string.JoinNonEmpty(' ', changeRequestData.FirstName, changeRequestData.MiddleName, changeRequestData.LastName);
 }
 
