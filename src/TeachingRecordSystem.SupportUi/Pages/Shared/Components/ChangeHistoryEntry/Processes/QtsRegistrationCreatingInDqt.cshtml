@@ -1,0 +1,41 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var createdEvent = Model.GetEvent<DqtQtsRegistrationCreatedEvent>();
+    var qts = createdEvent.QtsRegistration;
+}
+
+<timeline-entry title="DQT QTS registration created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-summary-list>
+        @if (qts?.TeacherStatusName is not null)
+        {
+            <row>
+                <key>Teacher status name</key>
+                <value use-empty-fallback>@qts.TeacherStatusName</value>
+            </row>
+        }
+
+        @if (qts?.EarlyYearsStatusName is not null)
+        {
+            <row>
+                <key>Early years status name</key>
+                <value use-empty-fallback>@qts.EarlyYearsStatusName</value>
+            </row>
+        }
+
+        @if (qts?.QtsDate is not null)
+        {
+            <row>
+                <key>QTS date</key>
+                <value use-empty-fallback>@qts.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+
+        @if (qts?.EytsDate is not null)
+        {
+            <row>
+                <key>EYTS date</key>
+                <value use-empty-fallback>@qts.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+        }
+    </govuk-summary-list>
+</timeline-entry>

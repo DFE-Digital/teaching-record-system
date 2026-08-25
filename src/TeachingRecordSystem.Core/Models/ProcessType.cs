@@ -78,5 +78,9 @@ public enum ProcessType
     InductionImportingIntoDqt = 76,
     InductionDeactivatingInDqt = 77,
     InductionReactivatingInDqt = 78,
-    PersonInductionStatusChangingInDqt = 79
+    PersonInductionStatusChangingInDqt = 79,
+    InitialTeacherTrainingCreatingInDqt = 80,
+    InitialTeacherTrainingUpdatingInDqt = 81,
+    QtsRegistrationCreatingInDqt = 82,
+    QtsRegistrationUpdatingInDqt = 83
 }
