@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks.OneLoginUserMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -40,11 +41,13 @@ public abstract class TestBase : IDisposable
 
     protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
-    protected OneLoginUserMatchingSupportTaskService OneLoginSupportTaskService => HostFixture.Services.GetRequiredService<OneLoginUserMatchingSupportTaskService>();
+    protected OneLoginUserMatchingSupportTaskService OneLoginSupportTaskService => CreateScopedService<OneLoginUserMatchingSupportTaskService>();
 
-    protected OneLoginService OneLoginService => HostFixture.Services.GetRequiredService<OneLoginService>();
+    protected OneLoginService OneLoginService => CreateScopedService<OneLoginService>();
 
-    protected AlertService AlertService => HostFixture.Services.GetRequiredService<AlertService>();
+    protected AlertService AlertService => CreateScopedService<AlertService>();
+
+    protected RoutesToProfessionalStatusService RoutesToProfessionalStatusService => CreateScopedService<RoutesToProfessionalStatusService>();
 
     protected Mock<IAadUserService> AzureActiveDirectoryUserServiceMock =>
         TestScopedServices.GetCurrent().AzureActiveDirectoryUserServiceMock;
@@ -53,7 +56,7 @@ public abstract class TestBase : IDisposable
 
     protected TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    protected JourneyHelper JourneyHelper => HostFixture.Services.GetRequiredService<JourneyHelper>();
+    protected JourneyHelper JourneyHelper => CreateScopedService<JourneyHelper>();
 
     protected TestableFeatureProvider FeatureProvider => TestScopedServices.GetCurrent().FeatureProvider;
 
@@ -71,11 +74,19 @@ public abstract class TestBase : IDisposable
         _disposables.Clear();
     }
 
-    protected T CreateJourneyCoordinator<T>()
+    protected T CreateJourneyCoordinator<T>() =>
+        ActivatorUtilities.CreateInstance<T>(CreateScope().ServiceProvider);
+
+    // Services that depend on TrsDbContext must never be resolved from the root provider; that hands every test the
+    // same DbContext instance and tests running in parallel then trip EF's concurrency detector.
+    protected T CreateScopedService<T>() where T : notnull =>
+        CreateScope().ServiceProvider.GetRequiredService<T>();
+
+    private IServiceScope CreateScope()
     {
         var scope = HostFixture.Services.CreateScope();
         _disposables.Add(scope);
-        return ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider);
+        return scope;
     }
 
     protected Guid GetCurrentUserId() =>

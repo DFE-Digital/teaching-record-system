@@ -69,6 +69,10 @@ public class HostFixture : InitializeDbFixture
         {
             builder.UseEnvironment("Tests");
 
+            // Fail loudly if a scoped service (in particular TrsDbContext) is ever resolved from the root provider;
+            // sharing one DbContext between parallel tests causes intermittent EF concurrency failures.
+            builder.UseDefaultServiceProvider(options => options.ValidateScopes = true);
+
             // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
             // i.e. Program.cs and that has a dependency on IConfiguration
             var configuration = TestConfiguration.GetConfiguration();
