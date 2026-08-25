@@ -1,6 +1,100 @@
+@using Microsoft.EntityFrameworkCore
+@using TeachingRecordSystem.Core.DataStore.Postgres
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Models
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@inject PersonInfoCache PersonInfoCache
+@inject SupportUiLinkGenerator LinkGenerator
+@inject TrsDbContext DbContext
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
+    var outcome = supportTaskUpdatedEvent.SupportTask.Outcome;
+    var personId = supportTaskUpdatedEvent.SupportTask.PersonId;
+    var personInfo = personId is not null ? await PersonInfoCache.GetPersonInfoAsync(personId.Value) : null;
+    var hasEmailSentEvent = Model.TryGetEvent<EmailSentEvent>(out var emailSentEvent);
+    var hasOneLoginUpdatedEvent = Model.TryGetEvent<OneLoginUserUpdatedEvent>(out var oneLoginUpdatedEvent);
+    
+    string? oneLoginEmail = null;
+    string? oneLoginSubject = null;
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+    if (hasOneLoginUpdatedEvent)
+    {
+        oneLoginEmail = oneLoginUpdatedEvent!.OneLoginUser.EmailAddress;
+        oneLoginSubject = oneLoginUpdatedEvent.OneLoginUser.Subject;
+    }
+    else
+    {
+        oneLoginSubject = supportTaskUpdatedEvent.SupportTask.OneLoginUserSubject;
+        if (oneLoginSubject is not null)
+        {
+            var oneLoginUser = await DbContext.OneLoginUsers
+                .IgnoreQueryFilters()
+                .Where(u => u.Subject == oneLoginSubject)
+                .Select(u => new { u.EmailAddress })
+                .SingleOrDefaultAsync();
+            oneLoginEmail = oneLoginUser?.EmailAddress;
+        }
+    }
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    var isVerified = outcome is SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches 
+        or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches 
+        or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected;
+}
+
+<timeline-entry title="GOV.UK One Login ID verification task completed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="verification-outcome">
+        @if (isVerified)
+        {
+            <tag color="@TagColor.Green">Identity verified</tag>
+        }
+        else
+        {
+            <tag color="@TagColor.Red">Identity verification rejected</tag>
+        }
+    </p>
+
+    <p class="govuk-body" data-testid="task-closed-message">
+        @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
+        {
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
+                Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
+            </a>
+            <text> closed for @oneLoginEmail.</text>
+        }
+        else
+        {
+            <text>Task closed for @oneLoginEmail.</text>
+        }
+    </p>
+
+    @if (hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OneLoginUser.PersonId is not null)
+    {
+        var matchedPersonId = oneLoginUpdatedEvent.OneLoginUser.PersonId!.Value;
+        var matchedPersonInfo = await PersonInfoCache.GetPersonInfoAsync(matchedPersonId);
+        var matchedPersonLinkText = $"{matchedPersonInfo?.FirstName} {matchedPersonInfo?.LastName}";
+
+        <p class="govuk-body" data-testid="one-login-matched-message">
+            @if (Model.Context.ContextType == ChangeHistoryContextType.SupportTask)
+            {
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+            else if (Model.Context.ContextType == ChangeHistoryContextType.Person)
+            {
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to a record.
+            }
+            else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+            {
+                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+        </p>
+    }
+
+    @if (hasEmailSentEvent)
+    {
+        <p class="govuk-body" data-testid="email-sent-message">
+            We’ve sent them an email confirming the outcome of their request.
+        </p>
+    }
 </timeline-entry>
