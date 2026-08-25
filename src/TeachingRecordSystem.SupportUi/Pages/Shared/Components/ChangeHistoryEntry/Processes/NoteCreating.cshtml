@@ -1,0 +1,20 @@
+@inject PersonInfoCache PersonInfoCache
+@model ChangeHistoryEntryViewModel
+@{
+    var noteCreatedEvent = Model.GetEvent<NoteCreatedEvent>();
+    var personInfo = Model.Context.GetPersonInfo(noteCreatedEvent.PersonId);
+    var note = noteCreatedEvent.Note;
+}
+
+<timeline-entry title="Notes added" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body">
+        Note added for @personInfo.FirstName @personInfo.LastName.
+    </p>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="note-content">
+        <govuk-details-summary>Note</govuk-details-summary>
+        <govuk-details-text>
+            @Html.ConvertNewlinesToLineBreaks(note.Content)
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

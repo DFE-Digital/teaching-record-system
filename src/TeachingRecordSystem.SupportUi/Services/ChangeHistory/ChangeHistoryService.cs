@@ -122,6 +122,7 @@ public class ChangeHistoryService(
             ProcessType.MandatoryQualificationCreating,
             ProcessType.MandatoryQualificationUpdating,
             ProcessType.MandatoryQualificationDeleting,
+            ProcessType.NoteCreating,
             ProcessType.PersonOneLoginUserDisconnecting,
             ProcessType.PersonOneLoginUserConnecting,
             ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,

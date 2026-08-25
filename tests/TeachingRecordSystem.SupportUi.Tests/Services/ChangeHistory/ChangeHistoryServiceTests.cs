@@ -262,6 +262,28 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(expectedLastNames, GetLastNames(result));
     }
 
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesNoteCreatingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var process = await CreateNoteCreatingProcessAsync(person.PersonId, user.UserId);
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.NoteCreating, entry.Process.ProcessType);
+    }
+
+
     [Theory]
     [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, null, false)]
@@ -616,6 +638,25 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
                 PersonId = personId,
                 Changes = PersonReactivatedEventChanges.PersonStatus
             });
+
+    private Task<Process> CreateNoteCreatingProcessAsync(Guid personId, Guid userId) =>
+        TestData.CreateProcessAsync(
+            ProcessType.NoteCreating,
+            userId,
+            changeReason: null,
+            new NoteCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = personId,
+                Note = new EventModels.Note
+                {
+                    NoteId = Guid.NewGuid(),
+                    PersonId = personId,
+                    Content = "Test note content",
+                    File = null
+                }
+            });
+
 
     private static EventModels.PersonDetails CreatePersonDetails(string lastName) =>
         new()
