@@ -136,6 +136,66 @@ public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : 
     }
 
     [Fact]
+    public async Task Execute_WithNoEmailAddressOnTheTask_UsesTheAddressTheRecordHeldAtTheTime()
+    {
+        // Arrange
+        var emailAddressAtTheTime = TestData.GenerateUniqueEmail();
+        var currentEmailAddress = TestData.GenerateUniqueEmail();
+        var person = await TestData.CreatePersonAsync(b => b.WithEmailAddress(currentEmailAddress));
+
+        var process = await CreateChangeNameRequestProcessAsync(
+            person,
+            ProcessType.ChangeOfNameRequestRejecting,
+            requestEmailAddress: null,
+            rejectionReason: ChangeRequestRejectReason.ImageQuality.GetDisplayName(),
+            newFirstName: null);
+
+        // The address on the record changed after the request was rejected.
+        await AddLegacyPersonDetailsUpdatedEventAsync(
+            person,
+            process.CreatedOn.AddDays(1),
+            oldEmailAddress: emailAddressAtTheTime,
+            emailAddress: currentEmailAddress);
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestEmailSentEventsJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, process.ProcessId);
+            Assert.Equal(emailAddressAtTheTime, emailSentEvent.Email.EmailAddress);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_WithNoEmailAddressOnTheTaskAndAnUnchangedRecord_UsesTheAddressOnTheRecord()
+    {
+        // Arrange
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var person = await TestData.CreatePersonAsync(b => b.WithEmailAddress(emailAddress));
+
+        var process = await CreateChangeNameRequestProcessAsync(
+            person,
+            ProcessType.ChangeOfNameRequestRejecting,
+            requestEmailAddress: null,
+            rejectionReason: ChangeRequestRejectReason.ImageQuality.GetDisplayName(),
+            newFirstName: null);
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestEmailSentEventsJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, process.ProcessId);
+            Assert.Equal(emailAddress, emailSentEvent.Email.EmailAddress);
+        });
+    }
+
+    [Fact]
     public async Task Execute_CancellingProcess_IsNotBackfilled()
     {
         // Arrange
@@ -271,16 +331,42 @@ public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : 
             personDetailsUpdatedEvent);
     }
 
-    private static EventModels.PersonDetails CreatePersonDetails(string firstName, string lastName) => new()
+    private static EventModels.PersonDetails CreatePersonDetails(string firstName, string lastName, string? emailAddress = null) => new()
     {
         FirstName = firstName,
         MiddleName = string.Empty,
         LastName = lastName,
         DateOfBirth = null,
-        EmailAddress = null,
+        EmailAddress = emailAddress,
         NationalInsuranceNumber = null,
         Gender = null
     };
+
+    private Task AddLegacyPersonDetailsUpdatedEventAsync(
+        Person person,
+        DateTime createdUtc,
+        string? oldEmailAddress,
+        string? emailAddress) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(new LegacyEvents.PersonDetailsUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = createdUtc,
+                RaisedBy = SystemUser.SystemUserId,
+                PersonId = person.PersonId,
+                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress,
+                PersonAttributes = CreatePersonDetails(person.FirstName, person.LastName, emailAddress),
+                OldPersonAttributes = CreatePersonDetails(person.FirstName, person.LastName, oldEmailAddress),
+                NameChangeReason = null,
+                NameChangeEvidenceFile = null,
+                DetailsChangeReason = null,
+                DetailsChangeReasonDetail = null,
+                DetailsChangeEvidenceFile = null
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
 
     private static async Task<EmailSentEvent> GetEmailSentEventAsync(TrsDbContext dbContext, Guid processId)
     {

@@ -109,7 +109,8 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
 
             // We have no record of whether the confirmation email was actually sent for these approvals, so
             // we assume one was sent to the address the change was requested from, falling back to the
-            // address on the record.
+            // address on the record. The legacy event snapshots the record as it was at the approval, so
+            // that address is already the one in force at the time.
             var emailAddress = !string.IsNullOrEmpty(requestEmailAddress)
                 ? requestEmailAddress
                 : personAttributes.EmailAddress ?? string.Empty;

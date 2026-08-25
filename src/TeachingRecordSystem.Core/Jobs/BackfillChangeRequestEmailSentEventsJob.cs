@@ -53,6 +53,8 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
             .Where(p => personIds.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, cancellationToken);
 
+        var emailAddressHistory = await PersonEmailAddressHistory.CreateAsync(dbContext, personIds, cancellationToken);
+
         foreach (var process in processes)
         {
             var payloads = process.Events!.Select(e => e.Payload).ToArray();
@@ -66,6 +68,7 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
             persons.TryGetValue(personId, out var person);
 
             var supportTask = supportTaskUpdatedEvent.SupportTask;
+            var personDetailsUpdatedEvent = payloads.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
             var isApproval = process.ProcessType is ProcessType.ChangeOfNameRequestApproving or ProcessType.ChangeOfDateOfBirthRequestApproving;
 
             var (requestEmailAddress, templateId) = supportTask.Data switch
@@ -88,7 +91,13 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
                 continue;
             }
 
-            var emailAddress = !string.IsNullOrEmpty(requestEmailAddress) ? requestEmailAddress : person?.EmailAddress;
+            // The address on the record may have changed since, so fall back to the one it held at the time
+            // rather than whatever is on it now. A process that changed the person's details carries that
+            // address itself.
+            var emailAddress = !string.IsNullOrEmpty(requestEmailAddress)
+                ? requestEmailAddress
+                : personDetailsUpdatedEvent?.PersonDetails.EmailAddress
+                    ?? emailAddressHistory.GetEmailAddressAt(personId, process.CreatedOn);
 
             // Nothing to send to means nothing was sent.
             if (string.IsNullOrEmpty(emailAddress))
@@ -97,8 +106,7 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
             }
 
             // An approval applies the change before emailing, so the person is addressed by their new name.
-            var firstName = payloads.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault()?.PersonDetails.FirstName
-                ?? person?.FirstName;
+            var firstName = personDetailsUpdatedEvent?.PersonDetails.FirstName ?? person?.FirstName;
 
             if (firstName is null)
             {
