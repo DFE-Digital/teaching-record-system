@@ -5,7 +5,6 @@ using TrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20260515.WebhookData;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]

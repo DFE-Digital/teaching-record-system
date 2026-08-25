@@ -3,13 +3,15 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
-public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture), IAsyncLifetime
+public class CheckAnswersTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.Index;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()

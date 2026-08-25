@@ -2,11 +2,13 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts;
 
-public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()

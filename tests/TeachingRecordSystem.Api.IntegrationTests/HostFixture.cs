@@ -12,12 +12,13 @@ using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.TestCommon.Database;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public class HostFixture : InitializeDbFixture
+public class HostFixture : IAsyncLifetime
 {
     private readonly ApiWebApplicationFactory _webApplicationFactory;
 
@@ -39,7 +40,11 @@ public class HostFixture : InitializeDbFixture
 
     public SigningCredentials JwtSigningCredentials { get; }
 
-    public IServiceProvider Services => _webApplicationFactory.Services;
+    // Resolves through the running test's scope when there is one, so scoped services aren't cached in the
+    // root provider and shared across tests. Falls back to the root provider outside a test (host start-up).
+    public IServiceProvider Services => TestServiceScope.Current ?? _webApplicationFactory.Services;
+
+    public IServiceProvider RootServices => _webApplicationFactory.Services;
 
     public void ConfigureEvidenceFilesHttpClient(Action<HttpClientInterceptorOptions> configure) =>
         configure(TestScopedServices.GetCurrent().EvidenceFilesHttpClientInterceptorOptions);
@@ -78,15 +83,21 @@ public class HostFixture : InitializeDbFixture
         }
     }
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await InitializeDbAsync();
+        // Seeded into the template rather than written once at start-up, so every test's database has them.
+        TestDatabases.AddTemplateSeed("api-application-users-v1", dbContext =>
+        {
+            EnsureApplicationUsers(dbContext);
+            return Task.CompletedTask;
+        });
 
-        using var dbContext = DbHelper.Instance.DbContextFactory.CreateDbContext();
-        EnsureApplicationUsers(dbContext);
+        await TestDatabases.InitializeAsync();
 
-        _ = Services;  // Start the server
+        _ = RootServices;  // Start the server
     }
+
+    public async ValueTask DisposeAsync() => await TestDatabases.DisposeAsync();
 
     private class ApiWebApplicationFactory(HostFixture hostFixture) : WebApplicationFactory<Program>
     {
@@ -120,7 +131,6 @@ public class HostFixture : InitializeDbFixture
                 services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
 
                 services
-                    .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>()
                     .AddSingleton<CurrentApiClientProvider>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>()
@@ -149,6 +159,9 @@ public class HostFixture : InitializeDbFixture
                     .ConfigurePrimaryHttpMessageHandler(_ => new DelegateToEvidenceFilesHandler());
 
                 TestScopedServices.ConfigureServices(services);
+
+                // Route every TrsDbContext at the database leased by the running test.
+                services.AddPooledTestDatabase();
             });
         }
 

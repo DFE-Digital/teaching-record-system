@@ -4,11 +4,13 @@ using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests.EditChangeRequest;
 
-public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
+    }
 
     [Fact]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()

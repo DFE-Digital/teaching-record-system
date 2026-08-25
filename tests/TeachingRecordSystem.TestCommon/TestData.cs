@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.TestCommon.Database;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -29,7 +30,11 @@ public partial class TestData(
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
 
-    public ReferenceDataCache ReferenceDataCache { get; } = referenceDataCache;
+    // TestData is registered as a singleton, so it would otherwise hold the process-wide cache for the
+    // lifetime of the run rather than the one belonging to the database the current test owns.
+    public ReferenceDataCache ReferenceDataCache => TestDatabaseScope.TryGetCurrent() is not null
+        ? PooledReferenceDataCaches.ForCurrentDatabase(DbContextFactory)
+        : referenceDataCache;
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
     {

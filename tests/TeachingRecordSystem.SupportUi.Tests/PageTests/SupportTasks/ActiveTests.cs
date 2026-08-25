@@ -6,7 +6,6 @@ using TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
@@ -122,6 +121,8 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_AssignedToFilterOptions_IncludeUnassignedAndMyselfAndExcludeCurrentUserFromUserList()
     {
         // Arrange
+        await DeleteSeededUsersAsync();
+
         var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
         var otherUser = await TestData.CreateUserAsync(name: "Other User", role: UserRoles.RecordManager);
 

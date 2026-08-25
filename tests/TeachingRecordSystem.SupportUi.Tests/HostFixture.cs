@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.SupportUi.Tests;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
@@ -16,7 +16,7 @@ using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public class HostFixture : InitializeDbFixture
+public class HostFixture : IAsyncLifetime
 {
     private readonly SupportUiApplicationFactory _webApplicationFactory;
 
@@ -25,43 +25,44 @@ public class HostFixture : InitializeDbFixture
         _webApplicationFactory = new SupportUiApplicationFactory();
     }
 
-    public static User AdminUser { get; private set; } = null!;
+    // Seeded into the template rather than created at host startup, so it exists in every test's database.
+    // The id is fixed so this instance matches the seeded row.
+    public static User AdminUser { get; } = new()
+    {
+        UserId = new Guid("8f0f0b47-3f0e-4a6d-9a1e-2f9b6a2a1c10"),
+        Active = true,
+        Name = "Test admin user",
+        Email = "test.admin@example.org",
+        Role = UserRoles.Administrator,
+        AzureAdUserId = null
+    };
 
-    public IServiceProvider Services => _webApplicationFactory.Services;
+    // Resolves through the running test's scope when there is one, so scoped services aren't cached in the
+    // root provider and shared across tests. Falls back to the root provider outside of a test (host start-up).
+    public IServiceProvider Services => TestServiceScope.Current ?? _webApplicationFactory.Services;
+
+    public IServiceProvider RootServices => _webApplicationFactory.Services;
 
     public HttpClient CreateClient() => _webApplicationFactory.CreateClient();
 
     public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await InitializeDbAsync();
-
-        _ = Services;  // Start the host
-
-        AdminUser = await CreateUser();
-
-        async Task<User> CreateUser()
+        TestDatabases.AddTemplateSeed("supportui-admin-user-v1", async dbContext =>
         {
-            await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
-
-            var user = new User
-            {
-                Active = true,
-                Name = "Test admin user",
-                Email = "test.admin@example.org",
-                Role = UserRoles.Administrator,
-                UserId = Guid.NewGuid(),
-                AzureAdUserId = null
-            };
-
-            dbContext.Users.Add(user);
-
+            dbContext.Users.Add(AdminUser);
             await dbContext.SaveChangesAsync();
+        });
 
-            return user;
-        }
+        TestDatabases.AddTemplateSeed("supportui-test-route-types-v1", AddTestRouteTypes.SeedAsync);
+
+        await TestDatabases.InitializeAsync();
+
+        _ = RootServices;  // Start the host
     }
+
+    public async ValueTask DisposeAsync() => await TestDatabases.DisposeAsync();
 
     private class SupportUiApplicationFactory : WebApplicationFactory<Program>
     {
@@ -90,17 +91,18 @@ public class HostFixture : InitializeDbFixture
                 PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
                 services
-                    .AddSingleton(DbHelper.Instance)
                     .AddSingleton<CurrentUserProvider>()
                     .AddSingleton<TestData>()
                     .AddSingleton<INotificationSender, NoopNotificationSender>()
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
-                    .AddStartupTask<AddTestRouteTypesStartupTask>()
                     .AddOneLoginService()
                     .AddSupportTaskServices()
                     .AddGovUkQuestionsTestingServices();
 
                 TestScopedServices.ConfigureServices(services);
+
+                // Route every TrsDbContext at the database leased by the running test.
+                services.AddPooledTestDatabase();
             });
         }
 

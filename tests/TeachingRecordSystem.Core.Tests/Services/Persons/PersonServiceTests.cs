@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Persons;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]

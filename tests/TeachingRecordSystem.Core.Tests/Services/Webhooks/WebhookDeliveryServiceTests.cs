@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class WebhookDeliveryServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]

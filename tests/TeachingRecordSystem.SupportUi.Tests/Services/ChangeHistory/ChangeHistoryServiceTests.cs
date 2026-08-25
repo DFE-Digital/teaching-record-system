@@ -6,7 +6,6 @@ using PaginationOptions = TeachingRecordSystem.SupportUi.Services.PaginationOpti
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services.ChangeHistory;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]

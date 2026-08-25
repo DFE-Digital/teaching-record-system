@@ -9,6 +9,8 @@ namespace TeachingRecordSystem.Core.Tests.EventPipelineTests;
 
 public class EventPipelineFixture : ServiceProviderFixture
 {
+    protected override bool UsePooledDatabase => true;
+
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services

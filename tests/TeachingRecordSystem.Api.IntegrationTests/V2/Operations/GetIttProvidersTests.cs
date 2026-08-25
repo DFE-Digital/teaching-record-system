@@ -1,8 +1,5 @@
-using TeachingRecordSystem.TestCommon.Infrastructure;
-
 namespace TeachingRecordSystem.Api.IntegrationTests.V2.Operations;
 
-[Collection(nameof(DisableParallelization))]  // To keep the set of training providers consistent
 public class GetIttProvidersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     // TODO: investigate!
@@ -10,9 +7,6 @@ public class GetIttProvidersTests(HostFixture hostFixture) : TestBase(hostFixtur
     public async Task Given_request_returns_list_of_itt_providers()
     {
         // Arrange
-        await DbHelper.ClearDataAsync();
-        await WithDbContextAsync(SeedLookupData.EnsureTestTrainingProvidersAsync);
-
         var request = new HttpRequestMessage(HttpMethod.Get, "/v2/itt-providers");
 
         // Act

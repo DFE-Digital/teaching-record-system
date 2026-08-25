@@ -2,14 +2,16 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
+public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.AlertType;
     private const string ThisStep = JourneySteps.Details;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

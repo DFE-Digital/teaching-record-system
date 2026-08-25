@@ -2,7 +2,6 @@ using System.Net;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250627;
 
-[Collection(nameof(DisableParallelization))]
 public class SetDeceasedTests : TestBase
 {
     public SetDeceasedTests(HostFixture hostFixture)

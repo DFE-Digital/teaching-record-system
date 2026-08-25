@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.TestCommon.Database;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Services;
 
-public abstract class ServiceTestBase
+public abstract class ServiceTestBase : PooledDatabaseTestBase
 {
     private readonly ServiceFixture _fixture;
 

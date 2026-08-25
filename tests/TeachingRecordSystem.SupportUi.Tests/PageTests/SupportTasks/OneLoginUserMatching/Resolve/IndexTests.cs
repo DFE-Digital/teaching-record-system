@@ -2,7 +2,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching.Resolve;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTestBase(hostFixture)
 {
     [Fact]

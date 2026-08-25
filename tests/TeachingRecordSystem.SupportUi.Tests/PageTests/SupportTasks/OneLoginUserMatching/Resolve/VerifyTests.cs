@@ -5,7 +5,6 @@ using CoreNationalInsuranceNumber = TeachingRecordSystem.Core.NationalInsuranceN
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching.Resolve;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingTestBase(hostFixture)
 {
     [Theory]
@@ -386,13 +385,6 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
     public async Task Post_SaveAndComeBackLater_PersistsJourneyStateIntoTaskAndRedirectsToCorrectPage(bool supportTaskDashboardEnabled)
     {
         // Arrange
-        // Recreate AdminUser since [ClearDbBeforeTest] removes it
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.Users.Add(HostFixture.AdminUser);
-            await dbContext.SaveChangesAsync();
-        });
-
         FeatureProvider.Features.Clear();
         if (supportTaskDashboardEnabled)
         {

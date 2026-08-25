@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Cli.Tests;
 using TeachingRecordSystem.TestCommon;
+using TeachingRecordSystem.TestCommon.Database;
 using Xunit.v3;
 
 [assembly: AssemblyFixture(typeof(CompositionRoot))]
@@ -34,14 +35,15 @@ public class CompositionRoot : IAsyncLifetime
             .AddDatabase(configuration)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()
-            .AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero)));
+            .AddSingleton<TimeProvider>(new FakeTimeProvider(new DateTimeOffset(2021, 1, 4, 0, 0, 0, TimeSpan.Zero)))
+            .AddPooledTestDatabase();
 
         return services.BuildServiceProvider();
     }
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => await Services.GetRequiredService<DbHelper>().InitializeAsync();
+    async ValueTask IAsyncLifetime.InitializeAsync() => await TestDatabases.InitializeAsync();
 
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    async ValueTask IAsyncDisposable.DisposeAsync() => await TestDatabases.DisposeAsync();
 
     private class TypeActivator(IServiceProvider serviceProvider) : ITypeActivator
     {

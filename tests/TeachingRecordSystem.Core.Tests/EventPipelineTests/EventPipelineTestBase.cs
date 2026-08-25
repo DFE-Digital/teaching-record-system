@@ -1,10 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.TestCommon.Database;
 
 namespace TeachingRecordSystem.Core.Tests.EventPipelineTests;
 
-public class EventPipelineTestBase
+public class EventPipelineTestBase : PooledDatabaseTestBase
 {
     private readonly EventPipelineFixture _fixture;
 

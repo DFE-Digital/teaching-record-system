@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.TestCommon.Database;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -16,10 +17,43 @@ public class ServiceProviderFixture : InitializeDbFixture
 
         // ReSharper disable once VirtualMemberCallInConstructor
         ConfigureServices(services, configuration);
+
+        // Registered last so it wins: every TrsDbContext is built against the database leased by the
+        // running test rather than one shared database.
+        if (UsePooledDatabase)
+        {
+            services.AddPooledTestDatabase();
+        }
+
         Services = services.BuildServiceProvider();
     }
 
     public IServiceProvider Services { get; set; }
+
+    // Opt in to give every test its own database. Fixtures that haven't migrated keep using the single
+    // shared database that DbHelper manages.
+    protected virtual bool UsePooledDatabase => false;
+
+    public override async ValueTask InitializeAsync()
+    {
+        if (UsePooledDatabase)
+        {
+            await TestDatabases.InitializeAsync();
+            return;
+        }
+
+        await base.InitializeAsync();
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (UsePooledDatabase)
+        {
+            await TestDatabases.DisposeAsync();
+        }
+
+        await base.DisposeAsync();
+    }
 
     public void WithService<TService>(Action<TService> action, params object[] arguments)
         where TService : notnull

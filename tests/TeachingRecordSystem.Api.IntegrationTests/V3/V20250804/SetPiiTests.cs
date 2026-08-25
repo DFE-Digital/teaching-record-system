@@ -2,7 +2,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250804;
 
-[Collection(nameof(DisableParallelization))]
 public class SetPiiTests : TestBase
 {
     public SetPiiTests(HostFixture hostFixture) : base(hostFixture)

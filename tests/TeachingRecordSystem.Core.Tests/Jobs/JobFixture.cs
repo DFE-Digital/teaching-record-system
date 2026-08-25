@@ -19,6 +19,8 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 public class JobFixture : ServiceProviderFixture
 {
+    protected override bool UsePooledDatabase => true;
+
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services
