@@ -12,6 +12,7 @@ public interface IOneLoginUserMatchingData : ISupportTaskData
     string? NotConnectingAdditionalDetails { get; init; }
     string[][]? VerifiedOrStatedNames { get; }
     DateOnly[]? VerifiedOrStatedDatesOfBirth { get; }
+    Guid? PersonId { get; }
 }
 
 public enum OneLoginUserNotConnectingReason

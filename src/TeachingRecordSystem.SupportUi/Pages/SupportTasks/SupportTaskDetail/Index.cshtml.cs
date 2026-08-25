@@ -155,11 +155,10 @@ public class Index(
         BackLink = this.GetReturnUrlOrDefault(
             IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
 
-        var changeHistoryContext = ChangeHistoryContext.ForSupportTask(SupportTaskReference);
         ChangeHistory = (await changeHistoryService.GetChangeHistoryBySupportTaskAsync(SupportTaskReference))
             .Select(e => new ChangeHistoryEntryViewModel
             {
-                Context = changeHistoryContext,
+                Context = e.Context,
                 Timestamp = e.Process.CreatedOn,
                 UserName = e.RaisedByUser.Name,
                 ProcessId = e.Process.ProcessId,

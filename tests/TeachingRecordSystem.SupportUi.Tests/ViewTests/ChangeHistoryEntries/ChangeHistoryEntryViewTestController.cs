@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 namespace TeachingRecordSystem.SupportUi.Tests.ViewTests.ChangeHistoryEntries;
 

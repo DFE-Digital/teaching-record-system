@@ -78,6 +78,9 @@ public class ResultPage<T>(IReadOnlyCollection<T> items, int currentPage, int pa
     public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public int Count => items.Count;
+
+    public ResultPage<R> Select<R>(Func<T, R> selector) =>
+        new(items.Select(selector).AsReadOnly(), CurrentPage, PageSize, TotalItemCount);
 }
 
 public class ResultPage(int currentPage, int pageSize, int totalItemCount)

@@ -1,11 +1,11 @@
 @using TeachingRecordSystem.Core.Events.ChangeReasons
-@inject PersonInfoCache PersonInfoCache
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model ChangeHistoryEntryViewModel
 @{
     var updatedEvent = Model.GetEvent<OneLoginUserUpdatedEvent>();
     var oneLoginUser = updatedEvent.OldOneLoginUser;
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
-    var personInfo = oneLoginUser.PersonId is not null ? await PersonInfoCache.GetPersonInfoAsync(oneLoginUser.PersonId.Value) : null;
+    var personInfo = oneLoginUser.PersonId is Guid personId ? Model.Context.GetPersonInfo(personId) : null;
     var personLinkText = personInfo is not null ? $"{personInfo.FirstName} {personInfo.LastName}" : "record";
 }
 
