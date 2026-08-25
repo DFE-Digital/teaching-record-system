@@ -177,11 +177,11 @@ public class ChangeRequestSupportTaskService(
                     [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = person.FirstName,
                     [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = GetRejectionReasonEmailText(options.RejectionReason)
                 },
-                processId: null);
+                processContext.ProcessId);
         }
     }
 
-    private static string GetRejectionReasonEmailText(ChangeRequestRejectReason reason) => reason switch
+    public static string GetRejectionReasonEmailText(ChangeRequestRejectReason reason) => reason switch
     {
         ChangeRequestRejectReason.RequestAndProofDontMatch => "This is because the proof you provided did not match your request.",
         ChangeRequestRejectReason.WrongTypeOfDocument => "This is because you provided the wrong type of document.",
@@ -192,7 +192,7 @@ public class ChangeRequestSupportTaskService(
     public Task CancelChangeRequestAsync(CancelChangeRequestSupportTaskOptions options, ProcessContext processContext) =>
         ResolveChangeRequestAsync(options.SupportTask, SupportRequestOutcome.Cancelled, rejectionReason: null, processContext);
 
-    private async Task SendEmailAsync(string templateId, string emailAddress, Dictionary<string, string> personalization, Guid? processId)
+    private async Task SendEmailAsync(string templateId, string emailAddress, Dictionary<string, string> personalization, Guid processId)
     {
         var email = new Email
         {
@@ -205,14 +205,7 @@ public class ChangeRequestSupportTaskService(
         dbContext.Emails.Add(email);
         await dbContext.SaveChangesAsync();
 
-        if (processId is Guid nonNullProcessId)
-        {
-            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, nonNullProcessId));
-        }
-        else
-        {
-            await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
-        }
+        await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processId));
     }
 
     private Task ResolveChangeRequestAsync(

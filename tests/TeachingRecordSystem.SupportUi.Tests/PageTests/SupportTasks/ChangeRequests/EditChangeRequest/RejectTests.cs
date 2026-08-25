@@ -151,6 +151,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         }
 
         EventObserver.Clear();
+        Events.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/change-requests/{supportTask.SupportTaskReference}/reject")
         {
@@ -220,6 +221,21 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         e2 =>
         {
             var emailEvent = Assert.IsType<LegacyEvents.EmailSentEvent>(e2);
+        });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(
+                isNameChange ? ProcessType.ChangeOfNameRequestRejecting : ProcessType.ChangeOfDateOfBirthRequestRejecting,
+                p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<Core.Events.SupportTaskUpdatedEvent, Core.Events.EmailSentEvent>(
+                supportTaskUpdatedEvent => Assert.Equal("Request and proof don’t match", supportTaskUpdatedEvent.RejectionReason),
+                emailSentEvent => Assert.Equal(
+                    isNameChange
+                        ? EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation
+                        : EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation,
+                    emailSentEvent.Email.TemplateId));
         });
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);

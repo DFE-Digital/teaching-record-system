@@ -285,8 +285,7 @@ Support UI *Change requests → reject* (name change).
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as rejected. |
-
-*The rejection email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A rejection email is sent when an email address is available. |
 
 ### `ChangeOfDateOfBirthRequestRejecting` (58)
 Support UI *Change requests → reject* (date-of-birth change).
@@ -294,8 +293,7 @@ Support UI *Change requests → reject* (date-of-birth change).
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as rejected. |
-
-*The rejection email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A rejection email is sent when an email address is available. |
 
 ### `ChangeOfNameRequestCancelling` (59)
 Support UI *Change requests → reject* with reason *Change no longer required* (name change).

@@ -28,10 +28,11 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
         EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation
     ];
 
-    // The confirmation email is sent by a background job shortly after the approval, so an email sent
-    // within this window of the approval is taken to be that approval's confirmation email.
-    private static readonly TimeSpan _emailSentBeforeApprovalTolerance = TimeSpan.FromHours(1);
-    private static readonly TimeSpan _emailSentAfterApprovalTolerance = TimeSpan.FromDays(1);
+    private static readonly ProcessType[] _approvalProcessTypes =
+    [
+        ProcessType.ChangeOfNameRequestApproving,
+        ProcessType.ChangeOfDateOfBirthRequestApproving
+    ];
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -46,22 +47,11 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
             .OrderBy(e => e.Created)
             .ToListAsync(cancellationToken);
 
-        var candidateEmails = (await dbContext.Emails
-                .Where(e => _approvalEmailTemplateIds.Contains(e.TemplateId) && e.SentOn != null)
-                .ToListAsync(cancellationToken))
-            .GroupBy(e => (e.TemplateId, e.EmailAddress))
-            .ToDictionary(g => g.Key, g => g.OrderBy(e => e.SentOn).ToArray());
-
-        // Emails that an approval process already points at are not up for grabs.
-        var claimedEmailIds = (await dbContext.ProcessEvents
-                .Where(pe => pe.EventName == nameof(EmailSentEvent))
-                .Where(pe => dbContext.Processes.Any(p =>
-                    p.ProcessId == pe.ProcessId &&
-                    (p.ProcessType == ProcessType.ChangeOfNameRequestApproving || p.ProcessType == ProcessType.ChangeOfDateOfBirthRequestApproving)))
-                .Select(pe => pe.Payload)
-                .ToListAsync(cancellationToken))
-            .Select(payload => ((EmailSentEvent)payload).Email.EmailId)
-            .ToHashSet();
+        var emailMatcher = await SentEmailMatcher.CreateAsync(
+            dbContext,
+            _approvalEmailTemplateIds,
+            _approvalProcessTypes,
+            cancellationToken);
 
         foreach (var legacyEvent in legacyEvents)
         {
@@ -124,7 +114,7 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
                 ? requestEmailAddress
                 : personAttributes.EmailAddress ?? string.Empty;
 
-            var email = FindSentEmail(candidateEmails, claimedEmailIds, emailTemplateId, emailAddress, legacyEvent.Created);
+            var email = emailMatcher.Match(emailTemplateId, emailAddress, legacyEvent.Created);
 
             if (email is null)
             {
@@ -141,9 +131,8 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
                 };
 
                 dbContext.Emails.Add(email);
+                emailMatcher.Claim(email.EmailId);
             }
-
-            claimedEmailIds.Add(email.EmailId);
 
             var emailSentEvent = new EmailSentEvent
             {
@@ -168,27 +157,6 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
         {
             await transaction.CommitAsync(cancellationToken);
         }
-    }
-
-    private static Email? FindSentEmail(
-        IReadOnlyDictionary<(string TemplateId, string EmailAddress), Email[]> candidateEmails,
-        HashSet<Guid> claimedEmailIds,
-        string templateId,
-        string emailAddress,
-        DateTime approvedOn)
-    {
-        if (!candidateEmails.TryGetValue((templateId, emailAddress), out var emails))
-        {
-            return null;
-        }
-
-        return emails
-            .Where(e => !claimedEmailIds.Contains(e.EmailId))
-            .Where(e =>
-                e.SentOn >= approvedOn - _emailSentBeforeApprovalTolerance &&
-                e.SentOn <= approvedOn + _emailSentAfterApprovalTolerance)
-            .OrderBy(e => (e.SentOn!.Value - approvedOn).Duration())
-            .FirstOrDefault();
     }
 
     private void CreateProcessAndProcessEvents(Event legacyEvent, ProcessType processType, IEvent[] newEvents)
