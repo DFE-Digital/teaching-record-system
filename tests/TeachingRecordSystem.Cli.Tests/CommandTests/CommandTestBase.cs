@@ -10,8 +10,6 @@ public abstract class CommandTestBase(IServiceProvider services) : PooledDatabas
 {
     protected FakeTimeProvider TimeProvider => (FakeTimeProvider)services.GetRequiredService<TimeProvider>();
 
-    protected DbHelper DbHelper => services.GetRequiredService<DbHelper>();
-
     // The CLI commands build their own host from configuration, so they can't see the ambient data source.
     // Overlaying the leased database's connection string points them at the same database as the test.
     protected IConfiguration Configuration => new ConfigurationBuilder()

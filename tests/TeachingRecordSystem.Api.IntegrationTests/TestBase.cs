@@ -76,8 +76,6 @@ public abstract class TestBase : IAsyncLifetime
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    protected DbHelper DbHelper => HostFixture.Services.GetRequiredService<DbHelper>();
-
     protected Guid DefaultApplicationUserId => HostFixture.DefaultApplicationUserId;
 
     protected Guid ApplicationUserId { get; } = HostFixture.DefaultApplicationUserId;

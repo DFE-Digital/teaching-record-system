@@ -26,8 +26,6 @@ public abstract class OperationTestBase : PooledDatabaseTestBase
 
     protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
 
-    protected DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
-
     protected IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected TestData TestData => Services.GetRequiredService<TestData>();

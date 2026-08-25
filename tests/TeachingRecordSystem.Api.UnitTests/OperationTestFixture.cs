@@ -13,8 +13,6 @@ namespace TeachingRecordSystem.Api.UnitTests;
 
 public class OperationTestFixture : ServiceProviderFixture
 {
-    protected override bool UsePooledDatabase => true;
-
     private readonly Mock<ICurrentUserProvider> _currentUserProviderMock = new();
 
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)

@@ -22,7 +22,7 @@ Postgres (the existing testcontainer or configured server)
    services.AddPooledTestDatabase();               // last, in ConfigureServices, so it wins
    ```
 
-   Fixtures deriving from `ServiceProviderFixture` just override `UsePooledDatabase => true`.
+   Fixtures deriving from `ServiceProviderFixture` get both for free.
 
 2. The test base class leases a database per test, either by deriving from `PooledDatabaseTestBase` or by
    calling `TestDatabases.AcquireAsync` from `InitializeAsync` and disposing the lease afterwards.

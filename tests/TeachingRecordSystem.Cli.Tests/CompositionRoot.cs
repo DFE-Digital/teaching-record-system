@@ -31,7 +31,6 @@ public class CompositionRoot : IAsyncLifetime
 
         services
             .AddSingleton<IConfiguration>(configuration)
-            .AddSingleton(DbHelper.Instance)
             .AddDatabase(configuration)
             .AddSingleton<TestData>()
             .AddSingleton<ReferenceDataCache>()

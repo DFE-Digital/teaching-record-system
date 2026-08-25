@@ -15,8 +15,6 @@ namespace TeachingRecordSystem.Core.Tests.Services;
 
 public class ServiceFixture : ServiceProviderFixture
 {
-    protected override bool UsePooledDatabase => true;
-
     protected override void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services

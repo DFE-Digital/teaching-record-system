@@ -77,7 +77,7 @@ in the test output, so the exact state that broke can be opened with `psql`.
    services.AddPooledTestDatabase();        // last, so it wins
    ```
 
-   Fixtures deriving from `ServiceProviderFixture` only need `protected override bool UsePooledDatabase => true;`.
+   Fixtures deriving from `ServiceProviderFixture` get both for free.
 
 2. **Startup seeding** — anything the host wrote to the database at start-up has to move into the template
    via `TestDatabases.AddTemplateSeed(key, seed)`. A startup task would otherwise only populate whichever
