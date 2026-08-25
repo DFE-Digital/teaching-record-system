@@ -84,6 +84,7 @@ jobs:
 
     outputs:
       matrix: ${{ steps.get_test_projects.outputs.matrix }}
+      projects: ${{ steps.get_test_projects.outputs.projects }}
 
     steps:
       - uses: actions/checkout@v7
@@ -140,6 +141,7 @@ jobs:
           done
 
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "projects=$(jq -c 'map(.project) | unique' <<<"$matrix")" >> $GITHUB_OUTPUT
 
   tests:
     name: Tests (${{ matrix.entry.project }}${{ matrix.entry.shards > 1 && format(' {0}/{1}', matrix.entry.shard, matrix.entry.shards) || '' }})
@@ -244,10 +246,47 @@ jobs:
         uses: ./.github/workflows/actions/test
         with:
           test_project_path: tests/TeachingRecordSystem.${{ matrix.entry.project }}
-          report_name: "${{ matrix.entry.project }}${{ matrix.entry.shards > 1 && format(' {0}/{1}', matrix.entry.shard, matrix.entry.shards) || '' }} test results"
           dotnet_test_args: >-
             --no-build ${{ steps.shard.outputs.filter }}
         timeout-minutes: 30
+
+      - name: Keep the results for the report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ matrix.entry.project }}-${{ matrix.entry.shard }}
+          path: tests/TeachingRecordSystem.${{ matrix.entry.project }}/**/*.trx
+          # A job that fell over before running any tests has nothing to upload; the failure itself is the
+          # signal, so don't add a second, more confusing one on top of it.
+          if-no-files-found: warn
+          retention-days: 7
+
+  report_test_results:
+    name: Test results (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    needs: [get_affected_projects, tests]
+    if: always() && needs.get_affected_projects.outputs.matrix != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJson(needs.get_affected_projects.outputs.projects) }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Every shard of a project lands in one report, so a project that is split over several jobs still
+      # reads as a single set of results.
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: test-results-${{ matrix.project }}-*
+          merge-multiple: true
+          path: results
+
+      - uses: dorny/test-reporter@v1
+        with:
+          name: ${{ matrix.project }} test results
+          path: "results/**/*.trx"
+          reporter: dotnet-trx
 
   check_test_results:
     name: Check test results
