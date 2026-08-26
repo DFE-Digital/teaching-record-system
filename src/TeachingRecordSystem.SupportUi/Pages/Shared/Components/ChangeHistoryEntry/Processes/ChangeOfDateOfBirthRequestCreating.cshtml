@@ -3,8 +3,7 @@
 @model ChangeHistoryEntryViewModel
 @{
     var supportTaskCreatedEvent = Model.GetEvent<SupportTaskCreatedEvent>();
-    var changeRequestData = supportTaskCreatedEvent.SupportTask.Data as ChangeDateOfBirthRequestData
-        ?? throw new InvalidOperationException($"Expected {nameof(ChangeDateOfBirthRequestData)} for {Model.ProcessType}.");
+    var changeRequestData = (ChangeDateOfBirthRequestData)supportTaskCreatedEvent.SupportTask.Data;
     var requestedDateOfBirth = changeRequestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat);
 }
 
