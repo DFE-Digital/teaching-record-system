@@ -40,45 +40,41 @@
                 {
                     <radios-item value="@role.Name">@role.DisplayName</radios-item>
                     <divider>
-                        <table class="govuk-table">
-                            <caption class="govuk-table__caption govuk-table__caption--s">Permissions</caption>
+                        <govuk-table>
+                            <table-caption class="govuk-table__caption--s">Permissions</table-caption>
 
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    @foreach (var permission in role.Permissions)
+                            <table-head>
+                                @foreach (var permission in role.Permissions)
+                                {
+                                    <table-head-cell>@permission.Type</table-head-cell>
+                                }
+                            </table-head>
+                            <table-row>
+                                @foreach (var permission in role.Permissions)
+                                {
+                                    switch (permission.Level)
                                     {
-                                        <th scope="col" class="govuk-table__header">@permission.Type</th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                                <tr class="govuk-table__row">
-                                    @foreach (var permission in role.Permissions)
-                                    {
-                                        switch (permission.Level)
-                                        {
-                                            case UserPermissionLevel.Edit:
-                                                <td class="govuk-table__cell">
-                                                    <tag color="TagColor.Green">Edit</tag>
-                                                </td>
-                                                break;
+                                        case UserPermissionLevel.Edit:
+                                            <table-cell>
+                                                <tag color="TagColor.Green">Edit</tag>
+                                            </table-cell>
+                                            break;
 
-                                            case UserPermissionLevel.View:
-                                                <td class="govuk-table__cell">
-                                                    <tag color="TagColor.LightBlue">View</tag>
-                                                </td>
-                                                break;
+                                        case UserPermissionLevel.View:
+                                            <table-cell>
+                                                <tag color="TagColor.LightBlue">View</tag>
+                                            </table-cell>
+                                            break;
 
-                                            default:
-                                                <td class="govuk-table__cell">
-                                                    <tag color="TagColor.Grey">No</tag>
-                                                </td>
-                                                break;
-                                        }
+                                        default:
+                                            <table-cell>
+                                                <tag color="TagColor.Grey">No</tag>
+                                            </table-cell>
+                                            break;
                                     }
-                                </tr>
-                            </tbody>
-                        </table>
+                                }
+                            </table-row>
+                        </govuk-table>
                     </divider>
                 }
             </govuk-radios>
