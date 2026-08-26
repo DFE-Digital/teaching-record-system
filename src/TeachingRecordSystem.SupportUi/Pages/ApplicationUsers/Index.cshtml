@@ -6,33 +6,29 @@
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-<table class="govuk-table">
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Name</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        @if (Model.Users!.Length > 0)
+<govuk-table>
+    <table-head>
+        <table-head-cell>Name</table-head-cell>
+    </table-head>
+    @if (Model.Users!.Length > 0)
+    {
+        @foreach (var user in Model.Users!)
         {
-            @foreach (var user in Model.Users!)
-            {
-                <tr class="govuk-table__row" data-testid="user-@user.UserId">
-                    <td class="govuk-table__cell">
-                        <a href="@LinkGenerator.ApplicationUsers.EditApplicationUser.Index(user.UserId)" class="govuk-link" data-testid="edit-application-user-@user.UserId">@user.Name</a>
-                    </td>
-                </tr>
-            }
+            <table-row data-testid="user-@user.UserId">
+                <table-cell>
+                    <a href="@LinkGenerator.ApplicationUsers.EditApplicationUser.Index(user.UserId)" class="govuk-link" data-testid="edit-application-user-@user.UserId">@user.Name</a>
+                </table-cell>
+            </table-row>
         }
-        else
-        {
-            <tr class="govuk-table__row" data-testid="no-users">
-                <td class="govuk-table__cell">
-                    <div class="govuk-caption-m">No users</div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    }
+    else
+    {
+        <table-row data-testid="no-users">
+            <table-cell>
+                <div class="govuk-caption-m">No users</div>
+            </table-cell>
+        </table-row>
+    }
+</govuk-table>
 
 <govuk-button-link href="@LinkGenerator.ApplicationUsers.AddApplicationUser.Index()" class="govuk-button--secondary" data-testid="add-application-user">Add application user</govuk-button-link>
