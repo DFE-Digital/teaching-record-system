@@ -16,28 +16,28 @@
             <span class="govuk-caption-l">Record management</span>
 
             <govuk-radios for="ConnectReason" data-testid="reason-options">
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true">
+                <legend class="govuk-fieldset__legend--l" is-page-heading="true">
                     @ViewBag.Title
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-hint>
+                </legend>
+                <hint>
                     <govuk-inset-text>
                         You’re connecting this GOV.UK One Login to the record with the TRN @Model.PersonTrn. You’ll be able to review the details before confirming.
                     </govuk-inset-text>
-                </govuk-radios-hint>
-                <govuk-radios-item value="@ConnectPersonReason.DataLossOrIncompleteInformation">
+                </hint>
+                <radios-item value="@ConnectPersonReason.DataLossOrIncompleteInformation">
                     @ConnectPersonReason.DataLossOrIncompleteInformation.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@ConnectPersonReason.NewInformationReceived">
+                </radios-item>
+                <radios-item value="@ConnectPersonReason.NewInformationReceived">
                     @ConnectPersonReason.NewInformationReceived.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@ConnectPersonReason.AnotherReason">
+                </radios-item>
+                <radios-item value="@ConnectPersonReason.AnotherReason">
                     @ConnectPersonReason.AnotherReason.GetDisplayName()
-                    <govuk-radios-item-conditional>
+                    <conditional>
                         <govuk-character-count for="ReasonDetail" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount" rows="@UiDefaults.ReasonDetailsRows">
-                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            <label>Enter details</label>
                         </govuk-character-count>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
+                    </conditional>
+                </radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

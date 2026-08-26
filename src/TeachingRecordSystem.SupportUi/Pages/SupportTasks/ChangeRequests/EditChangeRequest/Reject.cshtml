@@ -15,21 +15,21 @@
 
         <form method="post">
             <govuk-radios for="RejectionReasonChoice">
-                <govuk-radios-fieldset-legend>
+                <legend>
                     <h3 class="govuk-heading-m">Reason for rejecting</h3>
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@ChangeRequestRejectReason.RequestAndProofDontMatch">
+                </legend>
+                <radios-item value="@ChangeRequestRejectReason.RequestAndProofDontMatch">
                     @ChangeRequestRejectReason.RequestAndProofDontMatch.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@ChangeRequestRejectReason.WrongTypeOfDocument">
+                </radios-item>
+                <radios-item value="@ChangeRequestRejectReason.WrongTypeOfDocument">
                     @ChangeRequestRejectReason.WrongTypeOfDocument.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@ChangeRequestRejectReason.ImageQuality">
+                </radios-item>
+                <radios-item value="@ChangeRequestRejectReason.ImageQuality">
                     @ChangeRequestRejectReason.ImageQuality.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@ChangeRequestRejectReason.ChangeNoLongerRequired">
+                </radios-item>
+                <radios-item value="@ChangeRequestRejectReason.ChangeNoLongerRequired">
                     @ChangeRequestRejectReason.ChangeNoLongerRequired.GetDisplayName()
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             <govuk-button type="submit">Reject</govuk-button>

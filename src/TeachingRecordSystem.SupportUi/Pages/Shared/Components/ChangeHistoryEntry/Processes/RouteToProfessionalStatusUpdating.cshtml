@@ -50,8 +50,8 @@
     @if (hasRouteRows)
     {
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Route details</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Route details</summary>
+            <text>
                 @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
                 {
                     <p class="govuk-body" data-testid="status">
@@ -124,14 +124,14 @@
                         Source application reference: @professionalStatus.SourceApplicationReference
                     </p>
                 }
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Reason for change</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Reason</key>
@@ -165,7 +165,7 @@
                         </row>
                     }
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
     <partial name="~/Pages/Shared/Components/ChangeHistoryEntry/Processes/_PersonProfessionalStatusChanges.cshtml" model="@Model" />

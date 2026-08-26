@@ -24,22 +24,22 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true">
-                <govuk-input-label>Email address</govuk-input-label>
+                <label>Email address</label>
             </govuk-input>
 
             <govuk-input for="Name" input-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)">
-                <govuk-input-label>Name</govuk-input-label>
+                <label>Name</label>
             </govuk-input>
 
             <govuk-radios for="@Model.Role" radios-class="trs-user-roles">
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend--m">
                     Role
-                </govuk-radios-fieldset-legend>
+                </legend>
 
                 @foreach (var role in Model.RoleOptions)
                 {
-                    <govuk-radios-item value="@role.Name" disabled="@(!Model.IsActiveUser)">@role.DisplayName</govuk-radios-item>
-                    <govuk-radios-divider>
+                    <radios-item value="@role.Name" disabled="@(!Model.IsActiveUser)">@role.DisplayName</radios-item>
+                    <divider>
                         <table class="govuk-table">
                             <caption class="govuk-table__caption govuk-table__caption--s">Permissions</caption>
 
@@ -79,7 +79,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </govuk-radios-divider>
+                    </divider>
                 }
             </govuk-radios>
 

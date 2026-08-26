@@ -17,12 +17,12 @@
 }
 
 <govuk-radios for="UploadEvidence" data-testid="upload-evidence-options">
-    <govuk-radios-fieldset-legend data-testid="upload-evidence-options-legend">
+    <legend data-testid="upload-evidence-options-legend">
         <h2 class="govuk-fieldset__legend--m">Do you want to upload evidence?</h2>
-    </govuk-radios-fieldset-legend>
-    <govuk-radios-item value="@true">
+    </legend>
+    <radios-item value="@true">
         Yes
-        <govuk-radios-item-conditional>
+        <conditional>
             @if (Model.UploadedEvidenceFile is not null)
             {
                 var linkText = Model.UploadedEvidenceFile.FileName;
@@ -43,17 +43,17 @@
                     input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                 @if (Model.UploadedEvidenceFile is null)
                 {
-                    <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
+                    <label>Upload a file</label>
                 }
                 else
                 {
-                    <govuk-file-upload-label>Upload a new file to replace it</govuk-file-upload-label>
+                    <label>Upload a new file to replace it</label>
                 }
-                <govuk-file-upload-hint>Must be smaller than 50MB</govuk-file-upload-hint>
+                <hint>Must be smaller than 50MB</hint>
             </govuk-file-upload>
-        </govuk-radios-item-conditional>
-    </govuk-radios-item>
-    <govuk-radios-item value="@false">
+        </conditional>
+    </radios-item>
+    <radios-item value="@false">
         No
-    </govuk-radios-item>
+    </radios-item>
 </govuk-radios>

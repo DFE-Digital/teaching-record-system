@@ -13,27 +13,27 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <govuk-radios for="Reason">
-                <govuk-radios-fieldset-legend>
+                <legend>
                     <vc:support-task-header page-header="@ViewBag.Title" />
                     <div class="govuk-hint">We’ll email the person with the reason you select</div>
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest">
+                </legend>
+                <radios-item value="@OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest">
                     @OneLoginIdVerificationRejectReason.ProofDoesNotMatchRequest.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofIsUnclear">
+                </radios-item>
+                <radios-item value="@OneLoginIdVerificationRejectReason.ProofIsUnclear">
                     @OneLoginIdVerificationRejectReason.ProofIsUnclear.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.ProofIsWrongType">
+                </radios-item>
+                <radios-item value="@OneLoginIdVerificationRejectReason.ProofIsWrongType">
                     @OneLoginIdVerificationRejectReason.ProofIsWrongType.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@OneLoginIdVerificationRejectReason.AnotherReason">
+                </radios-item>
+                <radios-item value="@OneLoginIdVerificationRejectReason.AnotherReason">
                     @OneLoginIdVerificationRejectReason.AnotherReason.GetDisplayName()
-                    <govuk-radios-item-conditional>
+                    <conditional>
                         <govuk-character-count for="AdditionalDetails" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount">
-                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            <label>Enter details</label>
                         </govuk-character-count>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
+                    </conditional>
+                </radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

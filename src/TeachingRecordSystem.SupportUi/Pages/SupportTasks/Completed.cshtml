@@ -19,13 +19,13 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="get" asp-antiforgery="false" data-testid="search-form">
             <govuk-input for="Search" label-class="govuk-label--m" data-testid="search-input" type="search" input-hx-preserve="true">
-                <govuk-input-label>Search completed tasks</govuk-input-label>
-                <govuk-input-hint>
+                <label>Search completed tasks</label>
+                <hint>
                     Enter a name, task ID, email address or completion date
-                </govuk-input-hint>
-                <govuk-input-after-input>
+                </hint>
+                <after-input>
                     <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                </govuk-input-after-input>
+                </after-input>
             </govuk-input>
 
             <input type="hidden" asp-for="Type" />
@@ -55,11 +55,11 @@
                                   select-hx-push-url="true"
                                   class="govuk-!-width-one-half govuk-!-margin-bottom-0"
                                   select-class="govuk-!-width-full">
-                        <govuk-select-label class="govuk-label--s">Task type</govuk-select-label>
-                        <govuk-select-item value="">All types</govuk-select-item>
+                        <label class="govuk-label--s">Task type</label>
+                        <select-item value="">All types</select-item>
                         @foreach (var type in SupportTaskTypeRegistry.GetAllTypes(includeLegacy: false).OrderBy(t => t.GetTitle()))
                         {
-                            <govuk-select-item value="@type">@type.GetTitle()</govuk-select-item>
+                            <select-item value="@type">@type.GetTitle()</select-item>
                         }
                     </govuk-select>
 
@@ -72,13 +72,13 @@
                                   select-hx-push-url="true"
                                   class="govuk-!-width-one-half govuk-!-margin-bottom-0"
                                   select-class="govuk-!-width-full">
-                        <govuk-select-label class="govuk-label--s">Completed by</govuk-select-label>
-                        <govuk-select-item value="">All users</govuk-select-item>
+                        <label class="govuk-label--s">Completed by</label>
+                        <select-item value="">All users</select-item>
                         @foreach (var user in Model.CompletedByOptions!)
                         {
-                            <govuk-select-item value="@user.UserId">
+                            <select-item value="@user.UserId">
                                 @user.UserName
-                            </govuk-select-item>
+                            </select-item>
                         }
                     </govuk-select>
                 </div>

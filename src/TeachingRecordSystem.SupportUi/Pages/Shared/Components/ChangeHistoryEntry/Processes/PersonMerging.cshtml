@@ -91,8 +91,8 @@
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Details) || changeReason.EvidenceFile is not null))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Reason for change</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Comments</key>
@@ -105,15 +105,15 @@
                         </value>
                     </row>
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 
     @if (showDetailChanges)
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
-            <govuk-details-summary>Previous data</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Previous data</summary>
+            <text>
                 <govuk-summary-list>
                     @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
                     {
@@ -151,7 +151,7 @@
                         </row>
                     }
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 </timeline-entry>

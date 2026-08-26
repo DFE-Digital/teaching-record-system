@@ -211,16 +211,16 @@
             }
 
             <govuk-radios for="MatchedPersonId">
-                <govuk-radios-fieldset-legend>
+                <legend>
                     <h2 class="govuk-fieldset__legend govuk-fieldset__legend--m">What do you want to do with this GOV.UK One Login?</h2>
-                </govuk-radios-fieldset-legend>
+                </legend>
                 @foreach (var match in Model.SuggestedMatches)
                 {
-                    <govuk-radios-item value="@match.PersonId">Connect it to Record @match.Identifier (TRN @match.Trn)</govuk-radios-item>
+                    <radios-item value="@match.PersonId">Connect it to Record @match.Identifier (TRN @match.Trn)</radios-item>
                 }
-                <govuk-radios-item value="@ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel">
+                <radios-item value="@ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel">
                     Do not connect it to a record
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

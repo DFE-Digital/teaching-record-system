@@ -99,14 +99,14 @@
             @if (Model.CannotMergeReason is null)
             {
                 <govuk-radios for="PrimaryPersonId" data-testid="primary-person-options">
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                    <legend class="govuk-fieldset__legend--m">
                         Which is the primary record?
-                    </govuk-radios-fieldset-legend>
+                    </legend>
                     @foreach (var match in Model.PotentialDuplicates!)
                     {
-                        <govuk-radios-item value="@match.PersonId">
+                        <radios-item value="@match.PersonId">
                             TRN @match.Trn
-                        </govuk-radios-item>
+                        </radios-item>
                     }
                 </govuk-radios>
             }
