@@ -415,11 +415,6 @@
         "resolved": "10.0.11",
         "contentHash": "PJPtFYsZ+r+uz9qqXWUTEyKeJ1EiBGIJtqavkg9ZXijjGSFAk4Fgi5sqIxj+uAyLZwEKgexDUQXhWhvU6l3+og=="
       },
-      "Microsoft.Extensions.FileProviders.Embedded": {
-        "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "TZQQIZ1wFmQX7WdRAyhaDlv3splUPOYheTP3aZtoLpxMlVnLOFRjiLaDB0PZX/d27N52+FLbiNkwL02x4hZgjg=="
-      },
       "Microsoft.Graph.Beta": {
         "type": "Transitive",
         "resolved": "5.56.0-preview",
@@ -1059,7 +1054,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.103.0, )",
-          "GovUk.Frontend.AspNetCore": "[4.4.0, )",
+          "GovUk.Frontend.AspNetCore": "[5.0.0-alpha.0.66, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
@@ -1304,11 +1299,8 @@
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "KJ/dnGQ04bna1DyXNz9z3U3uPUfMjHuAfnDRTgsZN4rsU4W22rfMh7Kydb17gOKjoUxArj585pOqhrVna7FraQ==",
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "10.0.10"
-        }
+        "resolved": "5.0.0-alpha.0.66",
+        "contentHash": "0VRoHOfJdJ6zEtaUJxe3Qma2UoucJKe1bqts1+X9EdCtvYjvIM5KvzV0NNe+ozu2CA3HQtc5BcH5uV+NoCR2Lw=="
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",
