@@ -13,13 +13,13 @@
         <form method="get" asp-antiforgery="false" data-testid="search-form">
             <span class="govuk-caption-l">Search</span>
             <govuk-input for="Search" label-class="govuk-label--l" data-testid="search-input" type="search">
-                <govuk-input-label>@ViewBag.Title</govuk-input-label>
-                <govuk-input-hint>
+                <label>@ViewBag.Title</label>
+                <hint>
                     Enter a GOV.UK One Login email address, name, date of birth or TRN
-                </govuk-input-hint>
-                <govuk-input-after-input>
+                </hint>
+                <after-input>
                     <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                </govuk-input-after-input>
+                </after-input>
             </govuk-input>
         </form>
     </div>

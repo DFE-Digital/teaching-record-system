@@ -10,20 +10,20 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-radios for="HaveTrn">
-                <govuk-radios-item value="@true">
+                <radios-item value="@true">
                     Yes
-                    <govuk-radios-item-conditional>
+                    <conditional>
                         <govuk-input for="Trn" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false" pattern="[0-9]*">
-                            <govuk-input-label>Teacher reference number</govuk-input-label>
+                            <label>Teacher reference number</label>
                         </govuk-input>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@false">No</govuk-radios-item>
+                    </conditional>
+                </radios-item>
+                <radios-item value="@false">No</radios-item>
             </govuk-radios>
 
             <govuk-details>
-                <govuk-details-summary>What is a TRN?</govuk-details-summary>
-                <govuk-details-text>
+                <summary>What is a TRN?</summary>
+                <text>
                     <p class="govuk-body">
                         A teacher reference number (TRN) is a 7-digit number that uniquely identifies you in the education sector in England.
                     </p>
@@ -50,7 +50,7 @@
                             Find a lost TRN service (opens in a new tab).
                         </a>
                     </p>
-                </govuk-details-text>
+                </text>
             </govuk-details>
 
             <govuk-button type="submit">Continue</govuk-button>

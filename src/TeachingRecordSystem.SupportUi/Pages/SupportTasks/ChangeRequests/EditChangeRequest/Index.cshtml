@@ -77,8 +77,8 @@
     <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">Proof of identity</h2>
         <govuk-details>
-            <govuk-details-summary>Documents we accept</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Documents we accept</summary>
+            <text>
                 <p class="govuk-body">We accept the following documents:</p>
                 <ul class="govuk-list govuk-list--bullet">
                     @if (Model.ChangeType == SupportTaskType.ChangeNameRequest)
@@ -98,7 +98,7 @@
                         <li>driving license</li>
                     }
                 </ul>
-            </govuk-details-text>
+            </text>
         </govuk-details>
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full govuk-!-margin-bottom-4">

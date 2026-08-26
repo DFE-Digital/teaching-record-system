@@ -101,8 +101,8 @@
             </govuk-summary-list>
 
             <govuk-details class="govuk-!-margin-bottom-2">
-                <govuk-details-summary>Reason for change</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Reason for change</summary>
+                <text>
                     <govuk-summary-list>
                         <row>
                             <key>Reason</key>
@@ -127,12 +127,12 @@
                             </value>
                         </row>
                     </govuk-summary-list>
-                </govuk-details-text>
+                </text>
             </govuk-details>
 
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
-                <govuk-details-summary>Previous data</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Previous data</summary>
+                <text>
                     <govuk-summary-list>
                         @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
                         {
@@ -188,7 +188,7 @@
                             </row>
                         }
                     </govuk-summary-list>
-                </govuk-details-text>
+                </text>
             </govuk-details>
         </div>
     </div>

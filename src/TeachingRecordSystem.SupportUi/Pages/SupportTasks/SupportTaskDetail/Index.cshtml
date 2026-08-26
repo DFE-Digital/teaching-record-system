@@ -77,22 +77,22 @@
 
                 <div class="trs-support-task__overview-actions">
                     <govuk-select for="AssignedToUserId">
-                        <govuk-select-label>Assigned to</govuk-select-label>
-                        <govuk-select-item value="@Model.UnassignedUserId">Unassigned</govuk-select-item>
+                        <label>Assigned to</label>
+                        <select-item value="@Model.UnassignedUserId">Unassigned</select-item>
                         @if (Model.ShowMyselfOption)
                         {
-                            <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
+                            <select-item value="@Model.CurrentUserId">Myself</select-item>
                         }
                         @foreach (var option in Model.AssignToOptions!)
                         {
-                            <govuk-select-item value="@option.UserId">@option.UserName</govuk-select-item>
+                            <select-item value="@option.UserId">@option.UserName</select-item>
                         }
                     </govuk-select>
 
                     <govuk-select for="Status">
-                        <govuk-select-label>Status</govuk-select-label>
-                        <govuk-select-item value="@SupportTaskStatus.Open">Not started</govuk-select-item>
-                        <govuk-select-item value="@SupportTaskStatus.InProgress">In progress</govuk-select-item>
+                        <label>Status</label>
+                        <select-item value="@SupportTaskStatus.Open">Not started</select-item>
+                        <select-item value="@SupportTaskStatus.InProgress">In progress</select-item>
                     </govuk-select>
                 </div>
 
@@ -115,8 +115,8 @@
             else
             {
                 <govuk-details open="@Model.ExpandNotes" data-testid="notes">
-                    <govuk-details-summary>View notes</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>View notes</summary>
+                    <text>
                         <div class="moj-timeline">
                             @foreach (var note in Model.Notes!)
                             {
@@ -125,7 +125,7 @@
                                 </timeline-entry>
                             }
                         </div>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             }
 
@@ -147,8 +147,8 @@
             else
             {
                 <govuk-details open="@Model.ExpandZendeskTickets" data-testid="zendesk-tickets">
-                    <govuk-details-summary>View tickets</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>View tickets</summary>
+                    <text>
                         <table class="govuk-table">
                             <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
@@ -186,7 +186,7 @@
                             }
                             </tbody>
                         </table>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             }
 
@@ -202,15 +202,15 @@
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-2">History</h2>
 
                 <govuk-details>
-                    <govuk-details-summary>View activity</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>View activity</summary>
+                    <text>
                         <div class="moj-timeline">
                             @foreach (var entry in Model.ChangeHistory!)
                             {
                                 <vc:change-history-entry model="@entry" />
                             }
                         </div>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             </div>
         }

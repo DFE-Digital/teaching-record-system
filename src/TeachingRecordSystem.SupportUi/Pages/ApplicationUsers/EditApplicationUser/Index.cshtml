@@ -16,18 +16,18 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Name">
-                <govuk-input-label class="govuk-label--m">Name</govuk-input-label>
+                <label class="govuk-label--m">Name</label>
             </govuk-input>
 
             <govuk-input for="ShortName" input-class="govuk-input--width-10">
-                <govuk-input-label class="govuk-label--m">Short name</govuk-input-label>
+                <label class="govuk-label--m">Short name</label>
             </govuk-input>
 
             <govuk-checkboxes for="ApiRoles">
-                <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m">API roles</govuk-checkboxes-fieldset-legend>
+                <legend class="govuk-fieldset__legend--m">API roles</legend>
                 @foreach (var role in ApiRoles.All.OrderBy(r => r))
                 {
-                    <govuk-checkboxes-item value="@role">@role</govuk-checkboxes-item>
+                    <checkboxes-item value="@role">@role</checkboxes-item>
                 }
             </govuk-checkboxes>
 
@@ -81,132 +81,132 @@
             </div>
 
             <govuk-checkboxes for="IsOidcClient">
-                <govuk-checkboxes-item value="@true" label-class="govuk-label--m">
+                <checkboxes-item value="@true" label-class="govuk-label--m">
                     OIDC client
-                    <govuk-checkboxes-item-conditional>
+                    <conditional>
                         <govuk-input for="ClientId" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">Client ID</govuk-input-label>
+                            <label class="govuk-label--s">Client ID</label>
                         </govuk-input>
 
                         <govuk-password-input for="ClientSecret" input-class="trs-monospace" spellcheck="false">
-                            <govuk-password-input-label class="govuk-label--s">Client secret</govuk-password-input-label>
+                            <label class="govuk-label--s">Client secret</label>
                         </govuk-password-input>
 
                         <govuk-textarea for="RedirectUris" textarea-class="trs-monospace trs-nowrap">
-                            <govuk-textarea-label class="govuk-label--s">Redirect URIs</govuk-textarea-label>
-                            <govuk-textarea-hint>Enter one per line</govuk-textarea-hint>
-                            <govuk-textarea-value>@string.Join("\n", Model.RedirectUris!)</govuk-textarea-value>
+                            <label class="govuk-label--s">Redirect URIs</label>
+                            <hint>Enter one per line</hint>
+                            <value>@string.Join("\n", Model.RedirectUris!)</value>
                         </govuk-textarea>
 
                         <govuk-textarea for="PostLogoutRedirectUris" textarea-class="trs-monospace trs-nowrap">
-                            <govuk-textarea-label class="govuk-label--s">Post logout redirect URIs</govuk-textarea-label>
-                            <govuk-textarea-hint>Enter one per line</govuk-textarea-hint>
-                            <govuk-textarea-value>@string.Join("\n", Model.PostLogoutRedirectUris!)</govuk-textarea-value>
+                            <label class="govuk-label--s">Post logout redirect URIs</label>
+                            <hint>Enter one per line</hint>
+                            <value>@string.Join("\n", Model.PostLogoutRedirectUris!)</value>
                         </govuk-textarea>
 
                         <govuk-input for="OneLoginAuthenticationSchemeName" input-class="govuk-!-width-two-thirds trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">Authentication scheme name</govuk-input-label>
+                            <label class="govuk-label--s">Authentication scheme name</label>
                         </govuk-input>
 
                         <govuk-input for="OneLoginClientId" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login client ID</govuk-input-label>
+                            <label class="govuk-label--s">One Login client ID</label>
                         </govuk-input>
 
                         <govuk-radios for="UseSharedOneLoginSigningKeys">
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+                            <legend class="govuk-fieldset__legend--s">
                                 Use shared One Login signing keys (<span class="trs-monospace">/one-login-jwks</span>)
-                            </govuk-radios-fieldset-legend>
-                            <govuk-radios-item value="@true">Yes</govuk-radios-item>
-                            <govuk-radios-item value="@false">
+                            </legend>
+                            <radios-item value="@true">Yes</radios-item>
+                            <radios-item value="@false">
                                 No
-                                <govuk-radios-item-conditional>
+                                <conditional>
                                     <govuk-textarea for="OneLoginPrivateKeyPem" textarea-class="trs-monospace trs-nowrap" spellcheck="false">
-                                        <govuk-textarea-label class="govuk-label--s">One Login private key</govuk-textarea-label>
-                                        <govuk-textarea-hint>Enter a key in the PEM format</govuk-textarea-hint>
+                                        <label class="govuk-label--s">One Login private key</label>
+                                        <hint>Enter a key in the PEM format</hint>
                                     </govuk-textarea>
-                                </govuk-radios-item-conditional>
-                            </govuk-radios-item>
+                                </conditional>
+                            </radios-item>
                         </govuk-radios>
 
                         <govuk-input for="OneLoginRedirectUriPath" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login redirect URI path</govuk-input-label>
+                            <label class="govuk-label--s">One Login redirect URI path</label>
                         </govuk-input>
 
                         <govuk-input for="OneLoginPostLogoutRedirectUriPath" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login post logout redirect URI path</govuk-input-label>
+                            <label class="govuk-label--s">One Login post logout redirect URI path</label>
                         </govuk-input>
 
                         <govuk-radios for="RecordMatchingPolicy">
-                            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+                            <legend class="govuk-fieldset__legend--s">
                                 Record matching policy
-                            </govuk-radios-fieldset-legend>
-                            <govuk-radios-item value="@RecordMatchingPolicy.Required">
+                            </legend>
+                            <radios-item value="@RecordMatchingPolicy.Required">
                                 Required
-                                <govuk-radios-item-hint>Users must be matched to a teaching record to sign in</govuk-radios-item-hint>
-                            </govuk-radios-item>
-                            <govuk-radios-item value="@RecordMatchingPolicy.Deferred">
+                                <hint>Users must be matched to a teaching record to sign in</hint>
+                            </radios-item>
+                            <radios-item value="@RecordMatchingPolicy.Deferred">
                                 Deferred
-                                <govuk-radios-item-hint>Users can sign in without a teaching record and be allocated one later</govuk-radios-item-hint>
-                            </govuk-radios-item>
+                                <hint>Users can sign in without a teaching record and be allocated one later</hint>
+                            </radios-item>
                         </govuk-radios>
 
                         <h3 class="govuk-heading-s">App content</h3>
 
                         <govuk-input for="SignInUrl" input-class="trs-monospace" type="url" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">Sign in URL</govuk-input-label>
+                            <label class="govuk-label--s">Sign in URL</label>
                         </govuk-input>
 
                         <govuk-input for="SupportEmailAddressNotifyId" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">Support email address Notify ID</govuk-input-label>
-                            <govuk-input-hint>The GOV.UK Notify reply-to email address ID for support emails. Leave blank to use default.</govuk-input-hint>
+                            <label class="govuk-label--s">Support email address Notify ID</label>
+                            <hint>The GOV.UK Notify reply-to email address ID for support emails. Leave blank to use default.</hint>
                         </govuk-input>
 
                         <govuk-input for="SupportEmailAddress" input-class="govuk-!-width-two-thirds" type="email" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">Support email address</govuk-input-label>
-                            <govuk-input-hint>The support email address for display in page footers. Leave blank to use default.</govuk-input-hint>
+                            <label class="govuk-label--s">Support email address</label>
+                            <hint>The support email address for display in page footers. Leave blank to use default.</hint>
                         </govuk-input>
 
                         <govuk-input for="OneLoginCannotFindRecordEmailTemplateId" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login - ‘cannot find record’ email template ID</govuk-input-label>
-                            <govuk-input-hint>Leave blank to use default template</govuk-input-hint>
+                            <label class="govuk-label--s">One Login - ‘cannot find record’ email template ID</label>
+                            <hint>Leave blank to use default template</hint>
                         </govuk-input>
 
                         <govuk-input for="OneLoginNotVerifiedEmailTemplateId" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login - ‘not verified’ email template ID</govuk-input-label>
-                            <govuk-input-hint>Leave blank to use default template</govuk-input-hint>
+                            <label class="govuk-label--s">One Login - ‘not verified’ email template ID</label>
+                            <hint>Leave blank to use default template</hint>
                         </govuk-input>
 
                         <govuk-input for="OneLoginRecordMatchedEmailTemplateId" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login - ‘record matched’ email template ID</govuk-input-label>
-                            <govuk-input-hint>Leave blank to use default template</govuk-input-hint>
+                            <label class="govuk-label--s">One Login - ‘record matched’ email template ID</label>
+                            <hint>Leave blank to use default template</hint>
                         </govuk-input>
 
                         <govuk-input for="OneLoginNotConnectedEmailTemplateId" input-class="trs-monospace" spellcheck="false">
-                            <govuk-input-label class="govuk-label--s">One Login - ‘not connected’ email template ID</govuk-input-label>
-                            <govuk-input-hint>Leave blank to use default template</govuk-input-hint>
+                            <label class="govuk-label--s">One Login - ‘not connected’ email template ID</label>
+                            <hint>Leave blank to use default template</hint>
                         </govuk-input>
 
                         <govuk-textarea for="OneLoginNoMatchesPageContentHtml" textarea-class="govuk-!-width-full trs-monospace" rows="10" spellcheck="false">
-                            <govuk-textarea-label class="govuk-label--s">One Login - ‘no matches’ page content</govuk-textarea-label>
-                            <govuk-textarea-hint>HTML content shown on the No Matches page when a user cannot be matched to a teaching record. Leave blank to use default content.</govuk-textarea-hint>
+                            <label class="govuk-label--s">One Login - ‘no matches’ page content</label>
+                            <hint>HTML content shown on the No Matches page when a user cannot be matched to a teaching record. Leave blank to use default content.</hint>
                         </govuk-textarea>
 
                         <govuk-textarea for="OneLoginNoMatchesEmailSentFlashMessage" textarea-class="govuk-!-width-full trs-monospace" rows="3" spellcheck="false">
-                            <govuk-textarea-label class="govuk-label--s">One Login - ‘no matches’ email sent flash message</govuk-textarea-label>
-                            <govuk-textarea-hint>Flash message shown when email is sent on No Matches page. Use {0} placeholder for name. Leave blank to use default message.</govuk-textarea-hint>
+                            <label class="govuk-label--s">One Login - ‘no matches’ email sent flash message</label>
+                            <hint>Flash message shown when email is sent on No Matches page. Use {0} placeholder for name. Leave blank to use default message.</hint>
                         </govuk-textarea>
 
                         <govuk-textarea for="OneLoginNotConnectedEmailSentFlashMessage" textarea-class="govuk-!-width-full trs-monospace" rows="3" spellcheck="false">
-                            <govuk-textarea-label class="govuk-label--s">One Login - ‘not connected’ email sent flash message</govuk-textarea-label>
-                            <govuk-textarea-hint>Flash message shown when email is sent on Not Connecting page (deferred policy only). Use {0} placeholder for name. Leave blank to use default message.</govuk-textarea-hint>
+                            <label class="govuk-label--s">One Login - ‘not connected’ email sent flash message</label>
+                            <hint>Flash message shown when email is sent on Not Connecting page (deferred policy only). Use {0} placeholder for name. Leave blank to use default message.</hint>
                         </govuk-textarea>
 
                         <govuk-textarea for="OneLoginFoundPageLinkText" textarea-class="govuk-!-width-full trs-monospace" rows="3" spellcheck="false">
-                            <govuk-textarea-label class="govuk-label--s">One Login - ‘found’ page link text</govuk-textarea-label>
-                            <govuk-textarea-hint>HTML text with link shown on the Found page. Use {0} placeholder for continue URL. Leave blank to use default text.</govuk-textarea-hint>
+                            <label class="govuk-label--s">One Login - ‘found’ page link text</label>
+                            <hint>HTML text with link shown on the Found page. Use {0} placeholder for continue URL. Leave blank to use default text.</hint>
                         </govuk-textarea>
-                    </govuk-checkboxes-item-conditional>
-                </govuk-checkboxes-item>
+                    </conditional>
+                </checkboxes-item>
             </govuk-checkboxes>
 
             <govuk-button type="submit">Save changes</govuk-button>

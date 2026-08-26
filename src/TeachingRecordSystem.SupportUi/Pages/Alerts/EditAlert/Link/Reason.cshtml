@@ -18,32 +18,32 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-radios for="ChangeReason" data-testid="change-reason-options">
-                <govuk-radios-item value="@AlertChangeLinkReasonOption.IncorrectLink">
+                <radios-item value="@AlertChangeLinkReasonOption.IncorrectLink">
                     @AlertChangeLinkReasonOption.IncorrectLink.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@AlertChangeLinkReasonOption.ChangeOfLink">
+                </radios-item>
+                <radios-item value="@AlertChangeLinkReasonOption.ChangeOfLink">
                     @AlertChangeLinkReasonOption.ChangeOfLink.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@AlertChangeLinkReasonOption.AnotherReason">
+                </radios-item>
+                <radios-item value="@AlertChangeLinkReasonOption.AnotherReason">
                     @AlertChangeLinkReasonOption.AnotherReason.GetDisplayName()
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             <govuk-radios for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
-                <govuk-radios-fieldset-legend>
+                <legend>
                     <h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@true">
+                </legend>
+                <radios-item value="@true">
                     Yes
-                    <govuk-radios-item-conditional>
+                    <conditional>
                         <govuk-character-count for="ChangeReasonDetail" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                            <govuk-character-count-label>Add additional detail</govuk-character-count-label>
+                            <label>Add additional detail</label>
                         </govuk-character-count>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@false">
+                    </conditional>
+                </radios-item>
+                <radios-item value="@false">
                     No
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

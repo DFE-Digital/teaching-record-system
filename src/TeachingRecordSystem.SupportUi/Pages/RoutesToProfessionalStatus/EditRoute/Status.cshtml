@@ -13,12 +13,12 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-radios for=@Model.Status data-testid="status">
-                <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true" >
+                <legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true" >
                     @ViewBag.Title
-                </govuk-radios-fieldset-legend>
+                </legend>
                 @foreach (var status in Model.Statuses)
                 {
-                    <govuk-radios-item value="@status.Value">@status.Name</govuk-radios-item>
+                    <radios-item value="@status.Value">@status.Name</radios-item>
                 }
             </govuk-radios>
             <div class="govuk-button-group">

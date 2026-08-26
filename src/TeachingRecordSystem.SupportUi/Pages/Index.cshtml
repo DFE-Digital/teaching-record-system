@@ -13,17 +13,17 @@
         <h1 class="govuk-heading-m">@ViewBag.Title</h1>
 
         <govuk-tabs>
-            <govuk-tabs-item label="Records" id="records">
+            <tabs-item label="Records" id="records">
                 <div class="govuk-!-margin-bottom-6">
                     <form action="@LinkGenerator.Persons.Index()" method="get" asp-antiforgery="false" data-testid="search-form">
                         <div class="govuk-!-margin-bottom-4">
                             <govuk-input name="Search" data-testid="search-input" type="search" autocomplete="off">
-                                <govuk-input-label>
+                                <label>
                                     Enter a name, email address, date of birth or TRN
-                                </govuk-input-label>
-                                <govuk-input-after-input>
+                                </label>
+                                <after-input>
                                     <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                                </govuk-input-after-input>
+                                </after-input>
                             </govuk-input>
                         </div>
                     </form>
@@ -35,23 +35,23 @@
                         <a href="@LinkGenerator.Persons.AddPerson.Index()" class="govuk-link">Or create a record</a>
                     </p>
                 }
-            </govuk-tabs-item>
-            <govuk-tabs-item label="GOV.UK One Login" id="one-logins">
+            </tabs-item>
+            <tabs-item label="GOV.UK One Login" id="one-logins">
                 <div class="govuk-!-margin-bottom-6">
                     <form action="@LinkGenerator.OneLogins.Index()" method="get" asp-antiforgery="false" data-testid="search-form-onelogin">
                         <div class="govuk-!-margin-bottom-4">
                             <govuk-input name="Search" id="OneLoginSearch" data-testid="search-input-onelogin" type="search" autocomplete="off">
-                                <govuk-input-label>
+                                <label>
                                     Enter a GOV.UK One Login email address, name, date of birth or TRN
-                                </govuk-input-label>
-                                <govuk-input-after-input>
+                                </label>
+                                <after-input>
                                     <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                                </govuk-input-after-input>
+                                </after-input>
                             </govuk-input>
                         </div>
                     </form>
                 </div>
-            </govuk-tabs-item>
+            </tabs-item>
         </govuk-tabs>
     </div>
     @if (FeatureProvider.IsEnabled("SupportTaskDashboard") && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded)

@@ -11,22 +11,22 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-file-upload for="File" input-accept=".pdf, .jpg, .jpeg, .png">
-                <govuk-file-upload-label class="govuk-label--s">Upload a file</govuk-file-upload-label>
-                <govuk-file-upload-hint>
+                <label class="govuk-label--s">Upload a file</label>
+                <hint>
                     You can upload a PDF, JPG or PNG file no larger than @(ProofOfIdentity.MaxFileSizeMb)MB
-                </govuk-file-upload-hint>
+                </hint>
             </govuk-file-upload>
 
             <govuk-details>
-                <govuk-details-summary>Documents we accept</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Documents we accept</summary>
+                <text>
                     We accept the following documents:
                     <ul class="govuk-list govuk-list--bullet">
                         <li>passport</li>
                         <li>driving licence</li>
                         <li>birth certificate</li>
                     </ul>
-                </govuk-details-text>
+                </text>
             </govuk-details>
 
             <govuk-button type="submit">Continue</govuk-button>

@@ -186,22 +186,22 @@
             @if (Model.MatchOutcome == MatchPersonsResultOutcome.PotentialMatches)
             {
                 <govuk-radios for="PersonId">
-                    <govuk-radios-fieldset-legend>
+                    <legend>
                         <h2 class="govuk-fieldset__legend--m">What do you want to do with the @Model.SourceApplicationUserName request?</h2>
-                    </govuk-radios-fieldset-legend>
+                    </legend>
 
                     @foreach (var match in Model.PotentialDuplicates!)
                     {
-                        <govuk-radios-item value="@match.PersonId">
+                        <radios-item value="@match.PersonId">
                             Merge it with Record @match.Identifier
-                        </govuk-radios-item>
+                        </radios-item>
                     }
 
-                    <govuk-radios-divider>or</govuk-radios-divider>
+                    <divider>or</divider>
 
-                    <govuk-radios-item value="@ResolveTrnRequestState.CreateNewRecordPersonIdSentinel">
+                    <radios-item value="@ResolveTrnRequestState.CreateNewRecordPersonIdSentinel">
                         Create a new record from it
-                    </govuk-radios-item>
+                    </radios-item>
                 </govuk-radios>
             }
 

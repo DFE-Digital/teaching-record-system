@@ -23,23 +23,23 @@
             </govuk-inset-text>
 
             <govuk-radios for="Reason" data-testid="reason-for-disconnecting-options">
-                <govuk-radios-item value="@nameof(DisconnectPersonReason.ConnectedIncorrectly)">
+                <radios-item value="@nameof(DisconnectPersonReason.ConnectedIncorrectly)">
                     @DisconnectPersonReason.ConnectedIncorrectly.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@nameof(DisconnectPersonReason.NewInformation)">
+                </radios-item>
+                <radios-item value="@nameof(DisconnectPersonReason.NewInformation)">
                     @DisconnectPersonReason.NewInformation.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@nameof(DisconnectPersonReason.AnotherReason)">
+                </radios-item>
+                <radios-item value="@nameof(DisconnectPersonReason.AnotherReason)">
                     @DisconnectPersonReason.AnotherReason.GetDisplayName()
 
-                    <govuk-radios-item-conditional for="Details" data-testid="disconnect-reason-detail">
+                    <conditional for="Details" data-testid="disconnect-reason-detail">
                         <govuk-character-count for="ReasonDetail"
                                                max-length="UiDefaults.ReasonDetailsMaxCharacterCount"
                                                rows="UiDefaults.ReasonDetailsRows">
-                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            <label>Enter details</label>
                         </govuk-character-count>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
+                    </conditional>
+                </radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

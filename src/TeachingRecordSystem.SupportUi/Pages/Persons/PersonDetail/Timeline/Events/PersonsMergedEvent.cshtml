@@ -85,8 +85,8 @@
         @if (mergedEvent.Comments is not null || mergedEvent.EvidenceFile is not null)
         {
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-                <govuk-details-summary>Reason for change</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Reason for change</summary>
+                <text>
                     <govuk-summary-list>
                         <row>
                             <key>Comments</key>
@@ -99,15 +99,15 @@
                             </value>
                         </row>
                     </govuk-summary-list>
-                </govuk-details-text>
+                </text>
             </govuk-details>
         }
 
         @if (Model.PersonId == mergedEvent.PersonId)
         {
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
-                <govuk-details-summary>Previous data</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Previous data</summary>
+                <text>
                     <govuk-summary-list>
                         @if (mergedEvent.Changes.HasAnyFlag(LegacyEvents.PersonsMergedEventChanges.NameChange))
                         {
@@ -145,7 +145,7 @@
                             </row>
                         }
                     </govuk-summary-list>
-                </govuk-details-text>
+                </text>
             </govuk-details>
         }
     </div>

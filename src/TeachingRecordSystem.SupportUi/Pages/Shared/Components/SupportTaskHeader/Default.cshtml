@@ -29,8 +29,8 @@
 else
 {
     <govuk-details class="govuk-!-margin-bottom-6">
-        <govuk-details-summary>View notes</govuk-details-summary>
-        <govuk-details-text>
+        <summary>View notes</summary>
+        <text>
             <div class="moj-timeline">
                 @foreach (var note in Model.Notes)
                 {
@@ -39,6 +39,6 @@ else
                     </timeline-entry>
                 }
             </div>
-        </govuk-details-text>
+        </text>
     </govuk-details>
 }
