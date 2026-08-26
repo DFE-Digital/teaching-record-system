@@ -23,7 +23,7 @@ namespace TeachingRecordSystem.SupportUi.TagHelpers;
 // Applied to a sortable column header. Wraps the header content in a GET form + submit button (so
 // sorting happens on the server) and renders the aria-sort state and SVG direction indicator that
 // the MOJ component would add on the client.
-[HtmlTargetElement("th", Attributes = "sort-direction")]
+[HtmlTargetElement("table-head-cell", Attributes = "sort-direction")]
 public class SortableTableColumnTagHelper : TagHelper
 {
     // SVG direction indicators, copied verbatim from the MOJ Frontend sortable-table component so the
@@ -44,6 +44,11 @@ public class SortableTableColumnTagHelper : TagHelper
 
     [HtmlAttributeName("use-htmx")]
     public bool UseHtmx { get; set; }
+
+    // The GOV.UK table tag helpers collect each head cell's content and attributes when they run, so
+    // this has to have rewritten them by then. Tag helpers with the same Order run in the order their
+    // assemblies were added, and _ViewImports adds GovUk.Frontend.AspNetCore before this assembly.
+    public override int Order => int.MinValue;
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
@@ -138,7 +143,7 @@ public class SortableTableColumnTagHelper : TagHelper
 // Assigned to a <table> to opt it in to sortable-table behaviour. Adds the caption text and the
 // visually-hidden live-region status box that the MOJ Frontend sortable-table JavaScript would add
 // on the client. Individual sortable columns are declared with SortableTableColumnTagHelper.
-[HtmlTargetElement("table", Attributes = SortableAttributeName)]
+[HtmlTargetElement("govuk-table", Attributes = SortableAttributeName)]
 public class SortableTableTagHelper : TagHelper
 {
     private const string SortableAttributeName = "sortable";

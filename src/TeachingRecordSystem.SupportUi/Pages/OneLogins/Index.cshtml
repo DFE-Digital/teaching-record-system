@@ -27,54 +27,50 @@
 
 <div class="govuk-grid-row govuk-!-margin-top-6">
     <div class="govuk-grid-column-full">
-        <table class="govuk-table trs-table-layout-fixed" sortable>
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Email ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Email, direction, Model.PageNumber))">
-                        One Login email address
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-200"
-                        sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Name ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Name, direction, Model.PageNumber))">
-                        Name
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-160"
-                        sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.DateOfBirth, direction, Model.PageNumber))">
-                        DOB
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-130"
-                        sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Trn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Trn, direction, Model.PageNumber))">
-                        TRN
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @if (Model.SearchResults!.Count == 0)
+        <govuk-table class="trs-table-layout-fixed" sortable>
+            <table-head>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Email ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Email, direction, Model.PageNumber))">
+                    One Login email address
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-200"
+                    sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Name ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Name, direction, Model.PageNumber))">
+                    Name
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-160"
+                    sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.DateOfBirth, direction, Model.PageNumber))">
+                    DOB
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-130"
+                    sort-direction="@(Model.SortBy == OneLoginSearchSortByOption.Trn ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.OneLogins.Index(Model.Search, OneLoginSearchSortByOption.Trn, direction, Model.PageNumber))">
+                    TRN
+                </table-head-cell>
+            </table-head>
+            @if (Model.SearchResults!.Count == 0)
+            {
+                <table-row data-testid="no-matches">
+                    <table-cell colspan="4">No matching records</table-cell>
+                </table-row>
+            }
+            else
+            {
+                @foreach (var oneLoginInfo in Model.SearchResults)
                 {
-                    <tr class="govuk-table__row" data-testid="no-matches">
-                        <td class="govuk-table__cell" colspan="4">No matching records</td>
-                    </tr>
+                    <table-row data-testid="onelogin-@oneLoginInfo.Subject">
+                        <table-cell class="trs-break-word" data-testid="email">
+                            <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginInfo.Subject)" class="govuk-link">@oneLoginInfo.EmailAddress</a>
+                        </table-cell>
+                        <table-cell data-testid="name" use-empty-fallback>@oneLoginInfo.Name</table-cell>
+                        <table-cell data-testid="date-of-birth" use-empty-fallback>@(oneLoginInfo.DateOfBirth.HasValue ? oneLoginInfo.DateOfBirth.Value.ToString(WebConstants.DateDisplayFormat) : string.Empty)</table-cell>
+                        <table-cell data-testid="trn" use-empty-fallback>@oneLoginInfo.Trn</table-cell>
+                    </table-row>
                 }
-                else
-                {
-                    @foreach (var oneLoginInfo in Model.SearchResults)
-                    {
-                        <tr class="govuk-table__row" data-testid="onelogin-@oneLoginInfo.Subject">
-                            <td class="govuk-table__cell trs-break-word" data-testid="email">
-                                <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginInfo.Subject)" class="govuk-link">@oneLoginInfo.EmailAddress</a>
-                            </td>
-                            <td class="govuk-table__cell" data-testid="name" use-empty-fallback>@oneLoginInfo.Name</td>
-                            <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(oneLoginInfo.DateOfBirth.HasValue ? oneLoginInfo.DateOfBirth.Value.ToString(WebConstants.DateDisplayFormat) : string.Empty)</td>
-                            <td class="govuk-table__cell" data-testid="trn" use-empty-fallback>@oneLoginInfo.Trn</td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
+            }
+        </govuk-table>
 
         @if (Model.Pagination is not null)
         {

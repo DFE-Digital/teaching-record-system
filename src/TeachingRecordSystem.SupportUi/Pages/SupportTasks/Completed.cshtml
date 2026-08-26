@@ -115,103 +115,99 @@
         }
         else
         {
-            <table class="govuk-table trs-table-layout-fixed" sortable>
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header"
-                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Subject ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Subject, direction))"
-                            use-htmx="true"
-                            hx-select="main"
-                            hx-target="main"
-                            hx-swap="outerHTML"
-                            hx-push-url="true">
-                            Task
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedOn, direction))"
-                            use-htmx="true"
-                            hx-select="main"
-                            hx-target="main"
-                            hx-swap="outerHTML"
-                            hx-push-url="true">
-                            Completed on
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-180"
-                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.TaskType ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.TaskType, direction))"
-                            use-htmx="true"
-                            hx-select="main"
-                            hx-target="main"
-                            hx-swap="outerHTML"
-                            hx-push-url="true">
-                            Type
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-90"
-                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Source ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Source, direction))"
-                            use-htmx="true"
-                            hx-select="main"
-                            hx-target="main"
-                            hx-swap="outerHTML"
-                            hx-push-url="true">
-                            Source
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-180"
-                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Outcome ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Outcome, direction))"
-                            use-htmx="true"
-                            hx-select="main"
-                            hx-target="main"
-                            hx-swap="outerHTML"
-                            hx-push-url="true">
-                            Outcome
-                        </th>
-                        <th scope="col" class="govuk-table__header trs-!-width-150"
-                            sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedBy ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedBy, direction))"
-                            use-htmx="true"
-                            hx-select="main"
-                            hx-target="main"
-                            hx-swap="outerHTML"
-                            hx-push-url="true">
-                            Completed by
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body" data-testid="results">
-                    @foreach (var result in Model.Results!)
-                    {
-                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                            <td class="govuk-table__cell" data-testid="task-name-and-id">
-                                <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference, returnUrl: returnUrl)" class="govuk-link trs-task-link">
-                                    <span class="trs-task-link__name" data-testid="task-name"><span data-testid="subject">@result.Subject</span></span>
-                                    <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
-                                </a>
-                            </td>
-                            <td class="govuk-table__cell" data-testid="completed-on">@result.CompletedOn.ToString(WebConstants.DateDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="task-type">@result.SupportTaskType.GetTitle()</td>
-                            <td class="govuk-table__cell" data-testid="source">
-                                @if (result.SourceApplicationName is not null)
-                                {
-                                    <tag>@result.SourceApplicationName</tag>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback="Not applicable"></span>
-                                }
-                            </td>
-                            <td class="govuk-table__cell" data-testid="outcome">
-                                <tag class="trs-!-max-width-none">@result.Outcome.GetDisplayName()</tag>
-                            </td>
-                            <td class="govuk-table__cell" data-testid="completed-by" use-empty-fallback="Not set">
-                                @result.CompletedByName
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <govuk-table class="trs-table-layout-fixed" sortable data-testid="results">
+                <table-head>
+                    <table-head-cell
+                        sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Subject ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Subject, direction))"
+                        use-htmx="true"
+                        hx-select="main"
+                        hx-target="main"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Task
+                    </table-head-cell>
+                    <table-head-cell class="trs-!-width-150"
+                        sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedOn ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedOn, direction))"
+                        use-htmx="true"
+                        hx-select="main"
+                        hx-target="main"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Completed on
+                    </table-head-cell>
+                    <table-head-cell class="trs-!-width-180"
+                        sort-direction="@(Model.SortBy == CompletedTasksSortByOption.TaskType ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.TaskType, direction))"
+                        use-htmx="true"
+                        hx-select="main"
+                        hx-target="main"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Type
+                    </table-head-cell>
+                    <table-head-cell class="trs-!-width-90"
+                        sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Source ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Source, direction))"
+                        use-htmx="true"
+                        hx-select="main"
+                        hx-target="main"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Source
+                    </table-head-cell>
+                    <table-head-cell class="trs-!-width-180"
+                        sort-direction="@(Model.SortBy == CompletedTasksSortByOption.Outcome ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.Outcome, direction))"
+                        use-htmx="true"
+                        hx-select="main"
+                        hx-target="main"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Outcome
+                    </table-head-cell>
+                    <table-head-cell class="trs-!-width-150"
+                        sort-direction="@(Model.SortBy == CompletedTasksSortByOption.CompletedBy ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.SupportTasks.Completed(Model.Search, Model.Type, Model.CompletedByUserId, CompletedTasksSortByOption.CompletedBy, direction))"
+                        use-htmx="true"
+                        hx-select="main"
+                        hx-target="main"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Completed by
+                    </table-head-cell>
+                </table-head>
+                @foreach (var result in Model.Results!)
+                {
+                    <table-row data-testid="task:@result.SupportTaskReference">
+                        <table-cell data-testid="task-name-and-id">
+                            <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference, returnUrl: returnUrl)" class="govuk-link trs-task-link">
+                                <span class="trs-task-link__name" data-testid="task-name"><span data-testid="subject">@result.Subject</span></span>
+                                <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
+                            </a>
+                        </table-cell>
+                        <table-cell data-testid="completed-on">@result.CompletedOn.ToString(WebConstants.DateDisplayFormat)</table-cell>
+                        <table-cell data-testid="task-type">@result.SupportTaskType.GetTitle()</table-cell>
+                        <table-cell data-testid="source">
+                            @if (result.SourceApplicationName is not null)
+                            {
+                                <tag>@result.SourceApplicationName</tag>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback="Not applicable"></span>
+                            }
+                        </table-cell>
+                        <table-cell data-testid="outcome">
+                            <tag class="trs-!-max-width-none">@result.Outcome.GetDisplayName()</tag>
+                        </table-cell>
+                        <table-cell data-testid="completed-by" use-empty-fallback="Not set">
+                            @result.CompletedByName
+                        </table-cell>
+                    </table-row>
+                }
+            </govuk-table>
         }
 
         <govuk-pagination current-page="@Model.Pagination!.CurrentPage" total-pages="@Model.Pagination.LastPage" generate-page-href="@Model.Pagination.GetPageLink" />
