@@ -124,31 +124,27 @@
     }
     else
     {
-        <table class="govuk-table" data-testid="closed-alerts">
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header">Alert</th>
-                    <th scope="col" class="govuk-table__header trs-\!-width-200">Start date</th>
-                    <th scope="col" class="govuk-table__header trs-\!-width-200">End date</th>
-                    <th scope="col" class="govuk-table__header trs-\!-width-70"></th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @foreach (var (alert, externalLinkUri, canWrite) in Model.ClosedAlerts!)
-                {
-                    <tr class="govuk-table__row">
-                        <td class="govuk-table__cell"><a href="@LinkGenerator.Alerts.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></td>
-                        <td class="govuk-table__cell">@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</td>
-                        <td class="govuk-table__cell">@alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</td>
-                        <td class="govuk-table__cell">
-                            @if (canWrite)
-                            {
-                                <a href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <govuk-table data-testid="closed-alerts">
+            <table-head>
+                <table-head-cell>Alert</table-head-cell>
+                <table-head-cell class="trs-\!-width-200">Start date</table-head-cell>
+                <table-head-cell class="trs-\!-width-200">End date</table-head-cell>
+                <table-head-cell class="trs-\!-width-70"></table-head-cell>
+            </table-head>
+            @foreach (var (alert, externalLinkUri, canWrite) in Model.ClosedAlerts!)
+            {
+                <table-row>
+                    <table-cell><a href="@LinkGenerator.Alerts.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></table-cell>
+                    <table-cell>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</table-cell>
+                    <table-cell>@alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</table-cell>
+                    <table-cell>
+                        @if (canWrite)
+                        {
+                            <a href="@LinkGenerator.Alerts.DeleteAlert.Index(alert.AlertId)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
+                        }
+                    </table-cell>
+                </table-row>
+            }
+        </govuk-table>
     }
 </div>

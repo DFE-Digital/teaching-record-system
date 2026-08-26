@@ -19,107 +19,103 @@
             </h1>
 
             <div id="zendesk-tickets-container">
-                <table class="govuk-table trs-table-layout-fixed trs-zendesk-links-table">
-                    <thead class="govuk-table__head">
-                        <tr class="govuk-table__row">
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-half">
-                                Link to ticket
-                            </th>
-                            <th scope="col" class="govuk-table__header">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
+                <govuk-table class="trs-table-layout-fixed trs-zendesk-links-table">
+                    <table-head>
+                        <table-head-cell class="govuk-!-width-one-half">
+                            Link to ticket
+                        </table-head-cell>
+                        <table-head-cell>
+                            Action
+                        </table-head-cell>
+                    </table-head>
 
-                    <tbody class="govuk-table__body">
-                        @for (var i = 0; i < Model.TicketUrls!.Count; i++)
-                        {
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <govuk-input
-                                        data-testid="zendesk-ticket-@i"
-                                        for="TicketUrls[@i]"
-                                        name="@Html.NameFor(m => m.TicketUrls)"
-                                        id="TicketUrls-@i"
-                                        type="url"
-                                        class="trs-zendesk-links-table__link-input"
-                                        input-class="govuk-!-width-full">
-                                        <label class="govuk-label--s govuk-visually-hidden">
-                                            Zendesk URL
-                                        </label>
-                                    </govuk-input>
-                                </td>
+                    @for (var i = 0; i < Model.TicketUrls!.Count; i++)
+                    {
+                        <table-row>
+                            <table-cell>
+                                <govuk-input
+                                    data-testid="zendesk-ticket-@i"
+                                    for="TicketUrls[@i]"
+                                    name="@Html.NameFor(m => m.TicketUrls)"
+                                    id="TicketUrls-@i"
+                                    type="url"
+                                    class="trs-zendesk-links-table__link-input"
+                                    input-class="govuk-!-width-full">
+                                    <label class="govuk-label--s govuk-visually-hidden">
+                                        Zendesk URL
+                                    </label>
+                                </govuk-input>
+                            </table-cell>
 
-                                <td class="govuk-table__cell">
-                                    <div class="trs-zendesk-links-table__actions-container">
-                                        <div class="trs-zendesk-links-table__actions">
-                                            <govuk-button
-                                                type="button"
-                                                class="govuk-button--secondary trs-requires-js"
-                                                data-testid="remove-ticket-@i"
-                                                hx-post
-                                                hx-page-handler="RemoveTicket"
-                                                hx-route-index="@i"
-                                                hx-include="closest form"
-                                                hx-target="main"
-                                                hx-select="main"
-                                                hx-swap="outerHTML">
-                                                Remove
-                                            </govuk-button>
+                            <table-cell>
+                                <div class="trs-zendesk-links-table__actions-container">
+                                    <div class="trs-zendesk-links-table__actions">
+                                        <govuk-button
+                                            type="button"
+                                            class="govuk-button--secondary trs-requires-js"
+                                            data-testid="remove-ticket-@i"
+                                            hx-post
+                                            hx-page-handler="RemoveTicket"
+                                            hx-route-index="@i"
+                                            hx-include="closest form"
+                                            hx-target="main"
+                                            hx-select="main"
+                                            hx-swap="outerHTML">
+                                            Remove
+                                        </govuk-button>
 
-                                            @if (!string.IsNullOrEmpty(Model.TicketUrls[i]))
-                                            {
-                                                <a
-                                                    href="@Model.TicketUrls[i]"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    class="govuk-link">
-                                                    View ticket (opens in new tab)
-                                                </a>
-                                            }
-                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.TicketUrls[i]))
+                                        {
+                                            <a
+                                                href="@Model.TicketUrls[i]"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="govuk-link">
+                                                View ticket (opens in new tab)
+                                            </a>
+                                        }
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                        @if (!HttpContext.Request.IsHtmx())
-                        {
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <govuk-input
-                                        data-testid="zendesk-ticket-new"
-                                        name="TicketUrls"
-                                        type="url"
-                                        class="trs-zendesk-links-table__link-input"
-                                        input-class="govuk-!-width-full">
-                                        <label class="govuk-label--s govuk-visually-hidden">
-                                            Zendesk URL
-                                        </label>
-                                    </govuk-input>
-                                </td>
+                                </div>
+                            </table-cell>
+                        </table-row>
+                    }
+                    @if (!HttpContext.Request.IsHtmx())
+                    {
+                        <table-row>
+                            <table-cell>
+                                <govuk-input
+                                    data-testid="zendesk-ticket-new"
+                                    name="TicketUrls"
+                                    type="url"
+                                    class="trs-zendesk-links-table__link-input"
+                                    input-class="govuk-!-width-full">
+                                    <label class="govuk-label--s govuk-visually-hidden">
+                                        Zendesk URL
+                                    </label>
+                                </govuk-input>
+                            </table-cell>
 
-                                <td class="govuk-table__cell">
-                                    <div class="trs-zendesk-links-table__actions-container">
-                                        <div class="trs-zendesk-links-table__actions">
-                                            <govuk-button
-                                                type="button"
-                                                class="govuk-button--secondary trs-requires-js"
-                                                hx-post
-                                                hx-page-handler="RemoveTicket"
-                                                hx-route-index="@Model.TicketUrls.Count"
-                                                hx-include="closest form"
-                                                hx-target="main"
-                                                hx-select="main"
-                                                hx-swap="outerHTML">
-                                                Remove
-                                            </govuk-button>
-                                        </div>
+                            <table-cell>
+                                <div class="trs-zendesk-links-table__actions-container">
+                                    <div class="trs-zendesk-links-table__actions">
+                                        <govuk-button
+                                            type="button"
+                                            class="govuk-button--secondary trs-requires-js"
+                                            hx-post
+                                            hx-page-handler="RemoveTicket"
+                                            hx-route-index="@Model.TicketUrls.Count"
+                                            hx-include="closest form"
+                                            hx-target="main"
+                                            hx-select="main"
+                                            hx-swap="outerHTML">
+                                            Remove
+                                        </govuk-button>
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                </div>
+                            </table-cell>
+                        </table-row>
+                    }
+                </govuk-table>
 
                 <div class="govuk-!-margin-top-4 trs-requires-js">
                     <govuk-button
