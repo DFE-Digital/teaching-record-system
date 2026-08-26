@@ -36,7 +36,7 @@
         @foreach (var (alert, externalLinkUri, canWrite) in Model.OpenAlerts)
         {
             <govuk-summary-card data-testid="open-alert">
-                <title heading-level="3">@alert.AlertType!.Name</title>
+                <card-title heading-level="3">@alert.AlertType!.Name</card-title>
                 @if (canWrite)
                 {
                     <card-actions>
