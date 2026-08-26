@@ -282,7 +282,7 @@ jobs:
           merge-multiple: true
           path: results
 
-      - uses: dorny/test-reporter@v1
+      - uses: dorny/test-reporter@v3
         with:
           name: ${{ matrix.project }} test results
           path: "results/**/*.trx"
