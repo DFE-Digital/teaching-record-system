@@ -66,47 +66,43 @@
                     }
                     else
                     {
-                        <table class="govuk-table" sortable>
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
-                                        sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.Name ? Model.SortDirection : null)"
-                                        link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.Name, direction))">
-                                        Name
-                                    </th>
-                                    <th scope="col" class="govuk-table__header"
-                                        sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.DateCreated ? Model.SortDirection : null)"
-                                        link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.DateCreated, direction))">
-                                        Date created
-                                    </th>
-                                    <th scope="col" class="govuk-table__header trs-!-width-150"
-                                        sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.DateOfBirth ? Model.SortDirection : null)"
-                                        link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.DateOfBirth, direction))">
-                                        Date of birth
-                                    </th>
-                                    <th scope="col" class="govuk-table__header trs-!-width-150"
-                                        sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.Source ? Model.SortDirection : null)"
-                                        link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.Source, direction))">
-                                        Source
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body" data-testid="results">
-                                    @foreach (var result in Model.Results)
-                                    {
-                                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                                            <th scope="row" class="govuk-table__header" data-testid="name">
-                                                <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
-                                                    @result.FirstName @result.MiddleName @result.LastName
-                                                </a>
-                                            </th>
-                                            <td class="govuk-table__cell" data-testid="created-on">@result.CreatedOn.ToGmt().ToString(WebConstants.DateDisplayFormat)</td>
-                                            <td class="govuk-table__cell" data-testid="date-of-birth">@result.DateOfBirth.ToString(WebConstants.DateDisplayFormat)</td>
-                                            <td class="govuk-table__cell" data-testid="source"><tag color="TagColor.Auto">@result.SourceApplicationName</tag></td>
-                                        </tr>
-                                    }
-                            </tbody>
-                        </table>
+                        <govuk-table sortable data-testid="results" first-cell-is-header="true">
+                            <table-head>
+                                <table-head-cell class="govuk-!-width-one-quarter"
+                                    sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.Name ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.Name, direction))">
+                                    Name
+                                </table-head-cell>
+                                <table-head-cell
+                                    sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.DateCreated ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.DateCreated, direction))">
+                                    Date created
+                                </table-head-cell>
+                                <table-head-cell class="trs-!-width-150"
+                                    sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.DateOfBirth ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.DateOfBirth, direction))">
+                                    Date of birth
+                                </table-head-cell>
+                                <table-head-cell class="trs-!-width-150"
+                                    sort-direction="@(Model.SortBy == TrnRequestManualChecksSortByOption.Source ? Model.SortDirection : null)"
+                                    link-template="@(direction => LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Index(search: Model.Search, TrnRequestManualChecksSortByOption.Source, direction))">
+                                    Source
+                                </table-head-cell>
+                            </table-head>
+                                @foreach (var result in Model.Results)
+                                {
+                                    <table-row data-testid="task:@result.SupportTaskReference">
+                                        <table-cell data-testid="name">
+                                            <a href="@LinkGenerator.SupportTasks.TrnRequestManualChecksNeeded.Resolve.Index(result.SupportTaskReference)" class="govuk-link">
+                                                @result.FirstName @result.MiddleName @result.LastName
+                                            </a>
+                                        </table-cell>
+                                        <table-cell data-testid="created-on">@result.CreatedOn.ToGmt().ToString(WebConstants.DateDisplayFormat)</table-cell>
+                                        <table-cell data-testid="date-of-birth">@result.DateOfBirth.ToString(WebConstants.DateDisplayFormat)</table-cell>
+                                        <table-cell data-testid="source"><tag color="TagColor.Auto">@result.SourceApplicationName</tag></table-cell>
+                                    </table-row>
+                                }
+                        </govuk-table>
                     }
                 </filter-layout-content>
             </filter-layout>

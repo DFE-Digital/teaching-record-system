@@ -177,7 +177,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
             .GetElementByTestId("results");
 
         return r?
-            .GetElementsByClassName("govuk-table__row")
+            .QuerySelectorAll("tbody > tr")
             .ToArray() ?? [];
     }
 

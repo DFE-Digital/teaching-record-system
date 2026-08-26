@@ -19,7 +19,7 @@ public static class SupportTasksPageExtensions
     // Ticks the checkbox for the first task shown and returns its reference
     public static async Task<string> SelectFirstTaskAsync(this IPage page)
     {
-        var checkbox = page.Locator("[data-testid='results'] input[type='checkbox']").First;
+        var checkbox = page.Locator("[data-testid='results'] tbody input[type='checkbox']").First;
         var supportTaskReference = await checkbox.GetAttributeAsync("value");
 
         // The checkbox itself sits underneath its label, which is stretched across the row
