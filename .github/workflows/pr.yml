@@ -287,6 +287,9 @@ jobs:
           name: ${{ matrix.project }} test results
           path: "results/**/*.trx"
           reporter: dotnet-trx
+          # A project whose jobs fell over before running any tests has no .trx to report on; the failure
+          # itself is the signal, so don't add a second, more confusing one on top of it.
+          fail-on-empty: false
 
   check_test_results:
     name: Check test results
