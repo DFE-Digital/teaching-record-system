@@ -45,48 +45,48 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="RouteId" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true">
+                <label is-page-heading="true">
                     @ViewBag.Title
-                </govuk-select-label>
-                <govuk-select-hint>Start typing the name of the route</govuk-select-hint>
-                <govuk-select-item value=""></govuk-select-item>
+                </label>
+                <hint>Start typing the name of the route</hint>
+                <select-item value=""></select-item>
                 @foreach (var route in Model.Routes)
                 {
-                    <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
+                    <select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</select-item>
                 }
             </govuk-select>
             @if (Model.ArchivedRouteId is not null)
             {
                 <govuk-details open="true">
-                    <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>I cannot see the route I am looking for</summary>
+                    <text>
                         <govuk-select for=@Model.ArchivedRouteId label-class="govuk-label--m">
-                            <govuk-select-label>Inactive route type</govuk-select-label>
-                            <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
-                            <govuk-select-item value=""></govuk-select-item>
+                            <label>Inactive route type</label>
+                            <hint>Start typing to search inactive or historical routes</hint>
+                            <select-item value=""></select-item>
                             @foreach (var route in Model.ArchivedRoutes)
                             {
-                                <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
+                                <select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</select-item>
                             }
                         </govuk-select>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             }
             else
             {
                 <govuk-details open="false">
-                    <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>I cannot see the route I am looking for</summary>
+                    <text>
                         <govuk-select for=@Model.ArchivedRouteId label-class="govuk-label--m">
-                            <govuk-select-label>Inactive route type</govuk-select-label>
-                            <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
-                            <govuk-select-item value=""></govuk-select-item>
+                            <label>Inactive route type</label>
+                            <hint>Start typing to search inactive or historical routes</hint>
+                            <select-item value=""></select-item>
                             @foreach (var route in Model.ArchivedRoutes)
                             {
-                                <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
+                                <select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</select-item>
                             }
                         </govuk-select>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             }
 

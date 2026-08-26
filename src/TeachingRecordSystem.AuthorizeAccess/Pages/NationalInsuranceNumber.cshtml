@@ -8,22 +8,22 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
             <govuk-radios for="HaveNationalInsuranceNumber">
-                <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@true">
+                <legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</legend>
+                <radios-item value="@true">
                     Yes
-                    <govuk-radios-item-conditional>
+                    <conditional>
                         <govuk-input for="NationalInsuranceNumber" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" spellcheck="false">
-                            <govuk-input-label>National Insurance number</govuk-input-label>
-                            <govuk-input-hint>It’s on your National Insurance card, benefit letter, payslip or P60 - for example, 'QQ 12 34 56 C'</govuk-input-hint>
+                            <label>National Insurance number</label>
+                            <hint>It’s on your National Insurance card, benefit letter, payslip or P60 - for example, 'QQ 12 34 56 C'</hint>
                         </govuk-input>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@false">No</govuk-radios-item>
+                    </conditional>
+                </radios-item>
+                <radios-item value="@false">No</radios-item>
             </govuk-radios>
 
             <govuk-details>
-                <govuk-details-summary>What is a National Insurance number?</govuk-details-summary>
-                <govuk-details-text>
+                <summary>What is a National Insurance number?</summary>
+                <text>
                     <p class="govuk-body">
                         In the UK, a National Insurance number is a personal number used by HM Revenue and Customs (HMRC) to record the tax and National Insurance you pay. You keep the same number for life, even if you move out of the UK.
                     </p>
@@ -31,7 +31,7 @@
                     <p class="govuk-body">
                         It’s shown on UK documents such as your National Insurance card, benefit letter, payslip or P60.
                     </p>
-                </govuk-details-text>
+                </text>
             </govuk-details>
 
             <govuk-button type="submit">Continue</govuk-button>

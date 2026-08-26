@@ -17,10 +17,10 @@
         <span data-testid="induction-status-caption" class="govuk-caption-l">@Model.PageCaption</span>
         <form data-testid="submit-form" method="post">
             <govuk-radios for="InductionStatus">
-                <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--l" is-page-heading="true">Select an induction status</govuk-radios-fieldset-legend>
+                <legend data-testid="status-choices-legend" class="govuk-fieldset__legend--l" is-page-heading="true">Select an induction status</legend>
                 @foreach (var inductionStatus in Model.StatusChoices)
                 {
-                    <govuk-radios-item value="@inductionStatus.InductionStatus" checked="@(Model.InductionStatus == inductionStatus.InductionStatus)">@inductionStatus.Title</govuk-radios-item>
+                    <radios-item value="@inductionStatus.InductionStatus" checked="@(Model.InductionStatus == inductionStatus.InductionStatus)">@inductionStatus.Title</radios-item>
                 }
             </govuk-radios>
             <input type="hidden" name="InductionStatus" value="@Model.InductionStatus" />

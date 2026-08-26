@@ -82,8 +82,8 @@
         </div>
 
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-            <govuk-details-summary>@changesHeading</govuk-details-summary>
-            <govuk-details-text>
+            <summary>@changesHeading</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Reason</key>
@@ -111,12 +111,12 @@
                     </row>
 
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
 
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="request-data">
-            <govuk-details-summary>TRN request data</govuk-details-summary>
-            <govuk-details-text>
+            <summary>TRN request data</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Source</key>
@@ -169,14 +169,14 @@
                         <value use-empty-fallback>@requestData.Gender?.GetDisplayName()</value>
                     </row>
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
 
         @if (oldAttributes != null)
         {
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
-                <govuk-details-summary>Previous details</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Previous details</summary>
+                <text>
                     <govuk-summary-list>
                         @if (updatedEvent.Changes.HasAnyFlag(NpqTrnRequestSupportTaskResolvedEventChanges.PersonNameChange)) {
                             <row>
@@ -213,7 +213,7 @@
                             </row>
                         }
                     </govuk-summary-list>
-                </govuk-details-text>
+                </text>
             </govuk-details>
         }
     </div>

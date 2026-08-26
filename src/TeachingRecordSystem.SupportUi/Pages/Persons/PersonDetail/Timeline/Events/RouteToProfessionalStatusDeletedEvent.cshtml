@@ -29,8 +29,8 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Reason for deletion</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Reason for deletion</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Reason</key>
@@ -55,13 +55,13 @@
                         </value>
                     </row>
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
         @if (deletedEvent.Changes != RouteToProfessionalStatusDeletedEventChanges.None)
         {
             <govuk-details class="govuk-!-margin-bottom-2">
-                <govuk-details-summary>Person professional status updated as a result of the route deletion</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Person professional status updated as a result of the route deletion</summary>
+                <text>
                     <govuk-summary-list>
                         @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
                         {
@@ -99,12 +99,12 @@
                             </row>
                         }
                     </govuk-summary-list>
-                </govuk-details-text>
+                </text>
             </govuk-details>
         }
         <govuk-details class="govuk-!-margin-bottom-2">
-        <govuk-details-summary>Deleted data</govuk-details-summary>
-            <govuk-details-text>
+        <summary>Deleted data</summary>
+            <text>
                 <govuk-summary-list>
                 @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
                 {
@@ -202,7 +202,7 @@
                     </row>
                 }
             </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     </div>
 </div>
