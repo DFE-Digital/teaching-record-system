@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 

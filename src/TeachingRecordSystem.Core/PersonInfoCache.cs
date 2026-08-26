@@ -16,9 +16,9 @@ public class PersonInfoCache(IDbContextFactory<TrsDbContext> dbContextFactory, I
             return await dbContext.Persons
                 .IgnoreQueryFilters()
                 .Where(p => p.PersonId == personId)
-                .Select(p => new PersonInfo(p.PersonId, p.Trn, p.FirstName, p.LastName))
+                .Select(p => new PersonInfo(p.PersonId, p.Trn))
                 .SingleOrDefaultAsync();
         });
 }
 
-public record PersonInfo(Guid PersonId, string Trn, string FirstName, string LastName);
+public record PersonInfo(Guid PersonId, string Trn);

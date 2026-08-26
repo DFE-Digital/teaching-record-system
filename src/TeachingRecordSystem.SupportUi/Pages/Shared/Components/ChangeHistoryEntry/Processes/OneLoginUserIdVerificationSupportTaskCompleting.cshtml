@@ -1,45 +1,31 @@
-@using Microsoft.EntityFrameworkCore
-@using TeachingRecordSystem.Core.DataStore.Postgres
 @using TeachingRecordSystem.Core.Events
-@using TeachingRecordSystem.Core.Models
 @using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
-@inject PersonInfoCache PersonInfoCache
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @inject SupportUiLinkGenerator LinkGenerator
-@inject TrsDbContext DbContext
 @model ChangeHistoryEntryViewModel
 @{
     var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
     var supportTaskReference = supportTaskUpdatedEvent.SupportTask.SupportTaskReference;
     var outcome = supportTaskUpdatedEvent.SupportTask.Outcome;
-    var personId = supportTaskUpdatedEvent.SupportTask.PersonId;
-    var personInfo = personId is not null ? await PersonInfoCache.GetPersonInfoAsync(personId.Value) : null;
-    var hasEmailSentEvent = Model.TryGetEvent<EmailSentEvent>(out var emailSentEvent);
+    var hasEmailSentEvent = Model.TryGetEvent<EmailSentEvent>(out _);
     var hasOneLoginUpdatedEvent = Model.TryGetEvent<OneLoginUserUpdatedEvent>(out var oneLoginUpdatedEvent);
-    
-    string? oneLoginEmail = null;
-    string? oneLoginSubject = null;
+
+    string? oneLoginEmail;
+    string? oneLoginSubject;
 
     if (hasOneLoginUpdatedEvent)
     {
         oneLoginEmail = oneLoginUpdatedEvent!.OneLoginUser.EmailAddress;
-        oneLoginSubject = oneLoginUpdatedEvent.OneLoginUser.Subject;
+        oneLoginSubject = oneLoginUpdatedEvent!.OneLoginUser.Subject;
     }
     else
     {
-        oneLoginSubject = supportTaskUpdatedEvent.SupportTask.OneLoginUserSubject;
-        if (oneLoginSubject is not null)
-        {
-            var oneLoginUser = await DbContext.OneLoginUsers
-                .IgnoreQueryFilters()
-                .Where(u => u.Subject == oneLoginSubject)
-                .Select(u => new { u.EmailAddress })
-                .SingleOrDefaultAsync();
-            oneLoginEmail = oneLoginUser?.EmailAddress;
-        }
+        oneLoginSubject = supportTaskUpdatedEvent.SupportTask.OneLoginUserSubject!;
+        oneLoginEmail = Model.Context.GetOneLoginUserInfo(oneLoginSubject).EmailAddress;
     }
 
-    var isVerified = outcome is SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches 
-        or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches 
+    var isVerified = outcome is SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches
+        or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches
         or SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected;
 }
 
@@ -72,8 +58,8 @@
     @if (hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OneLoginUser.PersonId is not null)
     {
         var matchedPersonId = oneLoginUpdatedEvent.OneLoginUser.PersonId!.Value;
-        var matchedPersonInfo = await PersonInfoCache.GetPersonInfoAsync(matchedPersonId);
-        var matchedPersonLinkText = $"{matchedPersonInfo?.FirstName} {matchedPersonInfo?.LastName}";
+        var matchedPersonInfo = Model.Context.GetPersonInfo(matchedPersonId);
+        var matchedPersonLinkText = $"{matchedPersonInfo.FirstName} {matchedPersonInfo.LastName}";
 
         <p class="govuk-body" data-testid="one-login-matched-message">
             @if (Model.Context.ContextType == ChangeHistoryContextType.SupportTask)
