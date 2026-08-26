@@ -1,10 +1,9 @@
 @using TeachingRecordSystem.Core.Events
-@inject PersonInfoCache PersonInfoCache
 @model ChangeHistoryEntryViewModel
 @{
     var emailSentEvent = Model.GetEvent<EmailSentEvent>();
     var personId = emailSentEvent.PersonId!.Value;
-    var personInfo = await PersonInfoCache.GetRequiredPersonInfoAsync(personId);
+    var personInfo = Model.Context.GetPersonInfo(personId);
 }
 
 <timeline-entry title="TRN email sent to @personInfo.FirstName @personInfo.LastName" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
