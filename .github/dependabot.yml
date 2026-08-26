@@ -7,7 +7,6 @@ updates:
       interval: "daily"
     cooldown:
       default-days: 3
-    versioning-strategy: increase
     groups:
       dotnet:
         patterns:
