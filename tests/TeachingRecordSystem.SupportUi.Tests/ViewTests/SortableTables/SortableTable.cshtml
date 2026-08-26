@@ -1,5 +1,9 @@
 @using TeachingRecordSystem.SupportUi
 @model SortDirection?
+@* Added in the same order as Pages/_ViewImports.cshtml: tag helpers that share an Order run in the
+   order their assemblies were registered, so the sortable column helper only gets to rewrite the cell
+   before the GOV.UK table helper reads it because it sets an explicit Order. *@
+@addTagHelper *, GovUk.Frontend.AspNetCore
 @addTagHelper *, TeachingRecordSystem.SupportUi
 @{
     Layout = null;
@@ -9,17 +13,14 @@
     var include = "[name='SupportTaskReference']";
 }
 
-<table sortable>
-    <thead>
-        <tr>
-            <th sort-direction="@Model"
-                link-template="@(direction => $"/_sortable-table?sortDirection={direction}")"
-                use-htmx="true"
-                hx-select="main"
-                hx-include="@include">
-                Task
-            </th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<govuk-table sortable>
+    <table-head>
+        <table-head-cell sort-direction="@Model"
+                         link-template="@(direction => $"/_sortable-table?sortDirection={direction}")"
+                         use-htmx="true"
+                         hx-select="main"
+                         hx-include="@include">
+            Task
+        </table-head-cell>
+    </table-head>
+</govuk-table>

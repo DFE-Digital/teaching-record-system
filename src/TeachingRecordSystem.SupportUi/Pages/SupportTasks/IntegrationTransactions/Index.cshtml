@@ -16,122 +16,118 @@
     </div>
 
     <div class="govuk-grid-column-full" data-testid="results">
-        <table class="govuk-table" sortable>
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.IntegrationTransactionId ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.IntegrationTransactionId, direction))">
-                        ID
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.InterfaceType ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.InterfaceType, direction))">
-                        Interface
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.CreatedOn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.CreatedOn, direction))">
-                        Date and time
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.ImportStatus ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.ImportStatus, direction))">
-                        Import status
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Total ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Total, direction))">
-                        Total
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Successes ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Successes, direction))">
-                        Successes
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Warnings ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Warnings, direction))">
-                        Warnings
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Failures ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Failures, direction))">
-                        Failures
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Duplicates ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Duplicates, direction))">
-                        Duplicates
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @if (Model.Results!.Count == 0)
+        <govuk-table sortable>
+            <table-head>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.IntegrationTransactionId ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.IntegrationTransactionId, direction))">
+                    ID
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.InterfaceType ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.InterfaceType, direction))">
+                    Interface
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.CreatedOn ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.CreatedOn, direction))">
+                    Date and time
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.ImportStatus ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.ImportStatus, direction))">
+                    Import status
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Total ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Total, direction))">
+                    Total
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Successes ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Successes, direction))">
+                    Successes
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Warnings ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Warnings, direction))">
+                    Warnings
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Failures ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Failures, direction))">
+                    Failures
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Duplicates ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.SupportTasks.IntegrationTransactions.Index(IntegrationTransactionSortByOption.Duplicates, direction))">
+                    Duplicates
+                </table-head-cell>
+            </table-head>
+            @if (Model.Results!.Count == 0)
+            {
+                <table-row data-testid="no-integration-transactions-message">
+                    <table-cell colspan="8">No integration transactions</table-cell>
+                </table-row>
+            }
+            else
+            {
+                foreach (var result in Model.Results)
                 {
-                    <tr class="govuk-table__row" data-testid="no-integration-transactions-message">
-                        <td class="govuk-table__cell" colspan="8">No integration transactions</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var result in Model.Results)
-                    {
-                        <tr class="govuk-table__row" data-testid="integration-transaction:@result.IntegrationTransactionId">
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:id">
-                                @result.IntegrationTransactionId
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:interface">
-                                <a class="govuk-link" href="integration-transactions/@result.IntegrationTransactionId/detail">@result.InterfaceType.GetDisplayName()</a>
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:createdon">
-                                <div class="govuk-\!-text-align-centre">@result.CreatedOn.ToString(WebConstants.DateDisplayFormat)</div>
-                                <div>@result.CreatedOn.ToString("hh:mm tt")</div>
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:importstatus">
-                                @if (result.ImportStatus == IntegrationTransactionImportStatus.Success)
-                                {
-                                    <tag color="TagColor.Green" class="govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</tag>
-                                }
-                                else @if (result.ImportStatus == IntegrationTransactionImportStatus.InProgress)
-                                {
-                                    <tag color="TagColor.Blue" class="govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</tag>
-                                }
-                                else
-                                {
-                                    <tag color="TagColor.Red" class="govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</tag>
-                                }
-                            </td>
+                    <table-row data-testid="integration-transaction:@result.IntegrationTransactionId">
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:id">
+                            @result.IntegrationTransactionId
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:interface">
+                            <a class="govuk-link" href="integration-transactions/@result.IntegrationTransactionId/detail">@result.InterfaceType.GetDisplayName()</a>
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:createdon">
+                            <div class="govuk-\!-text-align-centre">@result.CreatedOn.ToString(WebConstants.DateDisplayFormat)</div>
+                            <div>@result.CreatedOn.ToString("hh:mm tt")</div>
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:importstatus">
+                            @if (result.ImportStatus == IntegrationTransactionImportStatus.Success)
+                            {
+                                <tag color="TagColor.Green" class="govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</tag>
+                            }
+                            else @if (result.ImportStatus == IntegrationTransactionImportStatus.InProgress)
+                            {
+                                <tag color="TagColor.Blue" class="govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</tag>
+                            }
+                            else
+                            {
+                                <tag color="TagColor.Red" class="govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</tag>
+                            }
+                        </table-cell>
 
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:total">
-                                @result.TotalCount
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:successes">
-                                @result.SuccessesCount
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:warnings">
-                                @result.WarningsCount
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:failures">
-                                @result.FailuresCount
-                            </td>
-                            <td class="govuk-table__cell"
-                                data-testid="integration-transaction:@result.IntegrationTransactionId:duplicates">
-                                @result.DuplicatesCount
-                            </td>
-                        </tr>
-                    }
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:total">
+                            @result.TotalCount
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:successes">
+                            @result.SuccessesCount
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:warnings">
+                            @result.WarningsCount
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:failures">
+                            @result.FailuresCount
+                        </table-cell>
+                        <table-cell
+                            data-testid="integration-transaction:@result.IntegrationTransactionId:duplicates">
+                            @result.DuplicatesCount
+                        </table-cell>
+                    </table-row>
                 }
-            </tbody>
-        </table>
+            }
+        </govuk-table>
     </div>
 
     <div class="govuk-grid-column-full">

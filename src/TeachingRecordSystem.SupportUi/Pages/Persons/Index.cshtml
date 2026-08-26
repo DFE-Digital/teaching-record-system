@@ -75,74 +75,70 @@
             </form>
         </div>
 
-        <table class="govuk-table trs-table-layout-fixed" sortable>
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header trs-!-width-200"
-                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.Name ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Name, direction))">
-                        Name
-                    </th>
-                    <th scope="col" class="govuk-table__header"
-                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.OneLoginEmailAddress ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.OneLoginEmailAddress, direction))">
-                        One Login email address
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-130"
-                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.DateOfBirth, direction))">
-                        Date of birth
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-80"
-                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.Trn ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Trn, direction))">
-                        TRN
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-110"
-                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.NationalInsuranceNumber ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.NationalInsuranceNumber, direction))">
-                        National Insurance number
-                    </th>
-                    <th scope="col" class="govuk-table__header trs-!-width-80"
-                        sort-direction="@(Model.SortBy == PersonSearchSortByOption.RecordStatus ? Model.SortDirection : null)"
-                        link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.RecordStatus, direction))">
-                        Record status
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @if (Model.SearchResults!.Count == 0)
+        <govuk-table class="trs-table-layout-fixed" sortable>
+            <table-head>
+                <table-head-cell class="trs-!-width-200"
+                    sort-direction="@(Model.SortBy == PersonSearchSortByOption.Name ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Name, direction))">
+                    Name
+                </table-head-cell>
+                <table-head-cell
+                    sort-direction="@(Model.SortBy == PersonSearchSortByOption.OneLoginEmailAddress ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.OneLoginEmailAddress, direction))">
+                    One Login email address
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-130"
+                    sort-direction="@(Model.SortBy == PersonSearchSortByOption.DateOfBirth ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.DateOfBirth, direction))">
+                    Date of birth
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-80"
+                    sort-direction="@(Model.SortBy == PersonSearchSortByOption.Trn ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.Trn, direction))">
+                    TRN
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-110"
+                    sort-direction="@(Model.SortBy == PersonSearchSortByOption.NationalInsuranceNumber ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.NationalInsuranceNumber, direction))">
+                    National Insurance number
+                </table-head-cell>
+                <table-head-cell class="trs-!-width-80"
+                    sort-direction="@(Model.SortBy == PersonSearchSortByOption.RecordStatus ? Model.SortDirection : null)"
+                    link-template="@(direction => LinkGenerator.Persons.Index(Model.Search, Model.IncludeActive, Model.IncludeDeactivated, Model.IncludeOneLoginUser, PersonSearchSortByOption.RecordStatus, direction))">
+                    Record status
+                </table-head-cell>
+            </table-head>
+            @if (Model.SearchResults!.Count == 0)
+            {
+                <table-row data-testid="no-matches">
+                    <table-cell colspan="6">No matching records</table-cell>
+                </table-row>
+            }
+            else
+            {
+                @foreach (var personInfo in Model.SearchResults)
                 {
-                    <tr class="govuk-table__row" data-testid="no-matches">
-                        <td class="govuk-table__cell" colspan="6">No matching records</td>
-                    </tr>
+                    <table-row data-testid="person-@personInfo.PersonId">
+                        <table-cell data-testid="name"><a href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></table-cell>
+                        <table-cell class="trs-break-word" data-testid="one-login-emails" use-empty-fallback>
+                            @if (personInfo.OneLoginUserEmailAddresses.Length > 0)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var email in personInfo.OneLoginUserEmailAddresses)
+                                    {
+                                        <li class="govuk-!-margin-bottom-0">@email</li>
+                                    }
+                                </ul>
+                            }
+                        </table-cell>
+                        <table-cell data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(WebConstants.DateDisplayFormat) : string.Empty)</table-cell>
+                        <table-cell data-testid="trn">@personInfo.Trn</table-cell>
+                        <table-cell data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</table-cell>
+                        <table-cell data-testid="status">@personInfo.PersonStatus</table-cell>
+                    </table-row>
                 }
-                else
-                {
-                    @foreach (var personInfo in Model.SearchResults)
-                    {
-                        <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
-                            <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
-                            <td class="govuk-table__cell trs-break-word" data-testid="one-login-emails" use-empty-fallback>
-                                @if (personInfo.OneLoginUserEmailAddresses.Length > 0)
-                                {
-                                    <ul class="govuk-list">
-                                        @foreach (var email in personInfo.OneLoginUserEmailAddresses)
-                                        {
-                                            <li class="govuk-!-margin-bottom-0">@email</li>
-                                        }
-                                    </ul>
-                                }
-                            </td>
-                            <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(WebConstants.DateDisplayFormat) : string.Empty)</td>
-                            <td class="govuk-table__cell" data-testid="trn">@personInfo.Trn</td>
-                            <td class="govuk-table__cell" data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</td>
-                            <td class="govuk-table__cell" data-testid="status">@personInfo.PersonStatus</td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
+            }
+        </govuk-table>
 
         <govuk-pagination current-page="@Model.Pagination!.CurrentPage" total-pages="@Model.Pagination.LastPage" generate-page-href="@Model.Pagination.GetPageLink" />
     </div>

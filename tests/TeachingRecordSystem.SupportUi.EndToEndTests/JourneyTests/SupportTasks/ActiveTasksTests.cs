@@ -110,7 +110,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Back on the first page with the task still ticked, rather than out of the list entirely
         await page.AssertSelectedTaskCountAsync(1);
-        Assert.Equal(1, await page.Locator("[data-testid='results'] input[type='checkbox']:checked").CountAsync());
+        Assert.Equal(1, await page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked").CountAsync());
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // The task picked on the first page is still ticked, not just counted
         await page.AssertSelectedTaskCountAsync(1);
-        Assert.Equal(1, await page.Locator("[data-testid='results'] input[type='checkbox']:checked").CountAsync());
+        Assert.Equal(1, await page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked").CountAsync());
 
         // The back link is rendered out of band, which a history restore has to be careful not to
         // strip out of the response
@@ -160,7 +160,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoForwardAsync();
 
         await page.AssertSelectedTaskCountAsync(2);
-        Assert.Equal(1, await page.Locator("[data-testid='results'] input[type='checkbox']:checked").CountAsync());
+        Assert.Equal(1, await page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked").CountAsync());
         Assert.Contains("pageNumber=1", await page.Locator(".govuk-back-link").GetAttributeAsync("href"));
     }
 
@@ -176,7 +176,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ToggleSelectAllAsync();
         await page.AssertSelectedTaskCountAsync(TasksPerPage);
-        Assert.Equal(TasksPerPage, await page.Locator("[data-testid='results'] input[type=checkbox]:checked").CountAsync());
+        Assert.Equal(TasksPerPage, await page.Locator("[data-testid='results'] tbody input[type=checkbox]:checked").CountAsync());
 
         await page.ClickAsync(".govuk-pagination__next a");
         await page.WaitForURLAsync(url => url.Contains("pageNumber=2"));
@@ -204,7 +204,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GotoAsync(createdTasks.ActiveTasksUrl);
 
         var selectAll = page.Locator("#select-all-tasks");
-        var rows = await page.Locator("[data-testid='results'] input[type=checkbox]").AllAsync();
+        var rows = await page.Locator("[data-testid='results'] tbody input[type=checkbox]").AllAsync();
 
         for (var i = 0; i < rows.Count; i++)
         {
