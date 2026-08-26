@@ -276,7 +276,7 @@ jobs:
 
       # Every shard of a project lands in one report, so a project that is split over several jobs still
       # reads as a single set of results.
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: test-results-${{ matrix.project }}-*
           merge-multiple: true
