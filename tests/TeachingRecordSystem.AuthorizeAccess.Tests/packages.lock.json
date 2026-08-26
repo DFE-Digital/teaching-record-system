@@ -1032,7 +1032,7 @@
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.103.0, )",
           "DfeAnalytics.AspNetCore": "[0.6.2, )",
-          "GovUk.Frontend.AspNetCore": "[5.0.0-alpha.0.66, )",
+          "GovUk.Frontend.AspNetCore": "[5.0.0-alpha.0.69, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Humanizer.Core": "[3.0.10, )",
@@ -1326,9 +1326,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[4.4.0, )",
-        "resolved": "5.0.0-alpha.0.66",
-        "contentHash": "0VRoHOfJdJ6zEtaUJxe3Qma2UoucJKe1bqts1+X9EdCtvYjvIM5KvzV0NNe+ozu2CA3HQtc5BcH5uV+NoCR2Lw=="
+        "requested": "[5.0.0-alpha.0.69, )",
+        "resolved": "5.0.0-alpha.0.69",
+        "contentHash": "u524hPzl8SR1oR1vP1OQyrjOfnA6uSBlR3ymBKfG7vJPTATOvh4GajlAyTmW/PaJnitKl/NoxSCto665dw4nxQ=="
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "CentralTransitive",

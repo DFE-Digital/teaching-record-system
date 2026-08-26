@@ -6,7 +6,7 @@
 }
 
 <govuk-summary-card data-testid="one-login-details">
-    <title>GOV.UK One Login details</title>
+    <card-title>GOV.UK One Login details</card-title>
     <govuk-summary-list>
         <row>
             <key>Email address</key>
@@ -31,7 +31,7 @@
     if (Model.OneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.Support || Model.OneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.External)
     {
         <govuk-summary-card data-testid="verified-details">
-            <title>Verified details</title>
+            <card-title>Verified details</card-title>
             <govuk-summary-list>
                 <row>
                     <key>Name</key>
@@ -49,7 +49,7 @@
 @if (Model.ConnectedPerson is not null)
 {
     <govuk-summary-card data-testid="connected-record-details">
-        <title>Connected record details</title>
+        <card-title>Connected record details</card-title>
         <card-actions>
             <action data-testid="view-record-link" href="@LinkGenerator.Persons.PersonDetail.Index(Model.ConnectedPerson.PersonId)" target="_blank" visually-hidden-text="connected record">View record (opens in new tab)</action>
         </card-actions>
