@@ -1,0 +1,276 @@
+using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
+
+namespace TeachingRecordSystem.EndToEndTests.SupportUiJourneys.Persons;
+
+public class SetStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
+{
+    [Fact]
+    public async Task Deactivate()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Deactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickGovUkButtonAsync("Confirm and deactivate record");
+
+        await page.AssertOnPersonDetailPageAsync(person.PersonId);
+        await page.AssertFlashMessageAsync(expectedHeader: "Ethelred The Unready’s record has been deactivated");
+    }
+
+    [Fact]
+    public async Task Reactivate()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Reactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for re-activation is a mistake");
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickGovUkButtonAsync("Confirm and reactivate record");
+
+        await page.AssertOnPersonDetailPageAsync(person.PersonId);
+        await page.AssertFlashMessageAsync(expectedHeader: "Ethelred The Unready’s record has been reactivated");
+    }
+
+    [Fact]
+    public async Task Deactivate_NavigateBack()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Deactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonDetailPageAsync(person.PersonId);
+    }
+
+    [Fact]
+    public async Task Reactivate_NavigateBack()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Reactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonDetailPageAsync(person.PersonId);
+    }
+
+    [Fact]
+    public async Task Deactivate_CYA_ChangeReason_ContinuesToCYA()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Deactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
+
+        await page.ClickLinkForElementWithTestIdAsync("change-deactivate-reason-link");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
+    }
+
+    [Fact]
+    public async Task Reactivate_CYA_ChangeReason_ContinuesToCYA()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Reactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for re-activation is a mistake");
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickLinkForElementWithTestIdAsync("change-reactivate-reason-link");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
+    }
+
+    [Fact]
+    public async Task Deactivate_CYA_NavigatesBackToCYA()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Deactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.SelectChangeReasonAsync("deactivate-reason-options", PersonDeactivateReason.ProblemWithTheRecord);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.Yes, "Reason for de-activation");
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickLinkForElementWithTestIdAsync("change-deactivate-reason-link");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Deactivated);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonDetailPageAsync(person.PersonId);
+    }
+
+    [Fact]
+    public async Task Reactivate_CYA_NavigatesBackToCYA()
+    {
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Ethelred")
+            .WithMiddleName("The")
+            .WithLastName("Unready"));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPageAsync(person.PersonId);
+        await page.ClickGovUkButtonAsync("Reactivate record");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.SelectChangeReasonAsync("reactivate-reason-options", PersonReactivateReason.DeactivatedByMistake);
+        await page.SelectProvideAdditionalInformationAsync("provide-more-information-options", ProvideMoreInformationOption.No);
+        await page.SelectUploadEvidenceAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickLinkForElementWithTestIdAsync("change-reactivate-reason-link");
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonSetStatusCheckAnswersPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonSetStatusChangeReasonPageAsync(person.PersonId, PersonStatus.Active);
+        await page.ClickBackLinkAsync();
+
+        await page.AssertOnPersonDetailPageAsync(person.PersonId);
+    }
+}

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Webhooks;
 
@@ -12,6 +13,7 @@ public abstract class TestBase
         HostFixture = hostFixture;
 
         WebhookMessageRecorder.Clear();
+        SetCurrentUser(TestUsers.Administrator);
     }
 
     protected string ApiBaseUrl => HostFixture.ApiBaseUrl;
@@ -28,9 +30,23 @@ public abstract class TestBase
 
     protected WebhookMessageRecorder WebhookMessageRecorder => HostFixture.WebhookMessageRecorder;
 
+    public static string TextSelector(string? text) => $":text(\"{text?.Replace("\"", "\\\"")}\")";
+
+    public static string TextIsSelector(string? text) => $":text-is(\"{text?.Replace("\"", "\\\"")}\")";
+
+    public static string HasTextSelector(string? text) => $":has-text(\"{text?.Replace("\"", "\\\"")}\")";
+
+    public static string LinkHrefContains(string hrefPart) => $"a[href*=\"{hrefPart}\"]";
+
     protected void SetCurrentOneLoginUser(OneLoginUserInfo user)
     {
         var currentUserProvider = HostFixture.AuthorizeAccessHostServices.GetRequiredService<OneLoginCurrentUserProvider>();
+        currentUserProvider.CurrentUser = user;
+    }
+
+    protected void SetCurrentUser(User user)
+    {
+        var currentUserProvider = HostFixture.SupportUiHostServices.GetRequiredService<CurrentUserProvider>();
         currentUserProvider.CurrentUser = user;
     }
 
