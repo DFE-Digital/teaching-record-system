@@ -29,20 +29,28 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
             NewEventName: nameof(RouteToProfessionalStatusCreatedEvent),
             ProcessType: ProcessType.RouteToProfessionalStatusCreating,
             ReasonProperty: "ChangeReason",
-            ReasonDetailProperty: "ChangeReasonDetail"),
+            ReasonDetailProperty: "ChangeReasonDetail",
+            RoutePayloadProperties: ["RouteToProfessionalStatus"],
+            HasInduction: true),
         new(
             LegacyEventName: nameof(LegacyEvents.RouteToProfessionalStatusUpdatedEvent),
             NewEventName: nameof(RouteToProfessionalStatusUpdatedEvent),
             ProcessType: ProcessType.RouteToProfessionalStatusUpdating,
             ReasonProperty: "ChangeReason",
             ReasonDetailProperty: "ChangeReasonDetail",
-            ExtraPayloadProperties: ["OldRouteToProfessionalStatus"]),
+            // The legacy Changes also carried the person-level flags from bit 24 up; those are now expressed by
+            // the person events, so only the route's own flags are kept.
+            RoutePayloadProperties: ["RouteToProfessionalStatus", "OldRouteToProfessionalStatus"],
+            ChangesMask: 0x3FFF,
+            HasInduction: true),
         new(
             LegacyEventName: nameof(LegacyEvents.RouteToProfessionalStatusDeletedEvent),
             NewEventName: nameof(RouteToProfessionalStatusDeletedEvent),
             ProcessType: ProcessType.RouteToProfessionalStatusDeleting,
             ReasonProperty: "DeletionReason",
-            ReasonDetailProperty: "DeletionReasonDetail"),
+            ReasonDetailProperty: "DeletionReasonDetail",
+            RoutePayloadProperties: ["RouteToProfessionalStatus"],
+            HasInduction: true),
         new(
             LegacyEventName: nameof(LegacyEvents.RouteToProfessionalStatusMigratedEvent),
             NewEventName: nameof(RouteToProfessionalStatusMigratedEvent),
@@ -51,15 +59,14 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
             // rather than an induction snapshot.
             ReasonProperty: null,
             ReasonDetailProperty: null,
-            PayloadProperties: [
+            RoutePayloadProperties: [
                 "RouteToProfessionalStatus",
-                "PersonAttributes",
-                "OldPersonAttributes",
                 "DqtInitialTeacherTraining",
                 "DqtQtsRegistration",
                 "DqtQtlsDate",
                 "DqtQtlsDateHasBeenSet"
-            ])
+            ],
+            HasInduction: false)
     ];
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
@@ -185,8 +192,8 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
         return (reader.GetDateTime(0), reader.GetGuid(1));
     }
 
-    // The process and its event are written by one statement: foreign keys are checked once the whole statement has
-    // run, so process_events can reference the processes the same statement inserts.
+    // The process and its events are written by one statement: foreign keys are checked once the whole statement
+    // has run, so process_events can reference the processes the same statement inserts.
     private static string BuildBackfillSql(EventMapping mapping) =>
         $"""
          WITH todo AS MATERIALIZED (
@@ -205,7 +212,9 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
                  END AS dqt_user_id,
                  CASE WHEN jsonb_typeof(e.payload->'RaisedBy') = 'object'
                      THEN e.payload->'RaisedBy'->>'DqtUserName'
-                 END AS dqt_user_name
+                 END AS dqt_user_name,
+                 {BuildPersonAttributesChangesSql()} AS person_attributes_changes,
+                 {BuildInductionChangesSql(mapping)} AS induction_changes
              FROM events e
              WHERE e.event_name = @legacyEventName
                AND e.created >= @fromCreated
@@ -233,7 +242,30 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
                  {BuildChangeReasonSql(mapping)}
              FROM todo
              RETURNING process_id
-         )
+         ),
+         inserted_person_attributes_events AS (
+             INSERT INTO process_events (
+                 process_event_id, process_id, event_name, payload,
+                 person_ids, one_login_user_subjects, support_task_references, created_on)
+             SELECT
+                 gen_random_uuid(),
+                 todo.process_id,
+                 '{nameof(PersonProfessionalStatusAttributesUpdatedEvent)}',
+                 jsonb_build_object(
+                     '$event-name', '{nameof(PersonProfessionalStatusAttributesUpdatedEvent)}',
+                     'EventId', gen_random_uuid(),
+                     'PersonId', todo.payload->'PersonId',
+                     'PersonAttributes', todo.payload->'PersonAttributes',
+                     'OldPersonAttributes', todo.payload->'OldPersonAttributes',
+                     'Changes', todo.person_attributes_changes),
+                 todo.person_ids,
+                 ARRAY[]::text[],
+                 ARRAY[]::text[],
+                 todo.created
+             FROM todo
+             WHERE todo.person_attributes_changes <> 0
+             RETURNING process_event_id
+         ){BuildInductionInsertSql(mapping)}
          INSERT INTO process_events (
              process_event_id, process_id, event_name, payload,
              person_ids, one_login_user_subjects, support_task_references, created_on)
@@ -241,13 +273,90 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
              todo.event_id,
              todo.process_id,
              '{mapping.NewEventName}',
-             {BuildPayloadSql(mapping)},
+             {BuildRoutePayloadSql(mapping)},
              todo.person_ids,
              ARRAY[]::text[],
              ARRAY[]::text[],
              todo.created
          FROM todo
          """;
+
+    // The legacy events recorded which person-level fields moved in their own Changes flags, but those flags
+    // weren't always set per-field, so the new events' flags are derived from the snapshots themselves.
+    private static string BuildPersonAttributesChangesSql()
+    {
+        var flags = new (string Property, int Value)[]
+        {
+            ("QtsDate", (int)PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate),
+            ("EytsDate", (int)PersonProfessionalStatusAttributesUpdatedEventChanges.EytsDate),
+            ("HasEyps", (int)PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps),
+            ("PqtsDate", (int)PersonProfessionalStatusAttributesUpdatedEventChanges.PqtsDate),
+            ("QtlsStatus", (int)PersonProfessionalStatusAttributesUpdatedEventChanges.QtlsStatus)
+        };
+
+        return BuildChangesMaskSql("PersonAttributes", "OldPersonAttributes", flags);
+    }
+
+    private static string BuildInductionChangesSql(EventMapping mapping)
+    {
+        if (!mapping.HasInduction)
+        {
+            return "0";
+        }
+
+        var flags = new (string Property, int Value)[]
+        {
+            ("Status", (int)PersonInductionUpdatedEventChanges.InductionStatus),
+            ("StartDate", (int)PersonInductionUpdatedEventChanges.InductionStartDate),
+            ("CompletedDate", (int)PersonInductionUpdatedEventChanges.InductionCompletedDate),
+            ("ExemptionReasonIds", (int)PersonInductionUpdatedEventChanges.InductionExemptionReasons),
+            ("StatusWithoutExemption", (int)PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption),
+            ("InductionExemptWithoutReason", (int)PersonInductionUpdatedEventChanges.InductionExemptWithoutReason)
+        };
+
+        return BuildChangesMaskSql("Induction", "OldInduction", flags);
+    }
+
+    private static string BuildChangesMaskSql(string property, string oldProperty, (string Property, int Value)[] flags) =>
+        string.Join(
+            " + ",
+            flags.Select(f =>
+                $"(CASE WHEN e.payload->'{property}'->'{f.Property}' IS DISTINCT FROM e.payload->'{oldProperty}'->'{f.Property}' THEN {f.Value} ELSE 0 END)"));
+
+    private static string BuildInductionInsertSql(EventMapping mapping)
+    {
+        if (!mapping.HasInduction)
+        {
+            return "";
+        }
+
+        return $"""
+         ,
+         inserted_induction_events AS (
+             INSERT INTO process_events (
+                 process_event_id, process_id, event_name, payload,
+                 person_ids, one_login_user_subjects, support_task_references, created_on)
+             SELECT
+                 gen_random_uuid(),
+                 todo.process_id,
+                 '{nameof(PersonInductionUpdatedEvent)}',
+                 jsonb_build_object(
+                     '$event-name', '{nameof(PersonInductionUpdatedEvent)}',
+                     'EventId', gen_random_uuid(),
+                     'PersonId', todo.payload->'PersonId',
+                     'Induction', todo.payload->'Induction',
+                     'OldInduction', todo.payload->'OldInduction',
+                     'Changes', todo.induction_changes),
+                 todo.person_ids,
+                 ARRAY[]::text[],
+                 ARRAY[]::text[],
+                 todo.created
+             FROM todo
+             WHERE todo.induction_changes <> 0
+             RETURNING process_event_id
+         )
+         """;
+    }
 
     // The reason, its detail, the evidence file and the additional information all move off the event and onto the
     // process, matching what the journeys now write.
@@ -276,21 +385,22 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
                 """;
     }
 
-    private static string BuildPayloadSql(EventMapping mapping)
+    private static string BuildRoutePayloadSql(EventMapping mapping)
     {
-        var properties = mapping.PayloadProperties ??
-            ["RouteToProfessionalStatus", .. mapping.ExtraPayloadProperties ?? [], "Changes", "PersonAttributes", "OldPersonAttributes", "Induction", "OldInduction"];
-
         var members = string.Join(
             ",\n                 ",
-            properties.Select(p => $"'{p}', todo.payload->'{p}'"));
+            mapping.RoutePayloadProperties.Select(p => $"'{p}', todo.payload->'{p}'"));
+
+        var changes = mapping.ChangesMask is int mask
+            ? $",\n                 'Changes', ((todo.payload->>'Changes')::int & {mask})"
+            : "";
 
         return $"""
                 jsonb_build_object(
                      '$event-name', '{mapping.NewEventName}',
                      'EventId', todo.payload->'EventId',
                      'PersonId', todo.payload->'PersonId',
-                     {members})
+                     {members}{changes})
                 """;
     }
 
@@ -300,6 +410,7 @@ public class BackfillRouteToProfessionalStatusProcessesJob(TrsDbContext dbContex
         ProcessType ProcessType,
         string? ReasonProperty,
         string? ReasonDetailProperty,
-        string[]? ExtraPayloadProperties = null,
-        string[]? PayloadProperties = null);
+        string[] RoutePayloadProperties,
+        bool HasInduction,
+        int? ChangesMask = null);
 }

@@ -472,7 +472,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
             var changeReason = p.ProcessContext.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(actualUpdatedEvent =>
+            p.AssertProcessHasEvent<RouteToProfessionalStatusUpdatedEvent>(actualUpdatedEvent =>
             {
                 Assert.Equal(person.PersonId, actualUpdatedEvent.PersonId);
                 Assert.Equal(state.Status, actualUpdatedEvent.RouteToProfessionalStatus.Status);
@@ -523,10 +523,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(actualCreatedEvent =>
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
             {
-                Assert.Equal(state.HoldsFrom, actualCreatedEvent.PersonAttributes.QtsDate);
-                Assert.Equal(qualification.HoldsFrom, actualCreatedEvent.OldPersonAttributes.QtsDate);
+                Assert.Equal(state.HoldsFrom, attributesEvent.PersonAttributes.QtsDate);
+                Assert.Equal(qualification.HoldsFrom, attributesEvent.OldPersonAttributes.QtsDate);
             });
         });
     }
@@ -560,10 +560,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(actualCreatedEvent =>
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
             {
-                Assert.Equal(state.HoldsFrom, actualCreatedEvent.PersonAttributes.EytsDate);
-                Assert.Equal(qualification.HoldsFrom, actualCreatedEvent.OldPersonAttributes.EytsDate);
+                Assert.Equal(state.HoldsFrom, attributesEvent.PersonAttributes.EytsDate);
+                Assert.Equal(qualification.HoldsFrom, attributesEvent.OldPersonAttributes.EytsDate);
             });
         });
     }
@@ -601,10 +601,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(actualCreatedEvent =>
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
             {
-                Assert.Equal(state.HoldsFrom, actualCreatedEvent.PersonAttributes.PqtsDate);
-                Assert.Equal(qualification.HoldsFrom, actualCreatedEvent.OldPersonAttributes.PqtsDate);
+                Assert.Equal(state.HoldsFrom, attributesEvent.PersonAttributes.PqtsDate);
+                Assert.Equal(qualification.HoldsFrom, attributesEvent.OldPersonAttributes.PqtsDate);
             });
         });
     }

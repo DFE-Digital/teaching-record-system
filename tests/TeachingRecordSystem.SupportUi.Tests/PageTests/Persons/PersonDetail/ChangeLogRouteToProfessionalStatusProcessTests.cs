@@ -737,9 +737,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
             DqtQtsRegistration = dqtQtsRegistration,
             DqtInitialTeacherTraining = dqtInitialTeacherTraining,
             DqtQtlsDate = populateOptional ? qtlsDate : null,
-            DqtQtlsDateHasBeenSet = populateOptional ? true : null,
-            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
-            OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person)
+            DqtQtlsDateHasBeenSet = populateOptional ? true : null
         };
 
         await TestData.CreateProcessAsync(

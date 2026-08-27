@@ -27,41 +27,6 @@
 
 <timeline-entry title="Route updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     <govuk-summary-list>
-        @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps))
-        {
-            <row>
-                <key>Person has Eyps</key>
-                <value data-testid="has-eyps" use-empty-fallback>@(updatedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</value>
-            </row>
-        }
-        @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate))
-        {
-            <row>
-                <key>EYTS date</key>
-                <value data-testid="eyts-date" use-empty-fallback>@updatedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-            </row>
-        }
-        @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
-        {
-            <row>
-                <key>PQTS date</key>
-                <value data-testid="pqts-date" use-empty-fallback>@updatedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-            </row>
-        }
-        @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate))
-        {
-            <row>
-                <key>QTS date</key>
-                <value data-testid="qts-date" use-empty-fallback>@updatedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-            </row>
-        }
-        @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtlsStatus))
-        {
-            <row>
-                <key>QTLS status</key>
-                <value data-testid="qtls-status" use-empty-fallback>@updatedEvent.PersonAttributes.QtlsStatus.ToString()</value>
-            </row>
-        }
         @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
         {
             <row>
@@ -182,41 +147,6 @@
         <govuk-details-summary>Previous data</govuk-details-summary>
         <govuk-details-text>
             <govuk-summary-list>
-                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps))
-                {
-                    <row>
-                        <key>Person has EYPS</key>
-                        <value data-testid="old-has-eyps" use-empty-fallback>@(updatedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate))
-                {
-                    <row>
-                        <key>EYTS date</key>
-                        <value data-testid="old-eyts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
-                {
-                    <row>
-                        <key>PQTS date</key>
-                        <value data-testid="old-pqts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate))
-                {
-                    <row>
-                        <key>QTS date</key>
-                        <value data-testid="old-qts-date" use-empty-fallback>@updatedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtlsStatus))
-                {
-                    <row>
-                        <key>QTLS status</key>
-                        <value data-testid="old-qtls-status" use-empty-fallback>@updatedEvent.OldPersonAttributes.QtlsStatus.ToString()</value>
-                    </row>
-                }
                 @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
                 {
                     <row>
@@ -306,4 +236,5 @@
             </govuk-summary-list>
         </govuk-details-text>
     </govuk-details>
+    <partial name="~/Pages/Shared/Components/ChangeHistoryEntry/Processes/_PersonProfessionalStatusChanges.cshtml" model="@Model" />
 </timeline-entry>

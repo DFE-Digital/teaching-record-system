@@ -8,8 +8,6 @@ public record RouteToProfessionalStatusMigratedEvent : IEvent
     string[] IEvent.SupportTaskReferences => [];
     public required Guid PersonId { get; init; }
     public required EventModels.RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }
-    public required EventModels.ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
-    public required EventModels.ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }
     public required EventModels.DqtInitialTeacherTraining? DqtInitialTeacherTraining { get; init; }
     public required EventModels.DqtQtsRegistration? DqtQtsRegistration { get; init; }
     public required DateOnly? DqtQtlsDate { get; init; }

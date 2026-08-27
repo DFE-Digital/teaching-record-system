@@ -15,29 +15,29 @@
     var hasMultipleChanges = (updatedEvent.Changes & (updatedEvent.Changes - 1)) != 0;
     if (!hasMultipleChanges)
     {
-        if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+        if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus))
         {
             heading = "Induction status changed";
         }
-        else if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+        else if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate))
         {
             heading = "Induction start date changed";
         }
-        else if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+        else if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate))
         {
             heading = "Induction completed date changed";
         }
-        else if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+        else if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons))
         {
             heading = "Induction exemption reason changed";
         }
     }
 
     var showItem = (updatedEvent.Changes &
-                   (PersonInductionUpdatedEventChanges.InductionStatus |
-                    PersonInductionUpdatedEventChanges.InductionExemptionReasons |
-                    PersonInductionUpdatedEventChanges.InductionStartDate |
-                    PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                   (LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus |
+                    LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons |
+                    LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate |
+                    LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate))
                    != 0;
 }
 
@@ -53,7 +53,7 @@
         </p>
         <div class="moj-timeline__description">
             <govuk-summary-list>
-                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+                @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus))
                 {
                     <row>
                         <key>Induction status</key>
@@ -61,7 +61,7 @@
                     </row>
                 }
 
-                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+                @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons))
                 {
                     <row>
                         <key>Exemption reason</key>
@@ -83,7 +83,7 @@
                     </row>
                 }
 
-                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+                @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate))
                 {
                     <row>
                         <key>Start date</key>
@@ -91,7 +91,7 @@
                     </row>
                 }
 
-                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate))
                 {
                     <row>
                         <key>Completed date</key>
@@ -134,7 +134,7 @@
                 <govuk-details-summary>Previous data</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
-                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+                        @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus))
                         {
                             <row>
                                 <key>Induction status</key>
@@ -142,7 +142,7 @@
                             </row>
                         }
 
-                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+                        @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons))
                         {
                             <row>
                                 <key>Exemption reason</key>
@@ -164,7 +164,7 @@
                             </row>
                         }
 
-                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+                        @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate))
                         {
                             <row>
                                 <key>Start date</key>
@@ -172,7 +172,7 @@
                             </row>
                         }
 
-                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                        @if (updatedEvent.Changes.HasFlag(LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate))
                         {
                             <row>
                                 <key>Completed date</key>

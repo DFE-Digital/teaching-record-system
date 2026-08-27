@@ -31,8 +31,6 @@ public class SetMissingHasEypsOnPersonsJob(
         {
             var person = route.Person!;
             var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person);
-            var oldInduction = EventModels.Induction.FromModel(person);
-            var newInduction = EventModels.Induction.FromModel(person);
 
             person.HasEyps = true;
 
@@ -48,18 +46,15 @@ public class SetMissingHasEypsOnPersonsJob(
                     AdditionalInformation = null
                 });
 
+            // Only the person's attributes change here; the route itself is untouched.
             await eventPublisher.PublishSingleEventAsync(
-                new RouteToProfessionalStatusUpdatedEvent
+                new PersonProfessionalStatusAttributesUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = person.PersonId,
-                    RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
-                    OldRouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
                     PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
                     OldPersonAttributes = oldPersonAttributes,
-                    Changes = RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps,
-                    Induction = newInduction,
-                    OldInduction = oldInduction
+                    Changes = PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps
                 },
                 processContext);
 

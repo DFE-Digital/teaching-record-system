@@ -201,42 +201,62 @@ public partial class TestData
             }
 
             var newInduction = EventModels.Induction.FromModel(person);
-            var personAttributesUpdated = person.RefreshProfessionalStatusAttributes(professionalStatusType, allRouteTypes, allRoutes);
-            var qtlsStatusUpdated = _routeToProfessionalStatusTypeId.Value == RouteToProfessionalStatusType.QtlsAndSetMembershipId &&
-                person.RefreshQtlsStatus(allRoutes);
+            person.RefreshProfessionalStatusAttributes(professionalStatusType, allRouteTypes, allRoutes);
 
-            var changes = RouteToProfessionalStatusCreatedEventChanges.None |
-                (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
-                    ? RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate
-                    : 0) |
-                (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
-                    ? RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate
-                    : 0) |
-                (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
-                    ? RouteToProfessionalStatusCreatedEventChanges.PersonHasEyps
-                    : 0) |
-                (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
-                    ? RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate
-                    : 0) |
-                (newInduction.Status != oldInduction.Status
-                    ? RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatus
-                    : 0) |
-                (newInduction.StatusWithoutExemption != oldInduction.StatusWithoutExemption
-                    ? RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatusWithoutExemption
-                    : 0) |
-                (qtlsStatusUpdated ? RouteToProfessionalStatusCreatedEventChanges.PersonQtlsStatus : 0);
+            if (_routeToProfessionalStatusTypeId.Value == RouteToProfessionalStatusType.QtlsAndSetMembershipId)
+            {
+                person.RefreshQtlsStatus(allRoutes);
+            }
+
+            var personAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person);
 
             var createdEvent = new RouteToProfessionalStatusCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 PersonId = person.PersonId,
-                RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(professionalStatus),
-                PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
-                OldPersonAttributes = oldPersonAttributes,
-                Changes = changes,
-                Induction = newInduction,
-                OldInduction = oldInduction
+                RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(professionalStatus)
             };
+
+            // Mirrors RoutesToProfessionalStatusService: the person's attributes and their induction go on the
+            // process as their own events.
+            var personAttributesChanges = PersonProfessionalStatusAttributesUpdatedEventChanges.None |
+                (personAttributes.QtsDate != oldPersonAttributes.QtsDate ? PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate : 0) |
+                (personAttributes.EytsDate != oldPersonAttributes.EytsDate ? PersonProfessionalStatusAttributesUpdatedEventChanges.EytsDate : 0) |
+                (personAttributes.HasEyps != oldPersonAttributes.HasEyps ? PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps : 0) |
+                (personAttributes.PqtsDate != oldPersonAttributes.PqtsDate ? PersonProfessionalStatusAttributesUpdatedEventChanges.PqtsDate : 0) |
+                (personAttributes.QtlsStatus != oldPersonAttributes.QtlsStatus ? PersonProfessionalStatusAttributesUpdatedEventChanges.QtlsStatus : 0);
+
+            var inductionChanges = PersonInductionUpdatedEventChanges.None |
+                (newInduction.Status != oldInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
+                (newInduction.StatusWithoutExemption != oldInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
+                (newInduction.StartDate != oldInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
+                (newInduction.CompletedDate != oldInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0);
+
+            List<IEvent> events = [createdEvent];
+
+            if (personAttributesChanges != PersonProfessionalStatusAttributesUpdatedEventChanges.None)
+            {
+                events.Add(new PersonProfessionalStatusAttributesUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    PersonAttributes = personAttributes,
+                    OldPersonAttributes = oldPersonAttributes,
+                    Changes = personAttributesChanges
+                });
+            }
+
+            if (inductionChanges != PersonInductionUpdatedEventChanges.None)
+            {
+                events.Add(new PersonInductionUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    Induction = newInduction,
+                    OldInduction = oldInduction,
+                    Changes = inductionChanges
+                });
+            }
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
 
@@ -265,17 +285,20 @@ public partial class TestData
                     }
             });
 
-            dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+            foreach (var @event in events)
             {
-                ProcessEventId = createdEvent.EventId,
-                ProcessId = processId,
-                EventName = nameof(RouteToProfessionalStatusCreatedEvent),
-                Payload = createdEvent,
-                PersonIds = [person.PersonId],
-                OneLoginUserSubjects = [],
-                SupportTaskReferences = [],
-                CreatedOn = now
-            });
+                dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+                {
+                    ProcessEventId = @event.EventId,
+                    ProcessId = processId,
+                    EventName = @event.GetType().Name,
+                    Payload = @event,
+                    PersonIds = [person.PersonId],
+                    OneLoginUserSubjects = [],
+                    SupportTaskReferences = [],
+                    CreatedOn = now
+                });
+            }
         }
     }
 }

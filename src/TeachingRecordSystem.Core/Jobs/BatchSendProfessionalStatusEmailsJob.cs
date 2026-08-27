@@ -44,9 +44,19 @@ public class BatchSendProfessionalStatusEmailsJob(
 
         var end = timeProvider.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
 
-        // The migrated events aren't a real award, so they're left out; the rest are read off the processes the
-        // route journeys now write, where the raised-by user lives on the process rather than the payload.
-        var eventNames = new[]
+        // Whether the person gained QTS/EYTS or lost QTLS is on their attributes event, not on the route's, so
+        // that's what these read; the raised-by user lives on the process. Migrating from DQT isn't a real award,
+        // so those processes are left out.
+        var attributesEventName = nameof(PersonProfessionalStatusAttributesUpdatedEvent);
+
+        var routeProcessTypes = new[]
+        {
+            (int)ProcessType.RouteToProfessionalStatusCreating,
+            (int)ProcessType.RouteToProfessionalStatusUpdating,
+            (int)ProcessType.RouteToProfessionalStatusDeleting
+        };
+
+        var routeEventNames = new[]
         {
             nameof(RouteToProfessionalStatusCreatedEvent),
             nameof(RouteToProfessionalStatusUpdatedEvent),
@@ -68,10 +78,14 @@ public class BatchSendProfessionalStatusEmailsJob(
                     $"""
                      select
                          pe.person_ids[1] as person_id,
-                         (pe.payload->'RouteToProfessionalStatus'->>'RouteToProfessionalStatusTypeId')::uuid route_to_professional_status_type_id
+                         (route.payload->'RouteToProfessionalStatus'->>'RouteToProfessionalStatusTypeId')::uuid route_to_professional_status_type_id
                      from process_events pe
                      join processes p on p.process_id = pe.process_id
-                     where pe.event_name = any({eventNames})
+                     -- The template depends on which route was awarded, which is on the route's own event.
+                     join process_events route on route.process_id = pe.process_id
+                         and route.event_name = any({routeEventNames})
+                     where pe.event_name = {attributesEventName}
+                     and p.process_type = any({routeProcessTypes})
                      and pe.created_on >= {start}
                      and pe.created_on < {end}
                      and p.user_id = any({jobOptionsAccessor.Value.RaisedByUserIds})
@@ -134,7 +148,8 @@ public class BatchSendProfessionalStatusEmailsJob(
                     $"""
                      select pe.person_ids[1] as person_id from process_events pe
                      join processes p on p.process_id = pe.process_id
-                     where pe.event_name = any({eventNames})
+                     where pe.event_name = {attributesEventName}
+                     and p.process_type = any({routeProcessTypes})
                      and pe.created_on >= {start}
                      and pe.created_on < {end}
                      and p.user_id = any({jobOptionsAccessor.Value.RaisedByUserIds})
@@ -190,7 +205,8 @@ public class BatchSendProfessionalStatusEmailsJob(
                     $"""
                      select pe.person_ids[1] as person_id from process_events pe
                      join processes p on p.process_id = pe.process_id
-                     where pe.event_name = any({eventNames})
+                     where pe.event_name = {attributesEventName}
+                     and p.process_type = any({routeProcessTypes})
                      and pe.created_on >= {start}
                      and pe.created_on < {end}
                      and p.user_id = any({jobOptionsAccessor.Value.RaisedByUserIds})

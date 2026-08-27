@@ -656,13 +656,17 @@ API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Add route*; the EW
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `RouteToProfessionalStatusCreatedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when adding the route moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when adding the route moves the person's induction. |
 
 ### `RouteToProfessionalStatusUpdating` (88)
-API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Edit route*.
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Edit route*; `SetMissingHasEypsOnPersonsJob`.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
-| `RouteToProfessionalStatusUpdatedEvent` | Sometimes | Only when a field on the route, the person's professional status attributes or their induction status actually changes. |
+| `RouteToProfessionalStatusUpdatedEvent` | Sometimes | Only when a field on the route itself actually changes. |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when the change moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when the change moves the person's induction. |
 
 ### `RouteToProfessionalStatusDeleting` (89)
 API `SetQtls`; Support UI *Delete route*.
@@ -670,9 +674,12 @@ API `SetQtls`; Support UI *Delete route*.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `RouteToProfessionalStatusDeletedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when deleting the route moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when deleting the route moves the person's induction. |
 
 ### `RouteToProfessionalStatusMigratingFromDqt` (90)
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `RouteToProfessionalStatusMigratedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when the migration moved the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |

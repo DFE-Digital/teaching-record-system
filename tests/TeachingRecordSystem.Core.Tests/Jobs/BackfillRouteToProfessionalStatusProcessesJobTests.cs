@@ -1,4 +1,5 @@
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Jobs;
@@ -46,12 +47,20 @@ public class BackfillRouteToProfessionalStatusProcessesJobTests(JobFixture fixtu
 
             var createdEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(processEvent.Payload);
             Assert.Equal(person.PersonId, createdEvent.PersonId);
-            Assert.Equal(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate, createdEvent.Changes);
-            Assert.Equal(new DateOnly(2024, 1, 1), createdEvent.PersonAttributes.QtsDate);
-            Assert.Null(createdEvent.OldPersonAttributes.QtsDate);
-            Assert.NotNull(createdEvent.Induction);
-            Assert.NotNull(createdEvent.OldInduction);
             Assert.Equal(RouteToProfessionalStatusStatus.InTraining, createdEvent.RouteToProfessionalStatus.Status);
+
+            // The person's attributes moved, so they get their own event on the same process.
+            var attributesEvent = await GetProcessEventPayloadAsync<PersonProfessionalStatusAttributesUpdatedEvent>(
+                dbContext, processEvent.ProcessId);
+            Assert.Equal(person.PersonId, attributesEvent.PersonId);
+            Assert.Equal(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate, attributesEvent.Changes);
+            Assert.Equal(new DateOnly(2024, 1, 1), attributesEvent.PersonAttributes.QtsDate);
+            Assert.Null(attributesEvent.OldPersonAttributes.QtsDate);
+
+            // The induction snapshots are identical, so no induction event is written.
+            Assert.False(await dbContext.ProcessEvents.AnyAsync(pe =>
+                pe.ProcessId == processEvent.ProcessId &&
+                pe.EventName == nameof(PersonInductionUpdatedEvent)));
 
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
             Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, process.ProcessType);
@@ -151,11 +160,92 @@ public class BackfillRouteToProfessionalStatusProcessesJobTests(JobFixture fixtu
             Assert.Equal(RouteToProfessionalStatusStatus.InTraining, updatedEvent.OldRouteToProfessionalStatus.Status);
             Assert.Equal(RouteToProfessionalStatusUpdatedEventChanges.Status, updatedEvent.Changes);
 
+            // Nothing about the person moved, so the route event is the only one on the process.
+            var processEvents = await dbContext.ProcessEvents.Where(pe => pe.ProcessId == processEvent.ProcessId).ToListAsync();
+            Assert.Single(processEvents);
+
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, process.ProcessType);
 
             // Nothing was recorded against the change, so the process has no reason at all.
             Assert.Null(process.ChangeReason);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventWithInductionChange_WritesAnInductionEventOnTheProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(new LegacyEvents.RouteToProfessionalStatusCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = TimeProvider.UtcNow,
+            RaisedBy = SystemUser.SystemUserId,
+            PersonId = person.PersonId,
+            RouteToProfessionalStatus = CreateRoute(),
+            ChangeReason = null,
+            ChangeReasonDetail = null,
+            EvidenceFile = null,
+            AdditionalInformation = null,
+            Changes = LegacyEvents.RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatus,
+            PersonAttributes = CreatePersonAttributes(qtsDate: null),
+            OldPersonAttributes = CreatePersonAttributes(qtsDate: null),
+            Induction = CreateInduction() with
+            {
+                Status = InductionStatus.RequiredToComplete,
+                StatusWithoutExemption = InductionStatus.RequiredToComplete,
+                StartDate = new DateOnly(2024, 9, 1)
+            },
+            OldInduction = CreateInduction()
+        });
+
+        // Act
+        await WithServiceAsync<BackfillRouteToProfessionalStatusProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+
+            var inductionEvent = await GetProcessEventPayloadAsync<PersonInductionUpdatedEvent>(dbContext, processEvent.ProcessId);
+            Assert.Equal(person.PersonId, inductionEvent.PersonId);
+            Assert.Equal(
+                PersonInductionUpdatedEventChanges.InductionStatus |
+                    PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption |
+                    PersonInductionUpdatedEventChanges.InductionStartDate,
+                inductionEvent.Changes);
+            Assert.Equal(InductionStatus.RequiredToComplete, inductionEvent.Induction.Status);
+            Assert.Equal(InductionStatus.None, inductionEvent.OldInduction.Status);
+            Assert.Equal(new DateOnly(2024, 9, 1), inductionEvent.Induction.StartDate);
+
+            // Nothing about the person's attributes moved, so no attributes event is written.
+            Assert.False(await dbContext.ProcessEvents.AnyAsync(pe =>
+                pe.ProcessId == processEvent.ProcessId &&
+                pe.EventName == nameof(PersonProfessionalStatusAttributesUpdatedEvent)));
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyMigratedEventWithUnchangedAttributes_WritesOnlyTheRouteEvent()
+    {
+        // Arrange
+        var legacyEvent = await AddMigratedEventAsync();
+
+        // Act
+        await WithServiceAsync<BackfillRouteToProfessionalStatusProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+
+            var processEvents = await dbContext.ProcessEvents.Where(pe => pe.ProcessId == processEvent.ProcessId).ToListAsync();
+            Assert.Single(processEvents);
+            Assert.Equal(nameof(RouteToProfessionalStatusMigratedEvent), processEvents[0].EventName);
         });
     }
 
@@ -194,9 +284,13 @@ public class BackfillRouteToProfessionalStatusProcessesJobTests(JobFixture fixtu
             Assert.NotNull(processEvent);
             Assert.Equal(nameof(RouteToProfessionalStatusDeletedEvent), processEvent.EventName);
 
-            var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(processEvent.Payload);
-            Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
-            Assert.Equal(new DateOnly(2024, 1, 1), deletedEvent.OldPersonAttributes.QtsDate);
+            Assert.IsType<RouteToProfessionalStatusDeletedEvent>(processEvent.Payload);
+
+            var attributesEvent = await GetProcessEventPayloadAsync<PersonProfessionalStatusAttributesUpdatedEvent>(
+                dbContext, processEvent.ProcessId);
+            Assert.Equal(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate, attributesEvent.Changes);
+            Assert.Equal(new DateOnly(2024, 1, 1), attributesEvent.OldPersonAttributes.QtsDate);
+            Assert.Null(attributesEvent.PersonAttributes.QtsDate);
 
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
             Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, process.ProcessType);
@@ -258,7 +352,11 @@ public class BackfillRouteToProfessionalStatusProcessesJobTests(JobFixture fixtu
             Assert.Equal("Qualified teacher", migratedEvent.DqtQtsRegistration?.TeacherStatusName);
             Assert.Equal(new DateOnly(2023, 6, 1), migratedEvent.DqtQtlsDate);
             Assert.True(migratedEvent.DqtQtlsDateHasBeenSet);
-            Assert.Equal(new DateOnly(2024, 1, 1), migratedEvent.PersonAttributes.QtsDate);
+
+            var attributesEvent = await GetProcessEventPayloadAsync<PersonProfessionalStatusAttributesUpdatedEvent>(
+                dbContext, processEvent.ProcessId);
+            Assert.Equal(new DateOnly(2024, 1, 1), attributesEvent.PersonAttributes.QtsDate);
+            Assert.Equal(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate, attributesEvent.Changes);
 
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
             Assert.Equal(ProcessType.RouteToProfessionalStatusMigratingFromDqt, process.ProcessType);
@@ -473,6 +571,15 @@ public class BackfillRouteToProfessionalStatusProcessesJobTests(JobFixture fixtu
             var processEvent = await dbContext.ProcessEvents.SingleOrDefaultAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
             Assert.Null(processEvent);
         });
+    }
+
+    private static async Task<TEvent> GetProcessEventPayloadAsync<TEvent>(TrsDbContext dbContext, Guid processId)
+        where TEvent : IEvent
+    {
+        var processEvent = await dbContext.ProcessEvents
+            .SingleAsync(pe => pe.ProcessId == processId && pe.EventName == typeof(TEvent).Name);
+
+        return Assert.IsType<TEvent>(processEvent.Payload);
     }
 
     private static EventModels.RouteToProfessionalStatus CreateRoute(

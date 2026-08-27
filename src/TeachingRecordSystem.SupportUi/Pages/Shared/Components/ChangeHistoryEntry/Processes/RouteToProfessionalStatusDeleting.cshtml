@@ -47,90 +47,10 @@
             </govuk-summary-list>
         </govuk-details-text>
     </govuk-details>
-    @if (deletedEvent.Changes != RouteToProfessionalStatusDeletedEventChanges.None)
-    {
-        <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Person professional status updated as a result of the route deletion</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
-                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
-                    {
-                        <row>
-                            <key>Person has EYPS</key>
-                            <value data-testid="has-eyps" use-empty-fallback>@(deletedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</value>
-                        </row>
-                    }
-                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
-                    {
-                        <row>
-                            <key>EYTS date</key>
-                            <value data-testid="eyts-date" use-empty-fallback>@deletedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
-                    {
-                        <row>
-                            <key>PQTS date</key>
-                            <value data-testid="pqts-date" use-empty-fallback>@deletedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
-                    {
-                        <row>
-                            <key>QTS date</key>
-                            <value data-testid="qts-date" use-empty-fallback>@deletedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
-                    {
-                        <row>
-                            <key>QTLS status</key>
-                            <value data-testid="qtls-status" use-empty-fallback>@deletedEvent.PersonAttributes.QtlsStatus.ToString()</value>
-                        </row>
-                    }
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
-    }
     <govuk-details class="govuk-!-margin-bottom-2">
     <govuk-details-summary>Deleted data</govuk-details-summary>
         <govuk-details-text>
             <govuk-summary-list>
-            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
-            {
-                <row>
-                    <key>Person has Eyps</key>
-                    <value data-testid="old-has-eyps">@(deletedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</value>
-                </row>
-            }
-            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
-            {
-                <row>
-                    <key>EYTS date</key>
-                    <value data-testid="old-eyts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
-            {
-                <row>
-                    <key>PQTS date</key>
-                    <value data-testid="old-pqts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
-            {
-                <row>
-                    <key>QTS date</key>
-                    <value data-testid="old-qts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
-            {
-                <row>
-                    <key>QTLS status</key>
-                    <value data-testid="old-qtls-status">@deletedEvent.OldPersonAttributes.QtlsStatus.ToString()</value>
-                </row>
-            }
             <row>
                 <key>Route</key>
                 <value data-testid="route" use-empty-fallback>@routeType.Name</value>
@@ -194,4 +114,5 @@
         </govuk-summary-list>
         </govuk-details-text>
     </govuk-details>
+    <partial name="~/Pages/Shared/Components/ChangeHistoryEntry/Processes/_PersonProfessionalStatusChanges.cshtml" model="@Model" />
 </timeline-entry>

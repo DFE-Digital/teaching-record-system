@@ -64,7 +64,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusDeletedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusDeletedEvent>(
                 deletedEvent => Assert.Equal(person.PersonId, deletedEvent.PersonId));
         });
     }
@@ -100,7 +100,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusCreatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusCreatedEvent>(
                 createdEvent => Assert.Equal(person.PersonId, createdEvent.PersonId));
         });
     }
@@ -154,7 +154,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusUpdatedEvent>(
                 updatedEvent =>
                 {
                     Assert.Equal(person.PersonId, updatedEvent.PersonId);
@@ -192,7 +192,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusUpdatedEvent>(
                 updatedEvent =>
                 {
                     Assert.Equal(person.PersonId, updatedEvent.PersonId);
@@ -230,7 +230,7 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusUpdatedEvent>(
                 updatedEvent =>
                 {
                     Assert.Equal(person.PersonId, updatedEvent.PersonId);
@@ -271,13 +271,16 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusCreatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusCreatedEvent>(
                 createdQtlsEventEvent =>
                 {
                     Assert.Equal(RouteToProfessionalStatusType.QtlsAndSetMembershipId, createdQtlsEventEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
                     Assert.Equal(person.PersonId, createdQtlsEventEvent.PersonId);
-                    Assert.True(createdQtlsEventEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate));
                 });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(
+                attributesEvent => Assert.True(
+                    attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate)));
         });
     }
 
@@ -319,13 +322,16 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusUpdatedEvent>(
                 updatedQtlsEvent =>
                 {
                     Assert.Equal(RouteToProfessionalStatusType.QtlsAndSetMembershipId, updatedQtlsEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
                     Assert.Equal(person.PersonId, updatedQtlsEvent.PersonId);
-                    Assert.True(updatedQtlsEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate));
                 });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(
+                attributesEvent => Assert.True(
+                    attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate)));
         });
     }
 
@@ -362,13 +368,16 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusUpdating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusUpdatedEvent>(
                 updatedQtlsEvent =>
                 {
                     Assert.Equal(RouteToProfessionalStatusType.QtlsAndSetMembershipId, updatedQtlsEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
                     Assert.Equal(person.PersonId, updatedQtlsEvent.PersonId);
-                    Assert.True(updatedQtlsEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate));
                 });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(
+                attributesEvent => Assert.True(
+                    attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate)));
         });
     }
 
@@ -410,16 +419,19 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
             Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
             Assert.Equal(CurrentUserProvider.GetCurrentApplicationUserId(), p.ProcessContext.UserId);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusCreatedEvent>(
+            p.AssertProcessHasEvent<RouteToProfessionalStatusCreatedEvent>(
                 createdQtlsEventEvent =>
                 {
                     Assert.Equal(
                         RouteToProfessionalStatusType.QtlsAndSetMembershipId,
                         createdQtlsEventEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
                     Assert.Equal(person.PersonId, createdQtlsEventEvent.PersonId);
-                    Assert.False(
-                        createdQtlsEventEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate));
                 });
+
+            // The person already held QTS from the earlier route, so their QTS date doesn't move.
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(
+                attributesEvent => Assert.False(
+                    attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate)));
         });
     }
 

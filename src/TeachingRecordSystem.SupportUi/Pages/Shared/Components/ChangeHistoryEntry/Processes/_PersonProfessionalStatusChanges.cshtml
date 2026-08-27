@@ -1,0 +1,162 @@
+@using TeachingRecordSystem.Core.Events
+@model ChangeHistoryEntryViewModel
+@*
+    The person's professional status attributes and their induction are their own events on the process, so any
+    process that can change them renders them the same way here rather than repeating the rows per route event.
+*@
+@{
+    var attributesEvent = Model.TryGetEvent<PersonProfessionalStatusAttributesUpdatedEvent>(out var a) ? a : null;
+    var inductionEvent = Model.TryGetEvent<PersonInductionUpdatedEvent>(out var i) ? i : null;
+}
+
+@if (attributesEvent is not null || inductionEvent is not null)
+{
+    <govuk-summary-list data-testid="person-changes">
+        @if (attributesEvent is not null)
+        {
+            @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps))
+            {
+                <row>
+                    <key>Person has EYPS</key>
+                    <value data-testid="has-eyps" use-empty-fallback>@(attributesEvent.PersonAttributes.HasEyps ? "Yes" : "No")</value>
+                </row>
+            }
+            @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.EytsDate))
+            {
+                <row>
+                    <key>EYTS date</key>
+                    <value data-testid="eyts-date" use-empty-fallback>@attributesEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.PqtsDate))
+            {
+                <row>
+                    <key>PQTS date</key>
+                    <value data-testid="pqts-date" use-empty-fallback>@attributesEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate))
+            {
+                <row>
+                    <key>QTS date</key>
+                    <value data-testid="qts-date" use-empty-fallback>@attributesEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtlsStatus))
+            {
+                <row>
+                    <key>QTLS status</key>
+                    <value data-testid="qtls-status" use-empty-fallback>@attributesEvent.PersonAttributes.QtlsStatus.ToString()</value>
+                </row>
+            }
+        }
+        @if (inductionEvent is not null)
+        {
+            @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+            {
+                <row>
+                    <key>Induction status</key>
+                    <value data-testid="induction-status" use-empty-fallback>@inductionEvent.Induction.Status.GetDisplayName()</value>
+                </row>
+            }
+            @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption))
+            {
+                <row>
+                    <key>Induction status without exemption</key>
+                    <value data-testid="induction-status-without-exemption" use-empty-fallback>@inductionEvent.Induction.StatusWithoutExemption.GetDisplayName()</value>
+                </row>
+            }
+            @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+            {
+                <row>
+                    <key>Induction start date</key>
+                    <value data-testid="induction-start-date" use-empty-fallback>@inductionEvent.Induction.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+            {
+                <row>
+                    <key>Induction completed date</key>
+                    <value data-testid="induction-completed-date" use-empty-fallback>@inductionEvent.Induction.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+        }
+    </govuk-summary-list>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="person-previous-data">
+        <govuk-details-summary>Previous record data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                @if (attributesEvent is not null)
+                {
+                    @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps))
+                    {
+                        <row>
+                            <key>Person has EYPS</key>
+                            <value data-testid="old-has-eyps" use-empty-fallback>@(attributesEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</value>
+                        </row>
+                    }
+                    @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.EytsDate))
+                    {
+                        <row>
+                            <key>EYTS date</key>
+                            <value data-testid="old-eyts-date" use-empty-fallback>@attributesEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.PqtsDate))
+                    {
+                        <row>
+                            <key>PQTS date</key>
+                            <value data-testid="old-pqts-date" use-empty-fallback>@attributesEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate))
+                    {
+                        <row>
+                            <key>QTS date</key>
+                            <value data-testid="old-qts-date" use-empty-fallback>@attributesEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtlsStatus))
+                    {
+                        <row>
+                            <key>QTLS status</key>
+                            <value data-testid="old-qtls-status" use-empty-fallback>@attributesEvent.OldPersonAttributes.QtlsStatus.ToString()</value>
+                        </row>
+                    }
+                }
+                @if (inductionEvent is not null)
+                {
+                    @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+                    {
+                        <row>
+                            <key>Induction status</key>
+                            <value data-testid="old-induction-status" use-empty-fallback>@inductionEvent.OldInduction.Status.GetDisplayName()</value>
+                        </row>
+                    }
+                    @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption))
+                    {
+                        <row>
+                            <key>Induction status without exemption</key>
+                            <value data-testid="old-induction-status-without-exemption" use-empty-fallback>@inductionEvent.OldInduction.StatusWithoutExemption.GetDisplayName()</value>
+                        </row>
+                    }
+                    @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+                    {
+                        <row>
+                            <key>Induction start date</key>
+                            <value data-testid="old-induction-start-date" use-empty-fallback>@inductionEvent.OldInduction.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                    {
+                        <row>
+                            <key>Induction completed date</key>
+                            <value data-testid="old-induction-completed-date" use-empty-fallback>@inductionEvent.OldInduction.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                }
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+}

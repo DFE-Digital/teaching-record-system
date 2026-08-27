@@ -32,12 +32,12 @@ public class SetMissingHasEypsOnPersonsJobTests(JobFixture fixture) : JobTestBas
             var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal("Data fix for incorrectly set Has EYPS flag", changeReason.Reason);
 
-            p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(updatedEvent =>
+            p.AssertProcessHasEvents<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
             {
-                Assert.Equal(person.PersonId, updatedEvent.PersonId);
-                Assert.Equal(RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps, updatedEvent.Changes);
-                Assert.True(updatedEvent.PersonAttributes.HasEyps);
-                Assert.False(updatedEvent.OldPersonAttributes.HasEyps);
+                Assert.Equal(person.PersonId, attributesEvent.PersonId);
+                Assert.Equal(PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps, attributesEvent.Changes);
+                Assert.True(attributesEvent.PersonAttributes.HasEyps);
+                Assert.False(attributesEvent.OldPersonAttributes.HasEyps);
             });
         });
     }
@@ -66,8 +66,8 @@ public class SetMissingHasEypsOnPersonsJobTests(JobFixture fixture) : JobTestBas
         });
 
         Events.AssertProcessesCreated(
-            p => p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>(),
-            p => p.AssertProcessHasEvents<RouteToProfessionalStatusUpdatedEvent>());
+            p => p.AssertProcessHasEvents<PersonProfessionalStatusAttributesUpdatedEvent>(),
+            p => p.AssertProcessHasEvents<PersonProfessionalStatusAttributesUpdatedEvent>());
     }
 
     [Fact]

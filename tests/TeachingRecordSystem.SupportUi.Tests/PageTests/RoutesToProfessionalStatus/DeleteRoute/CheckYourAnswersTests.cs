@@ -246,8 +246,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
                 Assert.Equal(deleteRouteState.ChangeReason!.GetDisplayName(), changeReason?.Reason);
                 Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, changeReason?.Details);
                 Assert.Null(changeReason?.EvidenceFile);
-                Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.None, deletedEvent.Changes);
             });
+
+            // Nothing about the person moved, so the route event is the only one on the process.
+            p.AssertProcessHasEvents<RouteToProfessionalStatusDeletedEvent>();
         });
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
@@ -294,13 +296,17 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
+            p.AssertProcessHasEvent<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
             {
                 Assert.Equal(raisedByUserId, p.ProcessContext.UserId);
                 Assert.Equal(person.PersonId, deletedEvent.PersonId);
-                Assert.Equal(qtsDate, deletedEvent.OldPersonAttributes.QtsDate);
-                Assert.Null(deletedEvent.PersonAttributes.QtsDate);
-                Assert.True(deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate));
+            });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(qtsDate, attributesEvent.OldPersonAttributes.QtsDate);
+                Assert.Null(attributesEvent.PersonAttributes.QtsDate);
+                Assert.True(attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate));
             });
         });
 
@@ -350,13 +356,17 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
+            p.AssertProcessHasEvent<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
             {
                 Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Now);
                 Assert.Equal(person.PersonId, deletedEvent.PersonId);
-                Assert.Equal(holdsFromEarliest, deletedEvent.OldPersonAttributes.QtsDate);
-                Assert.Equal(holdsFromLatest, deletedEvent.PersonAttributes.QtsDate);
-                Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
+            });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(holdsFromEarliest, attributesEvent.OldPersonAttributes.QtsDate);
+                Assert.Equal(holdsFromLatest, attributesEvent.PersonAttributes.QtsDate);
+                Assert.Equal(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate, attributesEvent.Changes);
             });
         });
 
