@@ -103,9 +103,7 @@ public static class Extensions
                     {
                         var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
                         var hasRequiredClaim = ctx.User.HasClaim(c => c.Type is "trn" or AuthorizeAccessClaimTypes.TrnRequestId);
-                        var isIdUser = scopes.Contains("dqt:read") && hasRequiredClaim;
-                        var isAuthorizeAccessUser = scopes.Contains("teaching_record") && hasRequiredClaim;
-                        return isIdUser || isAuthorizeAccessUser;
+                        return scopes.Contains("teaching_record") && hasRequiredClaim;
                     }));
         });
 

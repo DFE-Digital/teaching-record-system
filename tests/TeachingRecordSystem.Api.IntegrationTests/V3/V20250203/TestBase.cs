@@ -13,7 +13,4 @@ public abstract class TestBase : IntegrationTests.TestBase
 
     public HttpClient GetHttpClientWithApiKey() =>
         GetHttpClientWithApiKey(Version);
-
-    public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read") =>
-        GetHttpClientWithIdentityAccessToken(trn, scope, Version);
 }

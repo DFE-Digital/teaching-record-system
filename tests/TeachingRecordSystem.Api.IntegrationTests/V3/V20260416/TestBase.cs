@@ -19,7 +19,4 @@ public abstract class TestBase : IntegrationTests.TestBase
 
     public HttpClient GetHttpClientWithAuthorizeAccessTokenForTrnRequest(Guid applicationUserId, string trnRequestId) =>
         GetHttpClientWithAuthorizeAccessTokenForTrnRequest(applicationUserId, trnRequestId, Version);
-
-    public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read") =>
-        GetHttpClientWithIdentityAccessToken(trn, scope, Version);
 }

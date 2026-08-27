@@ -88,7 +88,8 @@ public abstract class TestBase
     {
         Claim[] claims = [
             new("scope", "teaching_record"),
-            new(AuthorizeAccessClaimTypes.Trn, trn)
+            new(AuthorizeAccessClaimTypes.Trn, trn),
+            new(AuthorizeAccessClaimTypes.TrsApplicationUserId, HostFixture.DefaultApplicationUserId.ToString())
         ];
 
         return GetHttpClientWithJwtAccessToken(claims, version);
@@ -100,16 +101,6 @@ public abstract class TestBase
             new("scope", "teaching_record"),
             new(AuthorizeAccessClaimTypes.TrnRequestId, trnRequestId),
             new(AuthorizeAccessClaimTypes.TrsApplicationUserId, applicationUserId.ToString())
-        ];
-
-        return GetHttpClientWithJwtAccessToken(claims, version);
-    }
-
-    protected HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read", string? version = null)
-    {
-        Claim[] claims = [
-            new("scope", scope),
-            new("trn", trn)
         ];
 
         return GetHttpClientWithJwtAccessToken(claims, version);
