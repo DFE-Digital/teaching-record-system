@@ -109,11 +109,9 @@ public class HostFixture : InitializeDbFixture
                 services.Configure<AuthenticationOptions>(options =>
                 {
                     options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestApiKeyAuthenticationHandler);
-                    options.SchemeMap["IdAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                     options.SchemeMap["AuthorizeAccessAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                 });
 
-                services.Configure<SimpleJwtBearerAuthenticationOptions>("IdAccessToken", o => o.IssuerSigningKey = hostFixture.JwtSigningCredentials.Key);
                 services.Configure<SimpleJwtBearerAuthenticationOptions>("AuthorizeAccessAccessToken", o => o.IssuerSigningKey = hostFixture.JwtSigningCredentials.Key);
 
                 // Add controllers defined in this test assembly

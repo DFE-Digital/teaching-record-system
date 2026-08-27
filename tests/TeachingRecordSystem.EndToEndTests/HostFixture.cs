@@ -279,11 +279,9 @@ public sealed class HostFixture : InitializeDbFixture
                 services.Configure<AuthenticationOptions>(options =>
                 {
                     //options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestApiKeyAuthenticationHandler);
-                    options.SchemeMap["IdAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                     options.SchemeMap["AuthorizeAccessAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                 });
 
-                services.Configure<SimpleJwtBearerAuthenticationOptions>("IdAccessToken", o => o.IssuerSigningKey = _hostFixture.JwtSigningCredentials.Key);
                 services.Configure<SimpleJwtBearerAuthenticationOptions>("AuthorizeAccessAccessToken", o => o.IssuerSigningKey = _hostFixture.JwtSigningCredentials.Key);
 
                 _hostFixture.ConfigureServices(services);
