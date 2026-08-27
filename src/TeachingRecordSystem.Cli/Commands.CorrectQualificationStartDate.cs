@@ -4,10 +4,13 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
+using TeachingRecordSystem.Core.Services.Webhooks;
 using File = System.IO.File;
 
 namespace TeachingRecordSystem.Cli;
@@ -46,10 +49,21 @@ public static partial class Commands
                 throw new FileNotFoundException($"Input file not found: {inputFile}", inputFile);
             }
 
+            var environment = new HostingEnvironment { EnvironmentName = Environments.Production };
+
+            // Publishing events runs the event handlers, so the webhook and job-scheduling services they
+            // depend on have to be registered here too.
             var services = new ServiceCollection()
                 .AddTimeProvider()
                 .AddDatabase(connectionString)
                 .AddSingleton<ReferenceDataCache>()
+                .AddWebhookOptions(configuration)
+                .AddWebhookDeliveryService(configuration)
+                .AddWebhookMessageFactory()
+                .AddMemoryCache()
+                .AddEventPublisher()
+                .AddBackgroundJobScheduler(environment)
+                .AddHangfire(environment)
                 .AddRoutesToProfessionalStatusService();
 
             var serviceProvider = services.BuildServiceProvider();

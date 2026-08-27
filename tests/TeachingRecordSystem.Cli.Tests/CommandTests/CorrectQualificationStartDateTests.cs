@@ -201,11 +201,13 @@ public class CorrectQualificationStartDateTests(IServiceProvider services) : Com
                 .Where(p => p.Trn == person1.Trn)
                 .SelectMany(p => p.Qualifications!.OfType<RouteToProfessionalStatus>())
                 .SingleAsync());
-            var @person1Event = await WithDbContextAsync(dbContext => dbContext.Events.SingleOrDefaultAsync(e => e.EventName == typeof(LegacyEvents.RouteToProfessionalStatusCreatedEvent).Name && e.PersonIds.Contains(person1.PersonId)));
-            var @person2Event = await WithDbContextAsync(dbContext => dbContext.Events.SingleOrDefaultAsync(e => e.EventName == typeof(LegacyEvents.RouteToProfessionalStatusCreatedEvent).Name && e.PersonIds.Contains(person2.PersonId)));
+            var person1Event = await WithDbContextAsync(dbContext => dbContext.ProcessEvents.SingleOrDefaultAsync(
+                e => e.EventName == nameof(RouteToProfessionalStatusUpdatedEvent) && e.PersonIds.Contains(person1.PersonId)));
+            var person2Event = await WithDbContextAsync(dbContext => dbContext.ProcessEvents.SingleOrDefaultAsync(
+                e => e.EventName == nameof(RouteToProfessionalStatusUpdatedEvent) && e.PersonIds.Contains(person2.PersonId)));
 
-            Assert.NotNull(@person1Event);
-            Assert.NotNull(@person2Event);
+            Assert.NotNull(person1Event);
+            Assert.NotNull(person2Event);
             Assert.Equal(correctedStartDate1, updatedQualification1.TrainingStartDate);
             Assert.Equal(correctedStartDate2, updatedQualification2.TrainingStartDate);
         }
