@@ -98,7 +98,7 @@ public static class Extensions
             options.AddPolicy(
                 AuthorizationPolicies.TeacherAuthAccessToken,
                 policy => policy
-                    .AddAuthenticationSchemes(AuthenticationSchemeNames.IdAccessToken, AuthenticationSchemeNames.AuthorizeAccessAccessToken)
+                    .AddAuthenticationSchemes(AuthenticationSchemeNames.AuthorizeAccessAccessToken)
                     .RequireAssertion(ctx =>
                     {
                         var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
