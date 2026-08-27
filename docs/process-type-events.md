@@ -631,3 +631,21 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `DqtQtsRegistrationUpdatedEvent` | Always | — |
+
+### `MandatoryQualificationDeactivatingInDqt` (84)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `MandatoryQualificationDqtDeactivatedEvent` | Always | — |
+
+### `MandatoryQualificationImportingIntoDqt` (85)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `MandatoryQualificationDqtImportedEvent` | Always | — |
+
+### `MandatoryQualificationMigratingFromDqt` (86)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `MandatoryQualificationMigratedEvent` | Always | — |
