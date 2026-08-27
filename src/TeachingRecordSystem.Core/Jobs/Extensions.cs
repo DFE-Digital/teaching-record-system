@@ -299,6 +299,16 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillMandatoryQualificationDqtProcessesJob>(
+                $"{nameof(BackfillMandatoryQualificationDqtProcessesJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillMandatoryQualificationDqtProcessesJob>(
+                nameof(BackfillMandatoryQualificationDqtProcessesJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("BackfillSupportTasksInReportingDb");
 
             recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob (dry-run)");

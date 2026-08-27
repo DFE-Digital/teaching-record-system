@@ -2,7 +2,6 @@ using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -775,11 +774,11 @@ public partial class TestData
 
             if (_importedByUser.HasValue)
             {
-                var createdEvent = new MandatoryQualificationDqtImportedEvent()
+                var importedByUser = _importedByUser.ValueOrFailure();
+
+                var importedEvent = new Core.Events.MandatoryQualificationDqtImportedEvent()
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = createdUtc!.Value,
-                    RaisedBy = _importedByUser.ValueOrFailure(),
                     PersonId = personId,
                     MandatoryQualification = new()
                     {
@@ -799,7 +798,34 @@ public partial class TestData
                     DqtState = 0
                 };
 
-                dbContext.AddEventWithoutBroadcast(createdEvent);
+                var processId = Guid.NewGuid();
+
+                dbContext.Processes.Add(new Process
+                {
+                    ProcessId = processId,
+                    ProcessType = ProcessType.MandatoryQualificationImportingIntoDqt,
+                    CreatedOn = createdUtc!.Value,
+                    UpdatedOn = createdUtc!.Value,
+                    UserId = importedByUser.UserId,
+                    DqtUserId = importedByUser.DqtUserId,
+                    DqtUserName = importedByUser.DqtUserName,
+                    PersonIds = [personId],
+                    OneLoginUserSubjects = [],
+                    SupportTaskReferences = [],
+                    ChangeReason = null
+                });
+
+                dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+                {
+                    ProcessEventId = importedEvent.EventId,
+                    ProcessId = processId,
+                    EventName = nameof(Core.Events.MandatoryQualificationDqtImportedEvent),
+                    Payload = importedEvent,
+                    PersonIds = [personId],
+                    OneLoginUserSubjects = [],
+                    SupportTaskReferences = [],
+                    CreatedOn = createdUtc!.Value
+                });
             }
         }
     }

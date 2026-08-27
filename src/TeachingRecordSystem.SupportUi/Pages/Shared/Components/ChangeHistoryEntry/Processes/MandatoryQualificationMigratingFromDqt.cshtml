@@ -1,0 +1,32 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var migratedEvent = Model.GetEvent<MandatoryQualificationMigratedEvent>();
+    var mandatoryQualification = migratedEvent.MandatoryQualification;
+}
+
+<timeline-entry title="Mandatory qualification migrated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (migratedEvent.Changes != MandatoryQualificationMigratedEventChanges.None)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (migratedEvent.Changes.HasFlag(MandatoryQualificationMigratedEventChanges.Provider))
+                    {
+                        <row>
+                            <key>Training provider</key>
+                            <value data-testid="provider">@(mandatoryQualification.Provider!.Name)</value>
+                        </row>
+                    }
+                    @if (migratedEvent.Changes.HasFlag(MandatoryQualificationMigratedEventChanges.Specialism))
+                    {
+                        <row>
+                            <key>Specialism</key>
+                            <value data-testid="specialism">@(mandatoryQualification.Specialism!.Value.GetTitle())</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+</timeline-entry>

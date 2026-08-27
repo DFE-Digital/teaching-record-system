@@ -82,5 +82,8 @@ public enum ProcessType
     InitialTeacherTrainingCreatingInDqt = 80,
     InitialTeacherTrainingUpdatingInDqt = 81,
     QtsRegistrationCreatingInDqt = 82,
-    QtsRegistrationUpdatingInDqt = 83
+    QtsRegistrationUpdatingInDqt = 83,
+    MandatoryQualificationDeactivatingInDqt = 84,
+    MandatoryQualificationImportingIntoDqt = 85,
+    MandatoryQualificationMigratingFromDqt = 86
 }
