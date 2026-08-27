@@ -6,6 +6,7 @@ using CsvHelper.Configuration.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using File = System.IO.File;
 
@@ -56,6 +57,7 @@ public static partial class Commands
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
             var routesToProfessionalStatusService = scope.ServiceProvider.GetRequiredService<RoutesToProfessionalStatusService>();
+            var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
 
             var systemUser = SystemUser.SystemUserId;
 
@@ -144,13 +146,21 @@ public static partial class Commands
                         new UpdateRouteToProfessionalStatusOptions
                         {
                             QualificationId = route.QualificationId,
-                            UpdatedBy = systemUser,
-                            TrainingStartDate = Optional.Option.Some(correctStart),
-                            ChangeReason = "Bulk correction",
-                            ChangeReasonDetail = $"Corrected via CLI from {prevStart:yyyy-MM-dd} to {correctStart:yyyy-MM-dd}"
-                        });
+                            TrainingStartDate = Optional.Option.Some(correctStart)
+                        },
+                        new ProcessContext(
+                            ProcessType.RouteToProfessionalStatusUpdating,
+                            timeProvider.UtcNow,
+                            systemUser,
+                            new ChangeReasonWithDetailsAndEvidence
+                            {
+                                Reason = "Bulk correction",
+                                Details = $"Corrected via CLI from {prevStart:yyyy-MM-dd} to {correctStart:yyyy-MM-dd}",
+                                EvidenceFile = null,
+                                AdditionalInformation = null
+                            }));
 
-                    if (changes is LegacyEvents.RouteToProfessionalStatusUpdatedEventChanges.None)
+                    if (changes is RouteToProfessionalStatusUpdatedEventChanges.None)
                     {
                         Console.WriteLine($"Skipping TRN {trn}: no effective change");
                         continue;

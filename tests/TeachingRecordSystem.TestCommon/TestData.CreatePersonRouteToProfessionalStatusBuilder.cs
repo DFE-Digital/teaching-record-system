@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -225,26 +226,56 @@ public partial class TestData
                     : 0) |
                 (qtlsStatusUpdated ? RouteToProfessionalStatusCreatedEventChanges.PersonQtlsStatus : 0);
 
-            var createdEvent = new RouteToProfessionalStatusCreatedEvent()
+            var createdEvent = new RouteToProfessionalStatusCreatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = now,
                 PersonId = person.PersonId,
-                RaisedBy = _createdByUser,
                 RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(professionalStatus),
                 PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
                 OldPersonAttributes = oldPersonAttributes,
-                ChangeReason = _changeReason,
-                ChangeReasonDetail = _changeReasonDetail,
-                EvidenceFile = _evidenceFile,
                 Changes = changes,
                 Induction = newInduction,
-                OldInduction = oldInduction,
-                AdditionalInformation = null
+                OldInduction = oldInduction
             };
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
-            dbContext.AddEventWithoutBroadcast(createdEvent);
+
+            var processId = Guid.NewGuid();
+
+            dbContext.Processes.Add(new Process
+            {
+                ProcessId = processId,
+                ProcessType = ProcessType.RouteToProfessionalStatusCreating,
+                CreatedOn = now,
+                UpdatedOn = now,
+                UserId = _createdByUser.UserId,
+                DqtUserId = _createdByUser.DqtUserId,
+                DqtUserName = _createdByUser.DqtUserName,
+                PersonIds = [person.PersonId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                ChangeReason = _changeReason is null && _changeReasonDetail is null && _evidenceFile is null ?
+                    null :
+                    new ChangeReasonWithDetailsAndEvidence
+                    {
+                        Reason = _changeReason,
+                        Details = _changeReasonDetail,
+                        EvidenceFile = _evidenceFile,
+                        AdditionalInformation = null
+                    }
+            });
+
+            dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+            {
+                ProcessEventId = createdEvent.EventId,
+                ProcessId = processId,
+                EventName = nameof(RouteToProfessionalStatusCreatedEvent),
+                Payload = createdEvent,
+                PersonIds = [person.PersonId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                CreatedOn = now
+            });
         }
     }
 }

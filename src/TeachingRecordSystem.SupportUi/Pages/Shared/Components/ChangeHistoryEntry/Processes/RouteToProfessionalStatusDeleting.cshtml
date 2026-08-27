@@ -1,0 +1,197 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
+@inject ReferenceDataCache ReferenceDataCache
+@model ChangeHistoryEntryViewModel
+@{
+    var deletedEvent = Model.GetEvent<RouteToProfessionalStatusDeletedEvent>();
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+    var professionalStatus = deletedEvent.RouteToProfessionalStatus;
+    var routeType = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(professionalStatus.RouteToProfessionalStatusTypeId);
+    var trainingProvider = professionalStatus.TrainingProviderId.HasValue ? await ReferenceDataCache.GetTrainingProviderByIdAsync(professionalStatus.TrainingProviderId.Value) : null;
+    var country = !string.IsNullOrEmpty(professionalStatus.TrainingCountryId) ? await ReferenceDataCache.GetTrainingCountryByIdAsync(professionalStatus.TrainingCountryId) : null;
+    var degreeType = professionalStatus.DegreeTypeId.HasValue ? await ReferenceDataCache.GetDegreeTypeByIdAsync(professionalStatus.DegreeTypeId.Value) : null;
+    var ageRangeType = professionalStatus.TrainingAgeSpecialismType;
+    var ageRangeFromTo = (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeTo is not null) ?
+        $"From {professionalStatus.TrainingAgeSpecialismRangeFrom} to {professionalStatus.TrainingAgeSpecialismRangeTo}" : null;
+    var subjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(professionalStatus.TrainingSubjectIds, ReferenceDataCache);
+}
+
+<timeline-entry title="Route deleted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-details class="govuk-!-margin-bottom-2">
+        <govuk-details-summary>Reason for deletion</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Reason</key>
+                    <value data-testid="reason" use-empty-fallback>@changeReason?.Reason</value>
+                </row>
+                <row>
+                    <key>Reason details</key>
+                    <value use-empty-fallback data-testid="reason-detail">
+                        @Html.ConvertNewlinesToLineBreaks(changeReason?.Details)
+                    </value>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value use-empty-fallback data-testid="additional-information">
+                        @Html.ConvertNewlinesToLineBreaks(changeReason?.AdditionalInformation)
+                    </value>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value>
+                        <vc:event-evidence-file-link evidence-file="@changeReason?.EvidenceFile" />
+                    </value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+    @if (deletedEvent.Changes != RouteToProfessionalStatusDeletedEventChanges.None)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Person professional status updated as a result of the route deletion</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
+                    {
+                        <row>
+                            <key>Person has EYPS</key>
+                            <value data-testid="has-eyps" use-empty-fallback>@(deletedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</value>
+                        </row>
+                    }
+                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
+                    {
+                        <row>
+                            <key>EYTS date</key>
+                            <value data-testid="eyts-date" use-empty-fallback>@deletedEvent.PersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
+                    {
+                        <row>
+                            <key>PQTS date</key>
+                            <value data-testid="pqts-date" use-empty-fallback>@deletedEvent.PersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
+                    {
+                        <row>
+                            <key>QTS date</key>
+                            <value data-testid="qts-date" use-empty-fallback>@deletedEvent.PersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
+                    {
+                        <row>
+                            <key>QTLS status</key>
+                            <value data-testid="qtls-status" use-empty-fallback>@deletedEvent.PersonAttributes.QtlsStatus.ToString()</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+    <govuk-details class="govuk-!-margin-bottom-2">
+    <govuk-details-summary>Deleted data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
+            {
+                <row>
+                    <key>Person has Eyps</key>
+                    <value data-testid="old-has-eyps">@(deletedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</value>
+                </row>
+            }
+            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
+            {
+                <row>
+                    <key>EYTS date</key>
+                    <value data-testid="old-eyts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.EytsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
+            {
+                <row>
+                    <key>PQTS date</key>
+                    <value data-testid="old-pqts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.PqtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
+            {
+                <row>
+                    <key>QTS date</key>
+                    <value data-testid="old-qts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.QtsDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus))
+            {
+                <row>
+                    <key>QTLS status</key>
+                    <value data-testid="old-qtls-status">@deletedEvent.OldPersonAttributes.QtlsStatus.ToString()</value>
+                </row>
+            }
+            <row>
+                <key>Route</key>
+                <value data-testid="route" use-empty-fallback>@routeType.Name</value>
+            </row>
+            <row>
+                <key>Status</key>
+                <value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</value>
+            </row>
+            <row>
+                <key>Start date</key>
+                <value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+            <row>
+                <key>End date</key>
+                <value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+            <row>
+                    <key>Held since</key>
+                <value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
+            </row>
+            <row>
+                <key>Induction exemption</key>
+                <value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</value>
+            </row>
+            <row>
+                <key>Training provider</key>
+                <value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</value>
+            </row>
+            <row>
+                <key>Degree type</key>
+                <value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</value>
+            </row>
+            <row>
+                <key>Country</key>
+                <value data-testid="country" use-empty-fallback>@country?.Name</value>
+            </row>
+            <row>
+                <key>Age range</key>
+                @if (ageRangeFromTo is not null)
+                {
+                    <value data-testid="age-range" use-empty-fallback>@ageRangeFromTo</value>
+                }
+                else
+                {
+                    <value data-testid="age-range-type" use-empty-fallback>@ageRangeType?.GetDisplayName()</value>
+                }
+            </row>
+            <row>
+                <key>Subjects</key>
+                <value use-empty-fallback data-testid="subjects"><list-text-items text-items="@subjects" /></value>
+            </row>
+            @if (professionalStatus.SourceApplicationReference is not null)
+            {
+                <row>
+                    <key>Source application reference</key>
+                    <value use-empty-fallback data-testId="source-application-reference">
+                        @professionalStatus.SourceApplicationReference
+                    </value>
+                </row>
+            }
+        </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

@@ -165,9 +165,12 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
             routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
                 new DeleteRouteToProfessionalStatusOptions
                 {
-                    QualificationId = route.QualificationId,
-                    DeletedBy = SystemUser.SystemUserId
-                }));
+                    QualificationId = route.QualificationId
+                },
+                new ProcessContext(
+                    ProcessType.RouteToProfessionalStatusDeleting,
+                    TimeProvider.UtcNow,
+                    SystemUser.SystemUserId)));
 
         TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 

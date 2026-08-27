@@ -649,3 +649,30 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `MandatoryQualificationMigratedEvent` | Always | — |
+
+### `RouteToProfessionalStatusCreating` (87)
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Add route*; the EWC Wales QTS import.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusCreatedEvent` | Always | — |
+
+### `RouteToProfessionalStatusUpdating` (88)
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Edit route*.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusUpdatedEvent` | Sometimes | Only when a field on the route, the person's professional status attributes or their induction status actually changes. |
+
+### `RouteToProfessionalStatusDeleting` (89)
+API `SetQtls`; Support UI *Delete route*.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusDeletedEvent` | Always | — |
+
+### `RouteToProfessionalStatusMigratingFromDqt` (90)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusMigratedEvent` | Always | — |

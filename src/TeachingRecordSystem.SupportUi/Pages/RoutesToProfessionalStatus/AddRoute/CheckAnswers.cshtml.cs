@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
@@ -11,6 +12,7 @@ public class CheckAnswersModel(
     AddRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
+    TimeProvider timeProvider,
     RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
     public JourneyInstanceId InstanceId => journey.InstanceId;
@@ -91,7 +93,6 @@ public class CheckAnswersModel(
                 PersonId = journey.PersonId,
                 RouteToProfessionalStatusTypeId = RouteType.RouteToProfessionalStatusTypeId,
                 Status = journey.Status,
-                CreatedBy = User.GetUserId(),
                 HoldsFrom = state.HoldsFrom,
                 TrainingStartDate = state.TrainingStartDate,
                 TrainingEndDate = state.TrainingEndDate,
@@ -102,12 +103,19 @@ public class CheckAnswersModel(
                 TrainingCountryId = state.TrainingCountryId,
                 TrainingProviderId = state.TrainingProviderId,
                 DegreeTypeId = state.DegreeTypeId,
-                IsExemptFromInduction = state.IsExemptFromInduction,
-                ChangeReason = state.ChangeReason?.GetDisplayName(),
-                ChangeReasonDetail = state.ChangeReasonDetail.ChangeReasonDetail,
-                EvidenceFile = state.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-                AdditionalInformation = state.ChangeReasonDetail.AdditionalInformation
-            });
+                IsExemptFromInduction = state.IsExemptFromInduction
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusCreating,
+                timeProvider.UtcNow,
+                User.GetUserId(),
+                new ChangeReasonWithDetailsAndEvidence
+                {
+                    Reason = state.ChangeReason?.GetDisplayName(),
+                    Details = state.ChangeReasonDetail.ChangeReasonDetail,
+                    EvidenceFile = state.ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                    AdditionalInformation = state.ChangeReasonDetail.AdditionalInformation
+                }));
 
         journey.DeleteInstance();
 

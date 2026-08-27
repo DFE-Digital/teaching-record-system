@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
@@ -10,6 +11,7 @@ public class CheckAnswersModel(
     DeleteRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
+    TimeProvider timeProvider,
     RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
     public JourneyInstanceId InstanceId => journey.InstanceId;
@@ -49,13 +51,19 @@ public class CheckAnswersModel(
         await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
-                QualificationId = QualificationId,
-                DeletedBy = User.GetUserId(),
-                DeletionReason = ChangeReason!.GetDisplayName(),
-                DeletionReasonDetail = ChangeReasonDetail.ChangeReasonDetail,
-                EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-                AdditionalInformation = ChangeReasonDetail.AdditionalInformation
-            });
+                QualificationId = QualificationId
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusDeleting,
+                timeProvider.UtcNow,
+                User.GetUserId(),
+                new ChangeReasonWithDetailsAndEvidence
+                {
+                    Reason = ChangeReason!.GetDisplayName(),
+                    Details = ChangeReasonDetail.ChangeReasonDetail,
+                    EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                    AdditionalInformation = ChangeReasonDetail.AdditionalInformation
+                }));
 
         journey.DeleteInstance();
 

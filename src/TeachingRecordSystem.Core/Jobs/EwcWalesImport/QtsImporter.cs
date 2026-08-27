@@ -120,9 +120,12 @@ public class QtsImporter
                                 PersonId = lookupData.Person.PersonId,
                                 RouteToProfessionalStatusTypeId = routeToProfessionalStatusTypeId,
                                 Status = RouteToProfessionalStatusStatus.Holds,
-                                CreatedBy = SystemUser.SystemUserId,
                                 HoldsFrom = awardedDate
-                            });
+                            },
+                            new ProcessContext(
+                                ProcessType.RouteToProfessionalStatusCreating,
+                                _timeProvider.UtcNow,
+                                SystemUser.SystemUserId));
                     }
 
                     //soft validation errors can be appended to the IntegrationTransactionRecord Failure message

@@ -85,5 +85,9 @@ public enum ProcessType
     QtsRegistrationUpdatingInDqt = 83,
     MandatoryQualificationDeactivatingInDqt = 84,
     MandatoryQualificationImportingIntoDqt = 85,
-    MandatoryQualificationMigratingFromDqt = 86
+    MandatoryQualificationMigratingFromDqt = 86,
+    RouteToProfessionalStatusCreating = 87,
+    RouteToProfessionalStatusUpdating = 88,
+    RouteToProfessionalStatusDeleting = 89,
+    RouteToProfessionalStatusMigratingFromDqt = 90
 }

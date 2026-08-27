@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -8,7 +8,8 @@ public class SetMissingHasEypsOnPersonsJob(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IFileService fileService,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    IEventPublisher eventPublisher)
 {
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -35,24 +36,32 @@ public class SetMissingHasEypsOnPersonsJob(
 
             person.HasEyps = true;
 
-            dbContext.AddEventWithoutBroadcast(new RouteToProfessionalStatusUpdatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = timeProvider.UtcNow,
-                PersonId = person.PersonId,
-                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId,
-                RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
-                OldRouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
-                ChangeReason = "Data fix for incorrectly set Has EYPS flag",
-                ChangeReasonDetail = null,
-                EvidenceFile = null,
-                PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
-                OldPersonAttributes = oldPersonAttributes,
-                Changes = RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps,
-                Induction = newInduction,
-                OldInduction = oldInduction,
-                AdditionalInformation = null
-            });
+            var processContext = new ProcessContext(
+                ProcessType.RouteToProfessionalStatusUpdating,
+                timeProvider.UtcNow,
+                DataStore.Postgres.Models.SystemUser.SystemUserId,
+                new ChangeReasonWithDetailsAndEvidence
+                {
+                    Reason = "Data fix for incorrectly set Has EYPS flag",
+                    Details = null,
+                    EvidenceFile = null,
+                    AdditionalInformation = null
+                });
+
+            await eventPublisher.PublishSingleEventAsync(
+                new RouteToProfessionalStatusUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
+                    OldRouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
+                    PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
+                    OldPersonAttributes = oldPersonAttributes,
+                    Changes = RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps,
+                    Induction = newInduction,
+                    OldInduction = oldInduction
+                },
+                processContext);
 
             updatedPersons.Add(person.PersonId);
         }
