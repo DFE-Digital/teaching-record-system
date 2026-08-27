@@ -1,0 +1,117 @@
+namespace TeachingRecordSystem.EndToEndTests.SupportUiJourneys.Users;
+
+public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
+{
+    [Fact]
+    public async Task AddUser()
+    {
+        var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToUsersPageAsync();
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.ClickLinkForElementWithTestIdAsync("add-user");
+
+        await page.AssertOnAddUserPageAsync();
+
+        await page.FillEmailInputAsync(testAzAdUser.Email);
+
+        await page.ClickGovUkButtonAsync("Add user");
+
+        await page.AssertOnAddUserConfirmPageAsync();
+
+        await page.SetCheckedAsync("label:has-text('Record manager')", true);
+
+        await page.ClickGovUkButtonAsync("Add user");
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.AssertFlashMessageAsync(expectedHeader: $"{testAzAdUser.Name} has been added as a record manager.");
+    }
+
+    [Fact]
+    public async Task EditUser()
+    {
+        var azAdUserId = Guid.NewGuid();
+        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, role: UserRoles.AccessManager);
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToUsersPageAsync();
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
+
+        await page.AssertOnEditUserPageAsync(user.UserId);
+
+        await page.SetCheckedAsync("label:has-text('Record manager')", true);
+
+        await page.ClickGovUkButtonAsync("Save changes");
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.AssertFlashMessageAsync(expectedHeader: $"{user.Name} has been changed to a record manager");
+    }
+
+    [Fact]
+    public async Task DeactivateUser()
+    {
+        var azAdUserId = Guid.NewGuid();
+        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, role: UserRoles.AccessManager);
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToUsersPageAsync();
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
+
+        await page.AssertOnEditUserPageAsync(user.UserId);
+
+        await page.ClickGovUkButtonAsync("Deactivate user");
+
+        await page.AssertOnEditUserDeactivatePageAsync(user.UserId);
+
+        await page.SetCheckedAsync("legend:has-text('Reason for deactivating user') + .govuk-radios label:has-text('They no longer need access')", true);
+        await page.SetCheckedAsync("legend:has-text('Do you have more information?') + .govuk-radios label:has-text('No')", true);
+        await page.SetCheckedAsync("legend:has-text('Do you want to upload evidence?') + .govuk-radios label:has-text('No')", true);
+
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.AssertFlashMessageAsync($"{user.Name}\u2019s account has been deactivated");
+    }
+
+    [Fact]
+    public async Task ReactivateUser()
+    {
+        var azAdUserId = Guid.NewGuid();
+        var user = await TestData.CreateUserAsync(active: false, azureAdUserId: azAdUserId, role: UserRoles.AccessManager);
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToUsersPageAsync();
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
+
+        await page.AssertOnEditUserPageAsync(user.UserId);
+
+        await page.ClickGovUkButtonAsync("Reactivate user");
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.AssertFlashMessageAsync(expectedHeader: $"{user.Name}\u2019s account has been reactivated");
+    }
+}
