@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Optional;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
@@ -11,6 +12,7 @@ public class CheckYourAnswersModel(
     EditRouteJourneyCoordinator journey,
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
+    TimeProvider timeProvider,
     RoutesToProfessionalStatusService routesToProfessionalStatusService) : PageModel
 {
     public string PageCaption => journey.PageCaption;
@@ -41,7 +43,6 @@ public class CheckYourAnswersModel(
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = journey.QualificationId,
-                UpdatedBy = User.GetUserId(),
                 RouteToProfessionalStatusTypeId = Option.Some(RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId),
                 Status = Option.Some(RouteDetail.Status),
                 HoldsFrom = Option.Some(RouteDetail.HoldsFrom),
@@ -54,12 +55,19 @@ public class CheckYourAnswersModel(
                 TrainingCountryId = Option.Some(RouteDetail.TrainingCountryId),
                 TrainingProviderId = Option.Some(RouteDetail.TrainingProviderId),
                 DegreeTypeId = Option.Some(RouteDetail.DegreeTypeId),
-                ExemptFromInduction = Option.Some(RouteDetail.IsExemptFromInduction),
-                ChangeReason = ChangeReason?.GetDisplayName(),
-                ChangeReasonDetail = ChangeReasonDetail.ChangeReasonDetail,
-                EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
-                AdditionalInformation = ChangeReasonDetail.AdditionalInformation
-            });
+                ExemptFromInduction = Option.Some(RouteDetail.IsExemptFromInduction)
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusUpdating,
+                timeProvider.UtcNow,
+                User.GetUserId(),
+                new ChangeReasonWithDetailsAndEvidence
+                {
+                    Reason = ChangeReason?.GetDisplayName(),
+                    Details = ChangeReasonDetail.ChangeReasonDetail,
+                    EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
+                    AdditionalInformation = ChangeReasonDetail.AdditionalInformation
+                }));
 
         journey.DeleteInstance();
 

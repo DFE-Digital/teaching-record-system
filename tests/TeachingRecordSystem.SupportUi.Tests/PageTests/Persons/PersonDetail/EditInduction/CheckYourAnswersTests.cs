@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -629,7 +628,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
 
         EventObserver.AssertEventsSaved(e =>
         {
-            var actualInductionUpdatedEvent = Assert.IsType<PersonInductionUpdatedEvent>(e);
+            var actualInductionUpdatedEvent = Assert.IsType<LegacyEvents.PersonInductionUpdatedEvent>(e);
 
             Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, TimeProvider.UtcNow);
             Assert.Equal(actualInductionUpdatedEvent.PersonId, person.PersonId);

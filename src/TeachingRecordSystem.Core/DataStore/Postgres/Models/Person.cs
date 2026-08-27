@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -80,7 +79,7 @@ public class Person
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        out PersonStatusUpdatedEvent @event)
+        out LegacyEvents.PersonStatusUpdatedEvent @event)
     {
         var oldStatus = Status;
         Status = targetStatus;
@@ -109,7 +108,7 @@ public class Person
         DateTime cpdModifiedOn,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        out PersonInductionUpdatedEvent? @event)
+        out LegacyEvents.PersonInductionUpdatedEvent? @event)
     {
         if (status is not (
             InductionStatus.RequiredToComplete
@@ -139,13 +138,13 @@ public class Person
         InductionStartDate = startDate;
         InductionCompletedDate = completedDate;
 
-        var changes = PersonInductionUpdatedEventChanges.None |
-            (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-            (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-            (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0);
+        var changes = LegacyEvents.PersonInductionUpdatedEventChanges.None |
+            (InductionStatus != oldEventInduction.Status ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus : 0) |
+            (InductionStartDate != oldEventInduction.StartDate ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
+            (InductionCompletedDate != oldEventInduction.CompletedDate ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
+            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0);
 
-        if (changes == PersonInductionUpdatedEventChanges.None)
+        if (changes == LegacyEvents.PersonInductionUpdatedEventChanges.None)
         {
             @event = null;
             return;
@@ -156,7 +155,7 @@ public class Person
         CpdInductionModifiedOn = now;
         CpdInductionCpdModifiedOn = cpdModifiedOn;
 
-        @event = new PersonInductionUpdatedEvent()
+        @event = new LegacyEvents.PersonInductionUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -198,7 +197,7 @@ public class Person
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
         string? additionalInformation,
-        out PersonInductionUpdatedEvent? @event)
+        out LegacyEvents.PersonInductionUpdatedEvent? @event)
     {
         // N.B. We allow missing data fields as some migrated data has missing fields
         // and we want to be able to test such scenarios.
@@ -233,15 +232,15 @@ public class Person
 
         InductionExemptWithoutReason = false;
 
-        var changes = PersonInductionUpdatedEventChanges.None |
-            (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
-            (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-            (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-            (!InductionExemptionReasonIds.ToHashSet().SetEquals(oldEventInduction.ExemptionReasonIds) ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0) |
-            (InductionExemptWithoutReason != oldEventInduction.InductionExemptWithoutReason ? PersonInductionUpdatedEventChanges.InductionExemptWithoutReason : 0);
+        var changes = LegacyEvents.PersonInductionUpdatedEventChanges.None |
+            (InductionStatus != oldEventInduction.Status ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus : 0) |
+            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
+            (InductionStartDate != oldEventInduction.StartDate ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
+            (InductionCompletedDate != oldEventInduction.CompletedDate ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
+            (!InductionExemptionReasonIds.ToHashSet().SetEquals(oldEventInduction.ExemptionReasonIds) ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0) |
+            (InductionExemptWithoutReason != oldEventInduction.InductionExemptWithoutReason ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptWithoutReason : 0);
 
-        if (changes == PersonInductionUpdatedEventChanges.None)
+        if (changes == LegacyEvents.PersonInductionUpdatedEventChanges.None)
         {
             @event = null;
             return;
@@ -249,7 +248,7 @@ public class Person
 
         InductionModifiedOn = now;
 
-        @event = new PersonInductionUpdatedEvent()
+        @event = new LegacyEvents.PersonInductionUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -269,7 +268,7 @@ public class Person
         Guid exemptionReasonId,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+        [NotNullWhen(true)] out LegacyEvents.PersonInductionUpdatedEvent? @event)
     {
         if (InductionExemptionReasonIds.Contains(exemptionReasonId))
         {
@@ -279,7 +278,7 @@ public class Person
 
         var oldEventInduction = EventModels.Induction.FromModel(this);
 
-        var changes = PersonInductionUpdatedEventChanges.InductionExemptionReasons;
+        var changes = LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons;
 
         InductionExemptionReasonIds = InductionExemptionReasonIds.Concat([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
@@ -287,10 +286,10 @@ public class Person
         if (InductionStatus.Exempt.IsHigherPriorityThan(InductionStatus))
         {
             InductionStatus = InductionStatus.Exempt;
-            changes |= PersonInductionUpdatedEventChanges.InductionStatus;
+            changes |= LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus;
         }
 
-        @event = new PersonInductionUpdatedEvent()
+        @event = new LegacyEvents.PersonInductionUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -328,7 +327,7 @@ public class Person
         Guid exemptionReasonId,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+        [NotNullWhen(true)] out LegacyEvents.PersonInductionUpdatedEvent? @event)
     {
         if (!InductionExemptionReasonIds.Contains(exemptionReasonId))
         {
@@ -338,7 +337,7 @@ public class Person
 
         var oldEventInduction = EventModels.Induction.FromModel(this);
 
-        var changes = PersonInductionUpdatedEventChanges.InductionExemptionReasons;
+        var changes = LegacyEvents.PersonInductionUpdatedEventChanges.InductionExemptionReasons;
 
         InductionExemptionReasonIds = InductionExemptionReasonIds.Except([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
@@ -348,10 +347,10 @@ public class Person
         if (InductionStatus is InductionStatus.Exempt && (allExemptionReasonIds.Count == 0 && !InductionExemptWithoutReason))
         {
             InductionStatus = InductionStatusWithoutExemption;
-            changes |= PersonInductionUpdatedEventChanges.InductionStatus;
+            changes |= LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus;
         }
 
-        @event = new PersonInductionUpdatedEvent()
+        @event = new LegacyEvents.PersonInductionUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -375,7 +374,7 @@ public class Person
         DateOnly? completedDate,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+        [NotNullWhen(true)] out LegacyEvents.PersonInductionUpdatedEvent? @event)
     {
         if (passed)
         {
@@ -397,13 +396,13 @@ public class Person
         InductionStartDate = startDate;
         InductionCompletedDate = completedDate;
 
-        var changes = PersonInductionUpdatedEventChanges.None |
-            (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
-            (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-            (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0);
+        var changes = LegacyEvents.PersonInductionUpdatedEventChanges.None |
+            (InductionStatus != oldEventInduction.Status ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatus : 0) |
+            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
+            (InductionStartDate != oldEventInduction.StartDate ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
+            (InductionCompletedDate != oldEventInduction.CompletedDate ? LegacyEvents.PersonInductionUpdatedEventChanges.InductionCompletedDate : 0);
 
-        if (changes == PersonInductionUpdatedEventChanges.None)
+        if (changes == LegacyEvents.PersonInductionUpdatedEventChanges.None)
         {
             @event = null;
             return false;
@@ -411,7 +410,7 @@ public class Person
 
         InductionModifiedOn = now;
 
-        @event = new PersonInductionUpdatedEvent()
+        @event = new LegacyEvents.PersonInductionUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,

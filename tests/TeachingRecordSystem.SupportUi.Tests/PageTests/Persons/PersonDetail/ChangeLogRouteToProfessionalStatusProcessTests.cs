@@ -1,15 +1,16 @@
 using System.Diagnostics;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
-using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 using ProfessionalStatusType = TeachingRecordSystem.Core.Models.ProfessionalStatusType;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task ProfessionalStatusCreatedEvent_RendersExpectedContent()
@@ -49,9 +50,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
-        Assert.NotNull(timelineItem);
-        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusCreating);
+        AssertRaisedBy(timelineItem, createdByUser.Name);
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
@@ -97,8 +97,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusCreating);
         Assert.Equal(awardDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
@@ -140,8 +139,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusCreating);
         Assert.Equal(changeReason, timelineItem.GetElementByTestId("reason")?.TrimmedText());
         Assert.Equal(changeReasonDetail, timelineItem.GetElementByTestId("reason-detail")?.TrimmedText());
         Assert.Equal($"{filename} (opens in new tab)", timelineItem.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
@@ -200,7 +198,6 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
-                UpdatedBy = updatedByUser.UserId,
                 HoldsFrom = Option.Some<DateOnly?>(holdsFrom),
                 TrainingStartDate = Option.Some<DateOnly?>(startDate),
                 TrainingEndDate = Option.Some<DateOnly?>(endDate),
@@ -210,7 +207,11 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 TrainingAgeSpecialismType = Option.Some<TrainingAgeSpecialismType?>(ageRange),
                 TrainingCountryId = Option.Some<string?>(country.CountryId),
                 ExemptFromInduction = Option.Some<bool?>(exemptFromInduction)
-            });
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusUpdating,
+                TimeProvider.UtcNow,
+                updatedByUser.UserId));
 
         Debug.Assert(changes is not RouteToProfessionalStatusUpdatedEventChanges.None);
 
@@ -222,10 +223,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
-        Assert.NotNull(timelineItem);
-        Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
+        AssertRaisedBy(timelineItem, updatedByUser.Name);
         Assert.Null(timelineItem.GetElementByTestId("status"));
         Assert.Equal(holdsFrom.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
@@ -294,9 +293,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
-                UpdatedBy = updatedByUser.UserId,
                 Status = Option.Some(status)
-            });
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusUpdating,
+                TimeProvider.UtcNow,
+                updatedByUser.UserId));
         Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -307,10 +309,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
-        Assert.NotNull(timelineItem);
-        Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
+        AssertRaisedBy(timelineItem, updatedByUser.Name);
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(awardDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
@@ -368,11 +368,19 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             new UpdateRouteToProfessionalStatusOptions
             {
                 QualificationId = professionalStatus.QualificationId,
-                UpdatedBy = updatedByUser.UserId,
-                Status = Option.Some(status),
-                ChangeReason = changeReason,
-                ChangeReasonDetail = changeReasonDetail
-            });
+                Status = Option.Some(status)
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusUpdating,
+                TimeProvider.UtcNow,
+                updatedByUser.UserId,
+                new ChangeReasonWithDetailsAndEvidence
+                {
+                    Reason = changeReason,
+                    Details = changeReasonDetail,
+                    EvidenceFile = null,
+                    AdditionalInformation = null
+                }));
         Debug.Assert(changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -383,8 +391,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
         Assert.Equal(changeReason, timelineItem.GetElementByTestId("reason")?.TrimmedText());
         Assert.Equal(changeReasonDetail, timelineItem.GetElementByTestId("reason-detail")?.TrimmedText());
     }
@@ -430,9 +437,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
-                QualificationId = professionalStatus.QualificationId,
-                DeletedBy = deletedByUser.UserId
-            });
+                QualificationId = professionalStatus.QualificationId
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusDeleting,
+                TimeProvider.UtcNow,
+                deletedByUser.UserId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -442,10 +452,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
-        Assert.NotNull(timelineItem);
-        Assert.Equal($"By {deletedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
-        Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
+        AssertRaisedBy(timelineItem, deletedByUser.Name);
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
@@ -476,9 +484,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
-                QualificationId = professionalStatus.QualificationId,
-                DeletedBy = deletedByUser.UserId
-            });
+                QualificationId = professionalStatus.QualificationId
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusDeleting,
+                TimeProvider.UtcNow,
+                deletedByUser.UserId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -488,8 +499,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Equal(professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
         Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
     }
@@ -506,9 +516,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
-                QualificationId = professionalStatus.QualificationId,
-                DeletedBy = deletedByUser.UserId
-            });
+                QualificationId = professionalStatus.QualificationId
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusDeleting,
+                TimeProvider.UtcNow,
+                deletedByUser.UserId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -518,8 +531,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Equal(professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
         Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
     }
@@ -536,9 +548,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
-                QualificationId = professionalStatus.QualificationId,
-                DeletedBy = deletedByUser.UserId
-            });
+                QualificationId = professionalStatus.QualificationId
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusDeleting,
+                TimeProvider.UtcNow,
+                deletedByUser.UserId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -548,8 +563,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Equal(professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("old-pqts-date")?.TrimmedText());
         Assert.Equal(WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
     }
@@ -566,9 +580,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         await RoutesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
             new DeleteRouteToProfessionalStatusOptions
             {
-                QualificationId = professionalStatus.QualificationId,
-                DeletedBy = deletedByUser.UserId
-            });
+                QualificationId = professionalStatus.QualificationId
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusDeleting,
+                TimeProvider.UtcNow,
+                deletedByUser.UserId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -578,8 +595,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
-        Assert.NotNull(timelineItem);
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Equal("No", timelineItem.GetElementByTestId("has-eyps")?.TrimmedText());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("old-has-eyps")?.TrimmedText());
     }
@@ -716,23 +732,19 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var migratedEvent = new RouteToProfessionalStatusMigratedEvent
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = TimeProvider.UtcNow,
-            RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             RouteToProfessionalStatus = routeToProfessionalStatus,
             DqtQtsRegistration = dqtQtsRegistration,
             DqtInitialTeacherTraining = dqtInitialTeacherTraining,
             DqtQtlsDate = populateOptional ? qtlsDate : null,
-            DqtQtlsDateHasBeenSet = populateOptional ? true : null,
-            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
-            OldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person)
+            DqtQtlsDateHasBeenSet = populateOptional ? true : null
         };
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        await TestData.CreateProcessAsync(
+            ProcessType.RouteToProfessionalStatusMigratingFromDqt,
+            createdByUser.UserId,
+            changeReason: null,
+            migratedEvent);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -742,9 +754,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-migrated-event");
-        Assert.NotNull(timelineItem);
-        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusMigratingFromDqt);
+        AssertRaisedBy(timelineItem, createdByUser.Name);
         Assert.Equal(populateOptional ? awardDate.ToString(WebConstants.DateDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(route.Name, timelineItem.GetElementByTestId("route")?.TrimmedText());
@@ -782,5 +793,23 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(populateOptional ? dqtAgeRangeFrom.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("dqt-age-range-from")?.TrimmedText());
         Assert.Equal(populateOptional ? dqtAgeRangeTo.ToString() : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("dqt-age-range-to")?.TrimmedText());
         Assert.Equal(populateOptional ? $"{ittSubject1!.dfeta_Value} - {ittSubject1!.dfeta_name}{ittSubject2!.dfeta_Value} - {ittSubject2!.dfeta_name}{ittSubject3!.dfeta_Value} - {ittSubject3!.dfeta_name}" : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("dqt-subjects")?.TrimmedText());
+    }
+
+    private async Task<IElement> GetChangeHistoryEntryAsync(IHtmlDocument doc, Guid personId, ProcessType processType)
+    {
+        var processId = await WithDbContextAsync(dbContext => dbContext.Processes
+            .Where(p => p.PersonIds.Contains(personId) && p.ProcessType == processType)
+            .Select(p => p.ProcessId)
+            .SingleAsync());
+
+        var entry = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
+        Assert.NotNull(entry);
+        return entry;
+    }
+
+    private static void AssertRaisedBy(IElement changeHistoryEntry, string expectedUserName)
+    {
+        var date = changeHistoryEntry.GetElementsByClassName("moj-timeline__date").SingleOrDefault();
+        Assert.Contains($"By {expectedUserName} on", date?.TrimmedText().ReplaceLineEndings(" "));
     }
 }

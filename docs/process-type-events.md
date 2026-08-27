@@ -649,3 +649,37 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `MandatoryQualificationMigratedEvent` | Always | — |
+
+### `RouteToProfessionalStatusCreating` (87)
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Add route*; the EWC Wales QTS import.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusCreatedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when adding the route moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when adding the route moves the person's induction. |
+
+### `RouteToProfessionalStatusUpdating` (88)
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Edit route*; `SetMissingHasEypsOnPersonsJob`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusUpdatedEvent` | Sometimes | Only when a field on the route itself actually changes. |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when the change moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when the change moves the person's induction. |
+
+### `RouteToProfessionalStatusDeleting` (89)
+API `SetQtls`; Support UI *Delete route*.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusDeletedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when deleting the route moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when deleting the route moves the person's induction. |
+
+### `RouteToProfessionalStatusMigratingFromDqt` (90)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusMigratedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when the migration moved the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |

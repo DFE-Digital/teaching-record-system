@@ -144,14 +144,17 @@ public static partial class Commands
                         PersonId = person.PersonId,
                         RouteToProfessionalStatusTypeId = routeId,
                         Status = routeStatus,
-                        CreatedBy = SystemUser.SystemUserId,
                         SourceApplicationUserId = SystemUser.SystemUserId,
                         SourceApplicationReference = nameof(CreateImportClaimTestDataCommand),
                         HoldsFrom = qtsDate,
                         TrainingStartDate = startDate,
                         TrainingSubjectIds = subjectIds,
                         IsExemptFromInduction = false
-                    });
+                    },
+                    new ProcessContext(
+                        ProcessType.RouteToProfessionalStatusCreating,
+                        DateTime.UtcNow,
+                        SystemUser.SystemUserId));
 
                 if (!string.IsNullOrWhiteSpace(inductionStatusStr))
                 {
