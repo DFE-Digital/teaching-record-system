@@ -351,10 +351,7 @@ public static class Extensions
 
             recurringJobManager.RemoveIfExists("BackfillAlertsInReportingDb");
 
-            recurringJobManager.AddOrUpdate<BackfillAuthzRegistrationTokenJob>(
-                nameof(BackfillAuthzRegistrationTokenJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                GetRecurringJobSchedule(BackfillAuthzRegistrationTokenJob.JobSchedule));
+            recurringJobManager.RemoveIfExists("BackfillAuthzRegistrationTokenJob");
 
             var deleteOldEvidenceFilesJobOptions = sp.GetRequiredService<IOptions<DeleteOldEvidenceFilesJobOptions>>().Value;
             recurringJobManager.AddOrUpdate<DeleteOldEvidenceFilesJob>(
