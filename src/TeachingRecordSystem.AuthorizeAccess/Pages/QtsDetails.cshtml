@@ -1,0 +1,98 @@
+@page "/qts-details"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.QtsDetailsModel
+@using TeachingRecordSystem.Core.DataStore.Postgres.Models
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@{
+    ViewBag.Title = "Enter your QTS details (optional)";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Components/accessible-autocomplete.min.css">
+}
+
+@section Scripts {
+    <script src="~/Components/accessible-autocomplete.min.js"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            const selectIds = [
+                '@nameof(Model.TrainingProviderId)',
+                '@nameof(Model.SubjectId)'
+            ];
+
+            selectIds.forEach(id => {
+                const selectElement = document.querySelector(`#${id}`);
+                if (!selectElement) return;
+
+                accessibleAutocomplete.enhanceSelectElement({
+                    defaultValue: '',
+                    selectElement: selectElement
+                });
+
+                setTimeout(() => {
+                    const inputElement = selectElement.parentElement.querySelector('.autocomplete__input');
+                    if (!inputElement) return;
+
+                    inputElement.addEventListener('input', () => {
+                        if (inputElement.value === '') {
+                            selectElement.value = '';
+                        }
+                    });
+                }, 0);
+            });
+        }
+    </script>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-details>
+                <govuk-details-summary>Why are we asking this?</govuk-details-summary>
+                <govuk-details-text>
+                    <p class="govuk-body">
+                        Providing this data gives us additional information to help us match you to your teaching record.
+                    </p>
+                </govuk-details-text>
+            </govuk-details>
+
+            <govuk-input for="YearQtsReceived" input-class="govuk-input--width-4" spellcheck="false" pattern="[0-9]*">
+                <govuk-input-label class="govuk-label--m"><strong>Year QTS was received</strong></govuk-input-label>
+            </govuk-input>
+
+            <govuk-select for="TrainingProviderId" label-class="govuk-label--m" >
+                <govuk-select-label class="govuk-label--s">
+                    Training provider
+                </govuk-select-label>
+                <govuk-select-hint class="trs-requires-js">Start typing the name of the training provider</govuk-select-hint>
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var trainingProvider in Model.TrainingProviders)
+                {
+                    <govuk-select-item value="@trainingProvider.TrainingProviderId" selected="@(Model.TrainingProviderId == trainingProvider.TrainingProviderId)">
+                        @trainingProvider.Name.Replace("'", "’")
+                    </govuk-select-item>
+                }
+            </govuk-select>
+
+            <govuk-select for="SubjectId" label-class="govuk-label--m">
+                <govuk-select-label class="govuk-label--s">
+                    Subject
+                </govuk-select-label>
+                <govuk-select-hint class="trs-requires-js">Start typing the name of the subject</govuk-select-hint>
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var subject in Model.Subjects)
+                {
+                    <govuk-select-item value="@subject.TrainingSubjectId" selected="@(Model.SubjectId == subject.TrainingSubjectId)">
+                        @subject.Name.Replace("'", "’")
+                    </govuk-select-item>
+                }
+            </govuk-select>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button class="govuk-button--secondary" type="submit" name="Skip" value="true">Skip</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

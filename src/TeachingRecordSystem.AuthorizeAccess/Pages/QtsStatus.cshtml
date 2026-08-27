@@ -1,0 +1,31 @@
+@page "/qts-status"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.QtsStatusModel
+@{
+    ViewBag.Title = "Do you have qualified teacher status (QTS)";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <govuk-radios for="HaveQts">
+                <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</govuk-radios-fieldset-legend>
+                <govuk-radios-hint>
+                    Qualified teacher status (QTS) is a legal requirement to teach in many English schools and is considered desirable for teachers in the majority of schools in England.
+                </govuk-radios-hint>
+                <govuk-radios-item value="@true">Yes</govuk-radios-item>
+                <govuk-radios-item value="@false">No</govuk-radios-item>
+            </govuk-radios>
+
+            <govuk-details>
+                <govuk-details-summary>Why are we asking this?</govuk-details-summary>
+                <govuk-details-text>
+                    <p class="govuk-body">
+                        Providing this data gives us additional information to help us match you to your teaching record.
+                    </p>
+                </govuk-details-text>
+            </govuk-details>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

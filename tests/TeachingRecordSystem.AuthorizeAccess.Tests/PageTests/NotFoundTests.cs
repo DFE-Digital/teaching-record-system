@@ -32,7 +32,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
 
     [Fact]
-    public Task Post_ValidRequest_RedirectsToCheckAnswersPage() =>
+    public Task Post_ValidRequest_RedirectsToQtsStatusPage() =>
         WithJourneyCoordinatorAsync(
             CreateSignInJourneyState,
             async coordinator =>
@@ -49,7 +49,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 // Assert
                 Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-                Assert.Equal(JourneyUrls.CheckAnswers(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+                Assert.Equal(JourneyUrls.QtsStatus(coordinator.InstanceId), response.Headers.Location?.OriginalString);
             });
 
     private async Task SetupInstanceStateAsync(

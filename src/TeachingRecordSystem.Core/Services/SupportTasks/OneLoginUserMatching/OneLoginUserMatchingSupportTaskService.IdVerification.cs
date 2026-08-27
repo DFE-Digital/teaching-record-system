@@ -25,7 +25,12 @@ public partial class OneLoginUserMatchingSupportTaskService
                     StatedLastName = options.StatedLastName,
                     StatedDateOfBirth = options.StatedDateOfBirth,
                     EvidenceFileId = options.EvidenceFileId,
-                    EvidenceFileName = options.EvidenceFileName
+                    EvidenceFileName = options.EvidenceFileName,
+                    YearQtsReceived = options.YearQtsReceived,
+                    TrainingProviderId = options.TrainingProviderId,
+                    TrainingProviderName = options.TrainingProviderName,
+                    SubjectId = options.SubjectId,
+                    SubjectName = options.SubjectName
                 },
                 PersonId = null,
                 OneLoginUserSubject = options.OneLoginUserSubject,

@@ -17,6 +17,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         var statedTrn = "0000000";
         var clientApplicationUserId = (await TestData.CreateApplicationUserAsync()).UserId;
         var trnTokenTrn = "0000000";
+        var trainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var subject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).First();
+        var yearQtsReceived = TimeProvider.UtcNow.Year.ToString();
 
         var options = new CreateOneLoginUserRecordMatchingSupportTaskOptions
         {
@@ -27,7 +30,12 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
             StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
             StatedTrn = statedTrn,
             ClientApplicationUserId = clientApplicationUserId,
-            TrnTokenTrn = trnTokenTrn
+            TrnTokenTrn = trnTokenTrn,
+            YearQtsReceived = yearQtsReceived,
+            TrainingProviderId = trainingProvider.TrainingProviderId,
+            TrainingProviderName = trainingProvider.Name,
+            SubjectId = subject.TrainingSubjectId,
+            SubjectName = subject.Name
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -51,6 +59,11 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests
         Assert.Equal(statedTrn, data.StatedTrn);
         Assert.Equal(clientApplicationUserId, data.ClientApplicationUserId);
         Assert.Equal(trnTokenTrn, data.TrnTokenTrn);
+        Assert.Equal(yearQtsReceived, data.YearQtsReceived);
+        Assert.Equal(trainingProvider.TrainingProviderId, data.TrainingProviderId);
+        Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
+        Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
+        Assert.Equal(subject.Name, data.SubjectName);
 
         Events.AssertEventsPublished(e => Assert.IsType<SupportTaskCreatedEvent>(e));
     }
