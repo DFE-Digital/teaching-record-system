@@ -544,4 +544,30 @@ public class GetPersonByTrnTests : TestBase
         Assert.Equal(StatusCodes.Status308PermanentRedirect, (int)response.StatusCode);
         Assert.Equal($"/v3/persons/{anotherPerson.Trn}", response.Headers.Location?.OriginalString);
     }
+
+    [Fact]
+    public async Task Get_PersonIsMerged_RedirectRetainsQueryString()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var anotherPerson = await TestData.CreatePersonAsync();
+
+        await WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == person.PersonId)
+                .ExecuteUpdateAsync(u => u
+                    .SetProperty(p => p.Status, _ => PersonStatus.Deactivated)
+                    .SetProperty(p => p.MergedWithPersonId, _ => anotherPerson.PersonId)));
+
+        var queryString = "?include=Alerts%2CInduction&dateOfBirth=1990-01-01";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}{queryString}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status308PermanentRedirect, (int)response.StatusCode);
+        Assert.Equal($"/v3/persons/{anotherPerson.Trn}{queryString}", response.Headers.Location?.OriginalString);
+    }
 }
