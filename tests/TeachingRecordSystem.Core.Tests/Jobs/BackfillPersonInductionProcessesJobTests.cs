@@ -141,8 +141,8 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     public async Task Execute_MoreEventsThanFitInOneBatch_MigratesThemAll()
     {
         // Arrange
-        // The job's batch size is 1000; go a little over it so more than one batch is needed.
-        const int eventCount = 1005;
+        // The job's batch size is 5000; go a little over it so more than one batch is needed.
+        const int eventCount = 5005;
 
         var person = await TestData.CreatePersonAsync();
 

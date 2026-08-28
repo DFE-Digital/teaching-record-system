@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.ChangeReasons;
 using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -10,63 +13,51 @@ namespace TeachingRecordSystem.Core.Jobs;
 /// events stored in the <c>events</c> table.
 /// </summary>
 /// <remarks>
-/// There are a lot of these events, so they're migrated in batches, each committed on its own. Batches are paged
-/// through on the (created, event_id) key rather than repeatedly asking for the events that haven't been migrated
-/// yet; the latter would rescan everything already done on every batch.
+/// There are millions of these events, so this doesn't round-trip payloads through the change tracker like the
+/// smaller back-fill jobs do. Each batch is a single <c>INSERT ... SELECT</c> that rewrites the payload with jsonb
+/// operators in Postgres, so no event is ever deserialized. Batches are walked on the (created, event_id) key, which
+/// is what <c>ix_events_event_name_created</c> is ordered by.
 /// </remarks>
-public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext)
+public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger<BackfillPersonInductionProcessesJob> logger)
 {
-    private const int BatchSize = 1000;
+    private const int BatchSize = 5000;
 
-    // This matches the EventName value stored in the events table for the legacy event.
-    private static readonly string _legacyEventName = typeof(LegacyEvents.PersonInductionUpdatedEvent).Name;
+    // This matches the EventName value stored in the events table for the legacy event; the new event happens to
+    // share its name.
+    private static readonly string _legacyEventName = nameof(LegacyEvents.PersonInductionUpdatedEvent);
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
         dbContext.Database.SetCommandTimeout(0);
 
-        var lastCreated = DateTime.MinValue;
+        var lastCreated = DateTime.MinValue.ToUniversalTime();
         var lastEventId = Guid.Empty;
+        long totalMigrated = 0;
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var batch = await dbContext.Events
-                .Where(e => e.EventName == _legacyEventName)
-                .Where(e => e.Created > lastCreated || (e.Created == lastCreated && e.EventId.CompareTo(lastEventId) > 0))
-                .OrderBy(e => e.Created)
-                .ThenBy(e => e.EventId)
-                .Take(BatchSize)
-                .ToListAsync(cancellationToken);
+            // Find where this batch ends before writing anything, so the cursor advances over events that turn out
+            // to have been migrated already rather than reading them again on the next pass.
+            var batchEnd = await GetBatchEndAsync(lastCreated, lastEventId, cancellationToken);
 
-            if (batch.Count == 0)
+            if (batchEnd is not var (batchEndCreated, batchEndEventId))
             {
-                return;
+                break;
             }
-
-            var last = batch[^1];
-            lastCreated = last.Created;
-            lastEventId = last.EventId;
 
             await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-            // Skip events that have already been back-filled so the job is idempotent.
-            var batchEventIds = batch.Select(e => e.EventId).ToArray();
-            var alreadyMigratedEventIds = await dbContext.ProcessEvents
-                .Where(pe => batchEventIds.Contains(pe.ProcessEventId))
-                .Select(pe => pe.ProcessEventId)
-                .ToListAsync(cancellationToken);
-
-            foreach (var legacyEvent in batch.Where(e => !alreadyMigratedEventIds.Contains(e.EventId)))
-            {
-                if (legacyEvent.ToEventBase() is not LegacyEvents.PersonInductionUpdatedEvent updated)
-                {
-                    continue;
-                }
-
-                AddProcessAndProcessEvent(legacyEvent, updated);
-            }
-
-            await dbContext.SaveChangesAsync(cancellationToken);
+            var migrated = await dbContext.Database.ExecuteSqlRawAsync(
+                BackfillSql,
+                [
+                    new NpgsqlParameter("legacyEventName", _legacyEventName),
+                    new NpgsqlParameter("processType", (int)ProcessType.PersonInductionUpdating),
+                    new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated },
+                    new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId },
+                    new NpgsqlParameter("toCreated", NpgsqlDbType.TimestampTz) { Value = batchEndCreated },
+                    new NpgsqlParameter("toEventId", NpgsqlDbType.Uuid) { Value = batchEndEventId }
+                ],
+                cancellationToken);
 
             if (dryRun)
             {
@@ -78,62 +69,159 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext)
 
             await transaction.CommitAsync(cancellationToken);
 
-            // Otherwise the change tracker keeps every batch's entities alive for the lifetime of the job.
-            dbContext.ChangeTracker.Clear();
+            totalMigrated += migrated;
+            lastCreated = batchEndCreated;
+            lastEventId = batchEndEventId;
+
+            logger.LogInformation(
+                "Back-filled {Migrated} {EventName} event(s) so far; up to {LastCreated:O}.",
+                totalMigrated,
+                _legacyEventName,
+                lastCreated);
         }
+
+        logger.LogInformation("Back-filled {Migrated} {EventName} event(s).", totalMigrated, _legacyEventName);
     }
 
-    private void AddProcessAndProcessEvent(Event legacyEvent, LegacyEvents.PersonInductionUpdatedEvent updated)
+    private async Task<(DateTime Created, Guid EventId)?> GetBatchEndAsync(
+        DateTime lastCreated,
+        Guid lastEventId,
+        CancellationToken cancellationToken)
     {
-        var processId = Guid.NewGuid();
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
 
-        IEvent newEvent = new PersonInductionUpdatedEvent
+        if (connection.State is not System.Data.ConnectionState.Open)
         {
-            EventId = updated.EventId,
-            PersonId = updated.PersonId,
-            Induction = updated.Induction,
-            OldInduction = updated.OldInduction,
-            Changes = (PersonInductionUpdatedEventChanges)(int)updated.Changes
-        };
+            await connection.OpenAsync(cancellationToken);
+        }
 
-        var process = new Process
+        // The inner LIMIT keeps this to one batch's worth of index entries; the outer ordering then picks the last
+        // of them, whether or not there were a full batch's worth left.
+        await using var command = new NpgsqlCommand(
+            """
+            SELECT created, event_id FROM (
+                SELECT e.created, e.event_id
+                FROM events e
+                WHERE e.event_name = @legacyEventName
+                  AND e.created >= @fromCreated
+                  AND (e.created > @fromCreated OR e.event_id > @fromEventId)
+                ORDER BY e.created, e.event_id
+                LIMIT @batchSize
+            ) batch
+            ORDER BY batch.created DESC, batch.event_id DESC
+            LIMIT 1
+            """,
+            connection);
+
+        command.Transaction = (NpgsqlTransaction?)dbContext.Database.CurrentTransaction?.GetDbTransaction();
+        command.CommandTimeout = 0;
+        command.Parameters.AddWithValue("legacyEventName", _legacyEventName);
+        command.Parameters.Add(new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated });
+        command.Parameters.Add(new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId });
+        command.Parameters.AddWithValue("batchSize", BatchSize);
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        if (!await reader.ReadAsync(cancellationToken))
         {
-            ProcessId = processId,
-            ProcessType = ProcessType.PersonInductionUpdating,
-            CreatedOn = legacyEvent.Created,
-            UpdatedOn = legacyEvent.Created,
-            UserId = updated.RaisedBy.UserId,
-            DqtUserId = updated.RaisedBy.DqtUserId,
-            DqtUserName = updated.RaisedBy.DqtUserName,
-            PersonIds = [.. newEvent.PersonIds],
-            OneLoginUserSubjects = [],
-            SupportTaskReferences = [],
-            ChangeReason = updated.ChangeReason is null &&
-                updated.ChangeReasonDetail is null &&
-                updated.EvidenceFile is null &&
-                updated.AdditionalInformation is null
-                ? null
-                : new ChangeReasonWithDetailsAndEvidence
-                {
-                    Reason = updated.ChangeReason,
-                    Details = updated.ChangeReasonDetail,
-                    EvidenceFile = updated.EvidenceFile,
-                    AdditionalInformation = updated.AdditionalInformation
-                }
-        };
+            return null;
+        }
 
-        dbContext.Processes.Add(process);
-
-        dbContext.ProcessEvents.Add(new ProcessEvent
-        {
-            ProcessEventId = newEvent.EventId,
-            ProcessId = processId,
-            EventName = newEvent.GetType().Name,
-            Payload = newEvent,
-            PersonIds = newEvent.PersonIds,
-            OneLoginUserSubjects = newEvent.OneLoginUserSubjects,
-            SupportTaskReferences = newEvent.SupportTaskReferences,
-            CreatedOn = legacyEvent.Created
-        });
+        return (reader.GetDateTime(0), reader.GetGuid(1));
     }
+
+    // The process and its event are written by one statement: foreign keys are checked once the whole statement has
+    // run, so process_events can reference the processes the same statement inserts. The todo CTE is MATERIALIZED so
+    // gen_random_uuid() is evaluated once per row rather than once per reference.
+    //
+    // The new event keeps the legacy event's id, so the NOT EXISTS check below is what makes the job idempotent.
+    // Its Changes flags sit at the same bit positions as the legacy ones, so they carry over untouched.
+    private static readonly string BackfillSql =
+        $"""
+         WITH todo AS MATERIALIZED (
+             SELECT
+                 e.event_id,
+                 e.created,
+                 e.payload,
+                 gen_random_uuid() AS process_id,
+                 ARRAY[(e.payload->>'PersonId')::uuid] AS person_ids,
+                 CASE WHEN jsonb_typeof(e.payload->'RaisedBy') = 'object'
+                     THEN NULL
+                     ELSE (e.payload->>'RaisedBy')::uuid
+                 END AS user_id,
+                 CASE WHEN jsonb_typeof(e.payload->'RaisedBy') = 'object'
+                     THEN (e.payload->'RaisedBy'->>'DqtUserId')::uuid
+                 END AS dqt_user_id,
+                 CASE WHEN jsonb_typeof(e.payload->'RaisedBy') = 'object'
+                     THEN e.payload->'RaisedBy'->>'DqtUserName'
+                 END AS dqt_user_name
+             FROM events e
+             WHERE e.event_name = @legacyEventName
+               AND e.created >= @fromCreated
+               AND (e.created > @fromCreated OR e.event_id > @fromEventId)
+               AND e.created <= @toCreated
+               AND (e.created < @toCreated OR e.event_id <= @toEventId)
+               AND NOT EXISTS (SELECT 1 FROM process_events pe WHERE pe.process_event_id = e.event_id)
+         ),
+         inserted_processes AS (
+             INSERT INTO processes (
+                 process_id, process_type, created_on, updated_on,
+                 user_id, dqt_user_id, dqt_user_name,
+                 person_ids, one_login_user_subjects, support_task_references, change_reason)
+             SELECT
+                 todo.process_id,
+                 @processType,
+                 todo.created,
+                 todo.created,
+                 todo.user_id,
+                 todo.dqt_user_id,
+                 todo.dqt_user_name,
+                 todo.person_ids,
+                 ARRAY[]::text[],
+                 ARRAY[]::text[],
+                 {ChangeReasonSql}
+             FROM todo
+             RETURNING process_id
+         )
+         INSERT INTO process_events (
+             process_event_id, process_id, event_name, payload,
+             person_ids, one_login_user_subjects, support_task_references, created_on)
+         SELECT
+             todo.event_id,
+             todo.process_id,
+             '{nameof(PersonInductionUpdatedEvent)}',
+             jsonb_build_object(
+                 '$event-name', '{nameof(PersonInductionUpdatedEvent)}',
+                 'EventId', todo.payload->'EventId',
+                 'PersonId', todo.payload->'PersonId',
+                 'Induction', todo.payload->'Induction',
+                 'OldInduction', todo.payload->'OldInduction',
+                 'Changes', COALESCE(todo.payload->'Changes', '0'::jsonb)),
+             todo.person_ids,
+             ARRAY[]::text[],
+             ARRAY[]::text[],
+             todo.created
+         FROM todo
+         """;
+
+    // The reason, its detail, the evidence file and the additional information all move off the event and onto the
+    // process, matching what the Edit induction journey now writes.
+    //
+    // -> gives SQL NULL for an absent key but jsonb 'null' for one the serializer wrote as null, so both have to
+    // count as "nothing was recorded" or every process would get an all-null change reason.
+    private const string ChangeReasonSql =
+        """
+        CASE WHEN COALESCE(jsonb_typeof(todo.payload->'ChangeReason'), 'null') = 'null'
+                  AND COALESCE(jsonb_typeof(todo.payload->'ChangeReasonDetail'), 'null') = 'null'
+                  AND COALESCE(jsonb_typeof(todo.payload->'EvidenceFile'), 'null') = 'null'
+                  AND COALESCE(jsonb_typeof(todo.payload->'AdditionalInformation'), 'null') = 'null'
+             THEN NULL
+             ELSE jsonb_build_object(
+                 '$change-reason-type', 'ChangeReasonWithDetailsAndEvidence',
+                 'Reason', todo.payload->'ChangeReason',
+                 'Details', todo.payload->'ChangeReasonDetail',
+                 'EvidenceFile', todo.payload->'EvidenceFile',
+                 'AdditionalInformation', todo.payload->'AdditionalInformation')
+         END
+        """;
 }
