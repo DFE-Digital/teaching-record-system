@@ -622,14 +622,6 @@
           "Microsoft.Extensions.Primitives": "10.0.11"
         }
       },
-      "Microsoft.Extensions.FileProviders.Embedded": {
-        "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "TZQQIZ1wFmQX7WdRAyhaDlv3splUPOYheTP3aZtoLpxMlVnLOFRjiLaDB0PZX/d27N52+FLbiNkwL02x4hZgjg==",
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10"
-        }
-      },
       "Microsoft.Extensions.FileProviders.Physical": {
         "type": "Transitive",
         "resolved": "10.0.11",
@@ -1698,7 +1690,7 @@
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.103.0, )",
           "DfeAnalytics.AspNetCore": "[0.6.2, )",
-          "GovUk.Frontend.AspNetCore": "[4.4.0, )",
+          "GovUk.Frontend.AspNetCore": "[5.0.0-alpha.0.69, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Humanizer.Core": "[3.0.10, )",
@@ -1768,7 +1760,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.103.0, )",
-          "GovUk.Frontend.AspNetCore": "[4.4.0, )",
+          "GovUk.Frontend.AspNetCore": "[5.0.0-alpha.0.69, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
@@ -2030,12 +2022,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "KJ/dnGQ04bna1DyXNz9z3U3uPUfMjHuAfnDRTgsZN4rsU4W22rfMh7Kydb17gOKjoUxArj585pOqhrVna7FraQ==",
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "10.0.10"
-        }
+        "requested": "[5.0.0-alpha.0.69, )",
+        "resolved": "5.0.0-alpha.0.69",
+        "contentHash": "u524hPzl8SR1oR1vP1OQyrjOfnA6uSBlR3ymBKfG7vJPTATOvh4GajlAyTmW/PaJnitKl/NoxSCto665dw4nxQ=="
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "CentralTransitive",

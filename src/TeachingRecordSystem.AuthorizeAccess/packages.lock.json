@@ -19,12 +19,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[4.4.0, )",
-        "resolved": "4.4.0",
-        "contentHash": "KJ/dnGQ04bna1DyXNz9z3U3uPUfMjHuAfnDRTgsZN4rsU4W22rfMh7Kydb17gOKjoUxArj585pOqhrVna7FraQ==",
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "10.0.10"
-        }
+        "requested": "[5.0.0-alpha.0.69, )",
+        "resolved": "5.0.0-alpha.0.69",
+        "contentHash": "u524hPzl8SR1oR1vP1OQyrjOfnA6uSBlR3ymBKfG7vJPTATOvh4GajlAyTmW/PaJnitKl/NoxSCto665dw4nxQ=="
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "Direct",
@@ -400,11 +397,6 @@
         "type": "Transitive",
         "resolved": "10.8.0",
         "contentHash": "tXmzwQeWgiycaLOtvSFnz0TPkJxXTyZrkwSVPTr83FgSiMj3BD/8eIbvrpGi5rzc2AgfKyegKo1ntJlJFey1Zg=="
-      },
-      "Microsoft.Extensions.FileProviders.Embedded": {
-        "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "TZQQIZ1wFmQX7WdRAyhaDlv3splUPOYheTP3aZtoLpxMlVnLOFRjiLaDB0PZX/d27N52+FLbiNkwL02x4hZgjg=="
       },
       "Microsoft.Extensions.Http.Diagnostics": {
         "type": "Transitive",
