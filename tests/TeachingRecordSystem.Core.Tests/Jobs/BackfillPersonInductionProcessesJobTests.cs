@@ -197,11 +197,84 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     }
 
     [Fact]
+    public async Task Execute_LegacyEventWithAnEwcWalesInductionImportRecord_UsesTheWelshProcessType()
+    {
+        // Arrange
+        // The import writes a row per person alongside the induction change, which is what identifies it - the
+        // system user it runs as isn't exclusive to it.
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(person.PersonId));
+        await AddEwcWalesImportRecordAsync(person.PersonId, "IND20240101.csv", TimeProvider.UtcNow.AddSeconds(1));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonWelshInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventWithAnEwcWalesQtsImportRecord_UsesTheGenericProcessType()
+    {
+        // Arrange
+        // The QTS import shares the EWC Wales interface type, so the file name is what keeps it out.
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(person.PersonId));
+        await AddEwcWalesImportRecordAsync(person.PersonId, "QTS20240101.csv", TimeProvider.UtcNow.AddSeconds(1));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventWithAnUnrelatedEwcWalesInductionImportRecord_UsesTheGenericProcessType()
+    {
+        // Arrange
+        // The person was imported at some point, but not around this change, so it isn't the import's.
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(person.PersonId));
+        await AddEwcWalesImportRecordAsync(person.PersonId, "IND20240101.csv", TimeProvider.UtcNow.AddDays(-1));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
     public async Task Execute_LegacyEventRaisedByTheSystemUser_UsesTheGenericProcessType()
     {
         // Arrange
-        // Nothing is back-filled onto the Welsh type: its API operation has never been called, and the EWC Wales
-        // file import runs as the system user, which the DQT outbox handlers also wrote as.
+        // The system user on its own says nothing: the DQT outbox handlers wrote these events as the system user
+        // too, so without an import record to point at, the event keeps the generic type.
         var person = await TestData.CreatePersonAsync();
 
         var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(person.PersonId));
@@ -219,6 +292,22 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
             Assert.Equal(ProcessType.PersonInductionUpdating, process.ProcessType);
         });
     }
+
+    private Task AddEwcWalesImportRecordAsync(Guid personId, string fileName, DateTime createdDate) =>
+        TestData.CreateIntegrationTransactionAsync(t => t
+            .WithInterfaceType(IntegrationTransactionInterfaceType.EwcWales)
+            .WithImportStatus(IntegrationTransactionImportStatus.Success)
+            .WithFileName(fileName)
+            .WithCreatedOn(createdDate)
+            .WithTotalCount(1)
+            .WithSuccessCount(1)
+            .WithWarningCount(0)
+            .WithFailureCount(0)
+            .WithDuplicateCount(0)
+            .WithRow(r => r
+                .WithPersonId(personId)
+                .WithStatus(IntegrationTransactionRecordStatus.Success)
+                .WithCreatedDate(createdDate)));
 
     [Fact]
     public async Task Execute_LegacyEventRaisedByDqtUser_PutsTheDqtUserOnTheProcess()
