@@ -122,6 +122,8 @@ public class ChangeHistoryService(
             ProcessType.RouteToProfessionalStatusDeleting,
             ProcessType.RouteToProfessionalStatusMigratingFromDqt,
             ProcessType.PersonInductionUpdating,
+            ProcessType.PersonCpdInductionUpdating,
+            ProcessType.PersonWelshInductionUpdating,
             ProcessType.NoteCreating,
             ProcessType.PersonOneLoginUserDisconnecting,
             ProcessType.PersonOneLoginUserConnecting,

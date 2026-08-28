@@ -78,7 +78,7 @@ public class SetCpdInductionStatusHandler(
                 CompletedDate = command.CompletedDate,
                 CpdModifiedOn = command.CpdModifiedOn
             },
-            new ProcessContext(ProcessType.PersonInductionUpdating, timeProvider.UtcNow, currentUserId));
+            new ProcessContext(ProcessType.PersonCpdInductionUpdating, timeProvider.UtcNow, currentUserId));
 
         return new SetCpdInductionStatusResult();
     }

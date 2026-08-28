@@ -41,7 +41,7 @@ public class SetWelshInductionStatusHandler(
                 StartDate = !command.Passed ? command.StartDate : null,
                 CompletedDate = !command.Passed ? command.CompletedDate : null
             },
-            new ProcessContext(ProcessType.PersonInductionUpdating, timeProvider.UtcNow, currentUserId));
+            new ProcessContext(ProcessType.PersonWelshInductionUpdating, timeProvider.UtcNow, currentUserId));
 
         return new SetWelshInductionStatusResult();
     }

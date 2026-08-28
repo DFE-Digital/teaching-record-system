@@ -51,6 +51,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                 BackfillSql,
                 [
                     new NpgsqlParameter("legacyEventName", _legacyEventName),
+                    new NpgsqlParameter("cpdProcessType", (int)ProcessType.PersonCpdInductionUpdating),
                     new NpgsqlParameter("processType", (int)ProcessType.PersonInductionUpdating),
                     new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated },
                     new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId },
@@ -154,7 +155,8 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                  END AS dqt_user_id,
                  CASE WHEN jsonb_typeof(e.payload->'RaisedBy') = 'object'
                      THEN e.payload->'RaisedBy'->>'DqtUserName'
-                 END AS dqt_user_name
+                 END AS dqt_user_name,
+                 {CpdProcessTypeSql} AS process_type
              FROM events e
              WHERE e.event_name = @legacyEventName
                AND e.created >= @fromCreated
@@ -170,7 +172,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                  person_ids, one_login_user_subjects, support_task_references, change_reason)
              SELECT
                  todo.process_id,
-                 @processType,
+                 todo.process_type,
                  todo.created,
                  todo.created,
                  todo.user_id,
@@ -203,6 +205,26 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
              todo.created
          FROM todo
          """;
+
+    // The write paths now have a process type each, but a legacy payload only says what changed, not who changed it,
+    // so the back-fill can only recover the one source that leaves a mark: CpdInductionCpdModifiedOn is touched by
+    // the CPD path and by nothing else, so an event whose timestamp moved is certainly CPD's.
+    //
+    // The Welsh path is deliberately not guessed at. Everything it leaves behind - a FailedInWales status, the
+    // PassedInWales exemption reason - is just as reachable from the Support UI journey, so a heuristic would file
+    // support users' changes as EWC Wales's. Historical Welsh events therefore stay on PersonInductionUpdating;
+    // only events written from now on are attributed to PersonWelshInductionUpdating.
+    //
+    // The CPD tell is one-way too: CPD resending the same CpdModifiedOn alongside a new status leaves the timestamp
+    // unmoved, and those few events stay on the generic type rather than being misfiled.
+    private const string CpdProcessTypeSql =
+        """
+        CASE WHEN e.payload->'Induction'->'CpdCpdModifiedOn'
+                  IS DISTINCT FROM e.payload->'OldInduction'->'CpdCpdModifiedOn'
+             THEN @cpdProcessType
+             ELSE @processType
+         END
+        """;
 
     // The reason, its detail, the evidence file and the additional information all move off the event and onto the
     // process, matching what the Edit induction journey now writes.

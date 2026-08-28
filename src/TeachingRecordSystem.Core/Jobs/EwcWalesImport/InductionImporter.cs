@@ -118,7 +118,7 @@ public class InductionImporter
                                     CompletedDate = awardedDate
                                 },
                                 new ProcessContext(
-                                    ProcessType.PersonInductionUpdating,
+                                    ProcessType.PersonWelshInductionUpdating,
                                     _timeProvider.UtcNow,
                                     SystemUser.SystemUserId));
                         }

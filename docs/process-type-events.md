@@ -52,7 +52,21 @@ Support UI *Set status → reactivate*.
 | `PersonReactivatedEvent` | Always | — |
 
 ### `PersonInductionUpdating` (91)
-API `SetCpdInductionStatus` and `SetWelshInductionStatus`; Support UI *Edit induction*; the EWC Wales induction import.
+Support UI *Edit induction*. The two systems that drive induction themselves get their own types below, so this one is a support user changing the record by hand.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
+### `PersonCpdInductionUpdating` (92)
+API `SetCpdInductionStatus`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
+### `PersonWelshInductionUpdating` (93)
+API `SetWelshInductionStatus`; the EWC Wales induction import. Both are EWC Wales telling us the outcome of an induction served in Wales, so they share a type.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
