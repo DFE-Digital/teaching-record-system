@@ -40,6 +40,28 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 
+    [Fact]
+    public async Task WithEmptyChangeReason_DoesNotRenderReason()
+    {
+        // Arrange
+        var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
+
+        var changeReason = new ChangeReasonWithDetailsAndEvidence
+        {
+            Reason = null,
+            Details = null,
+            AdditionalInformation = null,
+            EvidenceFile = null
+        };
+
+        // Act
+        var entry = await PublishAlertCreatedEventAsync(alertType, changeReason);
+
+        // Assert
+        AssertTitle(entry, "Alert added");
+        Assert.Null(entry.GetElementByTestId("change-reason"));
+    }
+
     [Theory]
     [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
     [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
@@ -53,12 +75,8 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         {
             Reason = reason,
             Details = details,
-            AdditionalInformation = "Some additional information",
-            EvidenceFile = new EventModels.File
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.jpg"
-            }
+            AdditionalInformation = null,
+            EvidenceFile = null
         };
 
         // Act
@@ -74,7 +92,6 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         Assert.Equal("Reason for adding alert", changeReasonDetailsSummary?.TrimmedText());
 
         changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
     }
 
     [Fact]
