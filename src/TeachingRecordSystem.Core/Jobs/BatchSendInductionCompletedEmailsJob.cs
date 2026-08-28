@@ -36,14 +36,12 @@ public class BatchSendInductionCompletedEmailsJob(
             ExecutedUtc = executed
         };
 
-        // The induction snapshots now live on PersonInductionUpdatedEvent on the process. Only the processes that
-        // set the induction directly are considered - a route change can't move someone to Passed.
+        // The induction snapshots now live on PersonInductionUpdatedEvent. Several process types publish it - a route
+        // change moves the person's induction too - so this keys off the event rather than the process type.
         var inductionCompletees = await dbContext.Database.SqlQuery<InductionCompleteeQueryResult>(
             $"""
              select pe.person_ids[1] as person_id from process_events pe
-             join processes p on p.process_id = pe.process_id
              where pe.event_name = {nameof(PersonInductionUpdatedEvent)}
-             and p.process_type = {(int)ProcessType.PersonInductionUpdating}
              and pe.created_on >= {startDate}
              and pe.created_on < {endDate}
              and pe.payload->'Induction'->>'Status' = '4'
