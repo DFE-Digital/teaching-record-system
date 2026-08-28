@@ -35,8 +35,6 @@ public class HostFixture : InitializeDbFixture
 
     public static Guid DefaultApplicationUserId { get; } = new("c0c8c511-e8e4-4b8e-96e3-55085dafc05d");
 
-    public static Guid GetAnIdentityApplicationUserId { get; } = new("873f0cb0-7174-4256-921a-e8a8aaa06361");
-
     public SigningCredentials JwtSigningCredentials { get; }
 
     public IServiceProvider Services => _webApplicationFactory.Services;
@@ -55,13 +53,6 @@ public class HostFixture : InitializeDbFixture
             UserId = DefaultApplicationUserId,
             Name = "Tests",
             ApiRoles = ApiRoles.All.ToArray()
-        });
-
-        AddOrUpdateUser(new Core.DataStore.Postgres.Models.ApplicationUser
-        {
-            UserId = GetAnIdentityApplicationUserId,
-            Name = "Get an identity",
-            ApiRoles = [ApiRoles.UpdatePerson]
         });
 
         dbContext.SaveChanges();
@@ -96,11 +87,7 @@ public class HostFixture : InitializeDbFixture
 
             // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
             // i.e. Program.cs and that has a dependency on IConfiguration
-            var configuration = TestConfiguration.GetConfiguration()
-                .AddInMemoryCollection([
-                    KeyValuePair.Create("GetAnIdentityApplicationUserId", (string?)GetAnIdentityApplicationUserId.ToString())
-                ])
-                .Build();
+            var configuration = TestConfiguration.GetConfiguration();
             builder.UseConfiguration(configuration);
 
             builder.ConfigureServices((context, services) =>
