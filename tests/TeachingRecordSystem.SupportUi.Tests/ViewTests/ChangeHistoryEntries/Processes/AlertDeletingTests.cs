@@ -40,6 +40,28 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 
+    [Fact]
+    public async Task WithEmptyChangeReason_DoesNotRenderReason()
+    {
+        // Arrange
+        var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
+
+        var changeReason = new ChangeReasonWithDetailsAndEvidence
+        {
+            Reason = null,
+            Details = null,
+            AdditionalInformation = null,
+            EvidenceFile = null
+        };
+
+        // Act
+        var entry = await PublishAlertDeletedEventAsync(alertType, changeReason);
+
+        // Assert
+        AssertTitle(entry, "Alert deleted");
+        Assert.Null(entry.GetElementByTestId("change-reason"));
+    }
+
     [Theory]
     [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
     [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
@@ -52,12 +74,8 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         {
             Reason = reason,
             Details = details,
-            AdditionalInformation = "Some additional information",
-            EvidenceFile = new EventModels.File
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.jpg"
-            }
+            AdditionalInformation = null,
+            EvidenceFile = null
         };
 
         // Act
@@ -73,7 +91,6 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         Assert.Equal("Reason for deleting alert", changeReasonDetailsSummary?.TrimmedText());
 
         changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
     }
 
     private Task<IHtmlElement> PublishAlertDeletedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason = null)

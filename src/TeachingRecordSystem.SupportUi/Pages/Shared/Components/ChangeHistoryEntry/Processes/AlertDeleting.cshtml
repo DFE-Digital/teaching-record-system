@@ -13,7 +13,7 @@
         Alert deleted for @alertType?.Name with start date @alert.StartDate?.ToString(WebConstants.DateDisplayFormat)
     </p>
 
-    @if (changeReason is not null)
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
             <govuk-details-summary>Reason for deleting alert</govuk-details-summary>
