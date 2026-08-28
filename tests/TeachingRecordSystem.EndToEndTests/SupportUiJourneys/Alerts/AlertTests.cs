@@ -1,0 +1,452 @@
+using Microsoft.Playwright;
+using TeachingRecordSystem.EndToEndTests.SupportUiJourneys.Persons;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
+
+namespace TeachingRecordSystem.EndToEndTests.SupportUiJourneys.Alerts;
+
+public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
+{
+    [Fact]
+    public async Task AddAlert()
+    {
+        var person = await TestData.CreatePersonAsync();
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(Guid.Parse("9fafaa80-f9f8-44a0-b7b3-cffedcbe0298")); // Failed induction
+        var details = TestData.GenerateLoremIpsum();
+        var link = TestData.GenerateUrl();
+        var startDate = new DateOnly(2021, 1, 1);
+        var reason = AddAlertReasonOption.AnotherReason;
+        var reasonDetail = TestData.GenerateLoremIpsum();
+        var additionalInformation = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+        var personId = person.PersonId;
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonAlertsPageAsync(personId);
+
+        await page.ClickGovUkButtonAsync("Add an alert");
+
+        await page.AssertOnAddAlertTypePageAsync();
+
+        await page.CheckAsync($"label{TextIsSelector(alertType.Name)}");
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnAddAlertDetailsPageAsync();
+
+        await page.FillAsync("#Details", details);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnAddAlertLinkPageAsync();
+
+        await page.CheckAsync("label:text-is('Yes')");
+
+        await page.FillAsync("label:text-is('Enter link to panel outcome')", link);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnAddAlertStartDatePageAsync();
+
+        await page.FillDateInputAsync(startDate);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnAddAlertReasonPageAsync();
+
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.FillAsync("label:text-is('Enter a reason')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Enter details')", additionalInformation);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnAddAlertCheckAnswersPageAsync();
+
+        await page.ClickGovUkButtonAsync("Confirm and add alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert added");
+    }
+
+    [Fact]
+    public async Task EditAlertDetails()
+    {
+        var startDate = new DateOnly(2023, 1, 1);
+        var details = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithDetails(details)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var newDetails = TestData.GenerateLoremIpsum();
+        var reason = AlertChangeDetailsReasonOption.ChangeOfDetails;
+        var reasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertDetailsPageAsync(alertId);
+
+        await page.AssertOnEditAlertDetailsPageAsync(alertId);
+
+        await page.FillAsync("label:text-is('Change details')", newDetails);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertDetailsChangeReasonPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Enter details')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertDetailsCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and update alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert changed");
+    }
+
+    [Fact]
+    public async Task EditAlertStartDate()
+    {
+        var startDate = new DateOnly(2023, 1, 1);
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var newStartDate = new DateOnly(2023, 2, 3);
+        var reason = AlertChangeStartDateReasonOption.AnotherReason;
+        var reasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertStartDatePageAsync(alertId);
+
+        await page.AssertOnEditAlertStartDatePageAsync(alertId);
+
+        await page.FillDateInputAsync(newStartDate);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertStartDateChangeReasonPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertStartDateCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and update alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert changed");
+    }
+
+    [Fact]
+    public async Task EditAlertEndDate()
+    {
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var endDate = TestData.TimeProvider.Today.AddDays(-10);
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var newEndDate = TestData.TimeProvider.Today.AddDays(-5);
+        var reason = AlertChangeEndDateReasonOption.AnotherReason;
+        var reasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertEndDatePageAsync(alertId);
+
+        await page.AssertOnEditAlertEndDatePageAsync(alertId);
+
+        await page.FillDateInputAsync(newEndDate);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertEndDateChangeReasonPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertEndDateCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and update alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert changed");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EditAlertLink(bool hasCurrentLink)
+    {
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var link = hasCurrentLink ? TestData.GenerateUrl() : null;
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithExternalLink(link)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var newLink = TestData.GenerateUrl();
+        var changeReason = AlertChangeLinkReasonOption.ChangeOfLink;
+        var changeReasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertLinkPageAsync(alertId);
+
+        await page.AssertOnEditAlertLinkPageAsync(alertId);
+
+        if (hasCurrentLink)
+        {
+            await page.CheckAsync("label:text-is('Change link')");
+        }
+        else
+        {
+            await page.CheckAsync("label:text-is('Yes')");
+        }
+
+        await page.FillAsync("label:text-is('Enter link to panel outcome')", newLink);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertLinkChangeReasonPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditAlertLinkCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and update alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert changed");
+    }
+
+    [Fact]
+    public async Task CloseAlert()
+    {
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var newEndDate = TestData.TimeProvider.Today.AddDays(-5);
+        var changeReason = CloseAlertReasonOption.AlertPeriodHasEnded;
+        var changeReasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToCloseAlertPageAsync(alertId);
+
+        await page.AssertOnCloseAlertPageAsync(alertId);
+
+        await page.FillDateInputAsync(newEndDate);
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnCloseAlertChangeReasonPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnCloseAlertCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and close alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert closed");
+    }
+
+    [Fact]
+    public async Task ReopenAlert()
+    {
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var endDate = TestData.TimeProvider.Today.AddDays(-10);
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var changeReason = ReopenAlertReasonOption.ClosedInError;
+        var changeReasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToReopenAlertPageAsync(alertId);
+
+        await page.AssertOnReopenAlertPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnReopenAlertCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and reopen alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert re-opened");
+    }
+
+    [Fact]
+    public async Task DeleteAlert()
+    {
+        var startDate = TestData.TimeProvider.Today.AddDays(-50);
+        var endDate = TestData.TimeProvider.Today.AddDays(-10);
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts!.First().AlertId;
+        var reason = DeleteAlertReasonOption.AnotherReason;
+        var deleteReasonDetails = TestData.GenerateLoremIpsum();
+        var additionalInformation = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateSupportUiBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToDeleteAlertPageAsync(alertId);
+
+        await page.AssertOnDeleteAlertPageAsync(alertId);
+
+        await page.Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to provide more information?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Enter a reason')", deleteReasonDetails);
+        await page.FillAsync("label:text-is('Enter details')", additionalInformation);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnDeleteAlertCheckAnswersPageAsync(alertId);
+
+        await page.ClickGovUkButtonAsync("Confirm and delete alert");
+
+        await page.AssertOnPersonAlertsPageAsync(personId);
+
+        await page.AssertFlashMessageAsync("Alert deleted");
+    }
+}
