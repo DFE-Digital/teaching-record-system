@@ -1,13 +1,45 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
 @inject ReferenceDataCache ReferenceDataCache
 @model ChangeHistoryEntryViewModel
 @{
     var deletedEvent = Model.GetEvent<AlertDeletedEvent>();
     var alert = deletedEvent.Alert;
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 }
 
 <timeline-entry title="Alert deleted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     <p class="govuk-body">
         Alert deleted for @alertType?.Name with start date @alert.StartDate?.ToString(WebConstants.DateDisplayFormat)
     </p>
+
+    @if (changeReason is not null)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for deleting alert</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason details</key>
+                        <value use-empty-fallback>
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
+                        </value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value use-empty-fallback>
+                            @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                        </value>
+                    </row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
 </timeline-entry>

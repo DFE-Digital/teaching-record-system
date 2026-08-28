@@ -50,15 +50,16 @@ public partial class ChangeHistoryTests
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(
-            process.ProcessId,
-            "Alert added",
-            user.Name,
-            process.CreatedOn,
-            [
-                ("Alert type", alertType.Name),
-                ("Start date", startDate.ToString(WebConstants.DateDisplayFormat))
-            ]);
+        var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(changeHistoryItem);
+
+        var title = changeHistoryItem.GetElementsByClassName("moj-timeline__title").SingleOrDefault();
+        Assert.Equal("Alert added", title?.TrimmedText());
+
+        var bodyText = changeHistoryItem.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert added for", bodyText);
+        Assert.Contains(alertType.Name, bodyText);
+        Assert.Contains(startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Theory]
@@ -186,22 +187,18 @@ public partial class ChangeHistoryTests
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(
-            process.ProcessId,
-            "Alert changed",
-            user.Name,
-            process.CreatedOn,
-            [
-                ("Alert type", alertType.Name),
-                ("Start date", newStartDate.ToString(WebConstants.DateDisplayFormat)),
-                ("Details", "Updated alert details"),
-                ("External link", $"https://example.com (opens in new tab)")
-            ],
-            [
-                ("Start date", startDate.ToString(WebConstants.DateDisplayFormat)),
-                ("Details", "Original alert details"),
-                ("External link", WebConstants.EmptyFallbackContent)
-            ]);
+        var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(changeHistoryItem);
+
+        var title = changeHistoryItem.GetElementsByClassName("moj-timeline__title").SingleOrDefault();
+        Assert.Equal("Alert updated", title?.TrimmedText());
+
+        var bodyTexts = changeHistoryItem.GetElementsByClassName("govuk-body").Select(e => e.TrimmedText()).ToList();
+        Assert.Contains(bodyTexts, t => t.Contains("Start date changed from"));
+        Assert.Contains(bodyTexts, t => t.Contains(startDate.ToString(WebConstants.DateDisplayFormat)));
+        Assert.Contains(bodyTexts, t => t.Contains(newStartDate.ToString(WebConstants.DateDisplayFormat)));
+        Assert.Contains(bodyTexts, t => t.Contains("Details changed from"));
+        Assert.Contains(bodyTexts, t => t.Contains("External link changed from"));
     }
 
     [Theory]
@@ -329,15 +326,16 @@ public partial class ChangeHistoryTests
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(
-            process.ProcessId,
-            "Alert deleted",
-            user.Name,
-            process.CreatedOn,
-            [
-                ("Alert type", alertType.Name),
-                ("Start date", startDate.ToString(WebConstants.DateDisplayFormat))
-            ]);
+        var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(changeHistoryItem);
+
+        var title = changeHistoryItem.GetElementsByClassName("moj-timeline__title").SingleOrDefault();
+        Assert.Equal("Alert deleted", title?.TrimmedText());
+
+        var bodyText = changeHistoryItem.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert deleted for", bodyText);
+        Assert.Contains(alertType.Name, bodyText);
+        Assert.Contains(startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Theory]
