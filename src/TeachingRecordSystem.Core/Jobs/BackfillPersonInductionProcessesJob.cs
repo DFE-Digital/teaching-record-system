@@ -52,6 +52,8 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                 [
                     new NpgsqlParameter("legacyEventName", _legacyEventName),
                     new NpgsqlParameter("cpdProcessType", (int)ProcessType.PersonCpdInductionUpdating),
+                    new NpgsqlParameter("welshProcessType", (int)ProcessType.PersonWelshInductionUpdating),
+                    new NpgsqlParameter("ewcWalesInterfaceType", (int)IntegrationTransactionInterfaceType.EwcWales),
                     new NpgsqlParameter("processType", (int)ProcessType.PersonInductionUpdating),
                     new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated },
                     new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId },
@@ -209,26 +211,38 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
          FROM todo
          """;
 
-    // Each write path has its own process type now, but only CPD's can be picked out of history, by two tells.
+    // Each write path has its own process type now, and a legacy payload can be traced back to two of them.
     //
     // CpdInductionCpdModifiedOn is touched by the CPD path and by nothing else, so a moved timestamp says CPD. It's
     // a one-way tell - CPD resending the same CpdModifiedOn alongside a new status leaves the timestamp unmoved - so
     // the client's API role backs it up: the operation runs as the client's application user, and the role that lets
     // it be called is on the user row. Roles can be taken away, which is why the timestamp is tried first.
     //
-    // Nothing is attributed to PersonWelshInductionUpdating. Its API operation has never been called, so there are
-    // no events to find, and the EWC Wales file import runs as the system user, which isn't exclusive to it - the
-    // DQT outbox handlers wrote these events as the system user too whenever the message carried no DQT or TRS user,
-    // so filing every system-user event as EWC Wales's would mean filing DQT's exemption changes as EWC Wales's.
-    // Nor is there anything else to go on: a FailedInWales status and the PassedInWales exemption reason are both
-    // just as reachable from the Support UI journey. Every back-filled event therefore lands on the CPD type or the
-    // generic one; only work done from now on is attributed to the Welsh type.
+    // The EWC Wales import is found through the integration transaction it wrote alongside the induction change.
+    // The system user it runs as would not be enough on its own - the DQT outbox handlers wrote these events as the
+    // system user too whenever their message carried no DQT or TRS user - but the import records a row per person
+    // in the same loop iteration and the same transaction, so an induction change with a matching row is the
+    // import's. The file name is what the job itself routes on ("IND" for induction, "QTS" for qualifications), so
+    // it keeps the QTS import out. The row is written just after the induction change, hence the one-sided window.
+    //
+    // There is no tell for the Welsh API operation, but it has never been called, so there is nothing to find.
     private const string ProcessTypeSql =
         $"""
         CASE WHEN e.payload->'Induction'->'CpdCpdModifiedOn'
                   IS DISTINCT FROM e.payload->'OldInduction'->'CpdCpdModifiedOn'
              THEN @cpdProcessType
              WHEN '{ApiRoles.SetCpdInduction}' = ANY(u.api_roles) THEN @cpdProcessType
+             WHEN EXISTS (
+                 SELECT 1
+                 FROM integration_transaction_records itr
+                 JOIN integration_transactions it
+                     ON it.integration_transaction_id = itr.integration_transaction_id
+                 WHERE itr.person_id = (e.payload->>'PersonId')::uuid
+                   AND it.interface_type = @ewcWalesInterfaceType
+                   AND it.file_name ILIKE 'IND%'
+                   AND e.created <= itr.created_date
+                   AND e.created > itr.created_date - interval '1 minute')
+             THEN @welshProcessType
              ELSE @processType
          END
         """;
