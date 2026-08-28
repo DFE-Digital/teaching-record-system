@@ -167,37 +167,11 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     }
 
     [Fact]
-    public async Task Execute_LegacyEventRaisedByTheWelshInductionApiClient_UsesTheWelshProcessType()
-    {
-        // Arrange
-        // The API operations run as their client's application user, and the role that lets a client call them
-        // identifies which operation it was.
-        var person = await TestData.CreatePersonAsync();
-        var apiClient = await TestData.CreateApplicationUserAsync(apiRoles: [ApiRoles.SetWelshInduction]);
-
-        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(
-            person.PersonId,
-            raisedBy: EventModels.RaisedByUserInfo.FromUserId(apiClient.UserId)));
-
-        // Act
-        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
-
-        // Assert
-        await WithDbContextAsync(async dbContext =>
-        {
-            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
-            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
-
-            Assert.Equal(ProcessType.PersonWelshInductionUpdating, process.ProcessType);
-        });
-    }
-
-    [Fact]
     public async Task Execute_LegacyEventRaisedByTheCpdApiClient_UsesTheCpdProcessType()
     {
         // Arrange
-        // The role backs up the timestamp tell, for a CPD event that resent the same CpdModifiedOn.
+        // The operation runs as its client's application user, and the role that lets it be called is on the user
+        // row. That backs up the timestamp tell, for a CPD event that resent the same CpdModifiedOn.
         var cpdModifiedOn = TimeProvider.UtcNow;
         var person = await TestData.CreatePersonAsync();
         var apiClient = await TestData.CreateApplicationUserAsync(apiRoles: [ApiRoles.SetCpdInduction]);
@@ -226,8 +200,8 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     public async Task Execute_LegacyEventRaisedByTheSystemUser_UsesTheGenericProcessType()
     {
         // Arrange
-        // The EWC Wales file import runs as the system user, but so did the DQT outbox handlers, so a system-user
-        // event can't be attributed to either.
+        // Nothing is back-filled onto the Welsh type: its API operation has never been called, and the EWC Wales
+        // file import runs as the system user, which the DQT outbox handlers also wrote as.
         var person = await TestData.CreatePersonAsync();
 
         var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(person.PersonId));
