@@ -52,7 +52,6 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                 [
                     new NpgsqlParameter("legacyEventName", _legacyEventName),
                     new NpgsqlParameter("cpdProcessType", (int)ProcessType.PersonCpdInductionUpdating),
-                    new NpgsqlParameter("welshProcessType", (int)ProcessType.PersonWelshInductionUpdating),
                     new NpgsqlParameter("processType", (int)ProcessType.PersonInductionUpdating),
                     new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated },
                     new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId },
@@ -210,30 +209,26 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
          FROM todo
          """;
 
-    // Each write path has its own process type now, and a legacy payload has two tells for which one it came from.
+    // Each write path has its own process type now, but only CPD's can be picked out of history, by two tells.
     //
-    // The API operations run as the client's application user, and the role that lets a client call them is on the
-    // user row, so RaisedBy identifies both of them exactly. Roles can be taken away, so this reflects the client's
-    // roles now rather than at the time of the event - in practice these two clients keep theirs.
+    // CpdInductionCpdModifiedOn is touched by the CPD path and by nothing else, so a moved timestamp says CPD. It's
+    // a one-way tell - CPD resending the same CpdModifiedOn alongside a new status leaves the timestamp unmoved - so
+    // the client's API role backs it up: the operation runs as the client's application user, and the role that lets
+    // it be called is on the user row. Roles can be taken away, which is why the timestamp is tried first.
     //
-    // CpdInductionCpdModifiedOn is touched by the CPD path and by nothing else, so a moved timestamp says CPD even
-    // for an event whose client has since lost the role. It is checked first for that reason, and because a client
-    // holding both roles would otherwise be ambiguous. It is a one-way tell: CPD resending the same CpdModifiedOn
-    // alongside a new status leaves the timestamp unmoved, which is why the role check backs it up.
-    //
-    // What is left over stays on PersonInductionUpdating, and that includes the EWC Wales file import, which runs as
-    // the system user. The system user isn't exclusive to it - the DQT outbox handlers wrote these events as the
-    // system user too whenever the message carried no DQT or TRS user - so filing every system-user event as EWC
-    // Wales's would mean filing DQT's exemption changes as EWC Wales's. Nor is there anything else to go on: a
-    // FailedInWales status and the PassedInWales exemption reason are both just as reachable from the Support UI
-    // journey. Those imports keep the generic type; only imports run from now on are attributed.
+    // Nothing is attributed to PersonWelshInductionUpdating. Its API operation has never been called, so there are
+    // no events to find, and the EWC Wales file import runs as the system user, which isn't exclusive to it - the
+    // DQT outbox handlers wrote these events as the system user too whenever the message carried no DQT or TRS user,
+    // so filing every system-user event as EWC Wales's would mean filing DQT's exemption changes as EWC Wales's.
+    // Nor is there anything else to go on: a FailedInWales status and the PassedInWales exemption reason are both
+    // just as reachable from the Support UI journey. Every back-filled event therefore lands on the CPD type or the
+    // generic one; only work done from now on is attributed to the Welsh type.
     private const string ProcessTypeSql =
         $"""
         CASE WHEN e.payload->'Induction'->'CpdCpdModifiedOn'
                   IS DISTINCT FROM e.payload->'OldInduction'->'CpdCpdModifiedOn'
              THEN @cpdProcessType
              WHEN '{ApiRoles.SetCpdInduction}' = ANY(u.api_roles) THEN @cpdProcessType
-             WHEN '{ApiRoles.SetWelshInduction}' = ANY(u.api_roles) THEN @welshProcessType
              ELSE @processType
          END
         """;

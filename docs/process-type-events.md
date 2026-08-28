@@ -66,7 +66,7 @@ API `SetCpdInductionStatus`.
 | `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
 
 ### `PersonWelshInductionUpdating` (93)
-API `SetWelshInductionStatus`; the EWC Wales induction import. Both are EWC Wales telling us the outcome of an induction served in Wales, so they share a type. Note that back-filled imports carry `PersonInductionUpdating` (91) instead — the import runs as the system user, which isn't enough to tell it apart from the DQT outbox handlers that also wrote these events.
+API `SetWelshInductionStatus`; the EWC Wales induction import. Both are EWC Wales telling us the outcome of an induction served in Wales, so they share a type. Nothing is back-filled onto it: the API operation has never been called, and the import runs as the system user, which isn't enough to tell it apart from the DQT outbox handlers that also wrote these events. Historical induction changes from the import therefore carry `PersonInductionUpdating` (91).
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
