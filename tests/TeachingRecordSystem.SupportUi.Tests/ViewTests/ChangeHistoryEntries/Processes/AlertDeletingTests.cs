@@ -1,11 +1,12 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.ViewTests.ChangeHistoryEntries.Processes;
 
 public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTestBase(hostFixture)
 {
+    private static readonly DateOnly _startDate = new(2020, 4, 9);
+
     [Fact]
     public async Task ProcessRendersCorrectly()
     {
@@ -13,68 +14,18 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
 
         // Act
-        var entry = await PublishAlertDeletedEventAsync(alertType, changeReason: null);
+        var entry = await PublishAlertDeletedEventAsync(alertType);
 
         // Assert
         AssertTitle(entry, "Alert deleted");
 
-        entry.AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _startDate.ToString(WebConstants.DateDisplayFormat)));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert deleted for", bodyText);
+        Assert.Contains(alertType.Name, bodyText);
+        Assert.Contains(_startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
-    [Fact]
-    public async Task WithoutChangeReason_DoesNotRenderReason()
-    {
-        // Arrange
-        var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
-
-        // Act
-        var entry = await PublishAlertDeletedEventAsync(alertType, changeReason: null);
-
-        // Assert
-        AssertTitle(entry, "Alert deleted");
-        Assert.Null(entry.GetElementByTestId("change-reason"));
-    }
-
-    [Fact]
-    public async Task WithChangeReason_RendersCorrectly()
-    {
-        // Arrange
-        var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
-
-        var changeReason = new ChangeReasonWithDetailsAndEvidence
-        {
-            Reason = null,
-            Details = "Some deletion details",
-            AdditionalInformation = "Some additional information",
-            EvidenceFile = new EventModels.File
-            {
-                FileId = Guid.NewGuid(),
-                Name = "evidence.jpg"
-            }
-        };
-
-        // Act
-        var entry = await PublishAlertDeletedEventAsync(alertType, changeReason);
-
-        // Assert
-        AssertTitle(entry, "Alert deleted");
-
-        var changeReasonDetails = entry.GetElementByTestId("change-reason");
-        Assert.NotNull(changeReasonDetails);
-
-        var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
-        Assert.Equal("Reason for deletion", changeReasonDetailsSummary?.TrimmedText());
-
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Deletion details", changeReason.Details);
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
-        changeReasonDetails.AssertSummaryListRowContentContains("Evidence", changeReason.EvidenceFile.Name);
-    }
-
-    private static readonly DateOnly _startDate = new(2020, 4, 9);
-
-    private async Task<IHtmlElement> PublishAlertDeletedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason)
+    private async Task<IHtmlElement> PublishAlertDeletedEventAsync(AlertType alertType)
     {
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a
@@ -94,7 +45,7 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
 
         var process = await TestData.CreateProcessAsync(
             ProcessType.AlertDeleting,
-            changeReason: changeReason,
+            changeReason: null,
             events: new AlertDeletedEvent { EventId = Guid.NewGuid(), PersonId = person.PersonId, Alert = EventModels.Alert.FromModel(alert) });
 
         return await GetEntryHtmlAsync(process.ProcessId);

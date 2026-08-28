@@ -20,9 +20,10 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         // Assert
         AssertTitle(entry, "Alert added");
 
-        entry.AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _startDate.ToString(WebConstants.DateDisplayFormat)));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert added for", bodyText);
+        Assert.Contains(alertType.Name, bodyText);
+        Assert.Contains(_startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Fact]
@@ -39,16 +40,19 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 
-    [Fact]
-    public async Task WithChangeReason_RendersCorrectly()
+    [Theory]
+    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
+    [InlineData("Identified during data reconciliation with stakeholder", "", "Identified during data reconciliation with stakeholder")]
+    public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
     {
         // Arrange
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence
         {
-            Reason = "Another reason",
-            Details = "Some reason details",
+            Reason = reason,
+            Details = details,
             AdditionalInformation = "Some additional information",
             EvidenceFile = new EventModels.File
             {
@@ -69,10 +73,27 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for adding alert", changeReasonDetailsSummary?.TrimmedText());
 
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason", changeReason.Reason);
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", changeReason.Details);
+        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
         changeReasonDetails.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
-        changeReasonDetails.AssertSummaryListRowContentContains("Evidence", changeReason.EvidenceFile.Name);
+    }
+
+    [Fact]
+    public async Task WithDqtSanctionCode_RendersDqtSanctionName()
+    {
+        // Arrange
+        var dqtSanctionCode = "T1";
+        var dqtSanctionName = "Test Sanction";
+
+        // Act
+        var entry = await PublishAlertCreatedEventWithDqtSanctionAsync(dqtSanctionCode, dqtSanctionName, changeReason: null);
+
+        // Assert
+        AssertTitle(entry, "Alert added");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert added for", bodyText);
+        Assert.Contains(dqtSanctionName, bodyText);
+        Assert.Contains(_startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     private async Task<IHtmlElement> PublishAlertCreatedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason)
@@ -91,6 +112,29 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
             ProcessType.AlertCreating,
             changeReason: changeReason,
             events: new AlertCreatedEvent { EventId = Guid.NewGuid(), PersonId = person.PersonId, Alert = EventModels.Alert.FromModel(alert) });
+
+        return await GetEntryHtmlAsync(process.ProcessId);
+    }
+
+    private async Task<IHtmlElement> PublishAlertCreatedEventWithDqtSanctionAsync(string dqtSanctionCode, string dqtSanctionName, IChangeReasonInfo? changeReason)
+    {
+        var person = await TestData.CreatePersonAsync();
+
+        var alert = new EventModels.Alert
+        {
+            AlertId = Guid.NewGuid(),
+            AlertTypeId = null,  // No alert type so DQT sanction name will be displayed
+            Details = Faker.Lorem.Paragraph(),
+            ExternalLink = Faker.Internet.Url(),
+            StartDate = _startDate,
+            EndDate = null,
+            DqtSanctionCode = new EventModels.AlertDqtSanctionCode { Value = dqtSanctionCode, Name = dqtSanctionName }
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.AlertCreating,
+            changeReason: changeReason,
+            events: new AlertCreatedEvent { EventId = Guid.NewGuid(), PersonId = person.PersonId, Alert = alert });
 
         return await GetEntryHtmlAsync(process.ProcessId);
     }

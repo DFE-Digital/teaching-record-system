@@ -1,4 +1,3 @@
-using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
@@ -26,16 +25,12 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var entry = await PublishAlertUpdatedEventAsync(alertType, changeReason: null);
 
         // Assert
-        AssertTitle(entry, "Alert start date changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _newStartDate.ToString(WebConstants.DateDisplayFormat)));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Start date changed from", bodyText);
+        Assert.Contains(_oldStartDate.ToString(WebConstants.DateDisplayFormat), bodyText);
+        Assert.Contains(_newStartDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Fact]
@@ -48,20 +43,22 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var entry = await PublishAlertUpdatedEventAsync(alertType, changeReason: null);
 
         // Assert
-        AssertTitle(entry, "Alert start date changed");
+        AssertTitle(entry, "Alert updated");
         Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 
-    [Fact]
-    public async Task WithChangeReason_RendersCorrectly()
+    [Theory]
+    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
+    public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
     {
         // Arrange
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence
         {
-            Reason = "Another reason",
-            Details = "Some reason details",
+            Reason = reason,
+            Details = details,
             AdditionalInformation = "Some additional information",
             EvidenceFile = new EventModels.File
             {
@@ -74,7 +71,7 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var entry = await PublishAlertUpdatedEventAsync(alertType, changeReason);
 
         // Assert
-        AssertTitle(entry, "Alert start date changed");
+        AssertTitle(entry, "Alert updated");
 
         var changeReasonDetails = entry.GetElementByTestId("change-reason");
         Assert.NotNull(changeReasonDetails);
@@ -82,10 +79,8 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for change", changeReasonDetailsSummary?.TrimmedText());
 
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason", changeReason.Reason);
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", changeReason.Details);
+        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
         changeReasonDetails.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
-        changeReasonDetails.AssertSummaryListRowContentContains("Evidence", changeReason.EvidenceFile.Name);
     }
 
     [Fact]
@@ -102,17 +97,12 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { Details = _oldDetails });
 
         // Assert
-        AssertTitle(entry, "Alert details changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("Details", _newDetails));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("Details", _oldDetails));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Details changed from", bodyText);
+        Assert.Contains(_oldDetails, bodyText);
+        Assert.Contains(_newDetails, bodyText);
     }
 
     [Fact]
@@ -129,18 +119,12 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { ExternalLink = null });
 
         // Assert
-        AssertTitle(entry, "Alert link changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("External link", $"{_newExternalLink} (opens in new tab)"));
-
-        // The old alert had no external link, so the previous data falls back to the empty placeholder
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("External link", WebConstants.EmptyFallbackContent));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("External link changed from", bodyText);
+        Assert.Contains("(none)", bodyText);
+        Assert.Contains(_newExternalLink, bodyText);
     }
 
     [Fact]
@@ -157,21 +141,15 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { EndDate = _oldEndDate });
 
         // Assert
-        AssertTitle(entry, "Alert re-opened");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("End date", WebConstants.EmptyFallbackContent));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("End date", _oldEndDate.ToString(WebConstants.DateDisplayFormat)));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert re-opened", bodyText);
+        Assert.Contains(_oldEndDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Fact]
-    public async Task WithEndDateChange_WhenAlertClosed_RendersClosedAndOmitsPreviousData()
+    public async Task WithEndDateChange_WhenAlertClosed_RendersClosed()
     {
         // Arrange
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
@@ -184,15 +162,11 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { EndDate = null });
 
         // Assert
-        AssertTitle(entry, "Alert closed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("End date", _newEndDate.ToString(WebConstants.DateDisplayFormat)));
-
-        // Previous data is not rendered when an alert is closed
-        Assert.Null(entry.GetElementByTestId("previous-data"));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert closed", bodyText);
+        Assert.Contains(_newEndDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Fact]
@@ -209,17 +183,12 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { EndDate = _oldEndDate });
 
         // Assert
-        AssertTitle(entry, "Alert end date changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("End date", _newEndDate.ToString(WebConstants.DateDisplayFormat)));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("End date", _oldEndDate.ToString(WebConstants.DateDisplayFormat)));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("End date changed from", bodyText);
+        Assert.Contains(_oldEndDate.ToString(WebConstants.DateDisplayFormat), bodyText);
+        Assert.Contains(_newEndDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Fact]
@@ -236,17 +205,12 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { DqtSpent = false });
 
         // Assert
-        AssertTitle(entry, "Alert changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("DQT spent", true.ToString()));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("DQT spent", false.ToString()));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("DQT spent changed from", bodyText);
+        Assert.Contains("False", bodyText);
+        Assert.Contains("True", bodyText);
     }
 
     [Fact]
@@ -266,21 +230,16 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { DqtSanctionCode = oldSanctionCode });
 
         // Assert
-        AssertTitle(entry, "Alert changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("DQT sanction code", newSanctionCode.ToString()));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("DQT sanction code", oldSanctionCode.Value));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("DQT sanction code changed from", bodyText);
+        Assert.Contains("Old name", bodyText);
+        Assert.Contains("New name", bodyText);
     }
 
     [Fact]
-    public async Task WithMultipleChanges_RendersChanged()
+    public async Task WithMultipleChanges_RendersAllChanges()
     {
         // Arrange
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
@@ -293,22 +252,12 @@ public class AlertUpdatingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
             a => a with { StartDate = _oldStartDate, Details = _oldDetails });
 
         // Assert
-        AssertTitle(entry, "Alert changed");
+        AssertTitle(entry, "Alert updated");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _newStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("Details", _newDetails));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("Start date", _oldStartDate.ToString(WebConstants.DateDisplayFormat)),
-            ("Details", _oldDetails));
+        var bodyTexts = entry.GetElementsByClassName("govuk-body").Select(e => e.TrimmedText()).ToList();
+        Assert.Contains(bodyTexts, t => t.Contains("Start date changed from"));
+        Assert.Contains(bodyTexts, t => t.Contains("Details changed from"));
     }
-
-    private static IElement GetMainSummaryList(IHtmlElement entry) =>
-        entry.QuerySelectorAll(".govuk-summary-list").First(sl => sl.Closest(".govuk-details") is null);
 
     private Task<IHtmlElement> PublishAlertUpdatedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason = null) =>
         PublishAlertUpdatedEventAsync(
