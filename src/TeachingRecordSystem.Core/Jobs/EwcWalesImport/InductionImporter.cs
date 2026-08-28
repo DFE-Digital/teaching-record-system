@@ -5,6 +5,7 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Inductions;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
@@ -14,12 +15,18 @@ public class InductionImporter
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly TimeProvider _timeProvider;
+    private readonly InductionService _inductionService;
 
-    public InductionImporter(ILogger<InductionImporter> logger, TrsDbContext dbContext, TimeProvider timeProvider)
+    public InductionImporter(
+        ILogger<InductionImporter> logger,
+        TrsDbContext dbContext,
+        TimeProvider timeProvider,
+        InductionService inductionService)
     {
         _dbContext = dbContext;
         _logger = logger;
         _timeProvider = timeProvider;
+        _inductionService = inductionService;
     }
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -102,18 +109,18 @@ public class InductionImporter
                     {
                         if (lookupData.Person != null)
                         {
-                            lookupData.Person.TrySetWelshInductionStatus(
-                                 awardedDate.HasValue,
-                                 startDate,
-                                 awardedDate,
-                                  SystemUser.SystemUserId,
-                                 _timeProvider.UtcNow,
-                                 out var updatedEvent);
-
-                            if (updatedEvent is not null)
-                            {
-                                _dbContext.AddEventWithoutBroadcast(updatedEvent);
-                            }
+                            await _inductionService.TrySetWelshInductionStatusAsync(
+                                new SetWelshInductionStatusOptions
+                                {
+                                    PersonId = lookupData.Person.PersonId,
+                                    Passed = awardedDate.HasValue,
+                                    StartDate = startDate,
+                                    CompletedDate = awardedDate
+                                },
+                                new ProcessContext(
+                                    ProcessType.PersonInductionUpdating,
+                                    _timeProvider.UtcNow,
+                                    SystemUser.SystemUserId));
                         }
 
                         //soft validation errors can be appended to the IntegrationTransactionRecord Failure message

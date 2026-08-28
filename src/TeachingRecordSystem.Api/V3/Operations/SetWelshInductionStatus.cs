@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Inductions;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -10,7 +11,8 @@ public record SetWelshInductionStatusResult;
 public class SetWelshInductionStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
-    TimeProvider timeProvider) :
+    TimeProvider timeProvider,
+    InductionService inductionService) :
     ICommandHandler<SetWelshInductionStatusCommand, SetWelshInductionStatusResult>
 {
     public async Task<ApiResult<SetWelshInductionStatusResult>> ExecuteAsync(SetWelshInductionStatusCommand command)
@@ -31,20 +33,15 @@ public class SetWelshInductionStatusHandler(
 
         var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        person.TrySetWelshInductionStatus(
-            command.Passed,
-            !command.Passed ? command.StartDate : null,
-            !command.Passed ? command.CompletedDate : null,
-            currentUserId,
-            timeProvider.UtcNow,
-            out var updatedEvent);
-
-        if (updatedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-        }
-
-        await dbContext.SaveChangesAsync();
+        await inductionService.TrySetWelshInductionStatusAsync(
+            new SetWelshInductionStatusOptions
+            {
+                PersonId = person.PersonId,
+                Passed = command.Passed,
+                StartDate = !command.Passed ? command.StartDate : null,
+                CompletedDate = !command.Passed ? command.CompletedDate : null
+            },
+            new ProcessContext(ProcessType.PersonInductionUpdating, timeProvider.UtcNow, currentUserId));
 
         return new SetWelshInductionStatusResult();
     }

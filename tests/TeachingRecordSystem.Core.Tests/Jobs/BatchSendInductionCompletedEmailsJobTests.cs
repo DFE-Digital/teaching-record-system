@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Inductions;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -31,28 +32,22 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
             .WithQts()
             .WithEmailAddress(TestData.GenerateUniqueEmail()));
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.Attach(inductionCompletee1);
+        var passed = await WithServiceAsync<InductionService, bool>(inductionService =>
+            inductionService.SetInductionStatusAsync(
+                new SetInductionStatusOptions
+                {
+                    PersonId = inductionCompletee1.PersonId,
+                    Status = InductionStatus.Passed,
+                    StartDate = inductionStartDate,
+                    CompletedDate = inductionCompletedDate,
+                    ExemptionReasonIds = []
+                },
+                new ProcessContext(
+                    ProcessType.PersonInductionUpdating,
+                    TimeProvider.UtcNow,
+                    SystemUser.SystemUserId)));
 
-            inductionCompletee1.SetInductionStatus(
-                InductionStatus.Passed,
-                inductionStartDate,
-                inductionCompletedDate,
-                exemptionReasonIds: [],
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
-
-            Debug.Assert(@event is not null);
-            dbContext.AddEventWithoutBroadcast(@event);
-
-            await dbContext.SaveChangesAsync();
-        });
+        Debug.Assert(passed);
 
         TimeProvider.Advance(TimeSpan.FromDays(jobOptions.Value.EmailDelayDays + 2));
 
