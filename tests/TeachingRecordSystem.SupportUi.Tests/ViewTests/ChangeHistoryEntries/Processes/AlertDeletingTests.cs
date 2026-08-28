@@ -6,6 +6,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.ViewTests.ChangeHistoryEntries.Pr
 
 public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTestBase(hostFixture)
 {
+    private static readonly DateOnly _startDate = new(2020, 4, 9);
+
     [Fact]
     public async Task ProcessRendersCorrectly()
     {
@@ -13,14 +15,15 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
 
         // Act
-        var entry = await PublishAlertDeletedEventAsync(alertType, changeReason: null);
+        var entry = await PublishAlertDeletedEventAsync(alertType);
 
         // Assert
         AssertTitle(entry, "Alert deleted");
 
-        entry.AssertSummaryListHasRows(
-            ("Alert type", alertType.Name),
-            ("Start date", _startDate.ToString(WebConstants.DateDisplayFormat)));
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Alert deleted for", bodyText);
+        Assert.Contains(alertType.Name, bodyText);
+        Assert.Contains(_startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
     }
 
     [Fact]
@@ -37,16 +40,18 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 
-    [Fact]
-    public async Task WithChangeReason_RendersCorrectly()
+    [Theory]
+    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
+    public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
     {
         // Arrange
         var alertType = (await ReferenceDataCache.GetAlertTypesAsync()).SingleRandom();
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence
         {
-            Reason = null,
-            Details = "Some deletion details",
+            Reason = reason,
+            Details = details,
             AdditionalInformation = "Some additional information",
             EvidenceFile = new EventModels.File
             {
@@ -65,16 +70,18 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         Assert.NotNull(changeReasonDetails);
 
         var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
-        Assert.Equal("Reason for deletion", changeReasonDetailsSummary?.TrimmedText());
+        Assert.Equal("Reason for deleting alert", changeReasonDetailsSummary?.TrimmedText());
 
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Deletion details", changeReason.Details);
+        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
         changeReasonDetails.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
-        changeReasonDetails.AssertSummaryListRowContentContains("Evidence", changeReason.EvidenceFile.Name);
     }
 
-    private static readonly DateOnly _startDate = new(2020, 4, 9);
+    private Task<IHtmlElement> PublishAlertDeletedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason = null)
+    {
+        return PublishAlertDeletedEventInternalAsync(alertType, changeReason);
+    }
 
-    private async Task<IHtmlElement> PublishAlertDeletedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason)
+    private async Task<IHtmlElement> PublishAlertDeletedEventInternalAsync(AlertType alertType, IChangeReasonInfo? changeReason)
     {
         var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a

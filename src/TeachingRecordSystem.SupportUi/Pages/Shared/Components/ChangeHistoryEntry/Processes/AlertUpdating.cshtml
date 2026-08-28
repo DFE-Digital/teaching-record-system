@@ -1,4 +1,3 @@
-@using System.Numerics
 @using TeachingRecordSystem.Core.Events.ChangeReasons
 @inject ReferenceDataCache ReferenceDataCache
 @model ChangeHistoryEntryViewModel
@@ -10,112 +9,73 @@
     TrsUriHelper.TryCreateWebsiteUri(oldAlert.ExternalLink, out var oldExternalLinkUri);
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
 
-    var heading = "changed";
-    var hasMultipleChanges = BitOperations.PopCount((uint)updatedEvent.Changes) > 1;
-    if (!hasMultipleChanges)
+<timeline-entry title="Alert updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.StartDate))
     {
-        if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
-        {
-            heading = "details changed";
-        }
-        else if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
-        {
-            heading = "link changed";
-        }
-        else if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.StartDate))
-        {
-            heading = "start date changed";
-        }
-        else if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.EndDate))
-        {
-            if (alert.EndDate is null)
+        <p class="govuk-body">
+            Start date changed from @oldAlert.StartDate?.ToString(WebConstants.DateDisplayFormat) to @alert.StartDate?.ToString(WebConstants.DateDisplayFormat)
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.EndDate))
+    {
+        <p class="govuk-body">
+            @if (alert.EndDate is null && oldAlert.EndDate is not null)
             {
-                heading = "re-opened";
+                @:Alert re-opened (end date removed: was @oldAlert.EndDate?.ToString(WebConstants.DateDisplayFormat))
             }
-            else if (oldAlert.EndDate is null)
+            else if (alert.EndDate is not null && oldAlert.EndDate is null)
             {
-                heading = "closed";
+                @:Alert closed (end date set to @alert.EndDate?.ToString(WebConstants.DateDisplayFormat))
             }
             else
             {
-                heading = "end date changed";
+                @:End date changed from @oldAlert.EndDate?.ToString(WebConstants.DateDisplayFormat) to @alert.EndDate?.ToString(WebConstants.DateDisplayFormat)
             }
-        }
+        </p>
     }
-}
-
-<timeline-entry title="Alert @heading" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    <govuk-summary-list>
-        @if (alertType is not null)
-        {
-            <row>
-                <key>Alert type</key>
-                <value use-empty-fallback>@alertType.Name</value>
-            </row>
-        }
-        else
-        {
-            <row>
-                <key>DQT sanction code</key>
-                <value use-empty-fallback>@alert.DqtSanctionCode?.Value</value>
-            </row>
-            <row>
-                <key>DQT sanction name</key>
-                <value use-empty-fallback>@alert.DqtSanctionCode?.Name</value>
-            </row>
-        }
-        <row>
-            <key>Start date</key>
-            <value use-empty-fallback>@alert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
-        </row>
-        @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
-        {
-            <row>
-                <key>Details</key>
-                <value use-empty-fallback>
-                    @Html.ConvertNewlinesToLineBreaks(alert.Details)
-                </value>
-            </row>
-        }
-        @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
-        {
-            <row>
-                <key>External link</key>
-                <value>
-                    @if (alert.ExternalLink is not null)
-                    {
-                        <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{alert.ExternalLink} (opens in new tab)")</a>
-                    }
-                    else
-                    {
-                        <span use-empty-fallback></span>
-                    }
-                </value>
-            </row>
-        }
-        @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.EndDate))
-        {
-            <row>
-                <key>End date</key>
-                <value use-empty-fallback>@alert.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
-            </row>
-        }
-        @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
-        {
-            <row>
-                <key>DQT spent</key>
-                <value use-empty-fallback>@alert.DqtSpent</value>
-            </row>
-        }
-        @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode))
-        {
-            <row>
-                <key>DQT sanction code</key>
-                <value use-empty-fallback>@alert.DqtSanctionCode</value>
-            </row>
-        }
-    </govuk-summary-list>
+    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
+    {
+        <p class="govuk-body">
+            Details changed from "@Html.ConvertNewlinesToLineBreaks(oldAlert.Details)" to "@Html.ConvertNewlinesToLineBreaks(alert.Details)"
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
+    {
+        <p class="govuk-body">
+            External link changed from 
+            @if (oldAlert.ExternalLink is not null)
+            {
+                <a href="@oldExternalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@oldAlert.ExternalLink (opens in new tab)</a>
+            }
+            else
+            {
+                <text>(none)</text>
+            }
+            to 
+            @if (alert.ExternalLink is not null)
+            {
+                <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@alert.ExternalLink (opens in new tab)</a>
+            }
+            else
+            {
+                <text>(none)</text>
+            }
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode))
+    {
+        <p class="govuk-body">
+            DQT sanction code changed from @oldAlert.DqtSanctionCode?.Name to @alert.DqtSanctionCode?.Name
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
+    {
+        <p class="govuk-body">
+            DQT spent changed from @oldAlert.DqtSpent to @alert.DqtSpent
+        </p>
+    }
 
     @if (changeReason is not null)
     {
@@ -124,13 +84,16 @@
             <govuk-details-text>
                 <govuk-summary-list>
                     <row>
-                        <key>Reason</key>
-                        <value use-empty-fallback>@changeReason.Reason</value>
-                    </row>
-                    <row>
                         <key>Reason details</key>
                         <value use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
                         </value>
                     </row>
                     <row>
@@ -139,76 +102,6 @@
                             @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
                         </value>
                     </row>
-                    <row>
-                        <key>Evidence</key>
-                        <value>
-                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
-                        </value>
-                    </row>
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
-    }
-
-    @if (heading != "closed")
-    {
-        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
-            <govuk-details-summary>Previous data</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
-                    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.StartDate))
-                    {
-                        <row>
-                            <key>Start date</key>
-                            <value use-empty-fallback>@oldAlert.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
-                    {
-                        <row>
-                            <key>Details</key>
-                            <value use-empty-fallback>
-                                @Html.ConvertNewlinesToLineBreaks(oldAlert.Details)
-                            </value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
-                    {
-                        <row>
-                            <key>External link</key>
-                            <value>
-                                @if (oldAlert.ExternalLink is not null)
-                                {
-                                    <a href="@oldExternalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{oldAlert.ExternalLink} (opens in new tab)")</a>
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
-                            </value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.EndDate))
-                    {
-                        <row>
-                            <key>End date</key>
-                            <value use-empty-fallback>@oldAlert.EndDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSpent))
-                    {
-                        <row>
-                            <key>DQT spent</key>
-                            <value use-empty-fallback>@oldAlert.DqtSpent</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.DqtSanctionCode))
-                    {
-                        <row>
-                            <key>DQT sanction code</key>
-                            <value use-empty-fallback>@oldAlert.DqtSanctionCode!.Value</value>
-                        </row>
-                    }
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>
