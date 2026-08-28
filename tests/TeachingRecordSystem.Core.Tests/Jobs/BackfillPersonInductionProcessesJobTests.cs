@@ -113,6 +113,60 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     }
 
     [Fact]
+    public async Task Execute_LegacyEventWhereCpdModifiedOnMoved_UsesTheCpdProcessType()
+    {
+        // Arrange
+        // Only the CPD path touches CpdInductionCpdModifiedOn, so a moved timestamp is what marks the event as CPD's.
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(
+            person.PersonId,
+            induction: CreateInduction(InductionStatus.Passed, cpdCpdModifiedOn: TimeProvider.UtcNow),
+            oldInduction: CreateInduction(InductionStatus.InProgress)));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonCpdInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventWhereCpdModifiedOnIsUnchanged_UsesTheGenericProcessType()
+    {
+        // Arrange
+        // A person whose induction CPD already owns, changed by someone else: the timestamp is set on both sides and
+        // doesn't move, so the event stays on the generic type.
+        var cpdModifiedOn = TimeProvider.UtcNow;
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(
+            person.PersonId,
+            induction: CreateInduction(InductionStatus.Exempt, cpdCpdModifiedOn: cpdModifiedOn),
+            oldInduction: CreateInduction(InductionStatus.InProgress, cpdCpdModifiedOn: cpdModifiedOn)));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
     public async Task Execute_LegacyEventRaisedByDqtUser_PutsTheDqtUserOnTheProcess()
     {
         // Arrange
@@ -271,14 +325,15 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     private static EventModels.Induction CreateInduction(
         InductionStatus status = InductionStatus.None,
         DateOnly? startDate = null,
-        DateOnly? completedDate = null) => new()
+        DateOnly? completedDate = null,
+        DateTime? cpdCpdModifiedOn = null) => new()
         {
             Status = status,
             StatusWithoutExemption = status,
             StartDate = startDate,
             CompletedDate = completedDate,
             ExemptionReasonIds = [],
-            CpdCpdModifiedOn = Option.None<DateTime>(),
+            CpdCpdModifiedOn = cpdCpdModifiedOn is DateTime m ? Option.Some(m) : Option.None<DateTime>(),
             InductionExemptWithoutReason = false
         };
 
@@ -288,15 +343,17 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
         EventModels.RaisedByUserInfo? raisedBy = null,
         string? changeReason = "Some reason",
         string? additionalInformation = null,
-        EventModels.File? evidenceFile = null) =>
+        EventModels.File? evidenceFile = null,
+        EventModels.Induction? induction = null,
+        EventModels.Induction? oldInduction = null) =>
         new()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = createdUtc ?? TimeProvider.UtcNow,
             RaisedBy = raisedBy ?? SystemUser.SystemUserId,
             PersonId = personId,
-            Induction = CreateInduction(InductionStatus.RequiredToComplete),
-            OldInduction = CreateInduction(),
+            Induction = induction ?? CreateInduction(InductionStatus.RequiredToComplete),
+            OldInduction = oldInduction ?? CreateInduction(),
             ChangeReason = changeReason,
             ChangeReasonDetail = null,
             EvidenceFile = evidenceFile,

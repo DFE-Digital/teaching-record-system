@@ -57,6 +57,12 @@ public class SetWelshInductionStatusTests(OperationTestFixture operationTestFixt
 
         // Assert
         AssertSuccess(result);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonWelshInductionUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonInductionUpdatedEvent>();
+        });
     }
 
     [Fact]

@@ -329,13 +329,68 @@ public class ChangeLogInductionEventTests : TestBase
         Assert.Null(doc.GetElementByDataAttribute("data-process-id", processId.ToString()));
     }
 
+    [Fact]
+    public async Task Person_WithPersonCpdInductionUpdatingProcess_RendersTheSameEntry()
+    {
+        // Arrange
+        // CPD has its own process type, but the entry it renders is the same one.
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        var startDate = TimeProvider.Today.AddYears(-1);
+        var completedDate = TimeProvider.Today.AddDays(-10);
+
+        var induction = new EventModels.Induction
+        {
+            StartDate = startDate,
+            CompletedDate = completedDate,
+            Status = InductionStatus.Passed,
+            StatusWithoutExemption = InductionStatus.Passed,
+            ExemptionReasonIds = [],
+            CpdCpdModifiedOn = Option.Some(TimeProvider.UtcNow),
+            InductionExemptWithoutReason = false
+        };
+
+        var oldInduction = induction with
+        {
+            Status = InductionStatus.InProgress,
+            StatusWithoutExemption = InductionStatus.InProgress,
+            CompletedDate = null,
+            CpdCpdModifiedOn = Option.None<DateTime>()
+        };
+
+        var processId = await CreateInductionUpdatingProcessAsync(
+            person.PersonId,
+            EventModels.RaisedByUserInfo.FromUserId(createdByUser.UserId),
+            induction,
+            oldInduction,
+            PersonInductionUpdatedEvent.GetChanges(induction, oldInduction),
+            changeReason: null,
+            ProcessType.PersonCpdInductionUpdating);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var item = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
+        Assert.NotNull(item);
+        Assert.Equal(InductionStatus.Passed.GetTitle(), item.GetElementByTestId("induction-status")?.TrimmedText());
+        Assert.Equal(InductionStatus.InProgress.GetTitle(), item.GetElementByTestId("old-induction-status")?.TrimmedText());
+        Assert.Equal(completedDate.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("completed-date")?.TrimmedText());
+    }
+
     private async Task<Guid> CreateInductionUpdatingProcessAsync(
         Guid personId,
         EventModels.RaisedByUserInfo raisedBy,
         EventModels.Induction induction,
         EventModels.Induction oldInduction,
         PersonInductionUpdatedEventChanges changes,
-        IChangeReasonInfo? changeReason)
+        IChangeReasonInfo? changeReason,
+        ProcessType processType = ProcessType.PersonInductionUpdating)
     {
         var processId = Guid.NewGuid();
 
@@ -353,7 +408,7 @@ public class ChangeLogInductionEventTests : TestBase
             dbContext.Processes.Add(new Process
             {
                 ProcessId = processId,
-                ProcessType = ProcessType.PersonInductionUpdating,
+                ProcessType = processType,
                 CreatedOn = TimeProvider.UtcNow,
                 UpdatedOn = TimeProvider.UtcNow,
                 UserId = raisedBy.UserId,
