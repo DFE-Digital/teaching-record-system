@@ -168,6 +168,9 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension("pg_trgm");
+        modelBuilder.HasPostgresExtension("btree_gin");
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsDbContext).Assembly);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
