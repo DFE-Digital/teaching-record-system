@@ -14,11 +14,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(
-                """
-                CREATE EXTENSION IF NOT EXISTS pg_trgm;
-                CREATE EXTENSION IF NOT EXISTS btree_gin;
-                """);
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:btree_gin", ",,")
+                .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,");
 
             migrationBuilder.Sql("create collation case_insensitive (provider = icu, locale = 'und-u-ks-level2', deterministic = false);");
 
