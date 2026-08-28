@@ -56,7 +56,7 @@ API `SetCpdInductionStatus` and `SetWelshInductionStatus`; Support UI *Edit indu
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
-| `PersonInductionUpdatedEvent` | Sometimes | Only when the submitted values actually move the person's induction. |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
 
 ### `PersonDeceased` (42)
 API `SetDeceased`.
