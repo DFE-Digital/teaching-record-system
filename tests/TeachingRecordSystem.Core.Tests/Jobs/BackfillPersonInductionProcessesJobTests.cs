@@ -142,8 +142,8 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
     public async Task Execute_LegacyEventWhereCpdModifiedOnIsUnchanged_UsesTheGenericProcessType()
     {
         // Arrange
-        // A person whose induction CPD already owns, changed by someone else: the timestamp is set on both sides and
-        // doesn't move, so the event stays on the generic type.
+        // A person whose induction CPD already owns, changed by someone with no API role: the timestamp is set on
+        // both sides and doesn't move, so neither tell fires and the event stays on the generic type.
         var cpdModifiedOn = TimeProvider.UtcNow;
         var person = await TestData.CreatePersonAsync();
 
@@ -151,6 +151,86 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
             person.PersonId,
             induction: CreateInduction(InductionStatus.Exempt, cpdCpdModifiedOn: cpdModifiedOn),
             oldInduction: CreateInduction(InductionStatus.InProgress, cpdCpdModifiedOn: cpdModifiedOn)));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventRaisedByTheWelshInductionApiClient_UsesTheWelshProcessType()
+    {
+        // Arrange
+        // The API operations run as their client's application user, and the role that lets a client call them
+        // identifies which operation it was.
+        var person = await TestData.CreatePersonAsync();
+        var apiClient = await TestData.CreateApplicationUserAsync(apiRoles: [ApiRoles.SetWelshInduction]);
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(
+            person.PersonId,
+            raisedBy: EventModels.RaisedByUserInfo.FromUserId(apiClient.UserId)));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonWelshInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventRaisedByTheCpdApiClient_UsesTheCpdProcessType()
+    {
+        // Arrange
+        // The role backs up the timestamp tell, for a CPD event that resent the same CpdModifiedOn.
+        var cpdModifiedOn = TimeProvider.UtcNow;
+        var person = await TestData.CreatePersonAsync();
+        var apiClient = await TestData.CreateApplicationUserAsync(apiRoles: [ApiRoles.SetCpdInduction]);
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(
+            person.PersonId,
+            raisedBy: EventModels.RaisedByUserInfo.FromUserId(apiClient.UserId),
+            induction: CreateInduction(InductionStatus.Passed, cpdCpdModifiedOn: cpdModifiedOn),
+            oldInduction: CreateInduction(InductionStatus.InProgress, cpdCpdModifiedOn: cpdModifiedOn)));
+
+        // Act
+        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+
+            Assert.Equal(ProcessType.PersonCpdInductionUpdating, process.ProcessType);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventRaisedByTheSystemUser_UsesTheGenericProcessType()
+    {
+        // Arrange
+        // The EWC Wales file import runs as the system user, but so did the DQT outbox handlers, so a system-user
+        // event can't be attributed to either.
+        var person = await TestData.CreatePersonAsync();
+
+        var legacyEvent = await AddLegacyEventAsync(CreateLegacyEvent(person.PersonId));
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
