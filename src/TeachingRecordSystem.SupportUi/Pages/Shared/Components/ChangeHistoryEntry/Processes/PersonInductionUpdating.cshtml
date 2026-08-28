@@ -1,0 +1,187 @@
+@using Optional.Unsafe
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
+@inject ReferenceDataCache ReferenceDataCache
+@model ChangeHistoryEntryViewModel
+@{
+    var updatedEvent = Model.GetEvent<PersonInductionUpdatedEvent>();
+    var induction = updatedEvent.Induction;
+    var oldInduction = updatedEvent.OldInduction;
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+    var exemptionReasons = (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).ToDictionary(r => r.InductionExemptionReasonId);
+
+    // The status-without-exemption and exempt-without-reason flags are bookkeeping the user never sees, so an
+    // entry that only carries those has nothing to show and isn't rendered at all.
+    var displayedChanges = updatedEvent.Changes &
+        (PersonInductionUpdatedEventChanges.InductionStatus |
+         PersonInductionUpdatedEventChanges.InductionExemptionReasons |
+         PersonInductionUpdatedEventChanges.InductionStartDate |
+         PersonInductionUpdatedEventChanges.InductionCompletedDate);
+
+    var heading = "Induction changed";
+    var hasMultipleChanges = (displayedChanges & (displayedChanges - 1)) != 0;
+    if (!hasMultipleChanges)
+    {
+        if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+        {
+            heading = "Induction status changed";
+        }
+        else if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+        {
+            heading = "Induction start date changed";
+        }
+        else if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+        {
+            heading = "Induction completed date changed";
+        }
+        else if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+        {
+            heading = "Induction exemption reason changed";
+        }
+    }
+}
+
+@if (displayedChanges != PersonInductionUpdatedEventChanges.None)
+{
+    <timeline-entry title="@heading" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+        <govuk-summary-list>
+            @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+            {
+                <row>
+                    <key>Induction status</key>
+                    <value data-testid="induction-status" use-empty-fallback>@induction.Status.GetTitle()</value>
+                </row>
+            }
+
+            @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+            {
+                <row>
+                    <key>Exemption reason</key>
+                    <value data-testid="exemption-reason">
+                        @if (induction.ExemptionReasonIds.Length > 0)
+                        {
+                            <ul class="govuk-list">
+                                @foreach (var id in induction.ExemptionReasonIds)
+                                {
+                                    <li>@exemptionReasons[id].Name</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </value>
+                </row>
+            }
+
+            @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+            {
+                <row>
+                    <key>Start date</key>
+                    <value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+
+            @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+            {
+                <row>
+                    <key>Completed date</key>
+                    <value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+        </govuk-summary-list>
+
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason</key>
+                        <value data-testid="reason" use-empty-fallback>@changeReason?.Reason</value>
+                    </row>
+                    <row>
+                        <key>Reason details</key>
+                        <value use-empty-fallback data-testid="reason-detail">
+                            @Html.ConvertNewlinesToLineBreaks(changeReason?.Details)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Additional information</key>
+                        <value use-empty-fallback data-testid="additional-information">
+                            @Html.ConvertNewlinesToLineBreaks(changeReason?.AdditionalInformation)
+                        </value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value>
+                            <vc:event-evidence-file-link evidence-file="@changeReason?.EvidenceFile" />
+                        </value>
+                    </row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+                    {
+                        <row>
+                            <key>Induction status</key>
+                            <value data-testid="old-induction-status" use-empty-fallback>@oldInduction.Status.GetTitle()</value>
+                        </row>
+                    }
+
+                    @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+                    {
+                        <row>
+                            <key>Exemption reason</key>
+                            <value data-testid="old-exemption-reason">
+                                @if (oldInduction.ExemptionReasonIds.Length > 0)
+                                {
+                                    <ul class="govuk-list">
+                                        @foreach (var id in oldInduction.ExemptionReasonIds)
+                                        {
+                                            <li>@exemptionReasons[id].Name</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </value>
+                        </row>
+                    }
+
+                    @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+                    {
+                        <row>
+                            <key>Start date</key>
+                            <value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+
+                    @if (displayedChanges.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                    {
+                        <row>
+                            <key>Completed date</key>
+                            <value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+
+                    @if (oldInduction.CpdCpdModifiedOn.HasValue)
+                    {
+                        <row>
+                            <key>CPD modified on</key>
+                            <value data-testid="old-cpd-modified-on" use-empty-fallback>@oldInduction.CpdCpdModifiedOn.ValueOrDefault()!.ToString(TimelineItem.TimestampFormat)</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </timeline-entry>
+}

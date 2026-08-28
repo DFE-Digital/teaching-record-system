@@ -51,6 +51,13 @@ Support UI *Set status → reactivate*.
 | --- | --- | --- |
 | `PersonReactivatedEvent` | Always | — |
 
+### `PersonInductionUpdating` (91)
+API `SetCpdInductionStatus` and `SetWelshInductionStatus`; Support UI *Edit induction*; the EWC Wales induction import.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when the submitted values actually move the person's induction. |
+
 ### `PersonDeceased` (42)
 API `SetDeceased`.
 

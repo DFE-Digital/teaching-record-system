@@ -22,7 +22,6 @@ public class ChangeHistoryService(
         {
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
             nameof(LegacyEvents.InductionMigratedEvent),
-            nameof(LegacyEvents.PersonInductionUpdatedEvent),
             nameof(LegacyEvents.PersonDetailsUpdatedEvent),
             nameof(LegacyEvents.PersonCreatedEvent),
             nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
@@ -122,6 +121,7 @@ public class ChangeHistoryService(
             ProcessType.RouteToProfessionalStatusUpdating,
             ProcessType.RouteToProfessionalStatusDeleting,
             ProcessType.RouteToProfessionalStatusMigratingFromDqt,
+            ProcessType.PersonInductionUpdating,
             ProcessType.NoteCreating,
             ProcessType.PersonOneLoginUserDisconnecting,
             ProcessType.PersonOneLoginUserConnecting,
