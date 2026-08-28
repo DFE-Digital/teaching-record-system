@@ -193,6 +193,15 @@ jobs:
         run: dotnet build -c Release --no-restore
         working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
 
+      - name: Cache Playwright browsers
+        if: endsWith(matrix.project_short_name, 'EndToEndTests')
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('Directory.Packages.props') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
       - name: Install Playwright if required
         if: endsWith(matrix.entry.project, 'EndToEndTests')
         run: pwsh ./bin/Release/net10.0/playwright.ps1 install chromium
