@@ -52,6 +52,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                 [
                     new NpgsqlParameter("legacyEventName", _legacyEventName),
                     new NpgsqlParameter("cpdProcessType", (int)ProcessType.PersonCpdInductionUpdating),
+                    new NpgsqlParameter("welshProcessType", (int)ProcessType.PersonWelshInductionUpdating),
                     new NpgsqlParameter("processType", (int)ProcessType.PersonInductionUpdating),
                     new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated },
                     new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId },
@@ -156,8 +157,11 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                  CASE WHEN jsonb_typeof(e.payload->'RaisedBy') = 'object'
                      THEN e.payload->'RaisedBy'->>'DqtUserName'
                  END AS dqt_user_name,
-                 {CpdProcessTypeSql} AS process_type
+                 {ProcessTypeSql} AS process_type
              FROM events e
+             -- Joined on text so the object form of RaisedBy (a DQT user) simply matches nothing, rather than
+             -- putting a uuid cast that would throw on it behind a condition Postgres is free to reorder.
+             LEFT JOIN users u ON u.user_id::text = e.payload->>'RaisedBy'
              WHERE e.event_name = @legacyEventName
                AND e.created >= @fromCreated
                AND (e.created > @fromCreated OR e.event_id > @fromEventId)
@@ -206,22 +210,30 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
          FROM todo
          """;
 
-    // The write paths now have a process type each, but a legacy payload only says what changed, not who changed it,
-    // so the back-fill can only recover the one source that leaves a mark: CpdInductionCpdModifiedOn is touched by
-    // the CPD path and by nothing else, so an event whose timestamp moved is certainly CPD's.
+    // Each write path has its own process type now, and a legacy payload has two tells for which one it came from.
     //
-    // The Welsh path is deliberately not guessed at. Everything it leaves behind - a FailedInWales status, the
-    // PassedInWales exemption reason - is just as reachable from the Support UI journey, so a heuristic would file
-    // support users' changes as EWC Wales's. Historical Welsh events therefore stay on PersonInductionUpdating;
-    // only events written from now on are attributed to PersonWelshInductionUpdating.
+    // The API operations run as the client's application user, and the role that lets a client call them is on the
+    // user row, so RaisedBy identifies both of them exactly. Roles can be taken away, so this reflects the client's
+    // roles now rather than at the time of the event - in practice these two clients keep theirs.
     //
-    // The CPD tell is one-way too: CPD resending the same CpdModifiedOn alongside a new status leaves the timestamp
-    // unmoved, and those few events stay on the generic type rather than being misfiled.
-    private const string CpdProcessTypeSql =
-        """
+    // CpdInductionCpdModifiedOn is touched by the CPD path and by nothing else, so a moved timestamp says CPD even
+    // for an event whose client has since lost the role. It is checked first for that reason, and because a client
+    // holding both roles would otherwise be ambiguous. It is a one-way tell: CPD resending the same CpdModifiedOn
+    // alongside a new status leaves the timestamp unmoved, which is why the role check backs it up.
+    //
+    // What is left over stays on PersonInductionUpdating, and that includes the EWC Wales file import, which runs as
+    // the system user. The system user isn't exclusive to it - the DQT outbox handlers wrote these events as the
+    // system user too whenever the message carried no DQT or TRS user - so filing every system-user event as EWC
+    // Wales's would mean filing DQT's exemption changes as EWC Wales's. Nor is there anything else to go on: a
+    // FailedInWales status and the PassedInWales exemption reason are both just as reachable from the Support UI
+    // journey. Those imports keep the generic type; only imports run from now on are attributed.
+    private const string ProcessTypeSql =
+        $"""
         CASE WHEN e.payload->'Induction'->'CpdCpdModifiedOn'
                   IS DISTINCT FROM e.payload->'OldInduction'->'CpdCpdModifiedOn'
              THEN @cpdProcessType
+             WHEN '{ApiRoles.SetCpdInduction}' = ANY(u.api_roles) THEN @cpdProcessType
+             WHEN '{ApiRoles.SetWelshInduction}' = ANY(u.api_roles) THEN @welshProcessType
              ELSE @processType
          END
         """;
