@@ -775,8 +775,8 @@
           "EntityFrameworkCore.Projectables": "[6.0.6, )",
           "FluentValidation": "[12.1.1, )",
           "GovukNotify": "[8.1.0, )",
-          "Hangfire.Core": "[1.8.24, )",
-          "Hangfire.NetCore": "[1.8.24, )",
+          "Hangfire.Core": "[1.8.25, )",
+          "Hangfire.NetCore": "[1.8.25, )",
           "Hangfire.PostgreSql": "[1.21.1, )",
           "Humanizer.Core": "[3.0.10, )",
           "IdentityModel": "[6.2.0, )",
@@ -910,7 +910,7 @@
       },
       "Hangfire.Core": {
         "type": "CentralTransitive",
-        "requested": "[1.8.24, )",
+        "requested": "[1.8.25, )",
         "resolved": "1.8.25",
         "contentHash": "BxzXlHwXNrGPHJ7YfAVfeiXC+BHd6uPoyyfV+9bCJVPPGs4z0EQCW1X44Og/IUFM81ENCqAFP1r2rOkQhm4ydA==",
         "dependencies": {
@@ -919,7 +919,7 @@
       },
       "Hangfire.NetCore": {
         "type": "CentralTransitive",
-        "requested": "[1.8.24, )",
+        "requested": "[1.8.25, )",
         "resolved": "1.8.25",
         "contentHash": "ZfI7gwr7n70r635VS9aKsWSzOodY6U0bSIG0jDrqd5ODRLKvc+e5aXXGCnWHWzjvagvlwtUcRGG/lD0/3C7chA==",
         "dependencies": {
