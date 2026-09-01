@@ -9,26 +9,29 @@ public interface IJourneyWithSavedState
 
 public static class JourneyWithSavedStateExtensions
 {
-    public static void ApplySavedModelStateValues(this IJourneyWithSavedState journeyState, string pageName, ModelStateDictionary modelState)
+    extension(IJourneyWithSavedState journeyState)
     {
-        if (journeyState.SavedJourneyState?.PageName != pageName)
+        public void ApplySavedModelStateValues(string pageName, ModelStateDictionary modelState)
         {
-            return;
+            if (journeyState.SavedJourneyState?.PageName != pageName)
+            {
+                return;
+            }
+
+            foreach (var (key, value) in journeyState.SavedJourneyState.ModelStateValues)
+            {
+                modelState.SetModelValue(key, value, value);
+            }
         }
 
-        foreach (var (key, value) in journeyState.SavedJourneyState.ModelStateValues)
+        public void ClearSavedModelStateValues(string pageName)
         {
-            modelState.SetModelValue(key, value, value);
-        }
-    }
+            if (journeyState.SavedJourneyState?.PageName != pageName)
+            {
+                return;
+            }
 
-    public static void ClearSavedModelStateValues(this IJourneyWithSavedState journeyState, string pageName)
-    {
-        if (journeyState.SavedJourneyState?.PageName != pageName)
-        {
-            return;
+            journeyState.SavedJourneyState = null;
         }
-
-        journeyState.SavedJourneyState = null;
     }
 }

@@ -25,9 +25,11 @@ public static class MandatoryQualificationStatusRegistry
 
     public static IReadOnlyCollection<MandatoryQualificationStatusInfo> All => _info.Values.ToArray();
 
-    public static string GetName(this MandatoryQualificationStatus status) => _info[status].Name;
-
-    public static string GetTitle(this MandatoryQualificationStatus status) => _info[status].Title;
+    extension(MandatoryQualificationStatus status)
+    {
+        public string GetName() => _info[status].Name;
+        public string GetTitle() => _info[status].Title;
+    }
 
     private static MandatoryQualificationStatusInfo GetInfo(MandatoryQualificationStatus status)
     {

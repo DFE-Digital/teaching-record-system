@@ -5,9 +5,12 @@ namespace TeachingRecordSystem.SupportUi;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static Guid GetUserId(this ClaimsPrincipal principal) =>
-        Guid.Parse(principal.FindFirstValue(CustomClaims.UserId) ?? throw new InvalidOperationException($"{CustomClaims.UserId} claim was not found."));
+    extension(ClaimsPrincipal principal)
+    {
+        public Guid GetUserId() =>
+            Guid.Parse(principal.FindFirstValue(CustomClaims.UserId) ?? throw new InvalidOperationException($"{CustomClaims.UserId} claim was not found."));
 
-    public static bool IsActiveTrsUser(this ClaimsPrincipal principal) =>
-        principal.Claims.Any(c => c.Type == CustomClaims.UserId);
+        public bool IsActiveTrsUser() =>
+            principal.Claims.Any(c => c.Type == CustomClaims.UserId);
+    }
 }

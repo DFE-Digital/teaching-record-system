@@ -41,15 +41,17 @@ public static class SupportTaskTypeRegistry
     public static IReadOnlyCollection<SupportTaskType> GetAllTypes(bool includeLegacy = false) =>
         GetAll(includeLegacy).Select(t => t.SupportTaskType).ToArray();
 
-    public static SupportTaskCategory GetCategory(this SupportTaskType supportTaskType) =>
-        _info[supportTaskType].SupportTaskCategory;
+    extension(SupportTaskType supportTaskType)
+    {
+        public SupportTaskCategory GetCategory() =>
+            _info[supportTaskType].SupportTaskCategory;
 
-    public static Type GetDataType(this SupportTaskType supportTaskType) =>
-        _info[supportTaskType].DataType;
+        public Type GetDataType() =>
+            _info[supportTaskType].DataType;
 
-    public static string GetName(this SupportTaskType supportTaskType) => _info[supportTaskType].Name;
-
-    public static string GetTitle(this SupportTaskType supportTaskType) => _info[supportTaskType].Title;
+        public string GetName() => _info[supportTaskType].Name;
+        public string GetTitle() => _info[supportTaskType].Title;
+    }
 
     private static SupportTaskTypeDescription GetInfo(SupportTaskType supportTaskType)
     {

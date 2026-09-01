@@ -4,69 +4,72 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Qualificatio
 
 public static class QualificationsPageExtensions
 {
-    public static Task ClickConfirmEditButtonAsync(this IPage page) =>
-        page.ClickButtonAsync("Confirm and update qualification");
+    extension(IPage page)
+    {
+        public Task ClickConfirmEditButtonAsync() =>
+            page.ClickButtonAsync("Confirm and update qualification");
 
-    public static Task GoToAddMqPageAsync(this IPage page, Guid personId) =>
-        page.GotoAsync($"/mqs/add?personId={personId}");
+        public Task GoToAddMqPageAsync(Guid personId) =>
+            page.GotoAsync($"/mqs/add?personId={personId}");
 
-    public static Task AssertOnAddMqProviderPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/mqs/add/provider");
+        public Task AssertOnAddMqProviderPageAsync() =>
+            page.WaitForUrlPathAsync($"/mqs/add/provider");
 
-    public static Task AssertOnAddMqSpecialismPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/mqs/add/specialism");
+        public Task AssertOnAddMqSpecialismPageAsync() =>
+            page.WaitForUrlPathAsync($"/mqs/add/specialism");
 
-    public static Task AssertOnAddMqStartDatePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/mqs/add/start-date");
+        public Task AssertOnAddMqStartDatePageAsync() =>
+            page.WaitForUrlPathAsync($"/mqs/add/start-date");
 
-    public static Task AssertOnAddMqStatusPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/mqs/add/status");
+        public Task AssertOnAddMqStatusPageAsync() =>
+            page.WaitForUrlPathAsync($"/mqs/add/status");
 
-    public static Task AssertOnAddMqReasonPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/mqs/add/reason");
+        public Task AssertOnAddMqReasonPageAsync() =>
+            page.WaitForUrlPathAsync($"/mqs/add/reason");
 
-    public static Task AssertOnAddMqCheckAnswersPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/mqs/add/check-answers");
+        public Task AssertOnAddMqCheckAnswersPageAsync() =>
+            page.WaitForUrlPathAsync($"/mqs/add/check-answers");
 
-    public static Task AssertOnEditMqProviderPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider");
+        public Task AssertOnEditMqProviderPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider");
 
-    public static Task AssertOnEditMqProviderReasonPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/reason");
+        public Task AssertOnEditMqProviderReasonPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/reason");
 
-    public static Task AssertOnEditMqProviderConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/check-answers");
+        public Task AssertOnEditMqProviderConfirmPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/check-answers");
 
-    public static Task AssertOnEditMqSpecialismPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism");
+        public Task AssertOnEditMqSpecialismPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism");
 
-    public static Task AssertOnEditMqSpecialismReasonPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/reason");
+        public Task AssertOnEditMqSpecialismReasonPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/reason");
 
-    public static Task AssertOnEditMqSpecialismConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/check-answers");
+        public Task AssertOnEditMqSpecialismConfirmPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/check-answers");
 
-    public static Task AssertOnEditMqStartDatePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date");
+        public Task AssertOnEditMqStartDatePageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date");
 
-    public static Task AssertOnEditMqStartDateReasonPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/reason");
+        public Task AssertOnEditMqStartDateReasonPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/reason");
 
-    public static Task AssertOnEditMqStartDateConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/check-answers");
+        public Task AssertOnEditMqStartDateConfirmPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/check-answers");
 
-    public static Task AssertOnEditMqStatusPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status");
+        public Task AssertOnEditMqStatusPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status");
 
-    public static Task AssertOnEditMqStatusReasonPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/reason");
+        public Task AssertOnEditMqStatusReasonPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/reason");
 
-    public static Task AssertOnEditMqStatusConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/check-answers");
+        public Task AssertOnEditMqStatusConfirmPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/check-answers");
 
-    public static Task AssertOnDeleteMqPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete");
+        public Task AssertOnDeleteMqPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete");
 
-    public static Task AssertOnDeleteMqConfirmPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/check-answers");
+        public Task AssertOnDeleteMqConfirmPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/check-answers");
+    }
 }

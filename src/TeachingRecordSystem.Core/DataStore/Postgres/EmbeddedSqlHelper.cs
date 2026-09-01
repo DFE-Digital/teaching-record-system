@@ -10,11 +10,14 @@ internal static class EmbeddedSqlHelper
     public static string GetTriggerSql(string fileName) =>
         GetEmbeddedSql($"Triggers.{fileName}", "trigger");
 
-    public static void Procedure(this MigrationBuilder migrationBuilder, string fileName) =>
-        migrationBuilder.Sql(GetProcedureSql(fileName));
+    extension(MigrationBuilder migrationBuilder)
+    {
+        public void Procedure(string fileName) =>
+            migrationBuilder.Sql(GetProcedureSql(fileName));
 
-    public static void Trigger(this MigrationBuilder migrationBuilder, string fileName) =>
-        migrationBuilder.Sql(GetTriggerSql(fileName));
+        public void Trigger(string fileName) =>
+            migrationBuilder.Sql(GetTriggerSql(fileName));
+    }
 
     private static string GetEmbeddedSql(string relativePath, string resourceType)
     {

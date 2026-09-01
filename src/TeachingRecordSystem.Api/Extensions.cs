@@ -41,121 +41,123 @@ public static class Extensions
         return builder;
     }
 
-    public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    extension(IServiceCollection services)
     {
-        services
-            .AddMvc(options =>
-            {
-                options.AddHybridBodyModelBinderProvider();
-
-                options.Filters.Add(new ServiceFilterAttribute<AddTrnToSentryScopeResourceFilter>() { Order = -1 });
-                options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
-                options.Filters.Add(new ValidationExceptionFilter());
-
-                options.Conventions.Add(new ApiVersionConvention(configuration));
-                options.Conventions.Add(new AuthorizationPolicyConvention());
-                options.Conventions.Add(new BackFillVersionedEndpointsConvention());
-                options.Filters.Add(new NoCachePageFilter());
-
-                options.OutputFormatters.RemoveType<StringOutputFormatter>();
-            })
-            .ConfigureApiBehaviorOptions(options =>
-            {
-                options.SuppressInferBindingSourcesForParameters = true;
-            })
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new OneOfJsonConverterFactory());
-
-                options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-                {
-                    Modifiers =
-                    {
-                        Modifiers.OptionProperties
-                    }
-                };
-            });
-        services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
-
-        services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
-            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
-            .AddJwtBearer(AuthenticationSchemeNames.AuthorizeAccessAccessToken, options =>
-            {
-                options.Authority = configuration.GetRequiredValue("AuthorizeAccessIssuer");
-                options.MapInboundClaims = false;
-                options.TokenValidationParameters.ValidateAudience = false;
-            });
-
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(
-                AuthorizationPolicies.ApiKey,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireClaim(ClaimTypes.Name));
-
-            options.AddPolicy(
-                AuthorizationPolicies.TeacherAuthAccessToken,
-                policy => policy
-                    .AddAuthenticationSchemes(AuthenticationSchemeNames.AuthorizeAccessAccessToken)
-                    .RequireAssertion(ctx =>
-                    {
-                        var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        var hasRequiredClaim = ctx.User.HasClaim(c => c.Type is "trn" or AuthorizeAccessClaimTypes.TrnRequestId);
-                        return scopes.Contains("teaching_record") && hasRequiredClaim;
-                    }));
-        });
-
-        services
-            .AddApiCommands()
-            .AddWebhookOptions(configuration)
-            .AddOpenApi(configuration)
-            .AddFluentValidation()
-            .AddHttpContextAccessor()
-            .AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>())
-            .AddSingleton<ICurrentUserProvider, ClaimsPrincipalCurrentUserProvider>()
-            .AddMemoryCache()
-            .AddSingleton<AddTrnToSentryScopeResourceFilter>()
-            .AddTransient<GetPersonHelper>()
-            .AddEvidenceFilesHttpClient(configuration);
-
-        if (environment.IsProduction())
+        public IServiceCollection AddApiServices(IConfiguration configuration, IHostEnvironment environment)
         {
             services
-                .AddStartupTask<ReferenceDataCache>()
-                .AddRateLimiting(configuration);
+                .AddMvc(options =>
+                {
+                    options.AddHybridBodyModelBinderProvider();
+
+                    options.Filters.Add(new ServiceFilterAttribute<AddTrnToSentryScopeResourceFilter>() { Order = -1 });
+                    options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
+                    options.Filters.Add(new ValidationExceptionFilter());
+
+                    options.Conventions.Add(new ApiVersionConvention(configuration));
+                    options.Conventions.Add(new AuthorizationPolicyConvention());
+                    options.Conventions.Add(new BackFillVersionedEndpointsConvention());
+                    options.Filters.Add(new NoCachePageFilter());
+
+                    options.OutputFormatters.RemoveType<StringOutputFormatter>();
+                })
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressInferBindingSourcesForParameters = true;
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.Converters.Add(new OneOfJsonConverterFactory());
+
+                    options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+                    {
+                        Modifiers =
+                        {
+                            Modifiers.OptionProperties
+                        }
+                    };
+                });
+            services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
+
+            services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
+                .AddJwtBearer(AuthenticationSchemeNames.AuthorizeAccessAccessToken, options =>
+                {
+                    options.Authority = configuration.GetRequiredValue("AuthorizeAccessIssuer");
+                    options.MapInboundClaims = false;
+                    options.TokenValidationParameters.ValidateAudience = false;
+                });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    AuthorizationPolicies.ApiKey,
+                    policy => policy
+                        .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                        .RequireClaim(ClaimTypes.Name));
+
+                options.AddPolicy(
+                    AuthorizationPolicies.TeacherAuthAccessToken,
+                    policy => policy
+                        .AddAuthenticationSchemes(AuthenticationSchemeNames.AuthorizeAccessAccessToken)
+                        .RequireAssertion(ctx =>
+                        {
+                            var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            var hasRequiredClaim = ctx.User.HasClaim(c => c.Type is "trn" or AuthorizeAccessClaimTypes.TrnRequestId);
+                            return scopes.Contains("teaching_record") && hasRequiredClaim;
+                        }));
+            });
+
+            services
+                .AddApiCommands()
+                .AddWebhookOptions(configuration)
+                .AddOpenApi(configuration)
+                .AddFluentValidation()
+                .AddHttpContextAccessor()
+                .AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>())
+                .AddSingleton<ICurrentUserProvider, ClaimsPrincipalCurrentUserProvider>()
+                .AddMemoryCache()
+                .AddSingleton<AddTrnToSentryScopeResourceFilter>()
+                .AddTransient<GetPersonHelper>()
+                .AddEvidenceFilesHttpClient(configuration);
+
+            if (environment.IsProduction())
+            {
+                services
+                    .AddStartupTask<ReferenceDataCache>()
+                    .AddRateLimiting(configuration);
+            }
+
+            return services;
         }
 
-        return services;
-    }
+        private IServiceCollection AddEvidenceFilesHttpClient(IConfiguration configuration)
+        {
+            services.AddOptions<EvidenceFilesOptions>()
+                .Bind(configuration.GetSection("EvidenceFiles"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
+            services
+                .AddTransient<DownloadEvidenceFilesFromBlobStorageHttpHandler>()
+                .AddHttpClient("EvidenceFiles", client =>
+                {
+                    client.MaxResponseContentBufferSize = 5 * 1024 * 1024;  // 5MB
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                })
+                .AddHttpMessageHandler<DownloadEvidenceFilesFromBlobStorageHttpHandler>();
 
-    private static IServiceCollection AddEvidenceFilesHttpClient(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddOptions<EvidenceFilesOptions>()
-            .Bind(configuration.GetSection("EvidenceFiles"))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            return services;
+        }
 
-        services
-            .AddTransient<DownloadEvidenceFilesFromBlobStorageHttpHandler>()
-            .AddHttpClient("EvidenceFiles", client =>
-            {
-                client.MaxResponseContentBufferSize = 5 * 1024 * 1024;  // 5MB
-                client.Timeout = TimeSpan.FromSeconds(30);
-            })
-            .AddHttpMessageHandler<DownloadEvidenceFilesFromBlobStorageHttpHandler>();
+        private IServiceCollection AddFluentValidation()
+        {
+            services.AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true)
+                .AddValidatorsFromAssemblyContaining(typeof(Program))
+                .AddTransient<IValidatorInterceptor, PreferModelBindingErrorsValidationInterceptor>();
 
-        return services;
-    }
-
-    private static IServiceCollection AddFluentValidation(this IServiceCollection services)
-    {
-        services.AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true)
-            .AddValidatorsFromAssemblyContaining(typeof(Program))
-            .AddTransient<IValidatorInterceptor, PreferModelBindingErrorsValidationInterceptor>();
-
-        return services;
+            return services;
+        }
     }
 }

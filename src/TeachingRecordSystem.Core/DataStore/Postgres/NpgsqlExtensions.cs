@@ -7,29 +7,32 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public static class NpgsqlExtensions
 {
-    public static void WriteValueOrNull<T>(this NpgsqlBinaryImporter writer, T? value, NpgsqlDbType dbType)
-        where T : struct
+    extension(NpgsqlBinaryImporter writer)
     {
-        if (value.HasValue)
+        public void WriteValueOrNull<T>(T? value, NpgsqlDbType dbType)
+            where T : struct
         {
-            writer.Write(value.Value, dbType);
+            if (value.HasValue)
+            {
+                writer.Write(value.Value, dbType);
+            }
+            else
+            {
+                writer.WriteNull();
+            }
         }
-        else
-        {
-            writer.WriteNull();
-        }
-    }
 
-    public static void WriteValueOrNull<T>(this NpgsqlBinaryImporter writer, T? value, NpgsqlDbType dbType)
-        where T : notnull
-    {
-        if (value is null)
+        public void WriteValueOrNull<T>(T? value, NpgsqlDbType dbType)
+            where T : notnull
         {
-            writer.WriteNull();
-        }
-        else
-        {
-            writer.Write(value, dbType);
+            if (value is null)
+            {
+                writer.WriteNull();
+            }
+            else
+            {
+                writer.Write(value, dbType);
+            }
         }
     }
 

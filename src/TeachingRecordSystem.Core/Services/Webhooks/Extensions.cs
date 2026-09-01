@@ -6,24 +6,27 @@ namespace TeachingRecordSystem.Core.Services.Webhooks;
 
 public static class Extensions
 {
-    public static IServiceCollection AddWebhookOptions(this IServiceCollection services, IConfiguration configuration)
+    extension(IServiceCollection services)
     {
-        services.AddOptions<WebhookOptions>()
-            .Bind(configuration.GetSection("Webhooks"))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+        public IServiceCollection AddWebhookOptions(IConfiguration configuration)
+        {
+            services.AddOptions<WebhookOptions>()
+                .Bind(configuration.GetSection("Webhooks"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
-        return services;
-    }
+            return services;
+        }
 
-    public static IServiceCollection AddWebhookDeliveryService(this IServiceCollection services, IConfiguration configuration)
-    {
-        AddWebhookOptions(services, configuration);
+        public IServiceCollection AddWebhookDeliveryService(IConfiguration configuration)
+        {
+            AddWebhookOptions(services, configuration);
 
-        WebhookSender.Register(services);
+            WebhookSender.Register(services);
 
-        services.AddSingleton<IHostedService, WebhookDeliveryService>();
+            services.AddSingleton<IHostedService, WebhookDeliveryService>();
 
-        return services;
+            return services;
+        }
     }
 }

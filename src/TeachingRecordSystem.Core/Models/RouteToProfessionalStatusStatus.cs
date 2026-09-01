@@ -96,27 +96,20 @@ public static class ProfessionalStatusStatusRegistry
 
     public static IReadOnlyCollection<ProfessionalStatusStatusInfo> All => _info.Values.OrderBy(s => s.Name).ToArray();
 
-    public static string GetName(this RouteToProfessionalStatusStatus status) => _info[status].Name;
-
-    public static string GetTitle(this RouteToProfessionalStatusStatus status) => _info[status].Title;
-
-    public static FieldRequirement GetStartDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingStartDateRequired;
-
-    public static FieldRequirement GetEndDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingEndDateRequired;
-
-    public static FieldRequirement GetHoldsFromDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].HoldsFromRequired;
-
-    public static FieldRequirement GetInductionExemptionRequirement(this RouteToProfessionalStatusStatus status) => _info[status].InductionExemptionRequired;
-
-    public static FieldRequirement GetTrainingProviderRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingProviderRequired;
-
-    public static FieldRequirement GetDegreeTypeRequirement(this RouteToProfessionalStatusStatus status) => _info[status].DegreeTypeRequired;
-
-    public static FieldRequirement GetCountryRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingCountryRequired;
-
-    public static FieldRequirement GetAgeSpecialismRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingAgeSpecialismTypeRequired;
-
-    public static FieldRequirement GetSubjectsRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingSubjectsRequired;
+    extension(RouteToProfessionalStatusStatus status)
+    {
+        public string GetName() => _info[status].Name;
+        public string GetTitle() => _info[status].Title;
+        public FieldRequirement GetStartDateRequirement() => _info[status].TrainingStartDateRequired;
+        public FieldRequirement GetEndDateRequirement() => _info[status].TrainingEndDateRequired;
+        public FieldRequirement GetHoldsFromDateRequirement() => _info[status].HoldsFromRequired;
+        public FieldRequirement GetInductionExemptionRequirement() => _info[status].InductionExemptionRequired;
+        public FieldRequirement GetTrainingProviderRequirement() => _info[status].TrainingProviderRequired;
+        public FieldRequirement GetDegreeTypeRequirement() => _info[status].DegreeTypeRequired;
+        public FieldRequirement GetCountryRequirement() => _info[status].TrainingCountryRequired;
+        public FieldRequirement GetAgeSpecialismRequirement() => _info[status].TrainingAgeSpecialismTypeRequired;
+        public FieldRequirement GetSubjectsRequirement() => _info[status].TrainingSubjectsRequired;
+    }
 
     private static ProfessionalStatusStatusInfo GetInfo(RouteToProfessionalStatusStatus status)
     {
