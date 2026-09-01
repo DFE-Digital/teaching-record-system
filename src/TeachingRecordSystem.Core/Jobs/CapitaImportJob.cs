@@ -325,7 +325,7 @@ public class CapitaImportJob(
 
         // if a potential match is not found and the result of the import of this row would be to create a person
         // make sure that first name and last name are both present.
-        var person = await dbContext.Persons.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Trn == record.TRN);
+        var person = await dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).FirstOrDefaultAsync(x => x.Trn == record.TRN);
         if (person is null && string.IsNullOrEmpty(record.GetFirstName()))
         {
             errors.Add("Unable to create a new record without a firstname");

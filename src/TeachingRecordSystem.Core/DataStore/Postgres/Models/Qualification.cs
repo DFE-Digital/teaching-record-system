@@ -11,4 +11,9 @@ public abstract class Qualification
     public QualificationType QualificationType { get; protected set; }
     public required Guid PersonId { get; init; }
     public Person? Person { get; }
+
+    public static class QueryFilterNames
+    {
+        public const string Deleted = "Deleted";
+    }
 }

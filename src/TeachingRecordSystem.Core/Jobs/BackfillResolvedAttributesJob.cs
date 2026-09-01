@@ -46,7 +46,7 @@ public class BackfillResolvedAttributesJob(TrsDbContext dbContext)
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         var supportTasks = await dbContext.SupportTasks
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
             .Include(t => t.TrnRequestMetadata)
             .Where(t => _supportTaskTypes.Contains(t.SupportTaskType))
             .Where(t => t.Status == SupportTaskStatus.Closed)

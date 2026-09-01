@@ -111,7 +111,7 @@ public class TeacherPensionsSupportTaskServiceTests(ServiceFixture fixture) : Se
             Assert.Equal(42, data.IntegrationTransactionId);
 
             // The task's record is merged into the existing one, which the request resolves to
-            var mergedPerson = await dbContext.Persons.IgnoreQueryFilters().SingleAsync(p => p.PersonId == supportTask.PersonId);
+            var mergedPerson = await dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).SingleAsync(p => p.PersonId == supportTask.PersonId);
             Assert.Equal(PersonStatus.Deactivated, mergedPerson.Status);
             Assert.Equal(existingPerson.PersonId, mergedPerson.MergedWithPersonId);
 

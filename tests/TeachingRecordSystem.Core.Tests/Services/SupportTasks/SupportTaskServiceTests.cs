@@ -197,7 +197,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var dbSupportTask = await dbContext.SupportTasks.IgnoreQueryFilters().SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            var dbSupportTask = await dbContext.SupportTasks.IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted]).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(processContext.Now, dbSupportTask.DeletedOn);
         });
 

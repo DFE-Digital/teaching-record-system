@@ -12,4 +12,9 @@ public class WebhookEndpoint
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
+
+    public static class QueryFilterNames
+    {
+        public const string Deleted = "Deleted";
+    }
 }

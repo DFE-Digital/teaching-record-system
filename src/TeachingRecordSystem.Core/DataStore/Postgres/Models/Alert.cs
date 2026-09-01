@@ -25,6 +25,11 @@ public class Alert
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     [Projectable] public bool IsOpen => EndDate == null;
+
+    public static class QueryFilterNames
+    {
+        public const string Deleted = "Deleted";
+    }
 }
 
 public static class AlertValidationExtensions

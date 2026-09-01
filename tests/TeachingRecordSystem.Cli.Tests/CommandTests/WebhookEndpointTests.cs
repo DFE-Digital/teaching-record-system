@@ -106,7 +106,7 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
 
         var deletedEndpoint = await WithDbContextAsync(async dbContext =>
             await dbContext.WebhookEndpoints
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([WebhookEndpoint.QueryFilterNames.Deleted])
                 .SingleAsync(e => e.WebhookEndpointId == endpoint.WebhookEndpointId));
         Assert.NotNull(deletedEndpoint.DeletedOn);
 

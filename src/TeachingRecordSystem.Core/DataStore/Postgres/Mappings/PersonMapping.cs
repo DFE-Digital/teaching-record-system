@@ -11,7 +11,7 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.IncludeInAnalyticsSync(includeAllColumns: false);
         builder.ToTable("persons");
         builder.HasKey(p => p.PersonId);
-        builder.HasQueryFilter(p => p.Status == PersonStatus.Active);
+        builder.HasQueryFilter(Person.QueryFilterNames.Deactivated, p => p.Status == PersonStatus.Active);
         builder.Property(p => p.PersonId).ConfigureAnalyticsSync(included: true, hidden: true);
         builder.HasIndex(p => p.DqtContactId).HasFilter("dqt_contact_id is not null").IsUnique();
         builder.Property(p => p.CreatedOn).ConfigureAnalyticsSync(included: true, hidden: false);

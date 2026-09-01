@@ -87,6 +87,11 @@ public class SupportTask
         public static Subject FromOneLoginUser(string emailAddress) =>
             new(name: null, emailAddress);
     }
+
+    public static class QueryFilterNames
+    {
+        public const string Deleted = "Deleted";
+    }
 }
 
 public static class SupportTaskValidationExtensions

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core;
 
@@ -14,7 +15,7 @@ public class PersonInfoCache(IDbContextFactory<TrsDbContext> dbContextFactory, I
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             return await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
                 .Where(p => p.PersonId == personId)
                 .Select(p => new PersonInfo(p.PersonId, p.Trn))
                 .SingleOrDefaultAsync();

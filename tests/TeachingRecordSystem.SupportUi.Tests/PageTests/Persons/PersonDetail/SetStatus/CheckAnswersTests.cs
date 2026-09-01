@@ -255,7 +255,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
                 .SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(targetStatus, updatedPersonRecord.Status);

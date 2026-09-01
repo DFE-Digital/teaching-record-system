@@ -29,7 +29,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         {
             var now = TimeProvider.UtcNow;
 
-            var qualification = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleAsync(q => q.QualificationId == mq.QualificationId);
+            var qualification = await dbContext.MandatoryQualifications.IgnoreQueryFilters([Qualification.QueryFilterNames.Deleted]).SingleAsync(q => q.QualificationId == mq.QualificationId);
 
             var mqEstablishment = qualification.DqtMqEstablishmentValue is string mqEstablishmentValue ?
                 LegacyDataCache.Instance.GetMqEstablishmentByValue(mqEstablishmentValue) :

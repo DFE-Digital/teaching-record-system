@@ -45,7 +45,7 @@ public class CheckPersonExistsFilter(TrsDbContext dbContext) : IAsyncResourceFil
 
         Task<Person?> GetPersonAsync() => dbContext.Persons
             .FromSql($"select * from persons where person_id = {personId} for update")  // https://github.com/dotnet/efcore/issues/26042
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
             .SingleOrDefaultAsync();
     }
 }

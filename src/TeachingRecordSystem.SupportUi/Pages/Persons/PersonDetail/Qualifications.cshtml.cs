@@ -56,7 +56,7 @@ public class QualificationsModel(
             .ToArrayAsync();
 
         var personIsActive = await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
             .Where(p => p.PersonId == PersonId)
             .Select(p => p.Status == PersonStatus.Active)
             .SingleAsync();

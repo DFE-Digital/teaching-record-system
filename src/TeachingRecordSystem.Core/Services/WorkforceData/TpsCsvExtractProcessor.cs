@@ -15,8 +15,9 @@ public class TpsCsvExtractProcessor(
     {
         int i = 0;
         using var dbContext = dbContextFactory.CreateDbContext();
+        var persons = dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]);
         var invalidTrns = await dbContext.TpsCsvExtractItems
-            .Where(r => r.TpsCsvExtractId == tpsCsvExtractId && !dbContext.Persons.IgnoreQueryFilters().Any(p => p.Trn == r.Trn))
+            .Where(r => r.TpsCsvExtractId == tpsCsvExtractId && !persons.Any(p => p.Trn == r.Trn))
             .ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var item in invalidTrns)

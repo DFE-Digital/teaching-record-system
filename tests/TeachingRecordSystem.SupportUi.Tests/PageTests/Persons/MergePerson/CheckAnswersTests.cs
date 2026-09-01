@@ -180,14 +180,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             $"/persons/{personA.PersonId}");
 
         var primaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personA.PersonId));
         Assert.Equal(PersonStatus.Active, primaryPerson.Status);
         Assert.Null(primaryPerson.MergedWithPersonId);
 
         var secondaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personB.PersonId));
         Assert.Equal(PersonStatus.Deactivated, secondaryPerson.Status);

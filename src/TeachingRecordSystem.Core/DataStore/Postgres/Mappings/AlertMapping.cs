@@ -11,7 +11,7 @@ public class AlertMapping : IEntityTypeConfiguration<Alert>
         builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("alerts");
         builder.HasKey(x => x.AlertId);
-        builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Alert.DeletedOn)) == null);
+        builder.HasQueryFilter(Alert.QueryFilterNames.Deleted, q => EF.Property<DateTime?>(q, nameof(Alert.DeletedOn)) == null);
         builder.Property(x => x.AlertTypeId).IsRequired();
         builder.Property(x => x.PersonId).IsRequired().ConfigureAnalyticsSync(hidden: true);
         builder.Property(x => x.Details).ConfigureAnalyticsSync(policyTag: PolicyTagNames.SensitiveHidden);

@@ -1,4 +1,5 @@
 using System.CommandLine;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
@@ -25,7 +26,7 @@ public class DeleteSupportTaskTests(IServiceProvider services) : CommandTestBase
         await WithDbContextAsync(async dbContext =>
         {
             var updatedTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
                 .SingleOrDefaultAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             Assert.NotNull(updatedTask?.DeletedOn);  // TODO Figure out how to pass FakeTimeProvider to Command

@@ -422,7 +422,7 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
         WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             // The property is init-only, so go through the entry rather than the model.
@@ -435,7 +435,7 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
         WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             return dbSupportTask.SourceApplicationUserId;

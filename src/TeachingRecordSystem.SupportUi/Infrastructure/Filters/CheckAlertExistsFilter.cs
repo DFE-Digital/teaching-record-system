@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
@@ -40,7 +41,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
         // meaning the entire Alert is not found, but if Person is deactivated
         // we need to return a BadRequest instead of a NotFound result
         var currentAlertWithPotentiallyDeactivatedPerson = await query
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
             .SingleOrDefaultAsync();
 
         if (currentAlertWithPotentiallyDeactivatedPerson is not null &&

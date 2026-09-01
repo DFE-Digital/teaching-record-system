@@ -150,7 +150,7 @@ public class MandatoryQualificationServiceTests(ServiceFixture fixture) : Servic
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var dbMq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleAsync(q => q.QualificationId == mq.QualificationId);
+            var dbMq = await dbContext.MandatoryQualifications.IgnoreQueryFilters([Qualification.QueryFilterNames.Deleted]).SingleAsync(q => q.QualificationId == mq.QualificationId);
             Assert.NotNull(dbMq.DeletedOn);
         });
 

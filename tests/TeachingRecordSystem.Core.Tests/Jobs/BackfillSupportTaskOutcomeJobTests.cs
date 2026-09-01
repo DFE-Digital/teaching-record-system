@@ -376,7 +376,7 @@ public class BackfillSupportTaskOutcomeJobTests(JobFixture fixture) : JobTestBas
         WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             return dbSupportTask.Outcome;

@@ -41,7 +41,7 @@ public class DetailModel(TrsDbContext context) : PageModel
         var integrationTransaction = await context.IntegrationTransactions
             .Include(x => x.IntegrationTransactionRecords!)
                 .ThenInclude(r => r.Person)
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
             .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId);
 
         if (integrationTransaction is null)
