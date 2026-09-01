@@ -67,7 +67,7 @@ public class BackfillSupportTaskSourceApplicationUserJob(
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         var supportTasks = await dbContext.SupportTasks
-            .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
+            .IgnoreQueryFilters([QueryFilterNames.Deleted])
             .Where(t => t.SourceApplicationUserId == null)
             .ToListAsync(cancellationToken);
 
@@ -83,7 +83,7 @@ public class BackfillSupportTaskSourceApplicationUserJob(
 
         // Tasks that already carry the column still have events that pre-date it, so they belong in the map too.
         var sources = (await dbContext.SupportTasks
-                .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .Where(t => t.SourceApplicationUserId != null)
                 .Select(t => new { t.SupportTaskReference, SourceApplicationUserId = t.SourceApplicationUserId!.Value })
                 .ToListAsync(cancellationToken))

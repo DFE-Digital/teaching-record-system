@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -376,7 +377,7 @@ public class BackfillSupportTaskOutcomeJobTests(JobFixture fixture) : JobTestBas
         WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             return dbSupportTask.Outcome;

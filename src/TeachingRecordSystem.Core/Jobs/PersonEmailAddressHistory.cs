@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -93,7 +92,7 @@ public class PersonEmailAddressHistory
 
         // The person may have been deactivated since.
         var currentEmailAddresses = await dbContext.Persons
-            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => personIds.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, p => p.EmailAddress, cancellationToken);
 

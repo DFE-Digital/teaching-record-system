@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -92,7 +91,7 @@ public class MergePersonJourneyCoordinator(
     public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(params Guid[] personIds)
     {
         var potentialDuplicates = (await dbContext.Persons
-            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => personIds.Contains(p.PersonId))
             .Select(p => new PotentialDuplicate
             {

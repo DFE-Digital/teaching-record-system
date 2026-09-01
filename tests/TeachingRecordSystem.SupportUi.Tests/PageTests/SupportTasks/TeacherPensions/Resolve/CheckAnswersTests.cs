@@ -1,5 +1,5 @@
 using Optional;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -236,7 +236,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
         await WithDbContextAsync(async dbContext =>
         {
-            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == person.PersonId);
+            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == person.PersonId);
             var updatedPersonRecord = await dbContext.Persons.Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
             Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);
             Assert.Equal(person.LastName, updatedPersonRecord.LastName);
@@ -332,7 +332,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
         await WithDbContextAsync(async dbContext =>
         {
-            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == person.PersonId);
+            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == person.PersonId);
             var updatedPersonRecord = await dbContext.Persons.Include(x => x.OneLoginUsers).SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
             Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);
             Assert.Equal(person.LastName, updatedPersonRecord.LastName);
@@ -424,7 +424,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         Assert.StartsWith($"/support-tasks/teacher-pensions", response.Headers.Location?.OriginalString);
         await WithDbContextAsync(async dbContext =>
         {
-            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).SingleAsync(x => x.PersonId == person.PersonId);
+            var deactivatedPersonRecord = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleAsync(x => x.PersonId == person.PersonId);
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(x => x.PersonId == duplicatePerson1.PersonId);
             Assert.Equal(person.FirstName, updatedPersonRecord.FirstName);
             Assert.Equal(person.LastName, updatedPersonRecord.LastName);

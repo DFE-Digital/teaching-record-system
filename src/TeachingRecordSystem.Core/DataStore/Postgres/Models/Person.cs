@@ -661,9 +661,4 @@ public class Person
 
         return routeLevelExemptionIds.Concat(InductionExemptionReasonIds).Distinct().AsReadOnly();
     }
-
-    public static class QueryFilterNames
-    {
-        public const string Deactivated = "Deactivated";
-    }
 }

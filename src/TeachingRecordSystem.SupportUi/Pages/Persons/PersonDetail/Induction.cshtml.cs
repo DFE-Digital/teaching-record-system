@@ -62,7 +62,7 @@ public class InductionModel(
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons
-            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.Qualifications)
             .SingleAsync(q => q.PersonId == PersonId);
 

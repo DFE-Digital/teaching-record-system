@@ -79,16 +79,16 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             }
 
             query = dbContext.Persons
-                .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .Where(p => p.PersonId == oneLoginUser.PersonId);
         }
         else if (SearchTextHelper.IsDate(Search, out var dateOfBirth))
         {
-            query = dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).Where(p => p.DateOfBirth == dateOfBirth);
+            query = dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).Where(p => p.DateOfBirth == dateOfBirth);
         }
         else if (SearchTextHelper.IsTrn(Search))
         {
-            query = dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).Where(p => p.Trn == Search);
+            query = dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).Where(p => p.Trn == Search);
         }
         else if (!string.IsNullOrWhiteSpace(Search))
         {
@@ -102,11 +102,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                         // ReSharper disable once FormatStringProblem
                         new NpgsqlParameter("names", NpgsqlTypes.NpgsqlDbType.Varchar) { Value = Search }
                     ])
-                .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]);
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]);
         }
         else
         {
-            query = dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]);
+            query = dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]);
         }
 
         // Include OneLoginUsers for facet counting and filtering

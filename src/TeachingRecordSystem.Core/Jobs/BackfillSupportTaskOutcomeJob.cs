@@ -35,7 +35,7 @@ public class BackfillSupportTaskOutcomeJob(TrsDbContext dbContext)
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         var supportTasks = await dbContext.SupportTasks
-            .IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted])
+            .IgnoreQueryFilters([QueryFilterNames.Deleted])
             .Where(t => t.Status == SupportTaskStatus.Closed)
             .Where(t => t.Outcome == null)
             .ToListAsync(cancellationToken);

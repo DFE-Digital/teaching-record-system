@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
-using PostgresModels = TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -34,7 +33,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
 
         var person = await dbContext.Persons
-            .IgnoreQueryFilters([PostgresModels.Person.QueryFilterNames.Deactivated])
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Include(p => p.Alerts).AsSplitQuery()
             .Include(p => p.OneLoginUsers).AsSplitQuery()

@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Api.V3.Operations;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
@@ -38,7 +38,7 @@ public class SetDeceasedTests(OperationTestFixture operationTestFixture) : Opera
         AssertSuccess(result);
 
         var updatedPerson = await WithDbContextAsync(dbContext =>
-            dbContext.Persons.IgnoreQueryFilters([Person.QueryFilterNames.Deactivated]).SingleAsync(p => p.PersonId == person.PersonId));
+            dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleAsync(p => p.PersonId == person.PersonId));
 
         Assert.Equal(PersonStatus.Deactivated, updatedPerson.Status);
         Assert.Equal(dateOfDeath, updatedPerson.DateOfDeath);

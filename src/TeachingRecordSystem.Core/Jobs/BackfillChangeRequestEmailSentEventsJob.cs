@@ -49,7 +49,7 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
 
         // The person may have been deactivated since the change request was resolved.
         var persons = await dbContext.Persons
-            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => personIds.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, cancellationToken);
 

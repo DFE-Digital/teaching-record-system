@@ -1,4 +1,5 @@
 using System.CommandLine;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
@@ -106,7 +107,7 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
 
         var deletedEndpoint = await WithDbContextAsync(async dbContext =>
             await dbContext.WebhookEndpoints
-                .IgnoreQueryFilters([WebhookEndpoint.QueryFilterNames.Deleted])
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .SingleAsync(e => e.WebhookEndpointId == endpoint.WebhookEndpointId));
         Assert.NotNull(deletedEndpoint.DeletedOn);
 

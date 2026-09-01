@@ -20,7 +20,7 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
     {
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(u => u.Person)
-            .IgnoreQueryFilters([Person.QueryFilterNames.Deactivated])
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .SingleAsync(u => u.Subject == OneLoginUserSubject);
 
         OneLoginUser = GetOneLoginUserInfo(oneLoginUser);

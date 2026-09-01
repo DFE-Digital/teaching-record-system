@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services;
@@ -197,7 +198,7 @@ public class SupportTaskServiceTests(ServiceFixture fixture) : ServiceTestBase(f
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var dbSupportTask = await dbContext.SupportTasks.IgnoreQueryFilters([SupportTask.QueryFilterNames.Deleted]).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            var dbSupportTask = await dbContext.SupportTasks.IgnoreQueryFilters([QueryFilterNames.Deleted]).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
             Assert.Equal(processContext.Now, dbSupportTask.DeletedOn);
         });
 
