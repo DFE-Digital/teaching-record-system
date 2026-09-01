@@ -2,7 +2,6 @@ using AngleSharp.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private const string RequestPath = "/users";
@@ -65,6 +64,8 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestAndUsersFound_PaginatesUsersAndSortsByFirstName(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
         // Arrange
+        await DeleteSeededUsersAsync();
+
         var users = await TestData.CreateMultipleUsersAsync(22, i =>
             new() { Name = $"{(char)('A' + i)}user {Faker.Name.Last()}", Role = UserRoles.AccessManager });
         SetCurrentUser(users[0]);
@@ -252,6 +253,8 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_AdministratorUser_ShowsAdministratorUsers(string query, string[] expectedUserFirstNames)
     {
         // Arrange
+        await DeleteSeededUsersAsync();
+
         var users = await TestData.CreateMultipleUsersAsync(6, i => new()
         {
             Name = $"{(char)('A' + i)}user {Faker.Name.Last()}",
@@ -298,6 +301,8 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_AdministratorUser_ShowsAdministratorFilterCounts(string query, string[] expectedRoleLabels, string[] expectedStatusLabels)
     {
         // Arrange
+        await DeleteSeededUsersAsync();
+
         var users = await TestData.CreateMultipleUsersAsync(
             new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = true },
             new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = false },

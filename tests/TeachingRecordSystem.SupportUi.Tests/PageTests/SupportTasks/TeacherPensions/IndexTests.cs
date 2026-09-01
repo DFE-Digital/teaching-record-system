@@ -5,7 +5,6 @@ using TeachingRecordSystem.SupportUi.Tests.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.TeacherPensions;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]

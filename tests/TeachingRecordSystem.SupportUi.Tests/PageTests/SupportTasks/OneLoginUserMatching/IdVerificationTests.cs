@@ -8,7 +8,6 @@ using TeachingRecordSystem.SupportUi.Services.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.OneLoginUserMatching;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]

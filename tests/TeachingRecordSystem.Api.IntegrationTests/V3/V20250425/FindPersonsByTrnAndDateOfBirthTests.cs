@@ -1,6 +1,5 @@
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 {
     public FindPersonsByTrnAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)

@@ -1,15 +1,11 @@
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250627;
 
-public abstract class TestBase : IntegrationTests.TestBase
+public abstract class TestBase(HostFixture hostFixture) : IntegrationTests.TestBase(hostFixture)
 {
     public const string Version = VersionRegistry.V3MinorVersions.V20250627;
 
-    public ReferenceDataCache ReferenceCache { get; }
+    public ReferenceDataCache ReferenceCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
 
-    protected TestBase(HostFixture hostFixture) : base(hostFixture)
-    {
-        ReferenceCache = hostFixture.Services.GetRequiredService<ReferenceDataCache>();
-    }
 
     public HttpClient GetHttpClientWithApiKey() =>
         GetHttpClientWithApiKey(Version);

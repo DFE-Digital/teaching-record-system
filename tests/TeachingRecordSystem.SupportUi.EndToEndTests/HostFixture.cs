@@ -4,21 +4,24 @@ using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.EndToEndTests;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-public sealed class HostFixture : InitializeDbFixture
+public sealed class HostFixture : IAsyncLifetime
 {
     public const string BaseUrl = "http://localhost:55642";
 
+    private TestDatabaseLease? _databaseLease;
     private bool _initialized;
     private bool _disposed;
     private Host<Program>? _host;
@@ -63,6 +66,11 @@ public sealed class HostFixture : InitializeDbFixture
             builder =>
             {
                 var configuration = TestConfiguration.GetConfiguration();
+                configuration.AddInMemoryCollection([
+                    KeyValuePair.Create(
+                        $"ConnectionStrings:{TrsDbContext.ConnectionName}",
+                        (string?)_databaseLease!.ConnectionString)
+                ]);
                 builder.UseConfiguration(configuration);
 
                 builder.ConfigureServices((context, services) =>
@@ -75,7 +83,6 @@ public sealed class HostFixture : InitializeDbFixture
                     services
                         .AddSingleton<CurrentUserProvider>()
                         .AddStartupTask<TestUsers.CreateUsersStartupTask>()
-                        .AddSingleton(DbHelper.Instance)
                         .AddSingleton<TestData>()
                         .AddSingleton(GetMockFileService())
                         .AddSingleton(GetMockSafeFileService())
@@ -134,9 +141,10 @@ public sealed class HostFixture : InitializeDbFixture
         }
     }
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
+        await TestDatabases.InitializeAsync();
+        _databaseLease = await TestDatabases.AcquireForRunAsync();
 
         _host = CreateHost();
 
@@ -158,11 +166,9 @@ public sealed class HostFixture : InitializeDbFixture
         _browser = await browserType.LaunchAsync(browserOptions);
 
         _initialized = true;
-
-        await Services.GetRequiredService<DbHelper>().InitializeAsync();
     }
 
-    public override async ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (_disposed)
         {
@@ -183,7 +189,12 @@ public sealed class HostFixture : InitializeDbFixture
             await _host.DisposeAsync();
         }
 
-        await base.DisposeAsync();
+        if (_databaseLease is not null)
+        {
+            await _databaseLease.DisposeAsync();
+        }
+
+        await TestDatabases.DisposeAsync();
     }
 
     public sealed class Host<T> : IAsyncDisposable

@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260515;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase
 {
     public CreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)

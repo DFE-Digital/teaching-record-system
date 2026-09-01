@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public class PermissionsTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture), IAsyncLifetime
+public class PermissionsTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
         (null, false),
@@ -21,8 +21,10 @@ public class PermissionsTests(HostFixture hostFixture) : AddRouteTestBase(hostFi
     private RouteToProfessionalStatusType? _route;
     private RouteToProfessionalStatusStatus _status;
 
-    async ValueTask IAsyncLifetime.InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
+        await base.InitializeAsync();
+
         _route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .First(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable);
 
@@ -32,8 +34,6 @@ public class PermissionsTests(HostFixture hostFixture) : AddRouteTestBase(hostFi
         var person = await TestData.CreatePersonAsync();
         _personId = person.PersonId;
     }
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
     [MemberData(nameof(GetData))]

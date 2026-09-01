@@ -22,7 +22,9 @@ public sealed class DbHelper : IAsyncDisposable
 
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
+    private readonly SemaphoreSlim _containerLock = new(1, 1);
     private bool _haveResetSchema;
+    private bool _haveStartedContainer;
 
     private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer)
     {
@@ -64,12 +66,34 @@ public sealed class DbHelper : IAsyncDisposable
         return new DbHelper(serviceProvider, postgresContainer);
     }
 
+    // Starts the testcontainer without touching the shared 'trs' database, so the pooled-database
+    // infrastructure can share the container without paying for the legacy schema reset.
+    public async Task EnsureContainerStartedAsync()
+    {
+        if (_postgresContainer is null)
+        {
+            return;
+        }
+
+        await _containerLock.WaitAsync();
+
+        try
+        {
+            if (!_haveStartedContainer)
+            {
+                await _postgresContainer.StartAsync();
+                _haveStartedContainer = true;
+            }
+        }
+        finally
+        {
+            _containerLock.Release();
+        }
+    }
+
     public async Task InitializeAsync()
     {
-        if (_postgresContainer != null)
-        {
-            await _postgresContainer.StartAsync();
-        }
+        await EnsureContainerStartedAsync();
 
         var schemaUpdated = await EnsureSchemaAsync();
 
@@ -219,6 +243,7 @@ public sealed class DbHelper : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _schemaLock.Dispose();
+        _containerLock.Dispose();
         (_serviceProvider as IDisposable)?.Dispose();
 
         if (_postgresContainer is not null)

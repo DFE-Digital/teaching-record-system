@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRout
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class PermissionsTests(HostFixture hostFixture) : EditRouteTestBase(hostFixture), IAsyncLifetime
+public class PermissionsTests(HostFixture hostFixture) : EditRouteTestBase(hostFixture)
 {
     private static readonly IReadOnlyCollection<(string? UserRole, bool CanEdit)> _roleAccess = [
         (null, false),
@@ -40,8 +40,10 @@ public class PermissionsTests(HostFixture hostFixture) : EditRouteTestBase(hostF
     private RouteToProfessionalStatusType? _route;
     private RouteToProfessionalStatusStatus _status;
 
-    async ValueTask IAsyncLifetime.InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
+        await base.InitializeAsync();
+
         _route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .First(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable);
 
@@ -56,8 +58,6 @@ public class PermissionsTests(HostFixture hostFixture) : EditRouteTestBase(hostF
         _personId = person.PersonId;
         _qualificationId = person.Qualifications!.OfType<RouteToProfessionalStatus>().First().QualificationId;
     }
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
     [MemberData(nameof(GetData))]

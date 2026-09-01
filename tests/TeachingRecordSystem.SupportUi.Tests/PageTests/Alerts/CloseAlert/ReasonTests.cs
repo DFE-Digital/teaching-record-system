@@ -2,14 +2,16 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
-public class ReasonTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixture), IAsyncLifetime
+public class ReasonTests(HostFixture hostFixture) : CloseAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.Index;
     private const string ThisStep = JourneySteps.Reason;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

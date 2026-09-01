@@ -2,10 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
+using TeachingRecordSystem.TestCommon.Database;
+
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
-public abstract class JobTestBase
+public abstract class JobTestBase : PooledDatabaseTestBase
 {
     private readonly JobFixture _fixture;
 

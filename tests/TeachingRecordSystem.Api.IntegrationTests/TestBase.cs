@@ -9,11 +9,12 @@ using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public abstract class TestBase
+public abstract class TestBase : IAsyncLifetime
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
     {
@@ -31,6 +32,8 @@ public abstract class TestBase
     };
 
     private readonly TestScopedServices _testServices;
+    private TestDatabaseLease? _databaseLease;
+    private IDisposable? _serviceScope;
 
     protected TestBase(HostFixture hostFixture)
     {
@@ -41,9 +44,37 @@ public abstract class TestBase
 
     protected HostFixture HostFixture { get; }
 
-    protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+    protected string DatabaseName =>
+        _databaseLease?.DatabaseName ?? throw new InvalidOperationException("No database has been leased.");
 
-    protected DbHelper DbHelper => HostFixture.Services.GetRequiredService<DbHelper>();
+    public virtual async ValueTask InitializeAsync()
+    {
+        _databaseLease = await TestDatabases.AcquireAsync(TestContext.Current.CancellationToken);
+        _serviceScope = TestServiceScope.Push(HostFixture.RootServices);
+    }
+
+    public virtual async ValueTask DisposeAsync()
+    {
+        _serviceScope?.Dispose();
+        _serviceScope = null;
+
+        if (_databaseLease is null)
+        {
+            return;
+        }
+
+        // Keep a failing test's data so it can be inspected: psql -d <name>
+        if (TestContext.Current.TestState?.Result == TestResult.Failed)
+        {
+            TestContext.Current.SendDiagnosticMessage($"Retained test database '{_databaseLease.DatabaseName}'.");
+            _databaseLease.Retain();
+        }
+
+        await _databaseLease.DisposeAsync();
+        _databaseLease = null;
+    }
+
+    protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     protected Guid DefaultApplicationUserId => HostFixture.DefaultApplicationUserId;
 

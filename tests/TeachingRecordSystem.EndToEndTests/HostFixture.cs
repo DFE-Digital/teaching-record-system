@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Playwright;
@@ -21,13 +22,14 @@ using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.EndToEndTests;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Webhooks;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
 
 namespace TeachingRecordSystem.EndToEndTests;
 
-public sealed class HostFixture : InitializeDbFixture
+public sealed class HostFixture : IAsyncLifetime
 {
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
     public const string DeferredFakeOneLoginAuthenticationScheme = "DeferredFakeOneLogin";
@@ -42,6 +44,7 @@ public sealed class HostFixture : InitializeDbFixture
     private readonly AuthorizeAccessWebApplicationFactory _authorizeAccessWebApplicationFactory;
     private readonly SupportUiWebApplicationFactory _supportUiWebApplicationFactory;
 
+    private TestDatabaseLease? _databaseLease;
     private IPlaywright _playwright = null!;
     private IBrowser _browser = null!;
 
@@ -56,11 +59,6 @@ public sealed class HostFixture : InitializeDbFixture
         _webhookReceiver = new();
 
         TimeProvider = TimeProvider.System;
-
-        TestData = new(
-            DbHelper.Instance.DbContextFactory,
-            new ReferenceDataCache(DbHelper.Instance.DbContextFactory),
-            this.TimeProvider);
 
         using (var rsa = RSA.Create())
         {
@@ -82,13 +80,21 @@ public sealed class HostFixture : InitializeDbFixture
 
     public SigningCredentials JwtSigningCredentials { get; }
 
-    public IDbContextFactory<TrsDbContext> DbContextFactory => DbHelper.DbContextFactory;
+    public IDbContextFactory<TrsDbContext> DbContextFactory { get; private set; } = null!;
     public TimeProvider TimeProvider { get; }
-    public TestData TestData { get; }
+    public TestData TestData { get; private set; } = null!;
     public WebhookMessageRecorder WebhookMessageRecorder { get; }
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
+        // These tests drive real Kestrel servers over HTTP, so there is no per-test context for the ambient
+        // data source. They are serialised, so one database for the whole run is enough.
+        await TestDatabases.InitializeAsync();
+        _databaseLease = await TestDatabases.AcquireForRunAsync();
+
+        DbContextFactory = PooledTestDatabaseExtensions.CreateDbContextFactory(_databaseLease);
+        TestData = new(DbContextFactory, new ReferenceDataCache(DbContextFactory), TimeProvider);
+
         _apiWebApplicationFactory.StartServer();
         _authorizeAccessWebApplicationFactory.StartServer();
         //_supportUiWebApplicationFactory.StartServer();
@@ -110,14 +116,11 @@ public sealed class HostFixture : InitializeDbFixture
         var browserType = OperatingSystem.IsMacOS() ? _playwright.Webkit : _playwright.Chromium;
         _browser = await browserType.LaunchAsync(browserOptions);
 
-        var dbHelper = DbHelper.Instance;
-        await dbHelper.InitializeAsync();
-        await dbHelper.ClearDataAsync();
         await AddTestAppToApplicationUsers();
         await AddWebhookReceiverEndpoint();
     }
 
-    public override async ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _apiWebApplicationFactory.DisposeAsync();
         await _authorizeAccessWebApplicationFactory.DisposeAsync();
@@ -125,7 +128,12 @@ public sealed class HostFixture : InitializeDbFixture
 
         _webhookReceiver.Dispose();
 
-        await base.DisposeAsync();
+        if (_databaseLease is not null)
+        {
+            await _databaseLease.DisposeAsync();
+        }
+
+        await TestDatabases.DisposeAsync();
     }
 
     public Task<IBrowserContext> CreateBrowserContext() =>
@@ -271,6 +279,11 @@ public sealed class HostFixture : InitializeDbFixture
             builder.UseEnvironment("EndToEndTests");
 
             var configuration = TestConfiguration.GetConfiguration();
+            configuration.AddInMemoryCollection([
+                KeyValuePair.Create(
+                    $"ConnectionStrings:{TrsDbContext.ConnectionName}",
+                    (string?)_hostFixture._databaseLease!.ConnectionString)
+            ]);
             builder.UseConfiguration(configuration);
 
             builder.ConfigureServices((context, services) =>
@@ -287,7 +300,6 @@ public sealed class HostFixture : InitializeDbFixture
                 _hostFixture.ConfigureServices(services);
 
                 services
-                    .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>();
             });
         }
@@ -311,6 +323,11 @@ public sealed class HostFixture : InitializeDbFixture
             builder.UseStaticWebAssets();
 
             var configuration = TestConfiguration.GetConfiguration();
+            configuration.AddInMemoryCollection([
+                KeyValuePair.Create(
+                    $"ConnectionStrings:{TrsDbContext.ConnectionName}",
+                    (string?)_hostFixture._databaseLease!.ConnectionString)
+            ]);
             builder.UseConfiguration(configuration);
 
             builder.ConfigureServices(services =>
@@ -357,7 +374,6 @@ public sealed class HostFixture : InitializeDbFixture
                 _hostFixture.ConfigureServices(services);
 
                 services
-                    .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>()
                     .AddSingleton<OneLoginCurrentUserProvider>()
                     .AddSingleton(GetMockFileService())

@@ -3,13 +3,15 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
+public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.Reason;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()

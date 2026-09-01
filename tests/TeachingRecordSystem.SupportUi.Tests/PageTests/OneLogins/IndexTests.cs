@@ -2,7 +2,6 @@ using Optional;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.OneLogins;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
