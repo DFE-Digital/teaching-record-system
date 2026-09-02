@@ -1,6 +1,233 @@
+@using Microsoft.EntityFrameworkCore
+@using TeachingRecordSystem.Core.DataStore.Postgres
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@inject IFileService FileService
+@inject TrsDbContext DbContext
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var requestData = Model.GetEvent<TrnRequestUpdatedEvent>().TrnRequest;
+    var recordWasCreated = Model.TryGetEvent<PersonCreatedEvent>(out var personCreatedEvent);
+    var hasPersonDetailsUpdatedEvent = Model.TryGetEvent<PersonDetailsUpdatedEvent>(out var personDetailsUpdatedEvent);
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+    var applicationUserName = await DbContext.ApplicationUsers
+        .Where(u => u.UserId == requestData.ApplicationUserId)
+        .Select(u => u.Name)
+        .SingleOrDefaultAsync();
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    var source = applicationUserName is not null
+        ? $"{applicationUserName} TRN request"
+        : "TRN request of unknown source";
+
+    var title = recordWasCreated
+        ? $"Record created from {source}"
+        : $"Record updated from {source}";
+
+    var changeReasonHeading = recordWasCreated ? "Reason record was created" : "Reason for change";
+    var changeReason = recordWasCreated
+        ? "Record created - no existing person identified during task resolution"
+        : "Records merged - identified as same person during task resolution";
+
+    var attributes = recordWasCreated ? personCreatedEvent!.Details : personDetailsUpdatedEvent?.PersonDetails;
+    var oldAttributes = personDetailsUpdatedEvent?.OldPersonDetails;
+    var changes = hasPersonDetailsUpdatedEvent ? personDetailsUpdatedEvent!.Changes : PersonDetailsUpdatedEventChanges.None;
+
+    var name = attributes is not null
+        ? string.JoinNonEmpty(' ', attributes.FirstName, attributes.MiddleName, attributes.LastName)
+        : null;
+    var oldName = oldAttributes is not null
+        ? string.JoinNonEmpty(' ', oldAttributes.FirstName, oldAttributes.MiddleName, oldAttributes.LastName)
+        : null;
+
+    var requestDataName = string.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
+    var evidenceFileUrl = requestData.NpqEvidenceFileId is not null
+        ? await FileService.GetFileUrlAsync(requestData.NpqEvidenceFileId.Value, TimeSpan.FromMinutes(15))
+        : null;
+}
+
+<timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <div data-testid="details">
+        <govuk-summary-list>
+            @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+            {
+                <row>
+                    <key>Name</key>
+                    <value use-empty-fallback>@name</value>
+                </row>
+            }
+            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+            {
+                <row>
+                    <key>Date of birth</key>
+                    <value use-empty-fallback>@attributes!.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+            }
+            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+            {
+                <row>
+                    <key>Email address</key>
+                    <value use-empty-fallback>@attributes!.EmailAddress</value>
+                </row>
+            }
+            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+            {
+                <row>
+                    <key>National Insurance number</key>
+                    <value use-empty-fallback>@attributes!.NationalInsuranceNumber</value>
+                </row>
+            }
+            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+            {
+                <row>
+                    <key>Gender</key>
+                    <value use-empty-fallback>@attributes!.Gender?.GetDisplayName()</value>
+                </row>
+            }
+        </govuk-summary-list>
+    </div>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+        <govuk-details-summary>@changeReasonHeading</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Reason</key>
+                    <value>@changeReason</value>
+                </row>
+                @if (!recordWasCreated)
+                {
+                    <row>
+                        <key>Comments</key>
+                        <value use-empty-fallback>@supportTaskUpdatedEvent.Comments</value>
+                    </row>
+                }
+                <row>
+                    <key>Evidence</key>
+                    <value>
+                        @if (evidenceFileUrl is not null)
+                        {
+                            <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{requestData.NpqEvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                        }
+                    </value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="request-data">
+        <govuk-details-summary>TRN request data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Source</key>
+                    <value>
+                        @if (applicationUserName is not null)
+                        {
+                            <tag color="TagColor.Auto">@applicationUserName</tag>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </value>
+                </row>
+                <row>
+                    <key>Request ID</key>
+                    <value use-empty-fallback>@requestData.RequestId</value>
+                </row>
+                <row>
+                    <key>Created on</key>
+                    <value use-empty-fallback>@requestData.CreatedOn.ToString(WebConstants.DateAndTimeDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Name</key>
+                    <value>
+                        @if (!string.IsNullOrWhiteSpace(requestDataName))
+                        {
+                            @Html.ConvertNewlinesToLineBreaks(requestDataName)
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </value>
+                </row>
+                <row>
+                    <key>Date of birth</key>
+                    <value use-empty-fallback>@requestData.DateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
+                </row>
+                <row>
+                    <key>Email address</key>
+                    <value use-empty-fallback>@requestData.EmailAddress</value>
+                </row>
+                <row>
+                    <key>National Insurance number</key>
+                    <value use-empty-fallback>@requestData.NationalInsuranceNumber</value>
+                </row>
+                <row>
+                    <key>Gender</key>
+                    <value use-empty-fallback>@requestData.Gender?.GetDisplayName()</value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+
+    @if (oldAttributes is not null)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
+            <govuk-details-summary>Previous details</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                    {
+                        <row>
+                            <key>Name</key>
+                            <value use-empty-fallback>@oldName</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+                    {
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback>@oldAttributes.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+                    {
+                        <row>
+                            <key>Email address</key>
+                            <value use-empty-fallback>@oldAttributes.EmailAddress</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+                    {
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback>@oldAttributes.NationalInsuranceNumber</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                    {
+                        <row>
+                            <key>Gender</key>
+                            <value use-empty-fallback>@oldAttributes.Gender?.GetDisplayName()</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+
+    @if (Model.ContainsEvent<EmailSentEvent>())
+    {
+        <p class="govuk-body" data-testid="email-sent-message">
+            We’ve sent them an email confirming their TRN.
+        </p>
+    }
 </timeline-entry>

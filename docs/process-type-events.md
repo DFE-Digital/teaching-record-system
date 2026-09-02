@@ -479,6 +479,12 @@ CLI `webhook-endpoint delete`.
 
 ## NPQ TRN requests (legacy)
 
+The NPQ TRN request journey was removed from the Support UI, so nothing produces these process types any
+more. They cover the requests that were handled while it existed, plus the older ones
+[`BackfillNpqTrnRequestProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNpqTrnRequestProcessesJob.cs)
+back-filled from the legacy `NpqTrnRequestSupportTaskResolvedEvent` / `NpqTrnRequestSupportTaskRejectedEvent`
+events. The tables below describe what those processes hold.
+
 ### `NpqTrnRequestTaskCreating` (15)
 
 | Event | Emitted | Scenario |
@@ -494,7 +500,7 @@ CLI `webhook-endpoint delete`.
 | `TrnRequestUpdatedEvent` | Always | — |
 | `PersonCreatedEvent` | Sometimes | The support user chooses to create a new record. |
 | `PersonDetailsUpdatedEvent` | Sometimes | The support user merges into an existing record and updates its attributes. |
-| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. |
+| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. Only ever on a process the journey created — the email was introduced after the journey was already running as a process, so the back-filled ones never have one. |
 
 ### `NpqTrnRequestRejecting` (19)
 
