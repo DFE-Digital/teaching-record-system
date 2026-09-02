@@ -7,20 +7,23 @@ namespace TeachingRecordSystem.Core.Services.SupportTasks;
 
 public static class Extensions
 {
-    public static IServiceCollection AddSupportTaskService(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddTransient<SupportTaskService>();
+        public IServiceCollection AddSupportTaskService()
+        {
+            services.AddTransient<SupportTaskService>();
 
-        return services;
-    }
+            return services;
+        }
 
-    public static IServiceCollection AddSupportTaskServices(this IServiceCollection services)
-    {
-        services.AddSupportTaskService();
-        services.AddTransient<OneLoginUserMatchingSupportTaskService>();
-        services.AddTransient<ChangeRequestSupportTaskService>();
-        services.AddTransient<TeacherPensionsSupportTaskService>();
+        public IServiceCollection AddSupportTaskServices()
+        {
+            services.AddSupportTaskService();
+            services.AddTransient<OneLoginUserMatchingSupportTaskService>();
+            services.AddTransient<ChangeRequestSupportTaskService>();
+            services.AddTransient<TeacherPensionsSupportTaskService>();
 
-        return services;
+            return services;
+        }
     }
 }

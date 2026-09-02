@@ -13,51 +13,50 @@ public static class TempDataKeys
 
 public static class TempDataExtensions
 {
-    public static void SetFlashNotificationBanner(
-        this ITempDataDictionary tempData,
-        string? heading = null,
-        string? messageText = null,
-        Action<IHtmlContentBuilder>? buildMessageHtml = null,
-        NotificationBannerType notificationBannerType = NotificationBannerType.Success)
+    extension(ITempDataDictionary tempData)
     {
-        if (messageText is not null && buildMessageHtml is not null)
+        public void SetFlashNotificationBanner(string? heading = null,
+            string? messageText = null,
+            Action<IHtmlContentBuilder>? buildMessageHtml = null,
+            NotificationBannerType notificationBannerType = NotificationBannerType.Success)
         {
-            throw new ArgumentException($"Cannot set both {nameof(messageText)} and {nameof(buildMessageHtml)}.");
-        }
-
-        string? messageHtml = null;
-        if (buildMessageHtml is not null)
-        {
-            var builder = new HtmlContentBuilder();
-            buildMessageHtml(builder);
-            messageHtml = builder.ToHtmlString(HtmlEncoder.Default);
-        }
-
-        tempData.Add(
-            TempDataKeys.FlashSuccess,
-            new FlashNotificationBannerData
+            if (messageText is not null && buildMessageHtml is not null)
             {
-                Heading = heading,
-                Message = messageText,
-                MessageHtml = messageHtml,
-                NotificationBannerType = notificationBannerType
-            }.Serialize());
-    }
+                throw new ArgumentException($"Cannot set both {nameof(messageText)} and {nameof(buildMessageHtml)}.");
+            }
 
-    public static bool TryGetFlashNotificationBanner(
-        this ITempDataDictionary tempData,
-        [NotNullWhen(true)] out (string? Heading, string? MessageText, string? MessageHtml, NotificationBannerType NotificationBannerType)? result)
-    {
-        if (tempData.TryGetValue(TempDataKeys.FlashSuccess, out object? flashSuccessObject) && flashSuccessObject is string flashSuccessString)
-        {
-            var data = FlashNotificationBannerData.Deserialize(flashSuccessString);
-            result = (data.Heading, MessageText: data.Message, data.MessageHtml, data.NotificationBannerType);
-            return true;
+            string? messageHtml = null;
+            if (buildMessageHtml is not null)
+            {
+                var builder = new HtmlContentBuilder();
+                buildMessageHtml(builder);
+                messageHtml = builder.ToHtmlString(HtmlEncoder.Default);
+            }
+
+            tempData.Add(
+                TempDataKeys.FlashSuccess,
+                new FlashNotificationBannerData
+                {
+                    Heading = heading,
+                    Message = messageText,
+                    MessageHtml = messageHtml,
+                    NotificationBannerType = notificationBannerType
+                }.Serialize());
         }
-        else
+
+        public bool TryGetFlashNotificationBanner([NotNullWhen(true)] out (string? Heading, string? MessageText, string? MessageHtml, NotificationBannerType NotificationBannerType)? result)
         {
-            result = default;
-            return false;
+            if (tempData.TryGetValue(TempDataKeys.FlashSuccess, out object? flashSuccessObject) && flashSuccessObject is string flashSuccessString)
+            {
+                var data = FlashNotificationBannerData.Deserialize(flashSuccessString);
+                result = (data.Heading, MessageText: data.Message, data.MessageHtml, data.NotificationBannerType);
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
         }
     }
 

@@ -10,26 +10,29 @@ public interface IStartupTask
 
 public static partial class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddStartupTask(this IServiceCollection services, IStartupTask task) =>
-        AddStartupTask(services, _ => task);
-
-    public static IServiceCollection AddStartupTask<T>(this IServiceCollection services) where T : class, IStartupTask =>
-        AddStartupTask(services, sp => sp.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(sp));
-
-    public static IServiceCollection AddStartupTask(this IServiceCollection services, Func<IServiceProvider, IStartupTask> createTask)
+    extension(IServiceCollection services)
     {
-        if (!services.Any(d => !d.IsKeyedService && d.ImplementationType == typeof(RunStartupTasksHostedService)))
+        public IServiceCollection AddStartupTask(IStartupTask task) =>
+            AddStartupTask(services, _ => task);
+
+        public IServiceCollection AddStartupTask<T>() where T : class, IStartupTask =>
+            AddStartupTask(services, sp => sp.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(sp));
+
+        public IServiceCollection AddStartupTask(Func<IServiceProvider, IStartupTask> createTask)
         {
-            services.Insert(0, ServiceDescriptor.Transient<IHostedService, RunStartupTasksHostedService>());
+            if (!services.Any(d => !d.IsKeyedService && d.ImplementationType == typeof(RunStartupTasksHostedService)))
+            {
+                services.Insert(0, ServiceDescriptor.Transient<IHostedService, RunStartupTasksHostedService>());
+            }
+
+            services.AddTransient(sp => createTask(sp));
+
+            return services;
         }
 
-        services.AddTransient(sp => createTask(sp));
-
-        return services;
+        public IServiceCollection AddStartupTask(Func<IServiceProvider, Task> action) =>
+            AddStartupTask(services, sp => new DelegateStartupTask(sp, action));
     }
-
-    public static IServiceCollection AddStartupTask(this IServiceCollection services, Func<IServiceProvider, Task> action) =>
-        AddStartupTask(services, sp => new DelegateStartupTask(sp, action));
 
     private class DelegateStartupTask : IStartupTask
     {

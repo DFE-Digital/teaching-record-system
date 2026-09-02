@@ -22,9 +22,11 @@ public static class SupportTaskCategoryRegistry
     public static IReadOnlyCollection<SupportTaskCategoryInfo> GetAll() =>
         _info.Values.OrderBy(s => s.Title).ToArray();
 
-    public static string GetName(this SupportTaskCategory supportTaskCategory) => _info[supportTaskCategory].Name;
-
-    public static string GetTitle(this SupportTaskCategory supportTaskCategory) => _info[supportTaskCategory].Title;
+    extension(SupportTaskCategory supportTaskCategory)
+    {
+        public string GetName() => _info[supportTaskCategory].Name;
+        public string GetTitle() => _info[supportTaskCategory].Title;
+    }
 
     public static SupportTaskCategory GetSupportTaskCategoryForType(SupportTaskType supportTaskType) =>
         SupportTaskTypeRegistry.GetCategory(supportTaskType);

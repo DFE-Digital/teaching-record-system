@@ -40,46 +40,49 @@ public static class Extensions
             .AddJsonFile($"appsettings.aks_{deployedEnvironmentName}_shared.json");
     }
 
-    public static IServiceCollection AddBackgroundJobScheduler(this IServiceCollection services, IHostEnvironment environment)
+    extension(IServiceCollection services)
     {
-        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        public IServiceCollection AddBackgroundJobScheduler(IHostEnvironment environment)
         {
-            services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+            if (!environment.IsTests() && !environment.IsEndToEndTests())
+            {
+                services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+            }
+
+            return services;
         }
 
-        return services;
-    }
-
-    public static IServiceCollection AddBlobStorage(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
-    {
-        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        public IServiceCollection AddBlobStorage(IConfiguration configuration, IHostEnvironment environment)
         {
-            services.AddAzureClients(clientBuilder =>
+            if (!environment.IsTests() && !environment.IsEndToEndTests())
             {
-                clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
-
-                clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("SafeStorageConnectionString"))
-                    .WithName("safe");
-            });
-
-            services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
-            {
-                var sftpAccountName = configuration.GetValue<string>("SftpStorageName");
-                var sftpAccessKey = configuration.GetValue<string>("SftpStorageAccessKey");
-
-                if (string.IsNullOrEmpty(sftpAccountName) || string.IsNullOrEmpty(sftpAccessKey))
+                services.AddAzureClients(clientBuilder =>
                 {
-                    throw new InvalidOperationException("Invalid SFTP Storage connection string configuration.");
-                }
+                    clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
 
-                var dfsUri = new Uri($"https://{sftpAccountName}.dfs.core.windows.net");
-                var credential = new StorageSharedKeyCredential(sftpAccountName, sftpAccessKey);
+                    clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("SafeStorageConnectionString"))
+                        .WithName("safe");
+                });
 
-                return new DataLakeServiceClient(dfsUri, credential);
-            });
+                services.AddKeyedSingleton<DataLakeServiceClient>("sftpstorage", (sp, key) =>
+                {
+                    var sftpAccountName = configuration.GetValue<string>("SftpStorageName");
+                    var sftpAccessKey = configuration.GetValue<string>("SftpStorageAccessKey");
+
+                    if (string.IsNullOrEmpty(sftpAccountName) || string.IsNullOrEmpty(sftpAccessKey))
+                    {
+                        throw new InvalidOperationException("Invalid SFTP Storage connection string configuration.");
+                    }
+
+                    var dfsUri = new Uri($"https://{sftpAccountName}.dfs.core.windows.net");
+                    var credential = new StorageSharedKeyCredential(sftpAccountName, sftpAccessKey);
+
+                    return new DataLakeServiceClient(dfsUri, credential);
+                });
+            }
+
+            return services;
         }
-
-        return services;
     }
 
     public static IHostApplicationBuilder AddCoreServices(this IHostApplicationBuilder builder)
@@ -89,81 +92,84 @@ public static class Extensions
         return builder;
     }
 
-    public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    extension(IServiceCollection services)
     {
-        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        public IServiceCollection AddCoreServices(IConfiguration configuration, IHostEnvironment environment)
         {
-            services.AddOptions<AccessYourTeachingQualificationsOptions>()
-                .Bind(configuration.GetSection("AccessYourTeachingQualifications"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+            if (!environment.IsTests() && !environment.IsEndToEndTests())
+            {
+                services.AddOptions<AccessYourTeachingQualificationsOptions>()
+                    .Bind(configuration.GetSection("AccessYourTeachingQualifications"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+            }
+
+            services
+                .AddTimeProvider()
+                .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
+                .AddDatabase(configuration)
+                .AddHangfire(environment)
+                .AddBackgroundJobScheduler(environment)
+                .AddWebhookMessageFactory()
+                .AddSingleton<ReferenceDataCache>()
+                .AddBlobStorage(configuration, environment)
+                .AddFileService()
+                .AddNameSynonyms()
+                .AddTrnRequestService(configuration)
+                .AddEventPublisher()
+                .AddSupportTaskServices()
+                .AddSingleton<PersonInfoCache>()
+                .AddNoteService()
+                .AddPersonService()
+                .AddAlertService()
+                .AddMandatoryQualificationService()
+                .AddRoutesToProfessionalStatusService()
+                .AddUserService()
+                .AddInductionExemptionService()
+                .AddOneLoginService();
+
+            return services;
         }
 
-        services
-            .AddTimeProvider()
-            .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
-            .AddDatabase(configuration)
-            .AddHangfire(environment)
-            .AddBackgroundJobScheduler(environment)
-            .AddWebhookMessageFactory()
-            .AddSingleton<ReferenceDataCache>()
-            .AddBlobStorage(configuration, environment)
-            .AddFileService()
-            .AddNameSynonyms()
-            .AddTrnRequestService(configuration)
-            .AddEventPublisher()
-            .AddSupportTaskServices()
-            .AddSingleton<PersonInfoCache>()
-            .AddNoteService()
-            .AddPersonService()
-            .AddAlertService()
-            .AddMandatoryQualificationService()
-            .AddRoutesToProfessionalStatusService()
-            .AddUserService()
-            .AddInductionExemptionService()
-            .AddOneLoginService();
+        public IServiceCollection AddDatabase(IConfiguration configuration)
+        {
+            var connectionString = configuration.GetPostgresConnectionString();
 
-        return services;
-    }
+            return services.AddDatabase(connectionString);
+        }
 
-    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        var connectionString = configuration.GetPostgresConnectionString();
+        public IServiceCollection AddDatabase(string connectionString)
+        {
+            services.AddNpgsqlDataSource(connectionString, builder => builder.Name = "TrsDb");
 
-        return services.AddDatabase(connectionString);
-    }
+            services.AddDbContext<TrsDbContext>(
+                options => TrsDbContext.ConfigureOptions(options),
+                contextLifetime: ServiceLifetime.Scoped,
+                optionsLifetime: ServiceLifetime.Singleton);
 
-    public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
-    {
-        services.AddNpgsqlDataSource(connectionString, builder => builder.Name = "TrsDb");
+            services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options));
 
-        services.AddDbContext<TrsDbContext>(
-            options => TrsDbContext.ConfigureOptions(options),
-            contextLifetime: ServiceLifetime.Scoped,
-            optionsLifetime: ServiceLifetime.Singleton);
+            return services;
+        }
 
-        services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options));
+        public IServiceCollection AddTimeProvider()
+        {
+            services.AddSingleton(TimeProvider.System);
 
-        return services;
-    }
+            return services;
+        }
 
-    public static IServiceCollection AddTimeProvider(this IServiceCollection services)
-    {
-        services.AddSingleton(TimeProvider.System);
+        public IServiceCollection AddEventPublisher()
+        {
+            services.AddScoped<IEventPublisher, EventPublisher>();
 
-        return services;
-    }
+            services.Scan(s => s.FromAssemblyOf<IEvent>()
+                .AddClasses(c => c.AssignableToAny(typeof(IEventHandler), typeof(IEventHandler<>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
 
-    public static IServiceCollection AddEventPublisher(this IServiceCollection services)
-    {
-        services.AddScoped<IEventPublisher, EventPublisher>();
-
-        services.Scan(s => s.FromAssemblyOf<IEvent>()
-            .AddClasses(c => c.AssignableToAny(typeof(IEventHandler), typeof(IEventHandler<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
-
-        return services;
+            return services;
+        }
     }
 
     public static IHostApplicationBuilder AddHangfire(this IHostApplicationBuilder builder)
@@ -173,51 +179,54 @@ public static class Extensions
         return builder;
     }
 
-    public static IServiceCollection AddHangfire(this IServiceCollection services, IHostEnvironment environment)
+    extension(IServiceCollection services)
     {
-        var prepareSchemaIfNecessary = true;
-
-        var schemaPreparedMarkerFile = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "TeachingRecordSystem",
-            "hangfire-schema-prepared");
-
-        // Try to skip schema preparation in development to speed up startup
-        if (environment.IsDevelopment() && System.IO.File.Exists(schemaPreparedMarkerFile))
+        public IServiceCollection AddHangfire(IHostEnvironment environment)
         {
-            prepareSchemaIfNecessary = false;
+            var prepareSchemaIfNecessary = true;
+
+            var schemaPreparedMarkerFile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "TeachingRecordSystem",
+                "hangfire-schema-prepared");
+
+            // Try to skip schema preparation in development to speed up startup
+            if (environment.IsDevelopment() && System.IO.File.Exists(schemaPreparedMarkerFile))
+            {
+                prepareSchemaIfNecessary = false;
+            }
+
+            if (!environment.IsTests() && !environment.IsEndToEndTests())
+            {
+                services.AddHangfire((sp, configuration) => configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UsePostgreSqlStorage(o => o.UseConnectionFactory(new DbDataSourceConnectionFactory(sp.GetRequiredService<NpgsqlDataSource>())),
+                        new PostgreSqlStorageOptions()
+                        {
+                            PrepareSchemaIfNecessary = prepareSchemaIfNecessary,
+                            UseSlidingInvisibilityTimeout = true
+                        }));
+            }
+
+            if (environment.IsDevelopment() && !System.IO.File.Exists(schemaPreparedMarkerFile))
+            {
+                Directory.CreateDirectory(Directory.GetParent(schemaPreparedMarkerFile)!.FullName);
+                System.IO.File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
+            }
+
+            return services;
         }
 
-        if (!environment.IsTests() && !environment.IsEndToEndTests())
+        public IServiceCollection AddWebhookMessageFactory()
         {
-            services.AddHangfire((sp, configuration) => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(o => o.UseConnectionFactory(new DbDataSourceConnectionFactory(sp.GetRequiredService<NpgsqlDataSource>())),
-                    new PostgreSqlStorageOptions()
-                    {
-                        PrepareSchemaIfNecessary = prepareSchemaIfNecessary,
-                        UseSlidingInvisibilityTimeout = true
-                    }));
+            services
+                .AddTransient<WebhookMessageFactory>()
+                .AddSingleton<EventMapperRegistry>();
+
+            return services;
         }
-
-        if (environment.IsDevelopment() && !System.IO.File.Exists(schemaPreparedMarkerFile))
-        {
-            Directory.CreateDirectory(Directory.GetParent(schemaPreparedMarkerFile)!.FullName);
-            System.IO.File.WriteAllText(schemaPreparedMarkerFile, string.Empty);
-        }
-
-        return services;
-    }
-
-    public static IServiceCollection AddWebhookMessageFactory(this IServiceCollection services)
-    {
-        services
-            .AddTransient<WebhookMessageFactory>()
-            .AddSingleton<EventMapperRegistry>();
-
-        return services;
     }
 
     public static void ConfigureSerilog(

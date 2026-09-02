@@ -4,30 +4,33 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public static class OneLoginExtensions
 {
-    public static Task GoToDisconnectOneLoginAsync(this IPage page, Guid personId, string subject)
+    extension(IPage page)
     {
-        return page.GotoAsync($"/persons/{personId}/disconnect-one-login/{subject}");
-    }
+        public Task GoToDisconnectOneLoginAsync(Guid personId, string subject)
+        {
+            return page.GotoAsync($"/persons/{personId}/disconnect-one-login/{subject}");
+        }
 
-    public static Task ClickDisconnectOneLoginLinkAsync(this IPage page, string emailAddress)
-    {
-        return page.GetByTestId("associated-one-login-users")
-            .GetByRole(AriaRole.Link, new() { Name = $"Disconnect {emailAddress}" })
-            .ClickAsync();
-    }
+        public Task ClickDisconnectOneLoginLinkAsync(string emailAddress)
+        {
+            return page.GetByTestId("associated-one-login-users")
+                .GetByRole(AriaRole.Link, new() { Name = $"Disconnect {emailAddress}" })
+                .ClickAsync();
+        }
 
-    public static Task AssertOnDisconnectOneLoginIndexPageAsync(this IPage page, Guid personId, string subject)
-    {
-        return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}");
-    }
+        public Task AssertOnDisconnectOneLoginIndexPageAsync(Guid personId, string subject)
+        {
+            return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}");
+        }
 
-    public static Task AssertOnDisconnectOneLoginVerifiedPageAsync(this IPage page, Guid personId, string subject)
-    {
-        return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}/verified");
-    }
+        public Task AssertOnDisconnectOneLoginVerifiedPageAsync(Guid personId, string subject)
+        {
+            return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}/verified");
+        }
 
-    public static Task AssertOnDisconnectOneLoginCheckYourAnswersPageAsync(this IPage page, Guid personId, string subject)
-    {
-        return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}/check-answers");
+        public Task AssertOnDisconnectOneLoginCheckYourAnswersPageAsync(Guid personId, string subject)
+        {
+            return page.WaitForUrlPathAsync($"/persons/{personId}/disconnect-one-login/{subject}/check-answers");
+        }
     }
 }

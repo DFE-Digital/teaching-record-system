@@ -32,16 +32,20 @@ public static class MandatoryQualificationSpecialismRegistry
     public static IReadOnlyCollection<MandatoryQualificationSpecialismInfo> GetAll(bool includeLegacy) =>
         _info.Values.Where(i => includeLegacy || !i.Legacy).OrderBy(s => s.Title).ToArray();
 
-    public static string GetName(this MandatoryQualificationSpecialism specialism) => _info[specialism].Name;
-
-    public static string GetTitle(this MandatoryQualificationSpecialism specialism) => _info[specialism].Title;
+    extension(MandatoryQualificationSpecialism specialism)
+    {
+        public string GetName() => _info[specialism].Name;
+        public string GetTitle() => _info[specialism].Title;
+    }
 
     public static MandatoryQualificationSpecialism GetByDqtValue(string dqtValue) =>
         _info.Single(i => i.Value.DqtValue == dqtValue, $"Failed mapping '{dqtValue}' to {nameof(MandatoryQualificationSpecialism)}.").Key;
 
-    public static string GetDqtValue(this MandatoryQualificationSpecialism specialism) => _info[specialism].DqtValue;
-
-    public static bool IsLegacy(this MandatoryQualificationSpecialism specialism) => _info[specialism].Legacy;
+    extension(MandatoryQualificationSpecialism specialism)
+    {
+        public string GetDqtValue() => _info[specialism].DqtValue;
+        public bool IsLegacy() => _info[specialism].Legacy;
+    }
 
     public static bool TryMapFromDqtSpecialism(string mqestablishmentValue, string dqtValue, [NotNullWhen(true)] out MandatoryQualificationSpecialism? specialism)
     {

@@ -12,120 +12,123 @@ public static class HttpResponseMessageExtensions
 {
     private static readonly string[] _testDataStrings = GetTestDataStrings();
 
-    public static async Task<IHtmlDocument> GetDocumentAsync(this HttpResponseMessage response)
+    extension(HttpResponseMessage response)
     {
-        var content = await response.Content.ReadAsStringAsync();
-
-        var browsingContext = BrowsingContext.New(Configuration.Default);
-        var doc = (IHtmlDocument)await browsingContext.OpenAsync(req => req.Content(content));
-
-        AssertSmartQuotesUsed();
-        AssertDateInputsIncludeHint();
-
-        return doc;
-
-        void AssertSmartQuotesUsed()
+        public async Task<IHtmlDocument> GetDocumentAsync()
         {
-            VisitDocumentNodes(
-                doc,
-                node =>
-                {
-                    if (node.NodeType != NodeType.Text)
-                    {
-                        return;
-                    }
+            var content = await response.Content.ReadAsStringAsync();
 
-                    if (node.ParentElement is IHtmlScriptElement)
-                    {
-                        return;
-                    }
+            var browsingContext = BrowsingContext.New(Configuration.Default);
+            var doc = (IHtmlDocument)await browsingContext.OpenAsync(req => req.Content(content));
 
-                    using var reader = new StringReader(node.Text());
-                    string? line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        // Some of our test data has non-smart quotes in it; ignore errors for that data
-                        if (_testDataStrings.Any(d => line.Contains(d)))
-                        {
-                            continue;
-                        }
+            AssertSmartQuotesUsed();
+            AssertDateInputsIncludeHint();
 
-                        var nonSmartQuoteIndex = line.IndexOf('\'');
-                        if (nonSmartQuoteIndex != -1)
-                        {
-                            var indicatorLine = new string(' ', nonSmartQuoteIndex) + "^";
-                            var message = $"Missing smart quote:\n{line}\n{indicatorLine}";
-                            throw new XunitException(message);
-                        }
-                    }
-                });
-        }
+            return doc;
 
-        void AssertDateInputsIncludeHint()
-        {
-            foreach (var dateInputContainer in doc.QuerySelectorAll(".govuk-date-input"))
+            void AssertSmartQuotesUsed()
             {
-                // Find the closest fieldset ancestor
-                var dateParentElement = dateInputContainer.ParentElement;
-                while (dateParentElement != null && dateParentElement is not IHtmlFieldSetElement)
-                {
-                    dateParentElement = dateParentElement.ParentElement;
-                }
-
-                if (dateParentElement is IHtmlFieldSetElement fieldsetElement)
-                {
-                    // Look for a .govuk-hint element inside the fieldset
-                    var hintElement = fieldsetElement.QuerySelector(".govuk-hint");
-                    if (hintElement == null)
+                VisitDocumentNodes(
+                    doc,
+                    node =>
                     {
-                        throw new XunitException("Date input is missing a govuk-hint element in the fieldset.");
+                        if (node.NodeType != NodeType.Text)
+                        {
+                            return;
+                        }
+
+                        if (node.ParentElement is IHtmlScriptElement)
+                        {
+                            return;
+                        }
+
+                        using var reader = new StringReader(node.Text());
+                        string? line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            // Some of our test data has non-smart quotes in it; ignore errors for that data
+                            if (_testDataStrings.Any(d => line.Contains(d)))
+                            {
+                                continue;
+                            }
+
+                            var nonSmartQuoteIndex = line.IndexOf('\'');
+                            if (nonSmartQuoteIndex != -1)
+                            {
+                                var indicatorLine = new string(' ', nonSmartQuoteIndex) + "^";
+                                var message = $"Missing smart quote:\n{line}\n{indicatorLine}";
+                                throw new XunitException(message);
+                            }
+                        }
+                    });
+            }
+
+            void AssertDateInputsIncludeHint()
+            {
+                foreach (var dateInputContainer in doc.QuerySelectorAll(".govuk-date-input"))
+                {
+                    // Find the closest fieldset ancestor
+                    var dateParentElement = dateInputContainer.ParentElement;
+                    while (dateParentElement != null && dateParentElement is not IHtmlFieldSetElement)
+                    {
+                        dateParentElement = dateParentElement.ParentElement;
+                    }
+
+                    if (dateParentElement is IHtmlFieldSetElement fieldsetElement)
+                    {
+                        // Look for a .govuk-hint element inside the fieldset
+                        var hintElement = fieldsetElement.QuerySelector(".govuk-hint");
+                        if (hintElement == null)
+                        {
+                            throw new XunitException("Date input is missing a govuk-hint element in the fieldset.");
+                        }
+                    }
+                    else
+                    {
+                        throw new XunitException("Date input is not inside a fieldset.");
                     }
                 }
-                else
+            }
+
+            void VisitDocumentNodes(IHtmlDocument document, Action<INode> visit)
+            {
+                VisitNode(document.DocumentElement);
+
+                void VisitNode(INode node)
                 {
-                    throw new XunitException("Date input is not inside a fieldset.");
+                    visit(node);
+
+                    foreach (var child in node.GetDescendants())
+                    {
+                        visit(child);
+                    }
                 }
             }
         }
 
-        void VisitDocumentNodes(IHtmlDocument document, Action<INode> visit)
+        public async Task<HttpResponseMessage> FollowRedirectAsync(HttpClient httpClient)
         {
-            VisitNode(document.DocumentElement);
+            var statusCode = (int)response.StatusCode;
 
-            void VisitNode(INode node)
+            if (statusCode < 300 || statusCode > 399)
             {
-                visit(node);
-
-                foreach (var child in node.GetDescendants())
-                {
-                    visit(child);
-                }
+                throw new InvalidOperationException($"Response status code is not a redirect status: {statusCode}.");
             }
+
+            if (statusCode != StatusCodes.Status302Found)
+            {
+                throw new NotSupportedException();
+            }
+
+            var location = response.Headers.Location?.OriginalString;
+
+            if (location is null)
+            {
+                throw new InvalidOperationException("Response does not contain a Location header.");
+            }
+
+            return await httpClient.GetAsync(location);
         }
-    }
-
-    public static async Task<HttpResponseMessage> FollowRedirectAsync(this HttpResponseMessage response, HttpClient httpClient)
-    {
-        var statusCode = (int)response.StatusCode;
-
-        if (statusCode < 300 || statusCode > 399)
-        {
-            throw new InvalidOperationException($"Response status code is not a redirect status: {statusCode}.");
-        }
-
-        if (statusCode != StatusCodes.Status302Found)
-        {
-            throw new NotSupportedException();
-        }
-
-        var location = response.Headers.Location?.OriginalString;
-
-        if (location is null)
-        {
-            throw new InvalidOperationException("Response does not contain a Location header.");
-        }
-
-        return await httpClient.GetAsync(location);
     }
 
     private static string[] GetTestDataStrings()

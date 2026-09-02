@@ -4,81 +4,84 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Persons;
 
 public static class PersonsPageExtensions
 {
-    public static Task GoToPersonAlertsPageAsync(this IPage page, Guid personId) =>
-        page.GotoAsync($"/persons/{personId}/alerts");
+    extension(IPage page)
+    {
+        public Task GoToPersonAlertsPageAsync(Guid personId) =>
+            page.GotoAsync($"/persons/{personId}/alerts");
 
-    public static Task GoToPersonDetailPageAsync(this IPage page, Guid personId) =>
-        page.GotoAsync($"/persons/{personId}");
+        public Task GoToPersonDetailPageAsync(Guid personId) =>
+            page.GotoAsync($"/persons/{personId}");
 
-    public static Task GoToPersonAddPersonPageAsync(this IPage page) =>
-        page.GotoAsync($"/persons/add");
+        public Task GoToPersonAddPersonPageAsync() =>
+            page.GotoAsync($"/persons/add");
 
-    public static Task GoToPersonQualificationsPageAsync(this IPage page, Guid personId) =>
-        page.GotoAsync($"/persons/{personId}/qualifications");
+        public Task GoToPersonQualificationsPageAsync(Guid personId) =>
+            page.GotoAsync($"/persons/{personId}/qualifications");
 
-    public static Task AssertOnPersonDetailPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}");
+        public Task AssertOnPersonDetailPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}");
 
-    public static Task AssertOnPersonAlertsPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
+        public Task AssertOnPersonAlertsPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
 
-    public static Task AssertOnPersonQualificationsPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
+        public Task AssertOnPersonQualificationsPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
 
-    public static Task AssertOnPersonEditNamePageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-name");
+        public Task AssertOnPersonEditNamePageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-name");
 
-    public static Task AssertOnPersonEditNameConfirmPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-name/confirm");
+        public Task AssertOnPersonEditNameConfirmPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-name/confirm");
 
-    public static Task AssertOnPersonEditDateOfBirthPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth");
+        public Task AssertOnPersonEditDateOfBirthPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth");
 
-    public static Task AssertOnPersonEditDateOfBirthConfirmPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth/confirm");
+        public Task AssertOnPersonEditDateOfBirthConfirmPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth/confirm");
 
-    public static Task AssertOnPersonEditDetailsPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-details");
+        public Task AssertOnPersonEditDetailsPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-details");
 
-    public static Task AssertOnPersonEditDetailsNameChangeReasonPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/name-change-reason");
+        public Task AssertOnPersonEditDetailsNameChangeReasonPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/name-change-reason");
 
-    public static Task AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/other-details-change-reason");
+        public Task AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/other-details-change-reason");
 
-    public static Task AssertOnPersonEditDetailsCheckAnswersPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/check-answers");
+        public Task AssertOnPersonEditDetailsCheckAnswersPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/check-answers");
 
-    public static Task AssertOnAddPersonIndexPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/add");
+        public Task AssertOnAddPersonIndexPageAsync() =>
+            page.WaitForUrlPathAsync($"/persons/add");
 
-    public static Task AssertOnAddPersonPersonalDetailsPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/add/personal-details");
+        public Task AssertOnAddPersonPersonalDetailsPageAsync() =>
+            page.WaitForUrlPathAsync($"/persons/add/personal-details");
 
-    public static Task AssertOnAddPersonReasonPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/add/reason");
+        public Task AssertOnAddPersonReasonPageAsync() =>
+            page.WaitForUrlPathAsync($"/persons/add/reason");
 
-    public static Task AssertOnAddPersonCheckAnswersPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/persons/add/check-answers");
+        public Task AssertOnAddPersonCheckAnswersPageAsync() =>
+            page.WaitForUrlPathAsync($"/persons/add/check-answers");
 
-    public static Task AssertOnPersonSetStatusChangeReasonPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/reason");
+        public Task AssertOnPersonSetStatusChangeReasonPageAsync(Guid personId, PersonStatus targetStatus) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/reason");
 
-    public static Task AssertOnPersonSetStatusCheckAnswersPageAsync(this IPage page, Guid personId, PersonStatus targetStatus) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/check-answers");
+        public Task AssertOnPersonSetStatusCheckAnswersPageAsync(Guid personId, PersonStatus targetStatus) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/set-status/{targetStatus}/check-answers");
 
-    public static Task AssertOnMergePersonEnterTrnPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/merge/enter-trn");
+        public Task AssertOnMergePersonEnterTrnPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/merge/enter-trn");
 
-    public static Task AssertOnMergePersonMatchesPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/merge/matches");
+        public Task AssertOnMergePersonMatchesPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/merge/matches");
 
-    public static Task AssertOnMergePersonMergePageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/merge/merge");
+        public Task AssertOnMergePersonMergePageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/merge/merge");
 
-    public static Task AssertOnMergePersonReasonPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/merge/reason");
+        public Task AssertOnMergePersonReasonPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/merge/reason");
 
-    public static Task AssertOnMergePersonCheckAnswersPageAsync(this IPage page, Guid personId) =>
-        page.WaitForUrlPathAsync($"/persons/{personId}/merge/check-answers");
+        public Task AssertOnMergePersonCheckAnswersPageAsync(Guid personId) =>
+            page.WaitForUrlPathAsync($"/persons/{personId}/merge/check-answers");
+    }
 }

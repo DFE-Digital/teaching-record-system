@@ -313,55 +313,61 @@ public static partial class AssertEx
         doc.Body!.AssertNoChangeLink(keyContent);
     }
 
-    public static async Task<Guid> AssertFileWasUploadedAsync(this Mock<IFileService> fileServiceMock)
+    extension(Mock<IFileService> fileServiceMock)
     {
-        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Once);
-        return await Assert.IsType<Task<Guid>>(fileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
-    }
-
-    public static void AssertFileWasNotUploaded(this Mock<IFileService> fileServiceMock)
-    {
-        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
-    }
-
-    public static void AssertFileWasDeleted(this Mock<IFileService> fileServiceMock, Guid fileId)
-    {
-        fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
-    }
-
-    public static void AssertSummaryListHasRows(this IElement element, params (string Key, string? Value)[] expectedKeysAndValues)
-    {
-        var rows = element.GetElementsByClassName("govuk-summary-list__row");
-
-        Assert.Collection(rows, expectedKeysAndValues.Select(kv => (Action<IElement>)(row =>
+        public async Task<Guid> AssertFileWasUploadedAsync()
         {
-            var keyElement = row.GetElementsByClassName("govuk-summary-list__key").Single();
-            Assert.Equal(kv.Key, keyElement.TrimmedText());
+            fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Once);
+            return await Assert.IsType<Task<Guid>>(fileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
+        }
 
-            var valueElement = row.GetElementsByClassName("govuk-summary-list__value").Single();
-            Assert.Equal(kv.Value, valueElement.TrimmedText());
-        })).ToArray());
+        public void AssertFileWasNotUploaded()
+        {
+            fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
+        }
+
+        public void AssertFileWasDeleted(Guid fileId)
+        {
+            fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
+        }
     }
 
-    private static void AssertSummaryListRowValueCore<T>(this IElement doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
+    extension(IElement element)
     {
-        IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
-        Assert.NotNull(container);
+        public void AssertSummaryListHasRows(params (string Key, string? Value)[] expectedKeysAndValues)
+        {
+            var rows = element.GetElementsByClassName("govuk-summary-list__row");
 
-        var label = container.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
-        AssertSummaryListRowValueCore(label, valueAssertion);
-    }
+            Assert.Collection(rows, expectedKeysAndValues.Select(kv => (Action<IElement>)(row =>
+            {
+                var keyElement = row.GetElementsByClassName("govuk-summary-list__key").Single();
+                Assert.Equal(kv.Key, keyElement.TrimmedText());
 
-    private static void AssertSummaryListRowValuesCore<T>(this IElement doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
-    {
-        IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
-        Assert.NotNull(container);
+                var valueElement = row.GetElementsByClassName("govuk-summary-list__value").Single();
+                Assert.Equal(kv.Value, valueElement.TrimmedText());
+            })).ToArray());
+        }
 
-        var labels = container.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == keyContent);
-        Assert.Collection(labels, valueAssertions
-            .AsEnumerable()
-            .Select<Action<T>, Action<IElement>>(assertion => (label => AssertSummaryListRowValueCore(label, assertion)))
-            .ToArray());
+        private void AssertSummaryListRowValueCore<T>(string? containerTestId, string keyContent, Action<T> valueAssertion)
+        {
+            IParentNode? container = containerTestId is null ? element : element.GetAllElementsByTestId(containerTestId).SingleOrDefault();
+            Assert.NotNull(container);
+
+            var label = container.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
+            AssertSummaryListRowValueCore(label, valueAssertion);
+        }
+
+        private void AssertSummaryListRowValuesCore<T>(string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
+        {
+            IParentNode? container = containerTestId is null ? element : element.GetAllElementsByTestId(containerTestId).SingleOrDefault();
+            Assert.NotNull(container);
+
+            var labels = container.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == keyContent);
+            Assert.Collection(labels, valueAssertions
+                .AsEnumerable()
+                .Select<Action<T>, Action<IElement>>(assertion => (label => AssertSummaryListRowValueCore<T>(label, assertion)))
+                .ToArray());
+        }
     }
 
     private static void AssertSummaryListRowValueCore<T>(IElement? label, Action<T> valueAssertion)

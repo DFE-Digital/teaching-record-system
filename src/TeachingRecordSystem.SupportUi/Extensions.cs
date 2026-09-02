@@ -37,142 +37,145 @@ public static class Extensions
         return builder;
     }
 
-    public static IServiceCollection AddSupportUiServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    extension(IServiceCollection services)
     {
-        if (environment.IsDevelopment())
+        public IServiceCollection AddSupportUiServices(IConfiguration configuration, IHostEnvironment environment)
         {
-            services.AddSassCompiler();
-        }
-
-        services.AddGovUkFrontend(options =>
-        {
-            options.DefaultButtonPreventDoubleClick = true;
-            options.DefaultFileUploadJavaScriptEnhancements = true;
-        });
-
-        services.AddCsp(nonceByteAmount: 32);
-
-        services.AddSession(options =>
-        {
-            options.Cookie.Name = "sess";
-            options.Cookie.IsEssential = true;
-        });
-
-        services.AddGovUkQuestions();
-
-        services
-            .AddRazorPages()
-            .AddMvcOptions(options =>
+            if (environment.IsDevelopment())
             {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
+                services.AddSassCompiler();
+            }
 
-                options.Filters.Add(new FluentValidationExceptionFilter());
-                options.Filters.Add(new AuthorizeFilter(policy));
-                options.Filters.Add(new CheckUserExistsFilter());
-                options.Filters.Add(new ServiceFilterAttribute<RedirectWithPersonIdFilter> { Order = RedirectWithPersonIdFilter.Order });
-                options.Filters.Add(new NoCachePageFilter());
-                options.Filters.Add(new RequireActivePersonFilter());
-
-                options.ModelBinderProviders.Insert(2, new DateOnlyModelBinderProvider());
-            })
-            .AddCookieTempDataProvider(options =>
+            services.AddGovUkFrontend(options =>
             {
-                options.Cookie.Name = "trs-tempdata";
+                options.DefaultButtonPreventDoubleClick = true;
+                options.DefaultFileUploadJavaScriptEnhancements = true;
             });
 
-        services.Scan(s => s.FromAssemblyOf<Program>()
-            .AddClasses(f => f.AssignableTo<IConfigureFolderConventions>())
-            .As<IConfigureOptions<RazorPagesOptions>>()
-            .WithTransientLifetime());
+            services.AddCsp(nonceByteAmount: 32);
 
-        services.AddAuthorizationBuilder()
-            .AddAdminOnlyPolicies()
-            .AddSupportTasksPolicies()
-            .AddUserManagementPolicies()
-            .AddAlertsPolicies()
-            .AddNonPersonOrAlertDataPolicies()
-            .AddPersonDataPolicies();
-
-        services
-            .AddAzureActiveDirectory(environment)
-            .AddTransient<SupportUiLinkGenerator>()
-            .AddTransient<CheckMandatoryQualificationExistsFilter>()
-            .AddTransient<CheckUserExistsFilter>()
-            .AddTransient<RequireClosedAlertFilter>()
-            .AddTransient<RequireOpenAlertFilter>()
-            .AddTransient<RedirectWithPersonIdFilter>()
-            .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
-            .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
-            .AddScoped<SupportUiFormContext>()
-            .AddTransient<EvidenceUploadManager>()
-            .AddSingleton<PersonChangeableAttributesService>()
-            .AddSupportTaskSearchService()
-            .AddSupportTaskAssignmentOptions(configuration)
-            .AddOneLoginSearchService()
-            .AddChangeHistoryService();
-
-        if (environment.IsProduction())
-        {
-            services
-                .AddStartupTask<ReferenceDataCache>();
-        }
-
-        if (environment.IsDevelopment())
-        {
-            services.AddSingleton<IDistributedCache, DevelopmentFileDistributedCache>();
-        }
-
-        if (!environment.IsTests() && !environment.IsEndToEndTests())
-        {
-            services
-                .AddAzureAdAuthentication(configuration);
-        }
-
-        if (environment.IsProduction() || environment.IsDevelopment())
-        {
-            services.AddNotifyNotificationSender(configuration);
-        }
-        else
-        {
-            services.AddSingleton<INotificationSender, NoopNotificationSender>();
-        }
-
-        return services;
-    }
-
-    private static IServiceCollection AddAzureAdAuthentication(this IServiceCollection services, IConfiguration configuration)
-    {
-        var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
-
-        services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(configuration, "AzureAd", cookieScheme: CookieAuthenticationDefaults.AuthenticationScheme)
-            .EnableTokenAcquisitionToCallDownstreamApi(initialScopes: graphApiScopes)
-            .AddDistributedTokenCaches()
-            .AddMicrosoftGraph(defaultScopes: graphApiScopes);
-
-        services.ConfigureOptions(new AssignUserInfoOnSignIn(OpenIdConnectDefaults.AuthenticationScheme));
-
-        services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-        {
-            options.Cookie.Name = "trs-auth";
-            options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-
-            options.Events.OnSigningOut = ctx =>
+            services.AddSession(options =>
             {
-                ctx.Response.Redirect("/signed-out");
-                return Task.CompletedTask;
-            };
+                options.Cookie.Name = "sess";
+                options.Cookie.IsEssential = true;
+            });
 
-            options.Events.OnRedirectToAccessDenied = ctx =>
+            services.AddGovUkQuestions();
+
+            services
+                .AddRazorPages()
+                .AddMvcOptions(options =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .Build();
+
+                    options.Filters.Add(new FluentValidationExceptionFilter());
+                    options.Filters.Add(new AuthorizeFilter(policy));
+                    options.Filters.Add(new CheckUserExistsFilter());
+                    options.Filters.Add(new ServiceFilterAttribute<RedirectWithPersonIdFilter> { Order = RedirectWithPersonIdFilter.Order });
+                    options.Filters.Add(new NoCachePageFilter());
+                    options.Filters.Add(new RequireActivePersonFilter());
+
+                    options.ModelBinderProviders.Insert(2, new DateOnlyModelBinderProvider());
+                })
+                .AddCookieTempDataProvider(options =>
+                {
+                    options.Cookie.Name = "trs-tempdata";
+                });
+
+            services.Scan(s => s.FromAssemblyOf<Program>()
+                .AddClasses(f => f.AssignableTo<IConfigureFolderConventions>())
+                .As<IConfigureOptions<RazorPagesOptions>>()
+                .WithTransientLifetime());
+
+            services.AddAuthorizationBuilder()
+                .AddAdminOnlyPolicies()
+                .AddSupportTasksPolicies()
+                .AddUserManagementPolicies()
+                .AddAlertsPolicies()
+                .AddNonPersonOrAlertDataPolicies()
+                .AddPersonDataPolicies();
+
+            services
+                .AddAzureActiveDirectory(environment)
+                .AddTransient<SupportUiLinkGenerator>()
+                .AddTransient<CheckMandatoryQualificationExistsFilter>()
+                .AddTransient<CheckUserExistsFilter>()
+                .AddTransient<RequireClosedAlertFilter>()
+                .AddTransient<RequireOpenAlertFilter>()
+                .AddTransient<RedirectWithPersonIdFilter>()
+                .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+                .AddSingleton<ITagHelperInitializer<TextInputTagHelper>, TextInputTagHelperInitializer>()
+                .AddScoped<SupportUiFormContext>()
+                .AddTransient<EvidenceUploadManager>()
+                .AddSingleton<PersonChangeableAttributesService>()
+                .AddSupportTaskSearchService()
+                .AddSupportTaskAssignmentOptions(configuration)
+                .AddOneLoginSearchService()
+                .AddChangeHistoryService();
+
+            if (environment.IsProduction())
             {
-                ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
-                return Task.CompletedTask;
-            };
-        });
+                services
+                    .AddStartupTask<ReferenceDataCache>();
+            }
 
-        return services;
+            if (environment.IsDevelopment())
+            {
+                services.AddSingleton<IDistributedCache, DevelopmentFileDistributedCache>();
+            }
+
+            if (!environment.IsTests() && !environment.IsEndToEndTests())
+            {
+                services
+                    .AddAzureAdAuthentication(configuration);
+            }
+
+            if (environment.IsProduction() || environment.IsDevelopment())
+            {
+                services.AddNotifyNotificationSender(configuration);
+            }
+            else
+            {
+                services.AddSingleton<INotificationSender, NoopNotificationSender>();
+            }
+
+            return services;
+        }
+
+        private IServiceCollection AddAzureAdAuthentication(IConfiguration configuration)
+        {
+            var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
+
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(configuration, "AzureAd", cookieScheme: CookieAuthenticationDefaults.AuthenticationScheme)
+                .EnableTokenAcquisitionToCallDownstreamApi(initialScopes: graphApiScopes)
+                .AddDistributedTokenCaches()
+                .AddMicrosoftGraph(defaultScopes: graphApiScopes);
+
+            services.ConfigureOptions(new AssignUserInfoOnSignIn(OpenIdConnectDefaults.AuthenticationScheme));
+
+            services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.Cookie.Name = "trs-auth";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                options.Events.OnSigningOut = ctx =>
+                {
+                    ctx.Response.Redirect("/signed-out");
+                    return Task.CompletedTask;
+                };
+
+                options.Events.OnRedirectToAccessDenied = ctx =>
+                {
+                    ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                };
+            });
+
+            return services;
+        }
     }
 }

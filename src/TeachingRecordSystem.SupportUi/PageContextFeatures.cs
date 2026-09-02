@@ -5,66 +5,69 @@ namespace TeachingRecordSystem.SupportUi;
 
 public static class HttpContextExtensions
 {
-    public static CurrentPersonFeature GetCurrentPersonFeature(this HttpContext context) =>
-        context.Features.GetRequiredFeature<CurrentPersonFeature>();
+    extension(HttpContext context)
+    {
+        public CurrentPersonFeature GetCurrentPersonFeature() =>
+            context.Features.GetRequiredFeature<CurrentPersonFeature>();
 
-    public static void SetCurrentPersonFeature(this HttpContext context, CurrentPersonFeature currentPersonInfo) =>
-        context.Features.Set(currentPersonInfo);
+        public void SetCurrentPersonFeature(CurrentPersonFeature currentPersonInfo) =>
+            context.Features.Set(currentPersonInfo);
 
-    public static void SetCurrentPersonFeature(this HttpContext context, Person person) =>
-        SetCurrentPersonFeature(
-            context,
-            new CurrentPersonFeature(
-                person.PersonId,
-                person.Trn,
-                person.Status,
-                person.FirstName,
-                person.MiddleName,
-                person.LastName,
-                person.EmailAddress,
-                person.DateOfBirth,
-                person.NationalInsuranceNumber));
+        public void SetCurrentPersonFeature(Person person) =>
+            SetCurrentPersonFeature(
+                context,
+                new CurrentPersonFeature(
+                    person.PersonId,
+                    person.Trn,
+                    person.Status,
+                    person.FirstName,
+                    person.MiddleName,
+                    person.LastName,
+                    person.EmailAddress,
+                    person.DateOfBirth,
+                    person.NationalInsuranceNumber));
 
-    public static CurrentOneLoginUserFeature GetCurrentOneLoginUserFeature(this HttpContext context) =>
-        context.Features.GetRequiredFeature<CurrentOneLoginUserFeature>();
+        public CurrentOneLoginUserFeature GetCurrentOneLoginUserFeature() =>
+            context.Features.GetRequiredFeature<CurrentOneLoginUserFeature>();
 
-    public static void SetCurrentOneLoginUserFeature(this HttpContext context, CurrentOneLoginUserFeature currentOneLoginUserFeature) =>
-        context.Features.Set(currentOneLoginUserFeature);
+        public void SetCurrentOneLoginUserFeature(CurrentOneLoginUserFeature currentOneLoginUserFeature) =>
+            context.Features.Set(currentOneLoginUserFeature);
 
-    public static void SetCurrentOneLoginUserFeature(this HttpContext context, OneLoginUser oneLoginUser) =>
-        SetCurrentOneLoginUserFeature(
-            context,
-            new CurrentOneLoginUserFeature(
-                oneLoginUser.Subject,
-                oneLoginUser.EmailAddress,
-                oneLoginUser.PersonId,
-                oneLoginUser.VerifiedOn,
-                oneLoginUser.VerifiedNames,
-                oneLoginUser.VerifiedDatesOfBirth));
+        public void SetCurrentOneLoginUserFeature(OneLoginUser oneLoginUser) =>
+            SetCurrentOneLoginUserFeature(
+                context,
+                new CurrentOneLoginUserFeature(
+                    oneLoginUser.Subject,
+                    oneLoginUser.EmailAddress,
+                    oneLoginUser.PersonId,
+                    oneLoginUser.VerifiedOn,
+                    oneLoginUser.VerifiedNames,
+                    oneLoginUser.VerifiedDatesOfBirth));
 
-    public static CurrentMandatoryQualificationFeature GetCurrentMandatoryQualificationFeature(this HttpContext context) =>
-        context.Features.GetRequiredFeature<CurrentMandatoryQualificationFeature>();
+        public CurrentMandatoryQualificationFeature GetCurrentMandatoryQualificationFeature() =>
+            context.Features.GetRequiredFeature<CurrentMandatoryQualificationFeature>();
 
-    public static void SetCurrentMandatoryQualificationFeature(this HttpContext context, CurrentMandatoryQualificationFeature currentMandatoryQualificationFeature) =>
-        context.Features.Set(currentMandatoryQualificationFeature);
+        public void SetCurrentMandatoryQualificationFeature(CurrentMandatoryQualificationFeature currentMandatoryQualificationFeature) =>
+            context.Features.Set(currentMandatoryQualificationFeature);
 
-    public static CurrentProfessionalStatusFeature GetCurrentProfessionalStatusFeature(this HttpContext context) =>
-        context.Features.GetRequiredFeature<CurrentProfessionalStatusFeature>();
+        public CurrentProfessionalStatusFeature GetCurrentProfessionalStatusFeature() =>
+            context.Features.GetRequiredFeature<CurrentProfessionalStatusFeature>();
 
-    public static void SetCurrentProfessionalStatusFeature(this HttpContext context, CurrentProfessionalStatusFeature currentProfessionalStatusFeature) =>
-        context.Features.Set(currentProfessionalStatusFeature);
+        public void SetCurrentProfessionalStatusFeature(CurrentProfessionalStatusFeature currentProfessionalStatusFeature) =>
+            context.Features.Set(currentProfessionalStatusFeature);
 
-    public static CurrentSupportTaskFeature GetCurrentSupportTaskFeature(this HttpContext context) =>
-        context.Features.GetRequiredFeature<CurrentSupportTaskFeature>();
+        public CurrentSupportTaskFeature GetCurrentSupportTaskFeature() =>
+            context.Features.GetRequiredFeature<CurrentSupportTaskFeature>();
 
-    public static void SetCurrentSupportTaskFeature(this HttpContext context, CurrentSupportTaskFeature currentSupportTaskFeature) =>
-        context.Features.Set(currentSupportTaskFeature);
+        public void SetCurrentSupportTaskFeature(CurrentSupportTaskFeature currentSupportTaskFeature) =>
+            context.Features.Set(currentSupportTaskFeature);
 
-    public static CurrentAlertFeature GetCurrentAlertFeature(this HttpContext context) =>
-        context.Features.GetRequiredFeature<CurrentAlertFeature>();
+        public CurrentAlertFeature GetCurrentAlertFeature() =>
+            context.Features.GetRequiredFeature<CurrentAlertFeature>();
 
-    public static void SetCurrentAlertFeature(this HttpContext context, CurrentAlertFeature currentAlertFeature) =>
-        context.Features.Set(currentAlertFeature);
+        public void SetCurrentAlertFeature(CurrentAlertFeature currentAlertFeature) =>
+            context.Features.Set(currentAlertFeature);
+    }
 }
 
 public record CurrentPersonFeature(

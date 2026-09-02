@@ -4,140 +4,143 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.Alerts;
 
 public static class AlertsPageExtensions
 {
-    public static Task GoToAddAlertPageAsync(this IPage page, Guid personId) =>
-        page.GotoAsync($"/alerts/add?personId={personId}");
-
-    public static Task GoToEditAlertDetailsPageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/details");
-
-    public static Task GoToEditAlertStartDatePageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/start-date");
-
-    public static Task GoToEditAlertEndDatePageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/end-date");
-
-    public static Task GoToEditAlertLinkPageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/link");
-
-    public static Task GoToCloseAlertPageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/close");
-
-    public static Task GoToReopenAlertPageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/reopen");
-
-    public static Task GoToDeleteAlertPageAsync(this IPage page, Guid alertId) =>
-        page.GotoAsync($"/alerts/{alertId}/delete");
-
-    public static Task ClickAddAlertPersonAlertsPageAsync(this IPage page) =>
-        page.GetByTestId($"add-alert").ClickAsync();
-
-    public static Task ClickCloseAlertPersonAlertsPageAsync(this IPage page, Guid alertId) =>
-        page.GetByTestId($"close-{alertId}").ClickAsync();
-
-    public static Task ClickViewAlertPersonAlertsPageAsync(this IPage page, Guid alertId) =>
-        page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
-
-    public static Task AssertOnAddAlertTypePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/type");
-
-    public static Task AssertOnAddAlertDetailsPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/details");
-
-    public static Task AssertOnAddAlertConfirmPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/confirm");
-
-    public static Task AssertOnAddAlertLinkPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/link");
-
-    public static Task AssertOnAddAlertStartDatePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/start-date");
-
-    public static Task AssertOnAddAlertEndDatePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/end-date");
-
-    public static Task AssertOnAddAlertReasonPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/reason");
-
-    public static Task AssertOnAddAlertCheckAnswersPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync($"/alerts/add/check-answers");
-
-    public static Task AssertOnEditAlertDetailsPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/details");
-
-    public static Task AssertOnEditAlertDetailsChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/details/reason");
-
-    public static Task AssertOnEditAlertDetailsCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/details/check-answers");
-
-    public static Task AssertOnEditAlertStartDatePageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date");
-
-    public static Task AssertOnEditAlertStartDateChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/reason");
-
-    public static Task AssertOnEditAlertStartDateCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/check-answers");
-
-    public static Task AssertOnEditAlertEndDatePageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date");
-
-    public static Task AssertOnEditAlertEndDateChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/reason");
-
-    public static Task AssertOnEditAlertEndDateCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/check-answers");
-
-    public static Task AssertOnEditAlertLinkPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/link");
-
-    public static Task AssertOnEditAlertLinkChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/link/reason");
-
-    public static Task AssertOnEditAlertLinkCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/link/check-answers");
-
-    public static Task AssertOnAlertDetailPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}");
-
-    public static Task AssertOnCloseAlertPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/close");
-
-    public static Task AssertOnCloseAlertChangeReasonPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/close/reason");
-
-    public static Task AssertOnCloseAlertCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/close/check-answers");
-
-    public static Task AssertOnReopenAlertPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen");
-
-    public static Task AssertOnReopenAlertCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen/check-answers");
-
-    public static Task AssertOnDeleteAlertPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/delete");
-
-    public static Task AssertOnDeleteAlertCheckAnswersPageAsync(this IPage page, Guid alertId) =>
-        page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/check-answers");
-
-    public static Task ClickDeactivateButtonAsync(this IPage page) =>
-        page.ClickButtonAsync("Mark alert as inactive");
-
-    public static Task ClickReactivateButtonAsync(this IPage page) =>
-        page.ClickButtonAsync("Remove inactive status");
-
-    public static async Task SubmitAddAlertIndexPageAsync(this IPage page, string alertType, string? details, string link, DateOnly startDate)
+    extension(IPage page)
     {
-        await page.AssertOnAddAlertTypePageAsync();
-        await page.FillAsync("label:text-is('Alert type')", alertType);
-        if (details != null)
-        {
-            await page.FillAsync("label:text-is('Details')", details);
-        }
+        public Task GoToAddAlertPageAsync(Guid personId) =>
+            page.GotoAsync($"/alerts/add?personId={personId}");
 
-        await page.FillAsync("label:text-is('Link')", link);
-        await page.FillDateInputAsync(startDate);
-        await page.ClickContinueButtonAsync();
+        public Task GoToEditAlertDetailsPageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/details");
+
+        public Task GoToEditAlertStartDatePageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/start-date");
+
+        public Task GoToEditAlertEndDatePageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/end-date");
+
+        public Task GoToEditAlertLinkPageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/link");
+
+        public Task GoToCloseAlertPageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/close");
+
+        public Task GoToReopenAlertPageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/reopen");
+
+        public Task GoToDeleteAlertPageAsync(Guid alertId) =>
+            page.GotoAsync($"/alerts/{alertId}/delete");
+
+        public Task ClickAddAlertPersonAlertsPageAsync() =>
+            page.GetByTestId($"add-alert").ClickAsync();
+
+        public Task ClickCloseAlertPersonAlertsPageAsync(Guid alertId) =>
+            page.GetByTestId($"close-{alertId}").ClickAsync();
+
+        public Task ClickViewAlertPersonAlertsPageAsync(Guid alertId) =>
+            page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
+
+        public Task AssertOnAddAlertTypePageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/type");
+
+        public Task AssertOnAddAlertDetailsPageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/details");
+
+        public Task AssertOnAddAlertConfirmPageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/confirm");
+
+        public Task AssertOnAddAlertLinkPageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/link");
+
+        public Task AssertOnAddAlertStartDatePageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/start-date");
+
+        public Task AssertOnAddAlertEndDatePageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/end-date");
+
+        public Task AssertOnAddAlertReasonPageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/reason");
+
+        public Task AssertOnAddAlertCheckAnswersPageAsync() =>
+            page.WaitForUrlPathAsync($"/alerts/add/check-answers");
+
+        public Task AssertOnEditAlertDetailsPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/details");
+
+        public Task AssertOnEditAlertDetailsChangeReasonPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/details/reason");
+
+        public Task AssertOnEditAlertDetailsCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/details/check-answers");
+
+        public Task AssertOnEditAlertStartDatePageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date");
+
+        public Task AssertOnEditAlertStartDateChangeReasonPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/reason");
+
+        public Task AssertOnEditAlertStartDateCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/check-answers");
+
+        public Task AssertOnEditAlertEndDatePageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date");
+
+        public Task AssertOnEditAlertEndDateChangeReasonPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/reason");
+
+        public Task AssertOnEditAlertEndDateCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/check-answers");
+
+        public Task AssertOnEditAlertLinkPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/link");
+
+        public Task AssertOnEditAlertLinkChangeReasonPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/link/reason");
+
+        public Task AssertOnEditAlertLinkCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/link/check-answers");
+
+        public Task AssertOnAlertDetailPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}");
+
+        public Task AssertOnCloseAlertPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/close");
+
+        public Task AssertOnCloseAlertChangeReasonPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/close/reason");
+
+        public Task AssertOnCloseAlertCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/close/check-answers");
+
+        public Task AssertOnReopenAlertPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen");
+
+        public Task AssertOnReopenAlertCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen/check-answers");
+
+        public Task AssertOnDeleteAlertPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/delete");
+
+        public Task AssertOnDeleteAlertCheckAnswersPageAsync(Guid alertId) =>
+            page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/check-answers");
+
+        public Task ClickDeactivateButtonAsync() =>
+            page.ClickButtonAsync("Mark alert as inactive");
+
+        public Task ClickReactivateButtonAsync() =>
+            page.ClickButtonAsync("Remove inactive status");
+
+        public async Task SubmitAddAlertIndexPageAsync(string alertType, string? details, string link, DateOnly startDate)
+        {
+            await page.AssertOnAddAlertTypePageAsync();
+            await page.FillAsync("label:text-is('Alert type')", alertType);
+            if (details != null)
+            {
+                await page.FillAsync("label:text-is('Details')", details);
+            }
+
+            await page.FillAsync("label:text-is('Link')", link);
+            await page.FillDateInputAsync(startDate);
+            await page.ClickContinueButtonAsync();
+        }
     }
 }

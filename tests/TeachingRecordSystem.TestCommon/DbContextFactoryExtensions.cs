@@ -4,16 +4,19 @@ namespace TeachingRecordSystem.TestCommon;
 
 public static class DbContextFactoryExtensions
 {
-    public static async Task<T> WithDbContextAsync<T>(this IDbContextFactory<TrsDbContext> dbContextFactory, Func<TrsDbContext, Task<T>> action)
+    extension(IDbContextFactory<TrsDbContext> dbContextFactory)
     {
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        return await action(dbContext);
-    }
-
-    public static Task WithDbContextAsync(this IDbContextFactory<TrsDbContext> dbContextFactory, Func<TrsDbContext, Task> action) =>
-        dbContextFactory.WithDbContextAsync(async dbContext =>
+        public async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
         {
-            await action(dbContext);
-            return 0;
-        });
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            return await action(dbContext);
+        }
+
+        public Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+            dbContextFactory.WithDbContextAsync(async dbContext =>
+            {
+                await action(dbContext);
+                return 0;
+            });
+    }
 }

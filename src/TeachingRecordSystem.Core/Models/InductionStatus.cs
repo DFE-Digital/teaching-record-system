@@ -33,51 +33,49 @@ public static class InductionStatusRegistry
             .Select(s => s.Value)
             .ToArray();
 
-    public static string GetName(this InductionStatus status) => _info[status].Name;
-
-    public static string GetTitle(this InductionStatus status) => _info[status].Title;
-
-    public static bool RequiresQts(this InductionStatus status) => _info[status].RequiresQts;
-
-    public static bool RequiresStartDate(this InductionStatus status) => _info[status].RequiresStartDate;
-
-    public static bool RequiresCompletedDate(this InductionStatus status) => _info[status].RequiresCompletedDate;
-
-    public static bool RequiresExemptionReasons(this InductionStatus status) => _info[status].RequiresExemptionReasons;
-
-    public static bool IsHigherPriorityThan(this InductionStatus status, InductionStatus otherStatus) =>
-        status.GetPriority() < otherStatus.GetPriority();
-
-    public static string? ToDqtInductionStatus(this InductionStatus status, out string? statusDescription)
+    extension(InductionStatus status)
     {
-        switch (status)
-        {
-            case InductionStatus.RequiredToComplete:
-                statusDescription = "Required to Complete";
-                return "RequiredtoComplete";
-            case InductionStatus.Exempt:
-                statusDescription = "Exempt";
-                return "Exempt";
-            case InductionStatus.InProgress:
-                statusDescription = "In Progress";
-                return "InProgress";
-            case InductionStatus.Passed:
-                statusDescription = "Pass";
-                return "Pass";
-            case InductionStatus.Failed:
-                statusDescription = "Fail";
-                return "Fail";
-            case InductionStatus.FailedInWales:
-                statusDescription = "Failed in Wales";
-                return "FailedinWales";
-            case InductionStatus.None:
-            default:
-                statusDescription = null;
-                return null;
-        }
-    }
+        public string GetName() => _info[status].Name;
+        public string GetTitle() => _info[status].Title;
+        public bool RequiresQts() => _info[status].RequiresQts;
+        public bool RequiresStartDate() => _info[status].RequiresStartDate;
+        public bool RequiresCompletedDate() => _info[status].RequiresCompletedDate;
+        public bool RequiresExemptionReasons() => _info[status].RequiresExemptionReasons;
 
-    private static int GetPriority(this InductionStatus status) => _info[status].Priority;
+        public bool IsHigherPriorityThan(InductionStatus otherStatus) =>
+            status.GetPriority() < otherStatus.GetPriority();
+
+        public string? ToDqtInductionStatus(out string? statusDescription)
+        {
+            switch (status)
+            {
+                case InductionStatus.RequiredToComplete:
+                    statusDescription = "Required to Complete";
+                    return "RequiredtoComplete";
+                case InductionStatus.Exempt:
+                    statusDescription = "Exempt";
+                    return "Exempt";
+                case InductionStatus.InProgress:
+                    statusDescription = "In Progress";
+                    return "InProgress";
+                case InductionStatus.Passed:
+                    statusDescription = "Pass";
+                    return "Pass";
+                case InductionStatus.Failed:
+                    statusDescription = "Fail";
+                    return "Fail";
+                case InductionStatus.FailedInWales:
+                    statusDescription = "Failed in Wales";
+                    return "FailedinWales";
+                case InductionStatus.None:
+                default:
+                    statusDescription = null;
+                    return null;
+            }
+        }
+
+        private int GetPriority() => _info[status].Priority;
+    }
 
     private static InductionStatusDescription GetInfo(InductionStatus status)
     {

@@ -4,115 +4,118 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests.RoutesToProf
 
 public static class RoutesToProfessionalStatusPageExtensions
 {
-    public static Task SelectStatusAsync(this IPage page, RouteToProfessionalStatusStatus status)
+    extension(IPage page)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{status}']");
-        return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
-    }
-
-    public static Task SelectAgeRangeAsync(this IPage page, TrainingAgeSpecialismType ageRangeType)
-    {
-        var radioButton = page.Locator($"input[type='radio'][value='{ageRangeType}']");
-        return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
-    }
-
-    public static async Task SelectRouteChangeReasonOption(this IPage page, string reason, string? changeReasonDetails = null)
-    {
-        var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
-        await radioButton.Locator("xpath=following-sibling::label").ClickAsync();
-        if (changeReasonDetails != null)
+        public Task SelectStatusAsync(RouteToProfessionalStatusStatus status)
         {
-            await page.FillAsync($"label{TestBase.TextIsSelector("Enter a reason")}", changeReasonDetails);
+            var radioButton = page.Locator($"input[type='radio'][value='{status}']");
+            return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
         }
+
+        public Task SelectAgeRangeAsync(TrainingAgeSpecialismType ageRangeType)
+        {
+            var radioButton = page.Locator($"input[type='radio'][value='{ageRangeType}']");
+            return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+        }
+
+        public async Task SelectRouteChangeReasonOption(string reason, string? changeReasonDetails = null)
+        {
+            var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
+            await radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+            if (changeReasonDetails != null)
+            {
+                await page.FillAsync($"label{TestBase.TextIsSelector("Enter a reason")}", changeReasonDetails);
+            }
+        }
+
+        public Task EnterDegreeTypeAsync(string name) =>
+            page.FillAutocompleteAsync("DegreeTypeId", name);
+
+        public Task EnterCountryAsync(string name) =>
+            page.FillAutocompleteAsync("TrainingCountryId", name);
+
+        public Task EnterSubjectAsync(string name) =>
+            page.FillAutocompleteAsync("SubjectId1", name);
+
+        public Task EnterTrainingProviderAsync(string name) =>
+            page.FillAutocompleteAsync("TrainingProviderId", name);
+
+        public Task AssertOnRouteEditStatusPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/status");
+
+        public Task AssertOnRouteEditStartAndEndDatePageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/start-and-end-date");
+
+        public Task AssertOnRouteEditHoldsFromPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/holds-from");
+
+        public Task AssertOnRouteEditDegreeTypePageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/degree-type");
+
+        public Task AssertOnRouteEditAgeRangePageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/age-range");
+
+        public Task AssertOnRouteEditCountryPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/country");
+
+        public Task AssertOnRouteEditTrainingProviderPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/training-provider");
+
+        public Task AssertOnRouteEditSubjectsPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/subjects");
+
+        public Task AssertOnRouteEditInductionExemptionPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/induction-exemption");
+
+        public Task AssertOnRouteChangeReasonPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/reason");
+
+        public Task AssertOnRouteCheckYourAnswersPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/check-answers");
+
+        public Task AssertOnRouteAddRoutePageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/route");
+
+        public Task AssertOnRouteAddStatusPageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/status");
+
+        public Task AssertOnRouteAddStartAndEndDatePageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/start-and-end-date");
+
+        public Task AssertOnRouteAddTrainingProviderAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/training-provider");
+
+        public Task AssertOnRouteAddHoldsFromPageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/holds-from");
+
+        public Task AssertOnRouteAddInductionExemptionPageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/induction-exemption");
+
+        public Task AssertOnRouteAddDegreeTypePageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/degree-type");
+
+        public Task AssertOnRouteAddCountryAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/country");
+
+        public Task AssertOnRouteAddAgeRangeAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/age-range");
+
+        public Task AssertOnRouteAddSubjectsPageAsync() =>
+            page.WaitForUrlPathAsync("/routes/add/subjects");
+
+        public Task AssertOnRouteAddChangeReasonPage() =>
+            page.WaitForUrlPathAsync("/routes/add/reason");
+
+        public Task AssertOnRouteAddCheckYourAnswersPage() =>
+            page.WaitForUrlPathAsync("/routes/add/check-answers");
+
+        public Task AssertOnRouteDeleteChangeReasonPage(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/delete/reason");
+
+        public Task AssertOnRouteDeleteCheckYourAnswersPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/delete/check-answers");
+
+        public Task AssertOnRouteDetailPageAsync(Guid qualificationId) =>
+            page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/detail");
     }
-
-    public static Task EnterDegreeTypeAsync(this IPage page, string name) =>
-        page.FillAutocompleteAsync("DegreeTypeId", name);
-
-    public static Task EnterCountryAsync(this IPage page, string name) =>
-        page.FillAutocompleteAsync("TrainingCountryId", name);
-
-    public static Task EnterSubjectAsync(this IPage page, string name) =>
-        page.FillAutocompleteAsync("SubjectId1", name);
-
-    public static Task EnterTrainingProviderAsync(this IPage page, string name) =>
-        page.FillAutocompleteAsync("TrainingProviderId", name);
-
-    public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/status");
-
-    public static Task AssertOnRouteEditStartAndEndDatePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/start-and-end-date");
-
-    public static Task AssertOnRouteEditHoldsFromPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/holds-from");
-
-    public static Task AssertOnRouteEditDegreeTypePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/degree-type");
-
-    public static Task AssertOnRouteEditAgeRangePageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/age-range");
-
-    public static Task AssertOnRouteEditCountryPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/country");
-
-    public static Task AssertOnRouteEditTrainingProviderPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/training-provider");
-
-    public static Task AssertOnRouteEditSubjectsPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/subjects");
-
-    public static Task AssertOnRouteEditInductionExemptionPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/induction-exemption");
-
-    public static Task AssertOnRouteChangeReasonPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/reason");
-
-    public static Task AssertOnRouteCheckYourAnswersPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/check-answers");
-
-    public static Task AssertOnRouteAddRoutePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/route");
-
-    public static Task AssertOnRouteAddStatusPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/status");
-
-    public static Task AssertOnRouteAddStartAndEndDatePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/start-and-end-date");
-
-    public static Task AssertOnRouteAddTrainingProviderAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/training-provider");
-
-    public static Task AssertOnRouteAddHoldsFromPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/holds-from");
-
-    public static Task AssertOnRouteAddInductionExemptionPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/induction-exemption");
-
-    public static Task AssertOnRouteAddDegreeTypePageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/degree-type");
-
-    public static Task AssertOnRouteAddCountryAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/country");
-
-    public static Task AssertOnRouteAddAgeRangeAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/age-range");
-
-    public static Task AssertOnRouteAddSubjectsPageAsync(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/subjects");
-
-    public static Task AssertOnRouteAddChangeReasonPage(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/reason");
-
-    public static Task AssertOnRouteAddCheckYourAnswersPage(this IPage page) =>
-        page.WaitForUrlPathAsync("/routes/add/check-answers");
-
-    public static Task AssertOnRouteDeleteChangeReasonPage(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/delete/reason");
-
-    public static Task AssertOnRouteDeleteCheckYourAnswersPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/delete/check-answers");
-
-    public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId) =>
-        page.WaitForUrlPathAsync($"/routes/{qualificationId}/edit/detail");
 }

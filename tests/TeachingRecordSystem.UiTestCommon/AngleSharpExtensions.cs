@@ -6,32 +6,38 @@ namespace TeachingRecordSystem.UiTestCommon;
 
 public static class AngleSharpExtensions
 {
-    public static T? As<T>(this IElement element)
-        where T : class, IElement
+    extension(IElement element)
     {
-        return element as T;
-    }
-
-    public static IReadOnlyList<IElement> GetAllElementsByTestId(this IElement element, params string[] testIds) =>
-        testIds.SelectMany(testId => element.QuerySelectorAll($"*[data-testid='{testId}']")).ToList();
-
-    public static IReadOnlyList<IElement> GetAllElementsByTestId(this IHtmlDocument doc, params string[] testIds) =>
-        doc.Body!.GetAllElementsByTestId(testIds);
-
-    public static IElement? GetElementByLabel(this IHtmlDocument doc, string label)
-    {
-        var allLabels = doc.QuerySelectorAll("label");
-
-        foreach (var l in allLabels)
+        public T? As<T>()
+            where T : class, IElement
         {
-            if (l.TrimmedText() == label)
-            {
-                var @for = l.GetAttribute("for");
-                return @for is not null ? doc.GetElementById(@for) : null;
-            }
+            return element as T;
         }
 
-        return null;
+        public IReadOnlyList<IElement> GetAllElementsByTestId(params string[] testIds) =>
+            testIds.SelectMany(testId => element.QuerySelectorAll($"*[data-testid='{testId}']")).ToList();
+    }
+
+    extension(IHtmlDocument doc)
+    {
+        public IReadOnlyList<IElement> GetAllElementsByTestId(params string[] testIds) =>
+            doc.Body!.GetAllElementsByTestId(testIds);
+
+        public IElement? GetElementByLabel(string label)
+        {
+            var allLabels = doc.QuerySelectorAll("label");
+
+            foreach (var l in allLabels)
+            {
+                if (l.TrimmedText() == label)
+                {
+                    var @for = l.GetAttribute("for");
+                    return @for is not null ? doc.GetElementById(@for) : null;
+                }
+            }
+
+            return null;
+        }
     }
 
     public static IElement? GetElementByDataAttribute(this IElement element, string attributeName, string attributeValue) =>
@@ -43,31 +49,34 @@ public static class AngleSharpExtensions
     public static IElement? GetElementByTestId(this IElement element, string testId) =>
         element.GetAllElementsByTestId(testId).SingleOrDefault();
 
-    public static IElement? GetElementByTestId(this IHtmlDocument doc, string testId) =>
-        doc.Body!.GetElementByTestId(testId);
-
-    public static IReadOnlyList<IElement> GetSummaryListActionsByKey(this IHtmlDocument doc, string key)
+    extension(IHtmlDocument doc)
     {
-        var row = doc.GetSummaryListRowByKey(key);
-        return row?.QuerySelectorAll(".govuk-summary-list__actions>*").ToArray() ?? [];
-    }
+        public IElement? GetElementByTestId(string testId) =>
+            doc.Body!.GetElementByTestId(testId);
 
-    public static int GetSummaryListRowCountByKey(this IHtmlDocument doc, string key)
-    {
-        var count = 0;
-        var allRows = doc.QuerySelectorAll(".govuk-summary-list__row");
-
-        foreach (var row in allRows)
+        public IReadOnlyList<IElement> GetSummaryListActionsByKey(string key)
         {
-            var rowKey = row.QuerySelector(".govuk-summary-list__key");
-
-            if (rowKey?.TrimmedText() == key)
-            {
-                count++;
-            }
+            var row = doc.GetSummaryListRowByKey(key);
+            return row?.QuerySelectorAll(".govuk-summary-list__actions>*").ToArray() ?? [];
         }
 
-        return count;
+        public int GetSummaryListRowCountByKey(string key)
+        {
+            var count = 0;
+            var allRows = doc.QuerySelectorAll(".govuk-summary-list__row");
+
+            foreach (var row in allRows)
+            {
+                var rowKey = row.QuerySelector(".govuk-summary-list__key");
+
+                if (rowKey?.TrimmedText() == key)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
     }
 
     public static IElement? GetSummaryListRowByKey(this IDocument doc, string key) =>
@@ -108,30 +117,33 @@ public static class AngleSharpExtensions
 
     public static string TrimmedText(this INode node) => node.Text().Trim();
 
-    public static T GetChildElementOfTestId<T>(this IHtmlDocument doc, string testId, string childSelector) where T : IElement
+    extension(IHtmlDocument doc)
     {
-        var parent = doc.GetElementByTestId(testId);
-        Assert.NotNull(parent);
-        var child = parent.QuerySelector(childSelector);
-        Assert.NotNull(child);
-        Assert.IsAssignableFrom<T>(child);
-        return (T)child;
-    }
+        public T GetChildElementOfTestId<T>(string testId, string childSelector) where T : IElement
+        {
+            var parent = doc.GetElementByTestId(testId);
+            Assert.NotNull(parent);
+            var child = parent.QuerySelector(childSelector);
+            Assert.NotNull(child);
+            Assert.IsAssignableFrom<T>(child);
+            return (T)child;
+        }
 
-    public static IEnumerable<T> GetChildElementsOfTestId<T>(this IHtmlDocument doc, string testId, string childSelector) where T : IElement
-    {
-        var parent = doc.GetElementByTestId(testId);
-        Assert.NotNull(parent);
-        var children = parent.QuerySelectorAll(childSelector);
-        Assert.All(children, c => Assert.IsAssignableFrom<T>(c));
-        return children.Cast<T>();
-    }
+        public IEnumerable<T> GetChildElementsOfTestId<T>(string testId, string childSelector) where T : IElement
+        {
+            var parent = doc.GetElementByTestId(testId);
+            Assert.NotNull(parent);
+            var children = parent.QuerySelectorAll(childSelector);
+            Assert.All(children, c => Assert.IsAssignableFrom<T>(c));
+            return children.Cast<T>();
+        }
 
-    public static string GetHiddenInputValue(this IHtmlDocument doc, string name)
-    {
-        var element = doc.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
-        var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
+        public string GetHiddenInputValue(string name)
+        {
+            var element = doc.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
+            var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
 
-        return input.Value;
+            return input.Value;
+        }
     }
 }
