@@ -67,6 +67,10 @@ Support UI *Merge person*.
 | `PersonDetailsUpdatedEvent` | Sometimes | The retained record's attributes are changed to values taken from the secondary record. |
 | `OneLoginUserUpdatedEvent` | Sometimes | The deactivated record had linked One Login users, which are re-pointed to the retained record. |
 
+Merges from before the journey moved onto `PersonService` were back-filled from the legacy `PersonsMergedEvent`s by
+[`BackfillPersonMergeProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonMergeProcessesJob.cs). Those
+processes carry the two person events but no `OneLoginUserUpdatedEvent`, which the legacy event never recorded.
+
 ### `TeacherPensionsRecordImporting` (28)
 [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs) (Teachers' Pensions import).
 

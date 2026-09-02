@@ -1,0 +1,154 @@
+@using System.Diagnostics
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
+@inject PersonInfoCache PersonInfoCache
+@model ChangeHistoryEntryViewModel
+@{
+    var deactivatedEvent = Model.GetEvent<PersonDeactivatedEvent>();
+    Debug.Assert(deactivatedEvent.MergedWithPersonId is not null);
+
+    var deactivatedPersonId = deactivatedEvent.PersonId;
+    var retainedPersonId = deactivatedEvent.MergedWithPersonId!.Value;
+
+    // The One Login change history shows this process too, when the merge re-pointed a One Login user, so the
+    // record being looked at isn't always one of the two.
+    var thisRecordWasDeactivated = Model.Context.ContextType is ChangeHistoryContextType.Person &&
+        Model.Context.PersonId == deactivatedPersonId;
+
+    var deactivatedPersonTrn = (await PersonInfoCache.GetPersonInfoAsync(deactivatedPersonId))?.Trn;
+    var retainedPersonTrn = (await PersonInfoCache.GetPersonInfoAsync(retainedPersonId))?.Trn;
+
+    var title = thisRecordWasDeactivated
+        ? $"Record merged into TRN {retainedPersonTrn} and deactivated"
+        : $"Record merged with TRN {deactivatedPersonTrn}";
+
+    var hasDetailsUpdatedEvent = Model.TryGetEvent<PersonDetailsUpdatedEvent>(out var detailsUpdatedEvent);
+    var changes = hasDetailsUpdatedEvent ? detailsUpdatedEvent!.Changes : PersonDetailsUpdatedEventChanges.None;
+
+    var details = detailsUpdatedEvent?.PersonDetails;
+    var oldDetails = detailsUpdatedEvent?.OldPersonDetails;
+
+    var name = details is not null ? string.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName) : null;
+    var oldName = oldDetails is not null ? string.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName) : null;
+    var email = EmailAddress.TryParse(details?.EmailAddress, out var parsedEmail) ? parsedEmail.ToDisplayString() : details?.EmailAddress;
+    var oldEmail = EmailAddress.TryParse(oldDetails?.EmailAddress, out var oldParsedEmail) ? oldParsedEmail.ToDisplayString() : oldDetails?.EmailAddress;
+    var nino = NationalInsuranceNumber.TryParse(details?.NationalInsuranceNumber, out var parsedNino) ? parsedNino.ToDisplayString() : details?.NationalInsuranceNumber;
+    var oldNino = NationalInsuranceNumber.TryParse(oldDetails?.NationalInsuranceNumber, out var oldParsedNino) ? oldParsedNino.ToDisplayString() : oldDetails?.NationalInsuranceNumber;
+
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @* The attribute changes belong to the retained record, so they're not shown on the deactivated one. *@
+    @if (!thisRecordWasDeactivated)
+    {
+        <div data-testid="details">
+            <govuk-summary-list>
+                @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                {
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@name</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+                {
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@details!.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+                {
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@email</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+                {
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@nino</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                {
+                    <row>
+                        <key>Gender</key>
+                        <value use-empty-fallback>@details!.Gender?.GetDisplayName()</value>
+                    </row>
+                }
+            </govuk-summary-list>
+        </div>
+    }
+
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Details) || changeReason.EvidenceFile is not null))
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Comments</key>
+                        <value use-empty-fallback>@changeReason.Details</value>
+                    </row>
+                    <row>
+                        <key>Evidence</key>
+                        <value>
+                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                        </value>
+                    </row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+
+    @if (!thisRecordWasDeactivated)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                    {
+                        <row>
+                            <key>Name</key>
+                            <value use-empty-fallback>@oldName</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+                    {
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback>@oldDetails!.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+                    {
+                        <row>
+                            <key>Email address</key>
+                            <value use-empty-fallback>@oldEmail</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+                    {
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback>@oldNino</value>
+                        </row>
+                    }
+                    @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                    {
+                        <row>
+                            <key>Gender</key>
+                            <value use-empty-fallback>@oldDetails!.Gender?.GetDisplayName()</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
+</timeline-entry>
