@@ -11,12 +11,21 @@
     // The "other" person (the one merged with) is the retained record when viewing the deactivated record,
     // otherwise it is the deactivated record. otherPersonInfo is always available in this context.
     var otherPersonId = thisRecordWasDeactivated ? deactivatedEvent.MergedWithPersonId!.Value : deactivatedEvent.PersonId;
-    var otherPersonInfo = Model.Context.GetPersonInfo(otherPersonId);
+    // The other person may no longer exist in the Person table (e.g. their record was subsequently deleted);
+    // fall back to showing what we know without linking to a missing record.
+    var otherPersonInfo = Model.Context.TryGetPersonInfo(otherPersonId);
 }
 
 <timeline-entry title="Record merged in DQT" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     <p class="govuk-body">
-        Record merged with TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(otherPersonInfo.PersonId)" class="govuk-link" target="_blank" data-testid="merged-with-person-link">@otherPersonInfo.Trn <span class="govuk-visually-hidden">(opens in new tab)</span></a>@(thisRecordWasDeactivated ? " and deactivated" : "")
+        @if (otherPersonInfo is not null)
+        {
+            <text>Record merged with TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(otherPersonInfo.PersonId)" class="govuk-link" target="_blank" data-testid="merged-with-person-link">@otherPersonInfo.Trn <span class="govuk-visually-hidden">(opens in new tab)</span></a>@(thisRecordWasDeactivated ? " and deactivated" : "")</text>
+        }
+        else
+        {
+            <text>Record merged with another record@(thisRecordWasDeactivated ? " and deactivated" : "")</text>
+        }
     </p>
 
     @* Render the updated-event details only when an updated event exists and we're viewing the retained person *@

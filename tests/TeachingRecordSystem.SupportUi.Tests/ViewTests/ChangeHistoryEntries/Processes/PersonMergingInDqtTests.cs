@@ -207,4 +207,81 @@ public class PersonMergingInDqtTests(HostFixture hostFixture) : ChangeHistoryEnt
             Assert.Empty(entry.QuerySelectorAll(".govuk-summary-list"));
         }
     }
+
+    [Fact]
+    public async Task ProcessRendersCorrectly_WhenMergedWithPersonNoLongerExists_ForDeactivatedRecord()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        // Note the merged-with person id doesn't correspond to a row in the Person table
+        // (e.g. it may have subsequently been deleted); the view should degrade gracefully.
+        var mergedWithPersonId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.Status = PersonStatus.Deactivated;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var @event = new PersonDeactivatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            Changes = PersonDeactivatedEventChanges.PersonStatus | PersonDeactivatedEventChanges.MergedWithPersonId,
+            MergedWithPersonId = mergedWithPersonId,
+            DateOfDeath = null,
+        };
+
+        var user = SystemUser.Instance;
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, changeReason: null, @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, person.PersonId);
+
+        // Assert
+        AssertTitle(entry, "Record merged in DQT");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.NotNull(bodyText);
+        Assert.Contains("Record merged with another record", bodyText);
+        Assert.Contains("and deactivated", bodyText);
+
+        Assert.Null(entry.GetElementByTestId("merged-with-person-link"));
+    }
+
+    [Fact]
+    public async Task ProcessRendersCorrectly_WhenMergedWithPersonNoLongerExists_ForRetainedRecord()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        // Note the merged-with person id doesn't correspond to a row in the Person table
+        // (e.g. it may have subsequently been deleted); the view should degrade gracefully.
+        var mergedWithPersonId = Guid.NewGuid();
+
+        var @event = new PersonDeactivatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = mergedWithPersonId,
+            Changes = PersonDeactivatedEventChanges.PersonStatus | PersonDeactivatedEventChanges.MergedWithPersonId,
+            MergedWithPersonId = person.PersonId,
+            DateOfDeath = null,
+        };
+
+        var user = SystemUser.Instance;
+        var process = await TestData.CreateProcessAsync(ProcessType.PersonMergingInDqt, user.UserId, changeReason: null, @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, person.PersonId);
+
+        // Assert
+        AssertTitle(entry, "Record merged in DQT");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.NotNull(bodyText);
+        Assert.Contains("Record merged with another record", bodyText);
+        Assert.DoesNotContain("and deactivated", bodyText);
+
+        Assert.Null(entry.GetElementByTestId("merged-with-person-link"));
+    }
 }

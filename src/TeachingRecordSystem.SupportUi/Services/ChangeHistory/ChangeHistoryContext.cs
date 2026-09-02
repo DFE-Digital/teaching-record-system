@@ -73,6 +73,8 @@ public sealed record ChangeHistoryContext
 
     public PersonInfo GetPersonInfo(Guid personId) => _allPersons[personId];
 
+    public PersonInfo? TryGetPersonInfo(Guid personId) => _allPersons.TryGetValue(personId, out var personInfo) ? personInfo : null;
+
     public OneLoginUserInfo GetOneLoginUserInfo(string subject) => _allOneLoginUsers[subject];
 
     public record PersonInfo(Guid PersonId, string Trn, string FirstName, string LastName);
