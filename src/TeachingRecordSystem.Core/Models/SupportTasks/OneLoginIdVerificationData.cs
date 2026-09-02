@@ -14,6 +14,11 @@ public record OneLoginUserIdVerificationData : IOneLoginUserMatchingData
     public required string EvidenceFileName { get; init; }
     public required string? TrnTokenTrn { get; init; }
     public required Guid ClientApplicationUserId { get; init; }
+    public required string? YearQtsReceived { get; init; }
+    public required Guid? TrainingProviderId { get; init; }
+    public required string? TrainingProviderName { get; init; }
+    public required Guid? SubjectId { get; init; }
+    public required string? SubjectName { get; init; }
     public bool? Verified { get; init; }
     public Guid? PersonId { get; init; }
     public OneLoginUserIdVerificationOutcome? Outcome { get; init; }

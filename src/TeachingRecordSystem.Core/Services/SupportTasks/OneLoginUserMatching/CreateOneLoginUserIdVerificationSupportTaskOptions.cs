@@ -13,4 +13,9 @@ public record CreateOneLoginUserIdVerificationSupportTaskOptions
     public required DateOnly StatedDateOfBirth { get; init; }
     public required Guid EvidenceFileId { get; init; }
     public required string EvidenceFileName { get; init; }
+    public required string? YearQtsReceived { get; init; }
+    public required Guid? TrainingProviderId { get; init; }
+    public required string? TrainingProviderName { get; init; }
+    public required Guid? SubjectId { get; init; }
+    public required string? SubjectName { get; init; }
 }

@@ -458,6 +458,10 @@ public class SignInJourneyCoordinator(
 
         public string CheckAnswers() => linkGenerator.CheckAnswers(instanceId);
 
+        public string QtsStatus() => linkGenerator.QtsStatus(instanceId);
+
+        public string QtsDetails() => linkGenerator.QtsDetails(instanceId);
+
         public string SupportRequestSubmitted() => linkGenerator.SupportRequestSubmitted(instanceId);
 
         public string Found() => linkGenerator.Found(instanceId);

@@ -18,8 +18,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
                 var trn = "0000000";
+                var trainingProvider = await GetTrainingProviderAsync();
+                var subject = await GetTrainingSubjectAsync();
 
-                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
+                await SetupInstanceStateForVerifiedUserAsync(
+                    coordinator,
+                    oneLoginUser,
+                    nationalInsuranceNumber,
+                    trn,
+                    TimeProvider.UtcNow.Year.ToString(),
+                    trainingProvider.TrainingProviderId,
+                    subject.TrainingSubjectId);
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.CheckAnswers(coordinator.InstanceId));
 
@@ -30,6 +39,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var doc = await AssertEx.HtmlResponseAsync(response);
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
                 Assert.Equal(trn, doc.GetSummaryListValueByKey("TRN"));
+                Assert.Equal(TimeProvider.UtcNow.Year.ToString(), doc.GetSummaryListValueByKey("Year received"));
+                Assert.Equal(trainingProvider.Name, doc.GetSummaryListValueByKey("Provider"));
+                Assert.Equal(subject.Name, doc.GetSummaryListValueByKey("Subject"));
             });
 
     [Fact]
@@ -48,6 +60,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var trn = "0000000";
                 var proofOfIdentityFileId = Guid.NewGuid();
                 var proofOfIdentityFileName = "identity.png";
+                var trainingProvider = await GetTrainingProviderAsync();
+                var subject = await GetTrainingSubjectAsync();
 
                 await SetupInstanceStateForUnverifiedUserAsync(
                     coordinator,
@@ -58,7 +72,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     nationalInsuranceNumber,
                     trn,
                     proofOfIdentityFileId,
-                    proofOfIdentityFileName);
+                    proofOfIdentityFileName,
+                    TimeProvider.UtcNow.Year.ToString(),
+                    trainingProvider.TrainingProviderId,
+                    subject.TrainingSubjectId);
 
                 var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.CheckAnswers(coordinator.InstanceId));
 
@@ -72,6 +89,32 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
                 Assert.Equal(trn, doc.GetSummaryListValueByKey("TRN"));
                 Assert.Equal(proofOfIdentityFileName, doc.GetSummaryListValueByKey("Proof of identity"));
+                Assert.Equal(TimeProvider.UtcNow.Year.ToString(), doc.GetSummaryListValueByKey("Year received"));
+                Assert.Equal(trainingProvider.Name, doc.GetSummaryListValueByKey("Provider"));
+                Assert.Equal(subject.Name, doc.GetSummaryListValueByKey("Subject"));
+            });
+
+    [Fact]
+    public Task Get_ValidRequestWithMissingQtsDetails_DoesNotRenderMissingRows() =>
+        WithJourneyCoordinatorAsync(
+            CreateSignInJourneyState,
+            async coordinator =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+
+                await SetupInstanceStateWithMissingQtsDetailsAsync(coordinator, oneLoginUser);
+
+                var request = new HttpRequestMessage(HttpMethod.Get, JourneyUrls.CheckAnswers(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                var doc = await AssertEx.HtmlResponseAsync(response);
+                Assert.Null(doc.GetSummaryListValueByKey("Year received"));
+                Assert.Null(doc.GetSummaryListValueByKey("Provider"));
+                Assert.Null(doc.GetSummaryListValueByKey("Subject"));
             });
 
     [Fact]
@@ -90,8 +133,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
                 var trn = "0000000";
+                var trainingProvider = await GetTrainingProviderAsync();
+                var subject = await GetTrainingSubjectAsync();
+                var qtsYearReceived = TimeProvider.UtcNow.Year.ToString();
 
-                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
+                await SetupInstanceStateForVerifiedUserAsync(
+                    coordinator,
+                    oneLoginUser,
+                    nationalInsuranceNumber,
+                    trn,
+                    qtsYearReceived,
+                    trainingProvider.TrainingProviderId,
+                    subject.TrainingSubjectId);
 
                 LegacyEventPublisher.Clear();
 
@@ -125,6 +178,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(trn, data.StatedTrn);
                 Assert.Equal(trnToken.Trn, data.TrnTokenTrn);
                 Assert.Equal(applicationUser.UserId, data.ClientApplicationUserId);
+                Assert.Equal(qtsYearReceived, data.YearQtsReceived);
+                Assert.Equal(trainingProvider.TrainingProviderId, data.TrainingProviderId);
+                Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
+                Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
+                Assert.Equal(subject.Name, data.SubjectName);
 
                 LegacyEventPublisher.AssertEventsSaved(e =>
                 {
@@ -144,6 +202,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Assert.Equal(trn, eventData.StatedTrn);
                     Assert.Equal(trnToken.Trn, eventData.TrnTokenTrn);
                     Assert.Equal(applicationUser.UserId, eventData.ClientApplicationUserId);
+                    Assert.Equal(qtsYearReceived, eventData.YearQtsReceived);
+                    Assert.Equal(trainingProvider.TrainingProviderId, eventData.TrainingProviderId);
+                    Assert.Equal(trainingProvider.Name, eventData.TrainingProviderName);
+                    Assert.Equal(subject.TrainingSubjectId, eventData.SubjectId);
+                    Assert.Equal(subject.Name, eventData.SubjectName);
                 });
 
                 Events.AssertProcessesCreated(p =>
@@ -175,6 +238,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var trn = "0000000";
                 var proofOfIdentityFileId = Guid.NewGuid();
                 var proofOfIdentityFileName = "identity.png";
+                var trainingProvider = await GetTrainingProviderAsync();
+                var subject = await GetTrainingSubjectAsync();
+                var qtsYearReceived = TimeProvider.UtcNow.Year.ToString();
 
                 await SetupInstanceStateForUnverifiedUserAsync(
                     coordinator,
@@ -185,7 +251,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     nationalInsuranceNumber,
                     trn,
                     proofOfIdentityFileId,
-                    proofOfIdentityFileName);
+                    proofOfIdentityFileName,
+                    qtsYearReceived,
+                    trainingProvider.TrainingProviderId,
+                    subject.TrainingSubjectId);
 
                 LegacyEventPublisher.Clear();
 
@@ -222,6 +291,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(proofOfIdentityFileName, data.EvidenceFileName);
                 Assert.Equal(trnToken.Trn, data.TrnTokenTrn);
                 Assert.Equal(applicationUser.UserId, data.ClientApplicationUserId);
+                Assert.Equal(qtsYearReceived, data.YearQtsReceived);
+                Assert.Equal(trainingProvider.TrainingProviderId, data.TrainingProviderId);
+                Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
+                Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
+                Assert.Equal(subject.Name, data.SubjectName);
 
                 LegacyEventPublisher.AssertEventsSaved(e =>
                 {
@@ -242,6 +316,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Assert.Equal(trn, eventData.StatedTrn);
                     Assert.Equal(trnToken.Trn, eventData.TrnTokenTrn);
                     Assert.Equal(applicationUser.UserId, eventData.ClientApplicationUserId);
+                    Assert.Equal(qtsYearReceived, eventData.YearQtsReceived);
+                    Assert.Equal(trainingProvider.TrainingProviderId, eventData.TrainingProviderId);
+                    Assert.Equal(trainingProvider.Name, eventData.TrainingProviderName);
+                    Assert.Equal(subject.TrainingSubjectId, eventData.SubjectId);
+                    Assert.Equal(subject.Name, eventData.SubjectName);
                 });
 
                 Events.AssertProcessesCreated(p =>
@@ -268,8 +347,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
                 var trn = "0000000";
+                var trainingProvider = await GetTrainingProviderAsync();
+                var subject = await GetTrainingSubjectAsync();
+                var qtsYearReceived = TimeProvider.UtcNow.Year.ToString();
 
-                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
+                await SetupInstanceStateForVerifiedUserAsync(
+                    coordinator,
+                    oneLoginUser,
+                    nationalInsuranceNumber,
+                    trn,
+                    qtsYearReceived,
+                    trainingProvider.TrainingProviderId,
+                    subject.TrainingSubjectId);
 
                 LegacyEventPublisher.Clear();
 
@@ -303,6 +392,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var data = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
                 Assert.Equal(nationalInsuranceNumber, data.StatedNationalInsuranceNumber);
                 Assert.Equal(trn, data.StatedTrn);
+                Assert.Equal(qtsYearReceived, data.YearQtsReceived);
+                Assert.Equal(trainingProvider.TrainingProviderId, data.TrainingProviderId);
+                Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
+                Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
+                Assert.Equal(subject.Name, data.SubjectName);
             });
     }
 
@@ -322,8 +416,18 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
                 var trn = "0000000";
+                var trainingProvider = await GetTrainingProviderAsync();
+                var subject = await GetTrainingSubjectAsync();
+                var qtsYearReceived = TimeProvider.UtcNow.Year.ToString();
 
-                await SetupInstanceStateForVerifiedUserAsync(coordinator, oneLoginUser, nationalInsuranceNumber, trn);
+                await SetupInstanceStateForVerifiedUserAsync(
+                    coordinator,
+                    oneLoginUser,
+                    nationalInsuranceNumber,
+                    trn,
+                    qtsYearReceived,
+                    trainingProvider.TrainingProviderId,
+                    subject.TrainingSubjectId);
 
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.CheckAnswers(coordinator.InstanceId));
 
@@ -343,6 +447,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     dbContext.SupportTasks.SingleAsync(t => t.OneLoginUserSubject == oneLoginUser.Subject));
                 Assert.Null(supportTask.TrnRequestApplicationUserId);
                 Assert.Null(supportTask.TrnRequestId);
+                var data = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
+                Assert.Equal(qtsYearReceived, data.YearQtsReceived);
+                Assert.Equal(trainingProvider.TrainingProviderId, data.TrainingProviderId);
+                Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
+                Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
+                Assert.Equal(subject.Name, data.SubjectName);
             });
     }
 
@@ -350,7 +460,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         SignInJourneyCoordinator coordinator,
         OneLoginUser oneLoginUser,
         string? nationalInsuranceNumber,
-        string? trn)
+        string? trn,
+        string qtsYearReceived,
+        Guid trainingProviderId,
+        Guid subjectId)
     {
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
         await coordinator.OnOneLoginCallbackAsync(ticket);
@@ -359,6 +472,25 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber));
         AddUrlToPath(coordinator, StepUrls.Trn);
         coordinator.UpdateState(s => s.SetTrn(true, trn));
+        AddUrlToPath(coordinator, StepUrls.QtsStatus);
+        coordinator.UpdateState(s => s.SetQts(true));
+        AddUrlToPath(coordinator, StepUrls.QtsDetails);
+        coordinator.UpdateState(s => s.SetQtsDetails(qtsYearReceived, trainingProviderId, subjectId));
+        AddUrlToPath(coordinator, StepUrls.NotFound);
+        AddUrlToPath(coordinator, StepUrls.CheckAnswers);
+    }
+
+    private async Task SetupInstanceStateWithMissingQtsDetailsAsync(SignInJourneyCoordinator coordinator, OneLoginUser oneLoginUser)
+    {
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
+        await coordinator.OnOneLoginCallbackAsync(ticket);
+        Debug.Assert(coordinator.State.IdentityVerified);
+        AddUrlToPath(coordinator, StepUrls.NationalInsuranceNumber);
+        coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber()));
+        AddUrlToPath(coordinator, StepUrls.Trn);
+        coordinator.UpdateState(s => s.SetTrn(true, "0000000"));
+        AddUrlToPath(coordinator, StepUrls.QtsStatus);
+        coordinator.UpdateState(s => s.SetQts(true));
         AddUrlToPath(coordinator, StepUrls.NotFound);
         AddUrlToPath(coordinator, StepUrls.CheckAnswers);
     }
@@ -372,7 +504,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         string? nationalInsuranceNumber,
         string? trn,
         Guid? proofOfIdentityFileId = null,
-        string? proofOfIdentityFileName = null)
+        string? proofOfIdentityFileName = null,
+        string qtsYearReceived = "",
+        Guid trainingProviderId = default,
+        Guid subjectId = default)
     {
         var ticket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, oneLoginUser);
         await coordinator.OnOneLoginCallbackAsync(ticket);
@@ -385,9 +520,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         coordinator.UpdateState(s => s.SetNationalInsuranceNumber(true, nationalInsuranceNumber));
         AddUrlToPath(coordinator, StepUrls.Trn);
         coordinator.UpdateState(s => s.SetTrn(trn is not null, trn));
+        AddUrlToPath(coordinator, StepUrls.QtsStatus);
+        coordinator.UpdateState(s => s.SetQts(true));
+        AddUrlToPath(coordinator, StepUrls.QtsDetails);
+        coordinator.UpdateState(s => s.SetQtsDetails(qtsYearReceived, trainingProviderId, subjectId));
         AddUrlToPath(coordinator, StepUrls.NotFound);
         coordinator.UpdateState(s => s.SetProofOfIdentityFile(proofOfIdentityFileId ?? Guid.NewGuid(), proofOfIdentityFileName ?? "identity.png"));
         AddUrlToPath(coordinator, StepUrls.ProofOfIdentity);
         AddUrlToPath(coordinator, StepUrls.CheckAnswers);
     }
+
+    private async Task<TrainingProvider> GetTrainingProviderAsync() =>
+        (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => !x.Name.Contains('\'')).First();
+
+    private async Task<TrainingSubject> GetTrainingSubjectAsync() =>
+        (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => !x.Name.Contains('\'')).First();
 }

@@ -158,7 +158,24 @@ public partial class SignInTests
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickGovUkButtonAsync("Check your answers");
+        await page.ClickGovUkButtonAsync("Next");
+
+        var trainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
+            .Where(x => !x.Name.Contains('\''))
+            .First();
+        var qtsSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync())
+            .Where(x => !x.Name.Contains('\''))
+            .First();
+
+        await page.WaitForUrlPathAsync("/qts-status");
+        await page.CheckAsync("text=Yes");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/qts-details");
+        await page.FillAsync("input#YearQtsReceived", TimeProvider.UtcNow.Year.ToString());
+        await page.FillAutocompleteAsync("TrainingProviderId", trainingProvider.Name);
+        await page.FillAutocompleteAsync("SubjectId", qtsSubject.Name);
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/check-answers");
         await page.ClickGovUkButtonAsync("Submit support request");
@@ -194,5 +211,137 @@ public partial class SignInTests
         await page.AssertSignedInWithDormantTrnRequestAsync(trnRequestId);
 
         await page.CloseAsync();
+    }
+
+    [Fact]
+    public async Task SignIn_DeferredRecordMatchingPolicy_VerifiedUserWithUnmatchedTrn_ChoosesNoQts_GoesToCheckAnswers()
+    {
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
+            TestData.GenerateFirstName(),
+            TestData.GenerateLastName(),
+            TestData.GenerateDateOfBirth());
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
+
+        await page.WaitForUrlPathAsync("/connect");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
+
+        await page.WaitForUrlPathAsync("/national-insurance-number");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/trn");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('Teacher reference number')", "9999999");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/not-found");
+        await page.ClickGovUkButtonAsync("Next");
+
+        await page.WaitForUrlPathAsync("/qts-status");
+        await page.CheckAsync("text=No");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+    }
+
+    [Fact]
+    public async Task SignIn_DeferredRecordMatchingPolicy_VerifiedUserWithUnmatchedTrn_CanChangeQtsDetailsFromCheckAnswers()
+    {
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(
+            TestData.GenerateFirstName(),
+            TestData.GenerateLastName(),
+            TestData.GenerateDateOfBirth());
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        var trainingProviders = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
+            .Where(x => !x.Name.Contains('\''))
+            .Take(2)
+            .ToArray();
+        Assert.Equal(2, trainingProviders.Length);
+
+        var subjects = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync())
+            .Where(x => !x.Name.Contains('\''))
+            .Take(2)
+            .ToArray();
+        Assert.Equal(2, subjects.Length);
+
+        var currentYear = TimeProvider.UtcNow.Year.ToString();
+        var previousYear = (TimeProvider.UtcNow.Year - 1).ToString();
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToAuthorizeAccessTestStartPageAsync(deferred: true);
+
+        await page.WaitForUrlPathAsync("/connect");
+        await page.ClickGovUkButtonAsync("Find your teaching record");
+
+        await page.WaitForUrlPathAsync("/national-insurance-number");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/trn");
+        await page.CheckAsync("text=Yes");
+        await page.FillAsync("label:text-is('Teacher reference number')", "9999999");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/not-found");
+        await page.ClickGovUkButtonAsync("Next");
+
+        await page.WaitForUrlPathAsync("/qts-status");
+        await page.CheckAsync("text=Yes");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/qts-details");
+        await page.FillAsync("input#YearQtsReceived", currentYear);
+        await page.FillAutocompleteAsync("TrainingProviderId", trainingProviders[0].Name);
+        await page.FillAutocompleteAsync("SubjectId", subjects[0].Name);
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+        await page.AssertContentContainsAsync(currentYear, "Year received");
+        await page.AssertContentContainsAsync(trainingProviders[0].Name, "Provider");
+        await page.AssertContentContainsAsync(subjects[0].Name, "Subject");
+
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Year received");
+        await page.WaitForUrlPathAsync("/qts-details");
+        await page.FillAsync("input#YearQtsReceived", previousYear);
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+        await page.AssertContentContainsAsync(previousYear, "Year received");
+        await page.AssertContentContainsAsync(trainingProviders[0].Name, "Provider");
+        await page.AssertContentContainsAsync(subjects[0].Name, "Subject");
+
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Provider");
+        await page.WaitForUrlPathAsync("/qts-details");
+        await page.FillAutocompleteAsync("TrainingProviderId", trainingProviders[1].Name);
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+        await page.AssertContentContainsAsync(previousYear, "Year received");
+        await page.AssertContentContainsAsync(trainingProviders[1].Name, "Provider");
+        await page.AssertContentContainsAsync(subjects[0].Name, "Subject");
+
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Subject");
+        await page.WaitForUrlPathAsync("/qts-details");
+        await page.FillAutocompleteAsync("SubjectId", subjects[1].Name);
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/check-answers");
+        await page.AssertContentContainsAsync(previousYear, "Year received");
+        await page.AssertContentContainsAsync(trainingProviders[1].Name, "Provider");
+        await page.AssertContentContainsAsync(subjects[1].Name, "Subject");
     }
 }

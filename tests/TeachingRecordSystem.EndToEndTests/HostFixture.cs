@@ -128,9 +128,10 @@ public sealed class HostFixture : InitializeDbFixture
         await base.DisposeAsync();
     }
 
-    public Task<IBrowserContext> CreateBrowserContext() =>
+    public Task<IBrowserContext> CreateBrowserContext(bool javascriptEnabled = true) =>
         _browser.NewContextAsync(new()
         {
+            JavaScriptEnabled = javascriptEnabled,
             ViewportSize = ViewportSize.NoViewport
         });
 

@@ -219,6 +219,8 @@ public abstract class TestBase
         public const string Connect = "/connect";
         public const string NationalInsuranceNumber = "/national-insurance-number";
         public const string Trn = "/trn";
+        public const string QtsStatus = "/qts-status";
+        public const string QtsDetails = "/qts-details";
         public const string Found = "/found";
         public const string ContinueToApplication = "/continue-to-application";
         public const string NotFound = "/not-found";
@@ -245,6 +247,12 @@ public abstract class TestBase
 
         public static string Trn(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.Trn);
+
+        public static string QtsStatus(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.QtsStatus);
+
+        public static string QtsDetails(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.QtsDetails);
 
         public static string Found(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.Found);

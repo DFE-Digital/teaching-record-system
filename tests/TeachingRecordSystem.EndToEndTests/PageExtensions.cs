@@ -51,9 +51,39 @@ public static class PageExtensions
     public static Task ClickBackLinkAsync(this IPage page) =>
         page.ClickAsync(".govuk-back-link");
 
+    public static Task ClickChangeLinkForSummaryListRowWithKeyAsync(this IPage page, string key) =>
+        page.Locator($".govuk-summary-list__row:has(> dt{TextSelector(key)})").GetByText("Change").ClickAsync();
+
     public static string TextSelector(string? text) => $":text(\"{text?.Replace("\"", "\\\"")}\")";
 
     public static string TextIsSelector(string? text) => $":text-is(\"{text?.Replace("\"", "\\\"")}\")";
 
     public static string HasTextSelector(string? text) => $":has-text(\"{text?.Replace("\"", "\\\"")}\")";
+
+    public static Task<string> FindContentForLabelAsync(this IPage page, string label)
+    {
+        var dtElement = page.Locator($"dt{HasTextSelector(label)}");
+        var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
+        return ddElement.InnerTextAsync();
+    }
+
+    public static async Task AssertContentContainsAsync(this IPage page, string content, string label)
+    {
+        var ddText = await page.FindContentForLabelAsync(label);
+        Assert.Contains(content, ddText);
+    }
+
+    public static async Task FillAutocompleteAsync(this IPage page, string id, string name)
+    {
+        var input = page.Locator($"input#{id}");
+        await input.FillAsync(name);
+
+        if (name.Length == 0)
+        {
+            return;
+        }
+
+        await page.Locator(".autocomplete__menu--visible").WaitForAsync();
+        await input.PressAsync("Enter");
+    }
 }

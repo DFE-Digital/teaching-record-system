@@ -60,3 +60,8 @@
     border-color: transparent;
   }
 }
+
+body:not(.js-enabled) .trs-requires-js {
+  @extend .govuk-visually-hidden;
+}
+
