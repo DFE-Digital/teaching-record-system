@@ -92,7 +92,7 @@ public class PersonEmailAddressHistory
 
         // The person may have been deactivated since.
         var currentEmailAddresses = await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => personIds.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, p => p.EmailAddress, cancellationToken);
 

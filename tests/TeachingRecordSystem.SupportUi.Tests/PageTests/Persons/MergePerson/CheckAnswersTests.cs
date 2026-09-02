@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Events.Models;
@@ -180,14 +181,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             $"/persons/{personA.PersonId}");
 
         var primaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personA.PersonId));
         Assert.Equal(PersonStatus.Active, primaryPerson.Status);
         Assert.Null(primaryPerson.MergedWithPersonId);
 
         var secondaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personB.PersonId));
         Assert.Equal(PersonStatus.Deactivated, secondaryPerson.Status);

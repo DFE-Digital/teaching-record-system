@@ -1,4 +1,5 @@
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services;
 using TeachingRecordSystem.Core.Services.MandatoryQualifications;
@@ -150,7 +151,7 @@ public class MandatoryQualificationServiceTests(ServiceFixture fixture) : Servic
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var dbMq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleAsync(q => q.QualificationId == mq.QualificationId);
+            var dbMq = await dbContext.MandatoryQualifications.IgnoreQueryFilters([QueryFilterNames.Deleted]).SingleAsync(q => q.QualificationId == mq.QualificationId);
             Assert.NotNull(dbMq.DeletedOn);
         });
 

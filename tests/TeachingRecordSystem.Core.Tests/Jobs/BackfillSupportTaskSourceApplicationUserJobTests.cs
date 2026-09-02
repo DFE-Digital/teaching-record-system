@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging.Abstractions;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Models.SupportTasks;
@@ -422,7 +423,7 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
         WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             // The property is init-only, so go through the entry rather than the model.
@@ -435,7 +436,7 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
         WithDbContextAsync(async dbContext =>
         {
             var dbSupportTask = await dbContext.SupportTasks
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
 
             return dbSupportTask.SourceApplicationUserId;

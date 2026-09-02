@@ -36,7 +36,7 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
         // meaning the entire Route is not found, but if Person is deactivated we
         // we need to return a BadRequest instead of a NotFound result
         var currentRouteWithPotentiallyDeactivatedPerson = await query
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .SingleOrDefaultAsync();
 
         if (currentRouteWithPotentiallyDeactivatedPerson is not null &&

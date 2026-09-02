@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Api.V3.Operations;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
@@ -439,14 +440,14 @@ public class SetQtlsTests(OperationTestFixture operationTestFixture) : Operation
         WithDbContextAsync(dbContext =>
             dbContext.Qualifications
                 .OfType<RouteToProfessionalStatus>()
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .SingleOrDefaultAsync(q => q.PersonId == personId && q.RouteToProfessionalStatusTypeId == routeToProfessionalStatusTypeId));
 
     private Task<RouteToProfessionalStatus?> GetQtlsRoute(Guid personId) =>
         WithDbContextAsync(dbContext =>
             dbContext.Qualifications
                 .OfType<RouteToProfessionalStatus>()
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
                 .SingleOrDefaultAsync(q => q.PersonId == personId && q.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
     private Task<QtlsStatus> GetQtlsStatus(Guid personId) =>

@@ -73,7 +73,7 @@ public class EnterTrnModel(
         }
 
         var otherPerson = await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .SingleOrDefaultAsync(p => p.Trn == OtherTrn);
 
         if (otherPerson is null)

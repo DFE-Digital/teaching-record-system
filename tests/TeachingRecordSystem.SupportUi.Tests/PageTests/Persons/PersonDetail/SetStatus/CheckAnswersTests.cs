@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Events.Legacy;
@@ -255,7 +256,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(targetStatus, updatedPersonRecord.Status);

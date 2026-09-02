@@ -91,7 +91,7 @@ public class MergePersonJourneyCoordinator(
     public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(params Guid[] personIds)
     {
         var potentialDuplicates = (await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => personIds.Contains(p.PersonId))
             .Select(p => new PotentialDuplicate
             {

@@ -35,7 +35,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
         // meaning the entire Qualification is not found, but if Person is deactivated we
         // we need to return a BadRequest instead of a NotFound result
         var currentMqWithPotentiallyDeactivatedPerson = await query
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .SingleOrDefaultAsync();
 
         if (currentMqWithPotentiallyDeactivatedPerson is not null &&

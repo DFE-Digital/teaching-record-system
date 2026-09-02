@@ -40,7 +40,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
         // meaning the entire Alert is not found, but if Person is deactivated
         // we need to return a BadRequest instead of a NotFound result
         var currentAlertWithPotentiallyDeactivatedPerson = await query
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .SingleOrDefaultAsync();
 
         if (currentAlertWithPotentiallyDeactivatedPerson is not null &&

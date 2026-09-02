@@ -11,7 +11,7 @@ public class QualificationMapping : IEntityTypeConfiguration<Qualification>
         builder.IncludeInAnalyticsSync(hidden: false);
         builder.ToTable("qualifications");
         builder.HasKey(q => q.QualificationId);
-        builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Qualification.DeletedOn)) == null);
+        builder.HasQueryFilter(QueryFilterNames.Deleted, q => EF.Property<DateTime?>(q, nameof(Qualification.DeletedOn)) == null);
         builder.HasDiscriminator(q => q.QualificationType)
             .HasValue<MandatoryQualification>(QualificationType.MandatoryQualification)
             .HasValue<RouteToProfessionalStatus>(QualificationType.RouteToProfessionalStatus);
