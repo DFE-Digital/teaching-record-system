@@ -69,9 +69,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var trainingProvider in Model.TrainingProviders)
                 {
-                    <govuk-select-item value="@trainingProvider.TrainingProviderId" selected="@(Model.TrainingProviderId == trainingProvider.TrainingProviderId)">
-                        @trainingProvider.Name.Replace("'", "’")
-                    </govuk-select-item>
+                    <govuk-select-item value="@trainingProvider.TrainingProviderId" selected="@(Model.TrainingProviderId == trainingProvider.TrainingProviderId)">@trainingProvider.Name.Replace("'", "’")</govuk-select-item>
                 }
             </govuk-select>
 
@@ -83,9 +81,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var subject in Model.Subjects)
                 {
-                    <govuk-select-item value="@subject.TrainingSubjectId" selected="@(Model.SubjectId == subject.TrainingSubjectId)">
-                        @subject.Name.Replace("'", "’")
-                    </govuk-select-item>
+                    <govuk-select-item value="@subject.TrainingSubjectId" selected="@(Model.SubjectId == subject.TrainingSubjectId)">@subject.Name.Replace("'", "’")</govuk-select-item>
                 }
             </govuk-select>
 

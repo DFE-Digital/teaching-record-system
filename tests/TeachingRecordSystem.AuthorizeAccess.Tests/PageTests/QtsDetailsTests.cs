@@ -20,6 +20,8 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var existingYear = haveExistingValueInState ? "2023" : null;
                 Guid? existingTrainingProviderId = null;
                 Guid? existingSubjectId = null;
+                string? existingTrainingProviderText = null;
+                string? existingSubjectText = null;
 
                 if (haveExistingValueInState)
                 {
@@ -28,6 +30,8 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                     existingTrainingProviderId = trainingProvider.TrainingProviderId;
                     existingSubjectId = subject.TrainingSubjectId;
+                    existingTrainingProviderText = trainingProvider.Name.Replace("'", "’");
+                    existingSubjectText = subject.Name.Replace("'", "’");
 
                     coordinator.UpdateState(s => s.SetQtsDetails(existingYear!, existingTrainingProviderId.Value, existingSubjectId.Value));
                 }
@@ -43,6 +47,8 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(existingYear, doc.GetElementById("YearQtsReceived")?.GetAttribute("value"));
                 Assert.Equal(existingTrainingProviderId?.ToString(), doc.QuerySelector("#TrainingProviderId option:checked")?.GetAttribute("value"));
                 Assert.Equal(existingSubjectId?.ToString(), doc.QuerySelector("#SubjectId option:checked")?.GetAttribute("value"));
+                Assert.Equal(existingTrainingProviderText, doc.QuerySelector("#TrainingProviderId option:checked")?.TextContent);
+                Assert.Equal(existingSubjectText, doc.QuerySelector("#SubjectId option:checked")?.TextContent);
                 Assert.Equal("Why are we asking this?", doc.QuerySelector(".govuk-details__summary-text")?.TextContent.Trim());
             });
 
