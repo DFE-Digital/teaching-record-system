@@ -120,9 +120,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
                 startDate: lessThanSevenYearsAgo.AddYears(-1),
                 completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
         });
 
@@ -169,21 +167,13 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
                 startDate: null,
                 completedDate: null,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
             person.SetInductionStatus(
                 status,
                 startDate: null,
                 completedDate: null,
                 exemptionReasonIds: [],
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                additionalInformation: null,
-                out _);
+                now: TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
         });
 
@@ -301,9 +291,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
                 startDate: lessThanSevenYearsAgo.AddYears(-1),
                 completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
         });
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -362,22 +350,14 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
                 startDate: null,
                 completedDate: null,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
 
             person.SetInductionStatus(
                 status,
                 startDate: null,
                 completedDate: null,
                 exemptionReasonIds: [],
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                additionalInformation: null,
-                out _);
+                now: TimeProvider.UtcNow);
 
             await dbContext.SaveChangesAsync();
         });
@@ -421,21 +401,13 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
                 startDate: null,
                 completedDate: null,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
             person.SetInductionStatus(
                 status,
                 startDate: null,
                 completedDate: null,
                 exemptionReasonIds: [],
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                additionalInformation: null,
-                out _);
+                now: TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
         });
         var journeyInstance = await CreateJourneyInstanceAsync(

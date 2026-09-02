@@ -10,6 +10,17 @@ public record PersonInductionUpdatedEvent : IEvent
     public required EventModels.Induction Induction { get; init; }
     public required EventModels.Induction OldInduction { get; init; }
     public required PersonInductionUpdatedEventChanges Changes { get; init; }
+
+    public static PersonInductionUpdatedEventChanges GetChanges(
+        EventModels.Induction induction,
+        EventModels.Induction oldInduction) =>
+        PersonInductionUpdatedEventChanges.None |
+        (induction.Status != oldInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
+        (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
+        (induction.StartDate != oldInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
+        (induction.CompletedDate != oldInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
+        (!induction.ExemptionReasonIds.ToHashSet().SetEquals(oldInduction.ExemptionReasonIds) ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0) |
+        (induction.InductionExemptWithoutReason != oldInduction.InductionExemptWithoutReason ? PersonInductionUpdatedEventChanges.InductionExemptWithoutReason : 0);
 }
 
 [Flags]

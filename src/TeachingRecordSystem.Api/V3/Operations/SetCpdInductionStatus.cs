@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Inductions;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
 
@@ -13,7 +14,11 @@ public record SetCpdInductionStatusCommand(
 
 public record SetCpdInductionStatusResult;
 
-public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserProvider currentUserProvider, TimeProvider timeProvider) :
+public class SetCpdInductionStatusHandler(
+    TrsDbContext dbContext,
+    ICurrentUserProvider currentUserProvider,
+    TimeProvider timeProvider,
+    InductionService inductionService) :
     ICommandHandler<SetCpdInductionStatusCommand, SetCpdInductionStatusResult>
 {
     public async Task<ApiResult<SetCpdInductionStatusResult>> ExecuteAsync(SetCpdInductionStatusCommand command)
@@ -64,21 +69,16 @@ public class SetCpdInductionStatusHandler(TrsDbContext dbContext, ICurrentUserPr
 
         var currentUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        person.SetCpdInductionStatus(
-            command.Status,
-            command.StartDate,
-            command.CompletedDate,
-            command.CpdModifiedOn,
-            currentUserId,
-            timeProvider.UtcNow,
-            out var updatedEvent);
-
-        if (updatedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-        }
-
-        await dbContext.SaveChangesAsync();
+        await inductionService.SetCpdInductionStatusAsync(
+            new SetCpdInductionStatusOptions
+            {
+                PersonId = person.PersonId,
+                Status = command.Status,
+                StartDate = command.StartDate,
+                CompletedDate = command.CompletedDate,
+                CpdModifiedOn = command.CpdModifiedOn
+            },
+            new ProcessContext(ProcessType.PersonCpdInductionUpdating, timeProvider.UtcNow, currentUserId));
 
         return new SetCpdInductionStatusResult();
     }

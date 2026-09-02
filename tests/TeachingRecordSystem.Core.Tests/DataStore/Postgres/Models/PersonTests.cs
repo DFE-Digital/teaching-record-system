@@ -20,13 +20,7 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.None, person.InductionStatus);
@@ -44,13 +38,7 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.RequiredToComplete, person.InductionStatus);
@@ -68,13 +56,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.InProgress, person.InductionStatus);
@@ -92,13 +74,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2025, 1, 1),
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Passed, person.InductionStatus);
@@ -116,13 +92,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2025, 1, 1),
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Failed, person.InductionStatus);
@@ -140,13 +110,7 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             exemptionReasonIds: [InductionExemptionReason.QtlsId],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
@@ -164,13 +128,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2025, 1, 1),
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.FailedInWales, person.InductionStatus);
@@ -180,7 +138,7 @@ public class PersonTests
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.InProgress)]
     [InlineData(InductionStatus.RequiredToComplete)]
-    public void SetCpdInductionStatus_SetsOverallStatusAndOutsEvent(InductionStatus status)
+    public void SetCpdInductionStatus_SetsOverallStatus(InductionStatus status)
     {
         // Arrange
         var person = CreatePerson();
@@ -191,9 +149,7 @@ public class PersonTests
             startDate: status != InductionStatus.RequiredToComplete ? new DateOnly(2024, 1, 1) : null,
             completedDate: status == InductionStatus.Passed ? new DateOnly(2024, 10, 1) : null,
             cpdModifiedOn: TimeProvider.UtcNow,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(status, person.InductionStatus);
@@ -213,13 +169,7 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             [InductionExemptionReason.PassedInWalesId],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            TimeProvider.UtcNow);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
         TimeProvider.Advance(TimeSpan.FromDays(1));
@@ -230,9 +180,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2024, 10, 1),
             cpdModifiedOn: TimeProvider.UtcNow,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Passed, person.InductionStatus);
@@ -254,13 +202,7 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             [InductionExemptionReason.PassedInWalesId],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            TimeProvider.UtcNow);
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
         TimeProvider.Advance(TimeSpan.FromDays(1));
@@ -271,9 +213,7 @@ public class PersonTests
             startDate: status == InductionStatus.InProgress ? new DateOnly(2024, 1, 1) : null,
             completedDate: null,
             cpdModifiedOn: TimeProvider.UtcNow,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
@@ -301,13 +241,7 @@ public class PersonTests
             exemptionReasonIds: currentStatus is InductionStatus.Exempt ?
                 new[] { InductionExemptionReason.QtlsId } :
                 Array.Empty<Guid>(),
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            TimeProvider.UtcNow);
 
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
@@ -316,9 +250,7 @@ public class PersonTests
             passed,
             startDate: !passed ? new DateOnly(2024, 1, 1) : null,
             completedDate: !passed ? new DateOnly(2024, 10, 1) : null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(currentStatus, person.InductionStatus);
@@ -337,13 +269,7 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2024, 10, 1) : null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            TimeProvider.UtcNow);
 
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
@@ -352,9 +278,7 @@ public class PersonTests
             passed: true,
             startDate: null,
             completedDate: null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
@@ -373,13 +297,7 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2024, 10, 1) : null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            TimeProvider.UtcNow);
 
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
@@ -388,9 +306,7 @@ public class PersonTests
             passed: false,
             startDate: new DateOnly(2024, 1, 1),
             completedDate: new DateOnly(2024, 10, 1),
-            updatedBy: SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.FailedInWales, person.InductionStatus);
@@ -408,9 +324,7 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
             cpdModifiedOn: TimeProvider.UtcNow,
-            SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Act
         var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
@@ -430,9 +344,7 @@ public class PersonTests
             startDate: TimeProvider.Today.AddYears(-1),
             completedDate: TimeProvider.Today,
             cpdModifiedOn: TimeProvider.UtcNow,
-            SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Act
         var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
@@ -452,9 +364,7 @@ public class PersonTests
             startDate: TimeProvider.Today.AddYears(-9),
             completedDate: TimeProvider.Today.AddYears(-7),
             cpdModifiedOn: TimeProvider.UtcNow,
-            SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            out _);
+            TimeProvider.UtcNow);
 
         // Act
         var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
@@ -474,13 +384,7 @@ public class PersonTests
             startDate: TimeProvider.Today,
             completedDate: null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            SystemUser.SystemUserId,
-            TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            TimeProvider.UtcNow);
 
         // Act
         var result = person.InductionStatusManagedByCpd(TimeProvider.Today);
@@ -504,20 +408,12 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Act
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
@@ -536,20 +432,12 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Act
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(currentStatus, person.InductionStatus);
@@ -570,28 +458,18 @@ public class PersonTests
             startDate: initialStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
             completedDate: initialStatus.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
 
         // Act
         person.RemoveInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(initialStatus, person.InductionStatus);
@@ -610,28 +488,18 @@ public class PersonTests
             startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
             exemptionReasonIds: [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         person.AddInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         Debug.Assert(person.InductionStatus == currentStatus);
 
         // Act
         person.RemoveInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(currentStatus, person.InductionStatus);
@@ -648,22 +516,14 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             exemptionReasonIds: [InductionExemptionReason.QtlsId],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            additionalInformation: null,
-            out _);
+            now: TimeProvider.UtcNow);
 
         person.InductionExemptWithoutReason = true;
 
         // Act
         person.RemoveInductionExemptionReason(
             InductionExemptionReason.QtlsId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
@@ -685,9 +545,7 @@ public class PersonTests
         // Act
         person.RemoveInductionExemptionReason(
             exemptionReasonId,
-            updatedBy: SystemUser.SystemUserId,
-            now: TimeProvider.UtcNow,
-            out _);
+            now: TimeProvider.UtcNow);
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);

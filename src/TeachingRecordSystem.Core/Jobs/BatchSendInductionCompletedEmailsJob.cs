@@ -36,16 +36,18 @@ public class BatchSendInductionCompletedEmailsJob(
             ExecutedUtc = executed
         };
 
-        var inductionCompletees = await dbContext.Events.FromSql(
+        // The induction snapshots now live on PersonInductionUpdatedEvent. Several process types publish it - a route
+        // change moves the person's induction too - so this keys off the event rather than the process type.
+        var inductionCompletees = await dbContext.Database.SqlQuery<InductionCompleteeQueryResult>(
             $"""
-             select * from events
-             where event_name = 'PersonInductionUpdatedEvent'
-             and created >= {startDate}
-             and created < {endDate}
-             and payload->'Induction'->>'Status' = '4'
-             and payload->'OldInduction'->>'Status' != '4'
+             select pe.person_ids[1] as person_id from process_events pe
+             where pe.event_name = {nameof(PersonInductionUpdatedEvent)}
+             and pe.created_on >= {startDate}
+             and pe.created_on < {endDate}
+             and pe.payload->'Induction'->>'Status' = '4'
+             and pe.payload->'OldInduction'->>'Status' != '4'
              """)
-            .Join(dbContext.Persons, e => e.PersonIds.First(), p => p.PersonId, (e, p) => p)
+            .Join(dbContext.Persons, e => e.person_id, p => p.PersonId, (e, p) => p)
             .Where(p => p.InductionStatus == InductionStatus.Passed)  // Check the status is still Passed
             .Where(p => p.EmailAddress != null)
             .Where(p => !dbContext.InductionCompletedEmailsJobItems.Any(i => i.Trn == p.Trn))  // Ensure we haven't already processed this TRN
@@ -80,4 +82,8 @@ public class BatchSendInductionCompletedEmailsJob(
 
         transaction.Complete();
     }
+
+#pragma warning disable IDE1006 // Naming Styles
+    private record InductionCompleteeQueryResult(Guid person_id);
+#pragma warning restore IDE1006 // Naming Styles
 }

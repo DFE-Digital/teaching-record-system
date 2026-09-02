@@ -179,5 +179,16 @@ public class SetCpdInductionStatusTests(OperationTestFixture operationTestFixtur
 
         // Assert
         AssertSuccess(result);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonCpdInductionUpdating, p.ProcessContext.ProcessType);
+
+            p.AssertProcessHasEvents<PersonInductionUpdatedEvent>(updatedEvent =>
+            {
+                Assert.Equal(person.PersonId, updatedEvent.PersonId);
+                Assert.Equal(InductionStatus.InProgress, updatedEvent.Induction.Status);
+            });
+        });
     }
 }

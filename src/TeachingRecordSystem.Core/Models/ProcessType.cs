@@ -89,5 +89,8 @@ public enum ProcessType
     RouteToProfessionalStatusCreating = 87,
     RouteToProfessionalStatusUpdating = 88,
     RouteToProfessionalStatusDeleting = 89,
-    RouteToProfessionalStatusMigratingFromDqt = 90
+    RouteToProfessionalStatusMigratingFromDqt = 90,
+    PersonInductionUpdating = 91,
+    PersonCpdInductionUpdating = 92,
+    PersonWelshInductionUpdating = 93
 }

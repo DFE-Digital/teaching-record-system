@@ -51,6 +51,27 @@ Support UI *Set status → reactivate*.
 | --- | --- | --- |
 | `PersonReactivatedEvent` | Always | — |
 
+### `PersonInductionUpdating` (91)
+Support UI *Edit induction*. The two systems that drive induction themselves get their own types below, so this one is a support user changing the record by hand.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
+### `PersonCpdInductionUpdating` (92)
+API `SetCpdInductionStatus`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
+### `PersonWelshInductionUpdating` (93)
+API `SetWelshInductionStatus`; the EWC Wales induction import. Both are EWC Wales telling us the outcome of an induction served in Wales, so they share a type. Back-filled events reach it through the import's integration transaction rather than the system user it runs as, which the DQT outbox handlers also wrote as; an induction change with no matching import row keeps `PersonInductionUpdating` (91).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
 ### `PersonDeceased` (42)
 API `SetDeceased`.
 

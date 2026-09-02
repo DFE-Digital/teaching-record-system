@@ -893,23 +893,53 @@ public partial class TestData
             var completedDate = _completedDate.ValueOrDefault();
             var exemptionReasons = _exemptionReasonIds.ValueOr([]);
 
-            person.SetInductionStatus(
-                status,
-                startDate,
-                completedDate,
-                exemptionReasons,
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: SystemUser.SystemUserId,
-                testData.TimeProvider.UtcNow,
-                additionalInformation: null,
-                out var @event);
+            var now = testData.TimeProvider.UtcNow;
+            var oldInduction = EventModels.Induction.FromModel(person);
 
-            if (@event is not null)
+            if (!person.SetInductionStatus(status, startDate, completedDate, exemptionReasons, now))
             {
-                dbContext.AddEventWithoutBroadcast(@event);
+                return;
             }
+
+            var induction = EventModels.Induction.FromModel(person);
+
+            var updatedEvent = new Core.Events.PersonInductionUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Induction = induction,
+                OldInduction = oldInduction,
+                Changes = Core.Events.PersonInductionUpdatedEvent.GetChanges(induction, oldInduction)
+            };
+
+            var processId = Guid.NewGuid();
+
+            dbContext.Processes.Add(new Process
+            {
+                ProcessId = processId,
+                ProcessType = ProcessType.PersonInductionUpdating,
+                CreatedOn = now,
+                UpdatedOn = now,
+                UserId = SystemUser.SystemUserId,
+                DqtUserId = null,
+                DqtUserName = null,
+                PersonIds = [person.PersonId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                ChangeReason = null
+            });
+
+            dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+            {
+                ProcessEventId = updatedEvent.EventId,
+                ProcessId = processId,
+                EventName = nameof(Core.Events.PersonInductionUpdatedEvent),
+                Payload = updatedEvent,
+                PersonIds = [person.PersonId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                CreatedOn = now
+            });
         }
 
         internal static DateOnly? GetDefaultStartDate(InductionStatus status, DateOnly? qtsDate) =>

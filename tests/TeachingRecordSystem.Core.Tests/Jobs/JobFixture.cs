@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Inductions;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
@@ -31,6 +32,7 @@ public class JobFixture : ServiceProviderFixture
             .AddOneLoginService()
             .AddPersonService()
             .AddRoutesToProfessionalStatusService()
+            .AddInductionService()
             .AddSupportTaskServices()
             .AddTrnRequestService(configuration)
             .AddSingleton<IBackgroundJobScheduler>(_ => Mock.Of<IBackgroundJobScheduler>())

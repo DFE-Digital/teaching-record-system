@@ -245,9 +245,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
                 completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
         });
 
@@ -293,21 +291,13 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 startDate: null,
                 completedDate: null,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
             person.SetInductionStatus(
                 trsInductionStatus,
                 startDate: null,
                 completedDate: null,
                 exemptionReasonIds: [],
-                changeReason: null,
-                changeReasonDetail: null,
-                evidenceFile: null,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                additionalInformation: null,
-                out _);
+                now: TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
         });
 

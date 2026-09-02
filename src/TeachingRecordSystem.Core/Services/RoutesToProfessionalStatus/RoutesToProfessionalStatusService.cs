@@ -162,7 +162,7 @@ public class RoutesToProfessionalStatusService(
             (route.ExemptFromInductionDueToQtsDate != oldEventModel.ExemptFromInductionDueToQtsDate ? RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInductionDueToQtsDate : RouteToProfessionalStatusUpdatedEventChanges.None);
 
         var personAttributesChanges = GetPersonAttributesChanges(EventModels.ProfessionalStatusPersonAttributes.FromModel(person), oldPersonAttributes);
-        var inductionChanges = GetInductionChanges(newInduction, oldInduction);
+        var inductionChanges = PersonInductionUpdatedEvent.GetChanges(newInduction, oldInduction);
 
         // Refreshing the person's attributes or their induction is a change even when no field on the route itself
         // moved, so nothing is skipped unless all three are unchanged.
@@ -278,7 +278,7 @@ public class RoutesToProfessionalStatusService(
                 });
         }
 
-        var inductionChanges = GetInductionChanges(newInduction, oldInduction);
+        var inductionChanges = PersonInductionUpdatedEvent.GetChanges(newInduction, oldInduction);
 
         if (inductionChanges != PersonInductionUpdatedEventChanges.None)
         {
@@ -303,17 +303,6 @@ public class RoutesToProfessionalStatusService(
         (personAttributes.HasEyps != oldPersonAttributes.HasEyps ? PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps : 0) |
         (personAttributes.PqtsDate != oldPersonAttributes.PqtsDate ? PersonProfessionalStatusAttributesUpdatedEventChanges.PqtsDate : 0) |
         (personAttributes.QtlsStatus != oldPersonAttributes.QtlsStatus ? PersonProfessionalStatusAttributesUpdatedEventChanges.QtlsStatus : 0);
-
-    private static PersonInductionUpdatedEventChanges GetInductionChanges(
-        EventModels.Induction induction,
-        EventModels.Induction oldInduction) =>
-        PersonInductionUpdatedEventChanges.None |
-        (induction.Status != oldInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-        (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
-        (induction.StartDate != oldInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-        (induction.CompletedDate != oldInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-        (!induction.ExemptionReasonIds.ToHashSet().SetEquals(oldInduction.ExemptionReasonIds) ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0) |
-        (induction.InductionExemptWithoutReason != oldInduction.InductionExemptWithoutReason ? PersonInductionUpdatedEventChanges.InductionExemptWithoutReason : 0);
 
     private static void RefreshExemptFromInductionDueToQtsDate(RouteToProfessionalStatus route)
     {
