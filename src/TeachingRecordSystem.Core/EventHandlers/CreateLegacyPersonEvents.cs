@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 
@@ -84,45 +83,6 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 ReasonDetail = changeReason.Details,
                 EvidenceFile = changeReason.EvidenceFile,
                 AdditionalInformation = changeReason.AdditionalInformation
-            };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-        else if (processContext.ProcessType is ProcessType.PersonMerging)
-        {
-            Debug.Assert(@event.MergedWithPersonId is not null);
-            var mergedWithPersonId = @event.MergedWithPersonId!.Value;
-            var mergedWithPersonTrn = (await dbContext.Persons.FindAsync(mergedWithPersonId))!.Trn;
-
-            var deactivatedPersonTrn = (await dbContext.Persons.FindAsync(@event.PersonId))!.Trn;
-
-            var mergedWithPersonUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
-            Debug.Assert(mergedWithPersonUpdatedEvent is null || mergedWithPersonUpdatedEvent.PersonId == @event.MergedWithPersonId);
-            var mergedWithPerson = (await dbContext.Persons.FindAsync(mergedWithPersonId))!;
-
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
-
-            var changes = mergedWithPersonUpdatedEvent is null ?
-                LegacyEvents.PersonsMergedEventChanges.None :
-                (LegacyEvents.PersonsMergedEventChanges)((int)(mergedWithPersonUpdatedEvent.Changes) << 16);
-
-            var legacyEvent = new LegacyEvents.PersonsMergedEvent
-            {
-                EventId = @event.EventId,
-                CreatedUtc = processContext.Now,
-                RaisedBy = processContext.Process.UserId!,
-                PersonId = mergedWithPersonId,
-                PersonTrn = mergedWithPersonTrn,
-                SecondaryPersonId = @event.PersonId,
-                SecondaryPersonTrn = deactivatedPersonTrn,
-                SecondaryPersonStatus = PersonStatus.Deactivated,
-                Changes = changes,
-                PersonAttributes = mergedWithPersonUpdatedEvent?.PersonDetails ?? EventModels.PersonDetails.FromModel(mergedWithPerson),
-                OldPersonAttributes = mergedWithPersonUpdatedEvent?.OldPersonDetails ?? EventModels.PersonDetails.FromModel(mergedWithPerson),
-                EvidenceFile = changeReason.EvidenceFile,
-                Comments = changeReason.Details
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);

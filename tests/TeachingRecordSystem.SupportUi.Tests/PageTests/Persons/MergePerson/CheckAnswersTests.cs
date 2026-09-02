@@ -215,51 +215,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             }
         }
 
-        // event is published
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<LegacyEvents.PersonsMergedEvent>(e);
-            Assert.Equal(personA.PersonId, actualEvent.PersonId);
-            Assert.Equal(personA.Trn, actualEvent.PersonTrn);
-            Assert.Equal(personB.PersonId, actualEvent.SecondaryPersonId);
-            Assert.Equal(personB.Trn, actualEvent.SecondaryPersonTrn);
-            Assert.Equal(PersonStatus.Deactivated, actualEvent.SecondaryPersonStatus);
-
-            foreach (var attr in PersonAttributeInfos)
-            {
-                Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.OldPersonAttributes)));
-
-                if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
-                {
-                    Assert.Equal(FormatValue(attr.GetValueFromPerson(personB)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
-                }
-                else
-                {
-                    Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPersonAttributes(actualEvent.PersonAttributes)));
-                }
-            }
-
-            Assert.Equal(evidenceFileId, actualEvent.EvidenceFile?.FileId);
-            Assert.Equal(evidenceFileName, actualEvent.EvidenceFile?.Name);
-            Assert.Equal(comments, actualEvent.Comments);
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-
-            var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
-            {
-                PersonMatchedAttribute.FirstName => LegacyEvents.PersonsMergedEventChanges.FirstName,
-                PersonMatchedAttribute.MiddleName => LegacyEvents.PersonsMergedEventChanges.MiddleName,
-                PersonMatchedAttribute.LastName => LegacyEvents.PersonsMergedEventChanges.LastName,
-                PersonMatchedAttribute.DateOfBirth => LegacyEvents.PersonsMergedEventChanges.DateOfBirth,
-                PersonMatchedAttribute.EmailAddress => LegacyEvents.PersonsMergedEventChanges.EmailAddress,
-                PersonMatchedAttribute.NationalInsuranceNumber => LegacyEvents.PersonsMergedEventChanges.NationalInsuranceNumber,
-                PersonMatchedAttribute.Gender => LegacyEvents.PersonsMergedEventChanges.Gender,
-                PersonMatchedAttribute.FullName => throw new NotImplementedException(),
-                PersonMatchedAttribute.Trn => throw new NotImplementedException(),
-                _ => LegacyEvents.PersonsMergedEventChanges.None
-            };
-            Assert.Equal(expectedChange, actualEvent.Changes);
-        });
-
+        // events are published on the process
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.PersonMerging, p.ProcessContext.ProcessType);
@@ -268,9 +224,46 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             Assert.Null(changeReasonInfo.Reason);
             Assert.Equal(comments, changeReasonInfo.Details);
             Assert.Equal(evidenceFileId, changeReasonInfo.EvidenceFile?.FileId);
-            Assert.Equal("evidence.jpg", changeReasonInfo.EvidenceFile?.Name);
+            Assert.Equal(evidenceFileName, changeReasonInfo.EvidenceFile?.Name);
 
             p.AssertProcessHasEvents<PersonDeactivatedEvent, PersonDetailsUpdatedEvent>();
+
+            var deactivatedEvent = p.ProcessContext.Events.OfType<PersonDeactivatedEvent>().Single();
+            Assert.Equal(personB.PersonId, deactivatedEvent.PersonId);
+            Assert.Equal(personA.PersonId, deactivatedEvent.MergedWithPersonId);
+            Assert.Equal(PersonDeactivatedEventChanges.MergedWithPersonId, deactivatedEvent.Changes);
+
+            var detailsUpdatedEvent = p.ProcessContext.Events.OfType<PersonDetailsUpdatedEvent>().Single();
+            Assert.Equal(personA.PersonId, detailsUpdatedEvent.PersonId);
+
+            foreach (var attr in PersonAttributeInfos)
+            {
+                Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPersonAttributes(detailsUpdatedEvent.OldPersonDetails)));
+
+                if (attr.Attribute == sourcedFromSecondaryPersonAttribute.Attribute)
+                {
+                    Assert.Equal(FormatValue(attr.GetValueFromPerson(personB)), FormatValue(attr.GetValueFromPersonAttributes(detailsUpdatedEvent.PersonDetails)));
+                }
+                else
+                {
+                    Assert.Equal(FormatValue(attr.GetValueFromPerson(personA)), FormatValue(attr.GetValueFromPersonAttributes(detailsUpdatedEvent.PersonDetails)));
+                }
+            }
+
+            var expectedChange = sourcedFromSecondaryPersonAttribute.Attribute switch
+            {
+                PersonMatchedAttribute.FirstName => PersonDetailsUpdatedEventChanges.FirstName,
+                PersonMatchedAttribute.MiddleName => PersonDetailsUpdatedEventChanges.MiddleName,
+                PersonMatchedAttribute.LastName => PersonDetailsUpdatedEventChanges.LastName,
+                PersonMatchedAttribute.DateOfBirth => PersonDetailsUpdatedEventChanges.DateOfBirth,
+                PersonMatchedAttribute.EmailAddress => PersonDetailsUpdatedEventChanges.EmailAddress,
+                PersonMatchedAttribute.NationalInsuranceNumber => PersonDetailsUpdatedEventChanges.NationalInsuranceNumber,
+                PersonMatchedAttribute.Gender => PersonDetailsUpdatedEventChanges.Gender,
+                PersonMatchedAttribute.FullName => throw new NotImplementedException(),
+                PersonMatchedAttribute.Trn => throw new NotImplementedException(),
+                _ => PersonDetailsUpdatedEventChanges.None
+            };
+            Assert.Equal(expectedChange, detailsUpdatedEvent.Changes);
         });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
