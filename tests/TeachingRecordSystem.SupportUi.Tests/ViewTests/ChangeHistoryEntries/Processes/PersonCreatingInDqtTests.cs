@@ -26,7 +26,16 @@ public class PersonCreatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
                 gender: person.Gender));
 
         // Assert
-        AssertTitle(entry, "Record created");
+        AssertTitle(entry, "Record created in DQT");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Record created for", bodyText);
+        Assert.Contains($"{person.FirstName} {person.MiddleName} {person.LastName}", bodyText);
+
+        var recordDetails = entry.QuerySelector("details");
+        Assert.NotNull(recordDetails);
+        var recordDetailsSummary = recordDetails.GetElementsByTagName("summary").SingleOrDefault();
+        Assert.Equal("Record details", recordDetailsSummary?.TrimmedText());
 
         entry.AssertSummaryListHasRows(
             ("Name", $"{person.FirstName} {person.MiddleName} {person.LastName}"),
@@ -56,7 +65,14 @@ public class PersonCreatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
                 gender: null));
 
         // Assert
-        AssertTitle(entry, "Record created");
+        AssertTitle(entry, "Record created in DQT");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Record created for", bodyText);
+
+        var recordDetails = entry.QuerySelector("details");
+        Assert.NotNull(recordDetails);
+
         entry.AssertSummaryListHasRows();
     }
 

@@ -1,4 +1,10 @@
 @model ChangeHistoryEntryViewModel
+@{
+    var reactivatedEvent = Model.GetEvent<PersonReactivatedEvent>();
+    var personInfo = Model.Context.GetPersonInfo(reactivatedEvent.PersonId);
+    var name = string.JoinNonEmpty(' ', personInfo.FirstName, personInfo.LastName);
+}
 
-<timeline-entry title="Record reactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Record reactivated in DQT" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body">Record reactivated for @name</p>
 </timeline-entry>

@@ -25,7 +25,12 @@ public class PersonReactivatingInDqtTests(HostFixture hostFixture) : ChangeHisto
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Record reactivated");
+        AssertTitle(entry, "Record reactivated in DQT");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.NotNull(bodyText);
+        Assert.Contains($"Record reactivated for {person.FirstName} {person.LastName}", bodyText);
+
         Assert.Empty(entry.QuerySelectorAll(".govuk-summary-list"));
     }
 }

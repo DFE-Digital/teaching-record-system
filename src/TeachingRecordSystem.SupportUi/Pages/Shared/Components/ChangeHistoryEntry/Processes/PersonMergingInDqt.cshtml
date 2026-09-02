@@ -1,22 +1,32 @@
 @using System.Diagnostics
 @model ChangeHistoryEntryViewModel
-@inject PersonInfoCache PersonInfoCache
 @{
     var deactivatedEvent = Model.GetEvent<PersonDeactivatedEvent>();
     Debug.Assert(deactivatedEvent.MergedWithPersonId is not null);
 
-    var updatedEvent = Model.ContainsEvent<PersonUpdatedInDqtEvent>() ? Model.GetEvent<PersonUpdatedInDqtEvent>() : null ;
+    var updatedEvent = Model.ContainsEvent<PersonUpdatedInDqtEvent>() ? Model.GetEvent<PersonUpdatedInDqtEvent>() : null;
 
     var thisRecordWasDeactivated = Model.Context.PersonId == deactivatedEvent.PersonId;
 
-    var title = !thisRecordWasDeactivated
-        ? $"Record merged{(await PersonInfoCache.GetPersonInfoAsync(deactivatedEvent.PersonId) is { } childRecordInfo ? $" with TRN {childRecordInfo.Trn}" : null)}"
-        : $"Record merged{(await PersonInfoCache.GetPersonInfoAsync(deactivatedEvent.MergedWithPersonId!.Value) is { } masterRecordInfo ? $" with TRN {masterRecordInfo.Trn}" : null)}" + " and deactivated";
+    // The "other" person (the one merged with) is the retained record when viewing the deactivated record,
+    // otherwise it is the deactivated record. otherPersonInfo is always available in this context.
+    var otherPersonId = thisRecordWasDeactivated ? deactivatedEvent.MergedWithPersonId!.Value : deactivatedEvent.PersonId;
+    var otherPersonInfo = Model.Context.GetPersonInfo(otherPersonId);
 }
 
-<timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @if (updatedEvent is not null)
+<timeline-entry title="Record merged in DQT" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body">
+        Record merged with TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(otherPersonInfo.PersonId)" class="govuk-link" target="_blank" data-testid="merged-with-person-link">@otherPersonInfo.Trn <span class="govuk-visually-hidden">(opens in new tab)</span></a>@(thisRecordWasDeactivated ? " and deactivated" : "")
+    </p>
+
+    @* Render the updated-event details only when an updated event exists and we're viewing the retained person *@
+    @if (updatedEvent is not null && !thisRecordWasDeactivated)
     {
-        <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent"/>
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Merged details</govuk-details-summary>
+            <govuk-details-text>
+                <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
+            </govuk-details-text>
+        </govuk-details>
     }
 </timeline-entry>
