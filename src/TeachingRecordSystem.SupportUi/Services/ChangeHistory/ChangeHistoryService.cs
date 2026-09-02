@@ -283,6 +283,7 @@ public class ChangeHistoryService(
             .ToArray();
 
         var allPersons = await dbContext.Persons
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => allPersonIds.Contains(p.PersonId))
             .Select(p => new ChangeHistoryContext.PersonInfo(p.PersonId, p.Trn, p.FirstName, p.LastName))
             .ToArrayAsync();
