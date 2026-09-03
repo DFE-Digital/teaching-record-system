@@ -27,7 +27,6 @@ public class ChangeHistoryService(
             nameof(LegacyEvents.PersonCreatedEvent),
             nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
             nameof(LegacyEvents.PersonStatusUpdatedEvent),
-            nameof(LegacyEvents.TrnAllocatedEvent),
             nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
             nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
             nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
@@ -129,7 +128,8 @@ public class ChangeHistoryService(
             ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
             ProcessType.OneLoginUserPersonConnecting,
             ProcessType.OneLoginUserPersonDisconnecting,
-            ProcessType.NotifyingTrnRecipient
+            ProcessType.NotifyingTrnRecipient,
+            ProcessType.TrnAllocating
         };
 
         var processes = await dbContext.Processes

@@ -515,6 +515,20 @@ events. The tables below describe what those processes hold.
 
 ---
 
+## TRN allocation (historical)
+
+### `TrnAllocating` (91)
+
+Nothing produces this process type any more. It covers the TRNs handed out by the one-off jobs that allocated
+them to persons with EYPS and to overseas NPQ applicants, back-filled from the legacy `TrnAllocatedEvent`s by
+[`BackfillTrnAllocationProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnAllocationProcessesJob.cs).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TrnAllocatedEvent` | Always | — |
+
+---
+
 ## Historical / migration-only
 
 These "…InDqt" / "…FromDqt" process types are not produced by current application code. They were

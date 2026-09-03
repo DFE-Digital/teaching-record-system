@@ -1,0 +1,16 @@
+@using TeachingRecordSystem.Core.Events
+@model ChangeHistoryEntryViewModel
+@{
+    var trnAllocatedEvent = Model.GetEvent<TrnAllocatedEvent>();
+}
+
+<timeline-entry title="TRN allocated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <div data-testid="details">
+        <govuk-summary-list>
+            <row>
+                <key>TRN</key>
+                <value>@trnAllocatedEvent.Trn</value>
+            </row>
+        </govuk-summary-list>
+    </div>
+</timeline-entry>
