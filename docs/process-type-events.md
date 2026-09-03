@@ -241,6 +241,75 @@ A single process spans the whole sign-in journey.
 | --- | --- | --- |
 | `EmailSentEvent` | Always | The TRN recipient email is sent. |
 
+The four award process types below all come from
+[`SendAytqInviteEmailJob`](../src/TeachingRecordSystem.Core/Jobs/SendAytqInviteEmailJob.cs), which picks between
+them on the template of the email
+[`BatchSendProfessionalStatusEmailsJob`](../src/TeachingRecordSystem.Core/Jobs/BatchSendProfessionalStatusEmailsJob.cs)
+queued. Older ones were back-filled by
+[`BackfillNotificationEmailProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNotificationEmailProcessesJob.cs) —
+see [what that job covers](#what-the-notification-back-fill-covers) below.
+
+### `NotifyingQtsAwardee` (92)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The QTS awarded email is sent. |
+
+### `NotifyingInternationalQtsAwardee` (93)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The international QTS awarded email is sent. |
+
+### `NotifyingEytsAwardee` (94)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The EYTS awarded email is sent. |
+
+### `NotifyingQtlsAwardee` (95)
+
+The QTLS post-launch email, which goes to people who gained QTS through the QTLS and SET membership route.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The QTLS post-launch email is sent. |
+
+### `NotifyingInductionCompletee` (96)
+[`SendInductionCompletedEmailJob`](../src/TeachingRecordSystem.Core/Jobs/SendInductionCompletedEmailJob.cs). Older
+ones were back-filled from the legacy `InductionCompletedEmailSentEvent` by
+[`BackfillNotificationEmailProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNotificationEmailProcessesJob.cs);
+this job always wrote that event, so it has no second era.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The induction completed email is sent. |
+
+### `NotifyingLapsedQtlsHolder` (97)
+[`SendQtlsLapsedEmailJob`](../src/TeachingRecordSystem.Core/Jobs/SendQtlsLapsedEmailJob.cs), for the emails
+[`BatchSendProfessionalStatusEmailsJob`](../src/TeachingRecordSystem.Core/Jobs/BatchSendProfessionalStatusEmailsJob.cs)
+queues when a person's QTLS expires.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The QTLS lapsed email is sent. |
+
+### What the notification back-fill covers
+
+[`BackfillNotificationEmailProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNotificationEmailProcessesJob.cs)
+creates the processes for the emails of all six types above that were sent before those types existed. It handles
+two eras, which left behind different things:
+
+| Era | Sender | Recorded | How the person is recovered |
+| --- | --- | --- | --- |
+| Up to the AYTQ rewire | the original per-status batch jobs | a typed legacy event (`QtsAwardedEmailSentEvent` and friends); no `emails` row | it's on the event; the `emails` row is recreated from the batch job item |
+| Rewire onwards | `SendEmailJob` | a real `emails` row and the generic legacy `EmailSentEvent`; no process | the TRN in the email's metadata |
+
+The QTLS lapsed email is the exception in the second era: it carries neither a TRN nor any personalization, so
+the person comes from the QTLS expiry that caused it — the `PersonProfessionalStatusAttributesUpdatedEvent` that
+moved their `QtlsStatus` from Active to Expired shortly before the send, narrowed by the address it went to.
+Anything that doesn't come back to exactly one person is skipped rather than guessed at.
+
 ---
 
 ## Change requests (created via the API)

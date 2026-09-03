@@ -37,6 +37,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
+        Assert.Equal(person.PersonId.ToString(), email.Metadata["PersonId"].ToString());
 
         backgroundJobScheduler
             .Verify(
@@ -72,6 +73,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
+        Assert.Equal(person.PersonId.ToString(), email.Metadata["PersonId"].ToString());
 
         backgroundJobScheduler
             .Verify(
@@ -105,6 +107,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         Assert.Equal(person.EmailAddress, email.EmailAddress);
         Assert.Equal(EmailTemplateIds.QtlsPostLaunchForAllUsers, email.TemplateId);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
+        Assert.Equal(person.PersonId.ToString(), email.Metadata["PersonId"].ToString());
 
         backgroundJobScheduler
             .Verify(
@@ -140,6 +143,7 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         Assert.Equal(person.FirstName, email.Personalization["first name"]);
         Assert.Equal(person.LastName, email.Personalization["last name"]);
         Assert.Equal(person.Trn, email.Metadata["Trn"].ToString());
+        Assert.Equal(person.PersonId.ToString(), email.Metadata["PersonId"].ToString());
 
         backgroundJobScheduler
             .Verify(
@@ -185,11 +189,12 @@ public class BatchSendProfessionalStatusEmailsJobTests(JobFixture fixture) : Job
         Assert.NotNull(email);
         Assert.Equal(person.EmailAddress, email.EmailAddress);
         Assert.Equal(EmailTemplateIds.QtlsLapsed, email.TemplateId);
+        Assert.Equal(person.PersonId.ToString(), email.Metadata["PersonId"].ToString());
 
         backgroundJobScheduler
             .Verify(
                 s => s.EnqueueAsync(
-                    It.IsAny<System.Linq.Expressions.Expression<Func<SendEmailJob, Task>>>()),
+                    It.IsAny<System.Linq.Expressions.Expression<Func<SendQtlsLapsedEmailJob, Task>>>()),
                 Times.Once);
     }
 
