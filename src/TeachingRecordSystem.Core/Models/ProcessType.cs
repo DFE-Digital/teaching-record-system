@@ -91,7 +91,9 @@ public enum ProcessType
     RouteToProfessionalStatusDeleting = 89,
     RouteToProfessionalStatusMigratingFromDqt = 90,
     TrnAllocating = 91,
-    NotifyingProfessionalStatusAwardee = 92,
-    NotifyingInductionCompletee = 93,
-    NotifyingLapsedQtlsHolder = 94
+    NotifyingQtsAwardee = 92,
+    NotifyingInternationalQtsAwardee = 93,
+    NotifyingEytsAwardee = 94,
+    NotifyingInductionCompletee = 95,
+    NotifyingLapsedQtlsHolder = 96
 }

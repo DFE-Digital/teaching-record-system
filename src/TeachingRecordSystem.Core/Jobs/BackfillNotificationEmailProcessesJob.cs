@@ -48,7 +48,7 @@ public class BackfillNotificationEmailProcessesJob(TrsDbContext dbContext)
                 payload.PersonId,
                 payload.EmailAddress,
                 EmailTemplateIds.QtsAwardedEmailConfirmation,
-                ProcessType.NotifyingProfessionalStatusAwardee,
+                ProcessType.NotifyingQtsAwardee,
                 jobItem,
                 cancellationToken);
         }
@@ -75,7 +75,7 @@ public class BackfillNotificationEmailProcessesJob(TrsDbContext dbContext)
                 payload.PersonId,
                 payload.EmailAddress,
                 EmailTemplateIds.InternationalQtsAwardedEmailConfirmation,
-                ProcessType.NotifyingProfessionalStatusAwardee,
+                ProcessType.NotifyingInternationalQtsAwardee,
                 jobItem,
                 cancellationToken);
         }
@@ -102,7 +102,7 @@ public class BackfillNotificationEmailProcessesJob(TrsDbContext dbContext)
                 payload.PersonId,
                 payload.EmailAddress,
                 EmailTemplateIds.EytsAwardedEmailConfirmation,
-                ProcessType.NotifyingProfessionalStatusAwardee,
+                ProcessType.NotifyingEytsAwardee,
                 jobItem,
                 cancellationToken);
         }

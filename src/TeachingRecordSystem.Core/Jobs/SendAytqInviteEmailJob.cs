@@ -33,6 +33,9 @@ public class SendAytqInviteEmailJob(
 
         var email = await GetEmailByIdAsync(emailId);
 
+        // Resolved before the email goes out so an unhandled template fails without anything having been sent.
+        var processType = GetProcessType(email.TemplateId);
+
         // Ensure we've got the magic link personalization set
         if (!email.Personalization.ContainsKey(MagicLinkPersonalizationKey))
         {
@@ -50,25 +53,27 @@ public class SendAytqInviteEmailJob(
 
         await SendEmailAsync(email);
 
-        // Emails queued before the process was introduced don't record who they went to, so there's no
-        // person to hang a process off; the email has still been sent.
-        if (email.Metadata.TryGetValue(JobMetadataKeys.PersonId, out var personIdValue) &&
-            Guid.TryParse(personIdValue?.ToString(), out var personId))
-        {
-            var processContext = new ProcessContext(
-                ProcessType.NotifyingProfessionalStatusAwardee,
-                email.SentOn!.Value,
-                SystemUser.SystemUserId);
+        var personId = Guid.Parse(email.Metadata[JobMetadataKeys.PersonId].ToString()!);
 
-            await EventPublisher.PublishSingleEventAsync(
-                new EmailSentEvent
-                {
-                    PersonId = personId,
-                    Email = EventModels.Email.FromModel(email)
-                },
-                processContext);
-        }
+        var processContext = new ProcessContext(processType, email.SentOn!.Value, SystemUser.SystemUserId);
+
+        await EventPublisher.PublishSingleEventAsync(
+            new EmailSentEvent
+            {
+                PersonId = personId,
+                Email = EventModels.Email.FromModel(email)
+            },
+            processContext);
 
         txn.Complete();
     }
+
+    private static ProcessType GetProcessType(string templateId) => templateId switch
+    {
+        EmailTemplateIds.InternationalQtsAwardedEmailConfirmation => ProcessType.NotifyingInternationalQtsAwardee,
+        EmailTemplateIds.EytsAwardedEmailConfirmation => ProcessType.NotifyingEytsAwardee,
+        // The QTLS post-launch email goes to people who gained QTS through the QTLS and SET membership route.
+        EmailTemplateIds.QtsAwardedEmailConfirmation or EmailTemplateIds.QtlsPostLaunchForAllUsers => ProcessType.NotifyingQtsAwardee,
+        _ => throw new InvalidOperationException($"No process type for email template '{templateId}'.")
+    };
 }

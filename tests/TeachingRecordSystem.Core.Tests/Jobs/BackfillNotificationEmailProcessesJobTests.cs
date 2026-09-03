@@ -5,6 +5,14 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 public class BackfillNotificationEmailProcessesJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
+    private static readonly ProcessType[] _notificationProcessTypes =
+    [
+        ProcessType.NotifyingQtsAwardee,
+        ProcessType.NotifyingInternationalQtsAwardee,
+        ProcessType.NotifyingEytsAwardee,
+        ProcessType.NotifyingInductionCompletee
+    ];
+
     [Fact]
     public async Task Execute_LegacyQtsAwardedEmailSentEvent_CreatesProcessWithEmailSentEvent()
     {
@@ -70,7 +78,7 @@ public class BackfillNotificationEmailProcessesJobTests(JobFixture fixture) : Jo
             Assert.Equal(legacyEvent.CreatedUtc, email.SentOn);
 
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
-            Assert.Equal(ProcessType.NotifyingProfessionalStatusAwardee, process.ProcessType);
+            Assert.Equal(ProcessType.NotifyingQtsAwardee, process.ProcessType);
             Assert.Equal(SystemUser.SystemUserId, process.UserId);
             Assert.Equal(legacyEvent.CreatedUtc, process.CreatedOn);
             Assert.Equal(person.PersonId, Assert.Single(process.PersonIds));
@@ -132,7 +140,7 @@ public class BackfillNotificationEmailProcessesJobTests(JobFixture fixture) : Jo
             Assert.Equal(EmailTemplateIds.InternationalQtsAwardedEmailConfirmation, emailSentEvent.Email.TemplateId);
 
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
-            Assert.Equal(ProcessType.NotifyingProfessionalStatusAwardee, process.ProcessType);
+            Assert.Equal(ProcessType.NotifyingInternationalQtsAwardee, process.ProcessType);
         });
     }
 
@@ -190,7 +198,7 @@ public class BackfillNotificationEmailProcessesJobTests(JobFixture fixture) : Jo
             Assert.Equal(EmailTemplateIds.EytsAwardedEmailConfirmation, emailSentEvent.Email.TemplateId);
 
             var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
-            Assert.Equal(ProcessType.NotifyingProfessionalStatusAwardee, process.ProcessType);
+            Assert.Equal(ProcessType.NotifyingEytsAwardee, process.ProcessType);
         });
     }
 
@@ -311,7 +319,7 @@ public class BackfillNotificationEmailProcessesJobTests(JobFixture fixture) : Jo
         await WithDbContextAsync(async dbContext =>
         {
             var processes = await dbContext.Processes
-                .Where(p => p.PersonIds.Contains(person.PersonId) && p.ProcessType == ProcessType.NotifyingProfessionalStatusAwardee)
+                .Where(p => p.PersonIds.Contains(person.PersonId) && p.ProcessType == ProcessType.NotifyingQtsAwardee)
                 .ToListAsync();
             Assert.Single(processes);
         });
@@ -345,8 +353,7 @@ public class BackfillNotificationEmailProcessesJobTests(JobFixture fixture) : Jo
         await WithDbContextAsync(async dbContext =>
         {
             var processes = await dbContext.Processes
-                .Where(p => p.PersonIds.Contains(person.PersonId) &&
-                    (p.ProcessType == ProcessType.NotifyingProfessionalStatusAwardee || p.ProcessType == ProcessType.NotifyingInductionCompletee))
+                .Where(p => p.PersonIds.Contains(person.PersonId) && _notificationProcessTypes.Contains(p.ProcessType))
                 .ToListAsync();
             Assert.Empty(processes);
         });
