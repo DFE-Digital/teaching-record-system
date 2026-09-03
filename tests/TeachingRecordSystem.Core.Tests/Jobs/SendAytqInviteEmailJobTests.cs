@@ -8,7 +8,7 @@ public class SendAytqInviteEmailJobTests(JobFixture fixture) : JobTestBase(fixtu
 {
     [Theory]
     [InlineData(EmailTemplateIds.QtsAwardedEmailConfirmation, ProcessType.NotifyingQtsAwardee)]
-    [InlineData(EmailTemplateIds.QtlsPostLaunchForAllUsers, ProcessType.NotifyingQtsAwardee)]
+    [InlineData(EmailTemplateIds.QtlsPostLaunchForAllUsers, ProcessType.NotifyingQtlsAwardee)]
     [InlineData(EmailTemplateIds.InternationalQtsAwardedEmailConfirmation, ProcessType.NotifyingInternationalQtsAwardee)]
     [InlineData(EmailTemplateIds.EytsAwardedEmailConfirmation, ProcessType.NotifyingEytsAwardee)]
     public async Task Execute_WhenCalled_GetsTrnTokenSendsEmailPublishesEventAndUpdatesDatabase(

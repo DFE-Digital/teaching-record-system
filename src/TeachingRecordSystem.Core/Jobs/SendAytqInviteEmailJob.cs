@@ -72,8 +72,8 @@ public class SendAytqInviteEmailJob(
     {
         EmailTemplateIds.InternationalQtsAwardedEmailConfirmation => ProcessType.NotifyingInternationalQtsAwardee,
         EmailTemplateIds.EytsAwardedEmailConfirmation => ProcessType.NotifyingEytsAwardee,
-        // The QTLS post-launch email goes to people who gained QTS through the QTLS and SET membership route.
-        EmailTemplateIds.QtsAwardedEmailConfirmation or EmailTemplateIds.QtlsPostLaunchForAllUsers => ProcessType.NotifyingQtsAwardee,
+        EmailTemplateIds.QtlsPostLaunchForAllUsers => ProcessType.NotifyingQtlsAwardee,
+        EmailTemplateIds.QtsAwardedEmailConfirmation => ProcessType.NotifyingQtsAwardee,
         _ => throw new InvalidOperationException($"No process type for email template '{templateId}'.")
     };
 }
