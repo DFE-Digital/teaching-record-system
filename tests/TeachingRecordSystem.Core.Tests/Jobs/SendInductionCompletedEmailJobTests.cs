@@ -1,4 +1,3 @@
-using System.Text.Json;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Notify;
@@ -8,7 +7,7 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 public class SendInductionCompletedEmailJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
     [Fact]
-    public async Task Execute_WhenCalled_GetsTrnTokenSendsEmailAddsEventAndUpdatesDatabase()
+    public async Task Execute_WhenCalled_GetsTrnTokenSendsEmailPublishesEventAndUpdatesDatabase()
     {
         // Arrange
         var notificationSender = new Mock<INotificationSender>();
@@ -62,12 +61,25 @@ public class SendInductionCompletedEmailJobTests(JobFixture fixture) : JobTestBa
         Assert.NotNull(updatedJobItem);
         Assert.True(updatedJobItem.EmailSent);
 
-        var events = await WithDbContextAsync(dbContext => dbContext.Events
-            .Where(e => e.EventName == "InductionCompletedEmailSentEvent")
-            .ToListAsync());
-        var emailSentEvent = events
-            .Select(e => JsonSerializer.Deserialize<LegacyEvents.InductionCompletedEmailSentEvent>(e.Payload))
-            .SingleOrDefault(e => e!.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && e.PersonId == personId);
-        Assert.NotNull(emailSentEvent);
+        var sentEmail = await WithDbContextAsync(dbContext => dbContext.Emails
+            .SingleOrDefaultAsync(e => e.EmailAddress == emailAddress));
+        Assert.NotNull(sentEmail);
+        Assert.Equal(EmailTemplateIds.InductionCompletedEmailConfirmation, sentEmail.TemplateId);
+        Assert.Equal(TimeProvider.UtcNow, sentEmail.SentOn);
+
+        Events.AssertProcessesCreated(x =>
+        {
+            Assert.Equal(ProcessType.NotifyingInductionCompletee, x.ProcessContext.ProcessType);
+            Assert.Collection(x.ProcessContext.Process.PersonIds, id => Assert.Equal(personId, id));
+
+            Assert.Collection(
+                x.Events,
+                e =>
+                {
+                    var emailSentEvent = Assert.IsType<EmailSentEvent>(e);
+                    Assert.Equal(personId, emailSentEvent.PersonId);
+                    Assert.Equal(sentEmail.EmailId, emailSentEvent.Email.EmailId);
+                });
+        });
     }
 }

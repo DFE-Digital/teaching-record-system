@@ -1,5 +1,7 @@
+using System.Transactions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -19,10 +21,16 @@ public class SendAytqInviteEmailJob(
     public class JobMetadataKeys
     {
         public const string Trn = "Trn";
+        public const string PersonId = "PersonId";
     }
 
     public override async Task ExecuteAsync(Guid emailId)
     {
+        using var txn = new TransactionScope(
+            TransactionScopeOption.RequiresNew,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+
         var email = await GetEmailByIdAsync(emailId);
 
         // Ensure we've got the magic link personalization set
@@ -41,5 +49,26 @@ public class SendAytqInviteEmailJob(
         }
 
         await SendEmailAsync(email);
+
+        // Emails queued before the process was introduced don't record who they went to, so there's no
+        // person to hang a process off; the email has still been sent.
+        if (email.Metadata.TryGetValue(JobMetadataKeys.PersonId, out var personIdValue) &&
+            Guid.TryParse(personIdValue?.ToString(), out var personId))
+        {
+            var processContext = new ProcessContext(
+                ProcessType.NotifyingProfessionalStatusAwardee,
+                email.SentOn!.Value,
+                SystemUser.SystemUserId);
+
+            await EventPublisher.PublishSingleEventAsync(
+                new EmailSentEvent
+                {
+                    PersonId = personId,
+                    Email = EventModels.Email.FromModel(email)
+                },
+                processContext);
+        }
+
+        txn.Complete();
     }
 }

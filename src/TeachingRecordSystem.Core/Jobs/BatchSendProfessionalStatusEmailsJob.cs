@@ -123,7 +123,11 @@ public class BatchSendProfessionalStatusEmailsJob(
                     ["last name"] = qtsAwardee.LastName
                 };
 
-                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = qtsAwardee.Trn };
+                var metadata = new Dictionary<string, object>
+                {
+                    [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = qtsAwardee.Trn,
+                    [SendAytqInviteEmailJob.JobMetadataKeys.PersonId] = qtsAwardee.PersonId
+                };
 
                 var email = new Email
                 {
@@ -180,7 +184,11 @@ public class BatchSendProfessionalStatusEmailsJob(
                     ["last name"] = eytsAwardee.LastName
                 };
 
-                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = eytsAwardee.Trn };
+                var metadata = new Dictionary<string, object>
+                {
+                    [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = eytsAwardee.Trn,
+                    [SendAytqInviteEmailJob.JobMetadataKeys.PersonId] = eytsAwardee.PersonId
+                };
 
                 var email = new Email
                 {
@@ -236,12 +244,16 @@ public class BatchSendProfessionalStatusEmailsJob(
                     EmailId = Guid.NewGuid(),
                     TemplateId = EmailTemplateIds.QtlsLapsed,
                     EmailAddress = qtlsLoser.EmailAddress!,
-                    Personalization = new Dictionary<string, string>()
+                    Personalization = new Dictionary<string, string>(),
+                    Metadata = new Dictionary<string, object>
+                    {
+                        [SendQtlsLapsedEmailJob.JobMetadataKeys.PersonId] = qtlsLoser.PersonId
+                    }
                 };
 
                 dbContext.Emails.Add(email);
 
-                await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
+                await backgroundJobScheduler.EnqueueAsync<SendQtlsLapsedEmailJob>(j => j.ExecuteAsync(email.EmailId));
             }
 
             await dbContext.SaveChangesAsync(cancellationToken);
