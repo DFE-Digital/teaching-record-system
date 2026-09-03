@@ -36,12 +36,13 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
 
         // Assert
         AssertTitle(entry, "Mandatory qualification added");
-        Assert.Equal(provider.Name, entry.GetElementByTestId("provider")?.TrimmedText());
-        Assert.Equal(specialism.GetTitle(), entry.GetElementByTestId("specialism")?.TrimmedText());
-        Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), entry.GetElementByTestId("start-date")?.TrimmedText());
-        Assert.Equal(status.GetTitle(), entry.GetElementByTestId("status")?.TrimmedText());
-        Assert.Equal(endDate.ToString(WebConstants.DateDisplayFormat), entry.GetElementByTestId("end-date")?.TrimmedText());
-        Assert.Null(entry.GetElementByTestId("reason-for-change"));
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Mandatory qualification added for", bodyText);
+        Assert.Contains(specialism.GetTitle(), bodyText);
+        Assert.Contains(startDate.ToString(WebConstants.DateDisplayFormat), bodyText);
+
+        Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 
     [Fact]
@@ -74,11 +75,157 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        var reasonBlock = entry.GetElementByTestId("reason-for-change");
+        AssertTitle(entry, "Mandatory qualification added");
+
+        var reasonBlock = entry.GetElementByTestId("change-reason");
         Assert.NotNull(reasonBlock);
-        Assert.Equal(changeReason.Reason, reasonBlock.GetElementByTestId("reason")?.TrimmedText());
-        Assert.Equal(changeReason.Details, reasonBlock.GetElementByTestId("reason-detail")?.TrimmedText());
-        Assert.Equal(changeReason.AdditionalInformation, reasonBlock.GetElementByTestId("additional-information")?.TrimmedText());
+
+        var reasonBlockSummary = reasonBlock.GetElementsByTagName("summary").SingleOrDefault();
+        Assert.Equal("Reason for adding mandatory qualification", reasonBlockSummary?.TrimmedText());
+
+        reasonBlock.AssertSummaryListRowValueContentMatches("Reason details", changeReason.Reason!);
+        reasonBlock.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
         Assert.Equal($"{changeReason.EvidenceFile.Name} (opens in new tab)", reasonBlock.GetElementByTestId("evidence")?.TrimmedText());
+    }
+
+    [Fact]
+    public async Task WithChangeReasonAndNoEvidence_DoesNotRenderEvidenceRow()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var changeReason = new ChangeReasonWithDetailsAndEvidence
+        {
+            Reason = "Change of provider",
+            Details = "Some reason details",
+            AdditionalInformation = "Some additional information",
+            EvidenceFile = null
+        };
+
+        var @event = new MandatoryQualificationCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationCreating, changeReason: changeReason, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        AssertTitle(entry, "Mandatory qualification added");
+
+        var reasonBlock = entry.GetElementByTestId("change-reason");
+        Assert.NotNull(reasonBlock);
+        Assert.Null(reasonBlock.GetElementByTestId("evidence"));
+    }
+
+    [Theory]
+    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
+    [InlineData("Identified during data reconciliation with stakeholder", "", "Identified during data reconciliation with stakeholder")]
+    public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var changeReason = new ChangeReasonWithDetailsAndEvidence
+        {
+            Reason = reason,
+            Details = details,
+            AdditionalInformation = null,
+            EvidenceFile = null
+        };
+
+        var @event = new MandatoryQualificationCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationCreating, changeReason: changeReason, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        AssertTitle(entry, "Mandatory qualification added");
+
+        var reasonBlock = entry.GetElementByTestId("change-reason");
+        Assert.NotNull(reasonBlock);
+
+        var reasonBlockSummary = reasonBlock.GetElementsByTagName("summary").SingleOrDefault();
+        Assert.Equal("Reason for adding mandatory qualification", reasonBlockSummary?.TrimmedText());
+
+        reasonBlock.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
+    }
+
+    [Fact]
+    public async Task WithoutChangeReason_DoesNotRenderReason()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var @event = new MandatoryQualificationCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationCreating, changeReason: null, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        AssertTitle(entry, "Mandatory qualification added");
+        Assert.Null(entry.GetElementByTestId("change-reason"));
+    }
+
+    [Fact]
+    public async Task WithEmptyChangeReason_DoesNotRenderReason()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var changeReason = new ChangeReasonWithDetailsAndEvidence
+        {
+            Reason = null,
+            Details = null,
+            AdditionalInformation = null,
+            EvidenceFile = null
+        };
+
+        var @event = new MandatoryQualificationCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationCreating, changeReason: changeReason, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        AssertTitle(entry, "Mandatory qualification added");
+        Assert.Null(entry.GetElementByTestId("change-reason"));
     }
 }
