@@ -68,7 +68,7 @@ public class SendAytqInviteEmailJob(
         txn.Complete();
     }
 
-    private static ProcessType GetProcessType(string templateId) => templateId switch
+    internal static ProcessType GetProcessType(string templateId) => templateId switch
     {
         EmailTemplateIds.InternationalQtsAwardedEmailConfirmation => ProcessType.NotifyingInternationalQtsAwardee,
         EmailTemplateIds.EytsAwardedEmailConfirmation => ProcessType.NotifyingEytsAwardee,
