@@ -42,13 +42,10 @@ set `ConnectionStrings__DefaultConnection` as well.
 
 ### Resetting the database schema and data
 
-The test database schema is cached in a `.tests-schema-version.txt` file at the root of the repository (this file is git-ignored, so each
-worktree has its own). If the schema gets out of sync — tests fail with Postgres errors about missing tables or columns — remove the cache
-file to force the schema and data to be recreated on the next test run:
-
-```shell
-just remove-tests-schema-cache
-```
+The version of the schema a test database was built from is recorded as a comment on the database itself, so the schema and data are
+recreated automatically whenever they don't match the current model and seed data — including when the database has been dropped or
+replaced behind the tests' back. To force a rebuild, drop the test database (or delete the testcontainers container) and run the tests
+again.
 
 ### Boolean Expressions
 

@@ -170,16 +170,18 @@ To rollback a series of migrations, add an additional argument to the `ef databa
 > just ef database update <BeforeAddingUserRoleColumn>
 ```
 
-#### Regenerating the test cache
+#### Rebuilding the test database
 
-The trs_tests database for the tests should be migrated automatically, however sometimes it gets stuck and the tests may fail with the message:
+The trs_tests database for the tests should be migrated automatically: the version of the schema it was built from is recorded as a comment
+on the database, and the tests rebuild it whenever that doesn't match the current model and seed data. If it ever does get stuck and the
+tests fail with the message:
 ```
 Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving the entity changes. See the inner exception for details.
 ---- Npgsql.PostgresException : <some Postgres error, e.g. missing table or column>
 ```
-If this happens, regenerating the test cache usually fixes this, there's a `just` recipe:
+drop the database and run the tests again to have it rebuilt from scratch:
 ```shell
-> just remove-tests-schema-cache
+> dropdb -h localhost -U postgres trs_tests
 ```
 
 
