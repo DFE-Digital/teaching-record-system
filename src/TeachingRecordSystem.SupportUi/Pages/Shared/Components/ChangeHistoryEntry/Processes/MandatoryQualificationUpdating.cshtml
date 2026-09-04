@@ -2,25 +2,60 @@
 @model ChangeHistoryEntryViewModel
 @{
     var updatedEvent = Model.GetEvent<MandatoryQualificationUpdatedEvent>();
+    var mandatoryQualification = updatedEvent.MandatoryQualification;
     var oldMandatoryQualification = updatedEvent.OldMandatoryQualification;
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 }
 
 <timeline-entry title="Mandatory qualification changed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @if (changeReason is not null)
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
+    {
+        <p class="govuk-body">
+            Training provider changed from @(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None") to @(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
+    {
+        <p class="govuk-body">
+            Specialism changed from @(oldMandatoryQualification.Specialism?.GetTitle() ?? "None") to @(mandatoryQualification.Specialism?.GetTitle() ?? "None")
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.StartDate))
+    {
+        <p class="govuk-body">
+            Start date changed from @(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None") to @(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Status))
+    {
+        <p class="govuk-body">
+            Status changed from @(oldMandatoryQualification.Status?.GetTitle() ?? "None") to @(mandatoryQualification.Status?.GetTitle() ?? "None")
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.EndDate))
+    {
+        <p class="govuk-body">
+            End date changed from @(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None") to @(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")
+        </p>
+    }
+
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
             <govuk-details-summary>Reason for change</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
                     <row>
-                        <key>Reason</key>
-                        <value data-testid="change-reason">@(!string.IsNullOrEmpty(changeReason.Reason) ? changeReason.Reason : "None")</value>
-                    </row>
-                    <row>
-                        <key>More detail</key>
-                        <value data-testid="change-reason-detail" use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                        <key>Reason details</key>
+                        <value data-testid="change-reason" use-empty-fallback>
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
                         </value>
                     </row>
                     <row>
@@ -42,46 +77,4 @@
             </govuk-details-text>
         </govuk-details>
     }
-    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
-        <govuk-details-summary>Previous data</govuk-details-summary>
-        <govuk-details-text>
-            <govuk-summary-list>
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
-                {
-                    <row>
-                        <key>Training provider</key>
-                        <value data-testid="provider">@(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
-                {
-                    <row>
-                        <key>Specialism</key>
-                        <value data-testid="specialism">@(oldMandatoryQualification.Specialism?.GetTitle() ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.StartDate))
-                {
-                    <row>
-                        <key>Start date</key>
-                        <value data-testid="start-date">@(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Status))
-                {
-                    <row>
-                        <key>Status</key>
-                        <value data-testid="status">@(oldMandatoryQualification.Status?.GetTitle() ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.EndDate))
-                {
-                    <row>
-                        <key>End date</key>
-                        <value data-testid="end-date">@(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
-                    </row>
-                }
-            </govuk-summary-list>
-        </govuk-details-text>
-    </govuk-details>
 </timeline-entry>
