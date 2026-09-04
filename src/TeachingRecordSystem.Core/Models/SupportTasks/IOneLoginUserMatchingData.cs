@@ -8,6 +8,11 @@ public interface IOneLoginUserMatchingData : ISupportTaskData
     string? StatedNationalInsuranceNumber { get; init; }
     string? StatedTrn { get; init; }
     string? TrnTokenTrn { get; init; }
+    string? YearQtsReceived { get; init; }
+    Guid? TrainingProviderId { get; init; }
+    string? TrainingProviderName { get; init; }
+    Guid? SubjectId { get; init; }
+    string? SubjectName { get; init; }
     OneLoginUserNotConnectingReason? NotConnectingReason { get; init; }
     string? NotConnectingAdditionalDetails { get; init; }
     string[][]? VerifiedOrStatedNames { get; }

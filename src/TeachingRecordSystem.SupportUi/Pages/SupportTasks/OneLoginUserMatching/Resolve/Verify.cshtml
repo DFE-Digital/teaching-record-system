@@ -54,6 +54,34 @@
                 </row>
             </govuk-summary-list>
 
+            @if (Model.HasQtsDetails)
+            {
+                <h2 class="govuk-heading-m">QTS details</h2>
+                <govuk-summary-list>
+                    @if (!string.IsNullOrWhiteSpace(Model.QtsYearReceived))
+                    {
+                        <row>
+                            <key>Year received</key>
+                            <value data-testid="qts-year-received">@Model.QtsYearReceived</value>
+                        </row>
+                    }
+                    @if (Model.QtsProvider is not null)
+                    {
+                        <row>
+                            <key>Provider</key>
+                            <value data-testid="qts-provider">@Model.QtsProvider</value>
+                        </row>
+                    }
+                    @if (Model.QtsSubject is not null)
+                    {
+                        <row>
+                            <key>Subject</key>
+                            <value data-testid="qts-subject">@Model.QtsSubject</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            }
+
             <govuk-radios for="Verified" data-testid="reason-options">
                 <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--m">Can you verify this person’s identity?</govuk-radios-fieldset-legend>
                 <govuk-radios-item value="@true">

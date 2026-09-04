@@ -15,9 +15,15 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
         var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
             oneLoginUser.Subject,
-            b => b.WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg"));
+            b => b
+                .WithEvidenceFileName(evidenceIsPdf ? "evidence.pdf" : "evidence.jpg")
+                .WithYearQtsReceived(TimeProvider.UtcNow.Year.ToString())
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                .WithSubjectId(subject.TrainingSubjectId));
         var requestData = supportTask.GetData<OneLoginUserIdVerificationData>();
 
         var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
@@ -38,6 +44,9 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
         Assert.Equal(TrnHelper.NormalizeTrn(requestData.StatedTrn), doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(CoreNationalInsuranceNumber.Normalize(requestData.StatedNationalInsuranceNumber), doc.GetSummaryListValueByKey("National Insurance number"));
+        Assert.Equal(requestData.YearQtsReceived, doc.GetSummaryListValueByKey("Year received"));
+        Assert.Equal(trainingProvider.Name, doc.GetSummaryListValueByKey("Provider"));
+        Assert.Equal(subject.Name, doc.GetSummaryListValueByKey("Subject"));
         Assert.Contains("Yes, verify and find a matching record (if applicable)", doc.Body!.TextContent);
         if (evidenceIsPdf)
         {
@@ -49,6 +58,60 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
             Assert.NotNull(doc.GetElementByTestId($"image-{requestData.EvidenceFileId}"));
             Assert.Null(doc.GetElementByTestId($"pdf-{requestData.EvidenceFileId}"));
         }
+    }
+
+    [Fact]
+    public async Task Get_ValidRequest_WithNoQtsDetails_HidesQtsDetailsBlock()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser.Subject);
+
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementsByTagName("h2").SingleOrDefault(h => h.TextContent.Trim() == "QTS details"));
+        Assert.Null(doc.GetSummaryListValueByKey("Year received"));
+        Assert.Null(doc.GetSummaryListValueByKey("Provider"));
+        Assert.Null(doc.GetSummaryListValueByKey("Subject"));
+    }
+
+    [Fact]
+    public async Task Get_ValidRequest_WithPartialQtsDetails_RendersOnlyPopulatedRows()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUser.Subject,
+            b => b.WithYearQtsReceived(TimeProvider.UtcNow.Year.ToString()));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(supportTask);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/verify?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(TimeProvider.UtcNow.Year.ToString(), doc.GetSummaryListValueByKey("Year received"));
+        Assert.Null(doc.GetSummaryListValueByKey("Provider"));
+        Assert.Null(doc.GetSummaryListValueByKey("Subject"));
+        Assert.NotNull(doc.GetElementsByTagName("h2").SingleOrDefault(h => h.TextContent.Trim() == "QTS details"));
     }
 
     [Fact]
