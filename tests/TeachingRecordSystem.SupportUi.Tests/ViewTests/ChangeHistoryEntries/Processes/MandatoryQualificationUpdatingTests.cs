@@ -41,7 +41,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
         Assert.Contains("Specialism changed from", bodyText);
@@ -94,7 +94,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var reasonBlock = entry.GetElementByTestId("reason-for-change");
         Assert.NotNull(reasonBlock);
@@ -141,12 +141,58 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
         Assert.Contains("Training provider changed from", bodyText);
         Assert.Contains(oldProvider.Name, bodyText);
         Assert.Contains(newProvider.Name, bodyText);
+    }
+
+    [Fact]
+    public async Task ProcessRendersNoneValuesWithEmptyFallbackStyling()
+    {
+        // Arrange
+        var newProvider = MandatoryQualificationProvider.All.First();
+
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
+            .WithProvider(null)));
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var oldMandatoryQualification = EventModels.MandatoryQualification.FromModel(mq, providerNameHint: null);
+        var newMandatoryQualification = oldMandatoryQualification with
+        {
+            Provider = new EventModels.MandatoryQualificationProvider
+            {
+                MandatoryQualificationProviderId = newProvider.MandatoryQualificationProviderId,
+                Name = newProvider.Name
+            }
+        };
+
+        var @event = new MandatoryQualificationUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = newMandatoryQualification,
+            OldMandatoryQualification = oldMandatoryQualification,
+            Changes = MandatoryQualificationUpdatedEventChanges.Provider
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationUpdating, changeReason: null, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        AssertTitle(entry, "Mandatory qualification updated");
+
+        var bodyElement = entry.GetElementsByClassName("govuk-body").SingleOrDefault();
+        Assert.Contains("Training provider changed from", bodyElement?.TrimmedText());
+        Assert.Contains(newProvider.Name, bodyElement?.TrimmedText());
+
+        var fallbackSpan = bodyElement?.GetElementsByClassName("trs-empty-fallback").SingleOrDefault();
+        Assert.NotNull(fallbackSpan);
+        Assert.Equal("None", fallbackSpan.TrimmedText());
     }
 
     [Fact]
@@ -180,7 +226,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
         Assert.Contains("Start date changed from", bodyText);
@@ -216,7 +262,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
         Assert.Contains("Status changed from", bodyText);
@@ -255,7 +301,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
         Assert.Contains("End date changed from", bodyText);
@@ -333,7 +379,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
         Assert.Null(entry.GetElementByTestId("reason-for-change"));
     }
 
@@ -373,7 +419,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var entry = await GetEntryHtmlAsync(process.ProcessId);
 
         // Assert
-        AssertTitle(entry, "Mandatory qualification changed");
+        AssertTitle(entry, "Mandatory qualification updated");
 
         var reasonBlock = entry.GetElementByTestId("reason-for-change");
         Assert.NotNull(reasonBlock);

@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Html
 @using TeachingRecordSystem.Core.Events.ChangeReasons
 @model ChangeHistoryEntryViewModel
 @{
@@ -7,36 +8,48 @@
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 }
 
-<timeline-entry title="Mandatory qualification changed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Mandatory qualification updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
     {
         <p class="govuk-body">
-            Training provider changed from @(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None") to @(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")
+            Training provider changed from @ToDisplayValueOrFallback(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName) to @ToDisplayValueOrFallback(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName)
         </p>
     }
     @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
     {
         <p class="govuk-body">
-            Specialism changed from @(oldMandatoryQualification.Specialism?.GetTitle() ?? "None") to @(mandatoryQualification.Specialism?.GetTitle() ?? "None")
+            Specialism changed from @ToDisplayValueOrFallback(oldMandatoryQualification.Specialism?.GetTitle()) to @ToDisplayValueOrFallback(mandatoryQualification.Specialism?.GetTitle())
         </p>
     }
     @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.StartDate))
     {
         <p class="govuk-body">
-            Start date changed from @(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None") to @(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")
+            Start date changed from @ToDisplayValueOrFallback(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat))
         </p>
     }
     @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Status))
     {
         <p class="govuk-body">
-            Status changed from @(oldMandatoryQualification.Status?.GetTitle() ?? "None") to @(mandatoryQualification.Status?.GetTitle() ?? "None")
+            Status changed from @ToDisplayValueOrFallback(oldMandatoryQualification.Status?.GetTitle()) to @ToDisplayValueOrFallback(mandatoryQualification.Status?.GetTitle())
         </p>
     }
     @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.EndDate))
     {
         <p class="govuk-body">
-            End date changed from @(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None") to @(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")
+            End date changed from @ToDisplayValueOrFallback(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat))
         </p>
+    }
+
+    @functions {
+        private static IHtmlContent ToDisplayValueOrFallback(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return new HtmlString("<span class=\"trs-empty-fallback\">None</span>");
+            }
+
+            return new HtmlString(System.Net.WebUtility.HtmlEncode(value));
+        }
     }
 
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
