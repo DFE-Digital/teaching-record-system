@@ -5,87 +5,209 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@Model.BackLink" />
+    <govuk-back-link href="@Model.BackLink"/>
 }
 
 <form method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <vc:support-task-header page-header="@ViewBag.Title" />
+            <vc:support-task-header page-header="@ViewBag.Title"/>
 
-            <govuk-summary-card data-testid="request">
-                <title>Request details</title>
-                <govuk-summary-list>
-                    <row>
-                        <key>Name</key>
-                        <value use-empty-fallback>@Model.Name</value>
-                    </row>
-                    <row>
-                        <key>Email address</key>
-                        <value use-empty-fallback>@Model.EmailAddress</value>
-                    </row>
-                    <row>
-                        <key>Date of birth</key>
-                        <value use-empty-fallback>@Model.DateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
-                    </row>
-                    <row>
-                        <key>TRN</key>
-                        <value use-empty-fallback>@Model.Trn</value>
-                    </row>
-                    <row>
-                        <key>National Insurance number</key>
-                        <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
-                    </row>
-                </govuk-summary-list>
-            </govuk-summary-card>
+            <div class="govuk-summary-card" data-testid="request">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">Request details</h2>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <govuk-summary-list>
+                        <row>
+                            <key>Name</key>
+                            <value use-empty-fallback>@Model.Name</value>
+                        </row>
+                        <row>
+                            <key>Email address</key>
+                            <value use-empty-fallback>@Model.EmailAddress</value>
+                        </row>
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback>@Model.DateOfBirth.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                        <row>
+                            <key>TRN</key>
+                            <value use-empty-fallback>@Model.Trn</value>
+                        </row>
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
+                        </row>
+                    </govuk-summary-list>
+                </div>
+
+                <div class="govuk-summary-card__content">
+                    <govuk-summary-list>
+                        <row>
+                            <key>QTS details</key>
+                            <value use-empty-fallback></value>
+                        </row>
+                        <row>
+                            <key>Year received</key>
+                            <value use-empty-fallback>@Model.QtsYearReceived</value>
+                        </row>
+                        <row>
+                            <key>Provider</key>
+                            <value use-empty-fallback>@Model.QtsProvider</value>
+                        </row>
+                        <row>
+                            <key>Subject</key>
+                            <value use-empty-fallback>@Model.QtsProvider</value>
+                        </row>
+                    </govuk-summary-list>
+                </div>
+            </div>
 
             <govuk-inset-text>
-                Details that do not match are <highlight>highlighted</highlight> in the existing record
+                Details that do not match are
+                <highlight>highlighted</highlight>
+                in the existing record
             </govuk-inset-text>
 
             @foreach (var match in Model.SuggestedMatches!)
             {
-                <govuk-summary-card data-testid="match">
-	                <title>Record @match.Identifier</title>
-	                <govuk-summary-card-actions>
-		                <govuk-summary-card-action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
-			                View record (opens in a new tab)
-		                </govuk-summary-card-action>
-	                </govuk-summary-card-actions>
-                    <govuk-summary-list>
-                        <row>
-                            <key>Name</key>
-                            <value use-empty-fallback highlight="@match.HasNameMismatch">
-                                @match.FirstName @match.MiddleName @match.LastName
-                            </value>
-                        </row>
-                        @if (match.PreviousNames!.Count > 0)
-                        {
+                <div class="govuk-summary-card" data-testid="match">
+                    <div class="govuk-summary-card__title-wrapper">
+                        <h2 class="govuk-summary-card__title">Record @match.Identifier</h2>
+                        <ul class="govuk-summary-card__actions">
+                            <li class="govuk-summary-card__action">
+                                <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank"> View record (opens in a new tab) </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="govuk-summary-card__content">
+                        <govuk-summary-list>
                             <row>
-                                <key>Previous names</key>
-                                <value>
-                                    <list-text-items text-items="@match.PreviousNames"></list-text-items>
+                                <key>Name</key>
+                                <value use-empty-fallback highlight="@match.HasNameMismatch">
+                                    @match.FirstName @match.MiddleName @match.LastName
                                 </value>
                             </row>
-                        }
-                        <row>
-                            <key>Email address</key>
-                            <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</value>
-                        </row>
-                        <row>
-                            <key>Date of birth</key>
-                            <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.DateOfBirth))">@match.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                        <row>
-                            <key>TRN</key>
-                            <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</value>
-                        </row>
-                        <row>
-                            <key>National Insurance number</key>
-                            <value use-empty-fallback highlight="@(!(match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) || (string.IsNullOrEmpty(Model.NationalInsuranceNumber) && string.IsNullOrEmpty(match.NationalInsuranceNumber))))">@match.NationalInsuranceNumber</value>
-                        </row>
-                    </govuk-summary-list>
-                </govuk-summary-card>
+                            @if (match.PreviousNames!.Count > 0)
+                            {
+                                <row>
+                                    <key>Previous names</key>
+                                    <value>
+                                        <ul class="govuk-list">
+                                            @foreach (var previousName in match.PreviousNames)
+                                            {
+                                                <li>@previousName</li>
+                                            }
+                                        </ul>
+                                    </value>
+                                </row>
+                            }
+                            <row>
+                                <key>Email address</key>
+                                <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.EmailAddress))">@match.EmailAddress</value>
+                            </row>
+                            <row>
+                                <key>Date of birth</key>
+                                <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.DateOfBirth))">@match.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                            </row>
+                            <row>
+                                <key>TRN</key>
+                                <value use-empty-fallback highlight="@(!match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.Trn))">@match.Trn</value>
+                            </row>
+                            <row>
+                                <key>National Insurance number</key>
+                                <value use-empty-fallback highlight="@(!(match.MatchedAttributeTypes.Contains(PersonMatchedAttribute.NationalInsuranceNumber) || (string.IsNullOrEmpty(Model.NationalInsuranceNumber) && string.IsNullOrEmpty(match.NationalInsuranceNumber))))">@match.NationalInsuranceNumber</value>
+                            </row>
+                        </govuk-summary-list>
+                    </div>
+
+                    @if (match.QtlsDetails is { HasAnyDetails: true } hasQtlsDetails || match.QtsDetails.Any(qtsDetails => qtsDetails.HasAnyDetails))
+                    {
+                        <div class="govuk-summary-card__content">
+                            @if (match.QtlsDetails is { HasAnyDetails: true } qtlsDetails)
+                            {
+                                <h2 class="govuk-heading-s govuk-!-margin-bottom-2">QTS - QTLS and SET Membership</h2>
+                                <govuk-summary-list>
+                                    @if (qtlsDetails.YearReceived is not null)
+                                    {
+                                        <row>
+                                            <key>Year received</key>
+                                            <value use-empty-fallback>@qtlsDetails.YearReceived</value>
+                                        </row>
+                                    }
+                                    @if (qtlsDetails.Subjects.Count > 0)
+                                    {
+                                        <row>
+                                            <key>Subject</key>
+                                            <value>
+                                                @if (qtlsDetails.Subjects.Count == 1)
+                                                {
+                                                    <span use-empty-fallback>@qtlsDetails.Subjects.Single()</span>
+                                                }
+                                                else
+                                                {
+                                                    <ul class="govuk-list">
+                                                        @foreach (var subject in qtlsDetails.Subjects)
+                                                        {
+                                                            <li>
+                                                                <span>@subject</span>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </value>
+                                        </row>
+                                    }
+                                </govuk-summary-list>
+                            }
+
+                            @foreach (var qtsDetails in match.QtsDetails.Where(qtsDetails => qtsDetails.HasAnyDetails))
+                            {
+                                <h2 class="govuk-heading-s govuk-!-margin-bottom-2">@qtsDetails.Heading</h2>
+                                <govuk-summary-list>
+                                    @if (qtsDetails.YearReceived is not null)
+                                    {
+                                        <row>
+                                            <key>Year received</key>
+                                            <value use-empty-fallback highlight="@(qtsDetails.YearReceived != Model.QtsYearReceived)">@qtsDetails.YearReceived</value>
+                                        </row>
+                                    }
+                                    @if (qtsDetails.Provider is not null)
+                                    {
+                                        <row>
+                                            <key>Provider</key>
+                                            <value use-empty-fallback highlight="@(qtsDetails.Provider != Model.QtsProvider)">@qtsDetails.Provider</value>
+                                        </row>
+                                    }
+                                    @if (qtsDetails.Subjects.Count > 0)
+                                    {
+                                        <row>
+                                            <key>Subject</key>
+                                            <value>
+                                                @if (qtsDetails.Subjects.Count == 1)
+                                                {
+                                                    <span use-empty-fallback highlight="@(qtsDetails.Subjects.Contains(Model.QtsSubject))">@qtsDetails.Subjects.Single()</span>
+                                                }
+                                                else
+                                                {
+                                                    <ul class="govuk-list">
+                                                        @foreach (var subject in qtsDetails.Subjects)
+                                                        {
+                                                            <li>
+                                                                <span highlight="@(subject == Model.QtsSubject)">@subject</span>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </value>
+                                        </row>
+                                    }
+                                </govuk-summary-list>
+                            }
+                        </div>
+                    }
+                </div>
             }
 
             <govuk-radios for="MatchedPersonId">
