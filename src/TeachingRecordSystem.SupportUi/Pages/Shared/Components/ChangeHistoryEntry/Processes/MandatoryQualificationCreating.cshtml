@@ -4,12 +4,16 @@
     var createdEvent = Model.GetEvent<MandatoryQualificationCreatedEvent>();
     var mandatoryQualification = createdEvent.MandatoryQualification;
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+    var specialismTitle = mandatoryQualification.Specialism?.GetTitle();
+    var startDateText = mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat);
+    var bodyText = "Mandatory qualification added"
+        + (specialismTitle is not null ? $" for {specialismTitle}" : "")
+        + (startDateText is not null ? $" with start date {startDateText}" : "");
 }
 
 <timeline-entry title="Mandatory qualification added" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    <p class="govuk-body">
-        Mandatory qualification added for @(mandatoryQualification.Specialism?.GetTitle() ?? "None") with start date @(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")
-    </p>
+    <p class="govuk-body">@bodyText</p>
+
 
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {

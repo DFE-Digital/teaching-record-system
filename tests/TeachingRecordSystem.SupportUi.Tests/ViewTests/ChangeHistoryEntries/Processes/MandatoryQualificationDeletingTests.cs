@@ -61,6 +61,94 @@ public class MandatoryQualificationDeletingTests(HostFixture hostFixture) : Chan
         Assert.Equal($"{changeReason.EvidenceFile.Name} (opens in new tab)", reasonBlock.GetElementByTestId("evidence")?.TrimmedText());
     }
 
+    [Fact]
+    public async Task ProcessWithoutSpecialismRendersCorrectly()
+    {
+        // Arrange
+        var startDate = new DateOnly(2021, 10, 5);
+
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
+            .WithSpecialism(null)
+            .WithStartDate(startDate)));
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var @event = new MandatoryQualificationDeletedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationDeleting, changeReason: null, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Equal($"Mandatory qualification deleted with start date {startDate.ToString(WebConstants.DateDisplayFormat)}", bodyText);
+    }
+
+    [Fact]
+    public async Task ProcessWithoutStartDateRendersCorrectly()
+    {
+        // Arrange
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
+            .WithSpecialism(specialism)
+            .WithStartDate(null)));
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var @event = new MandatoryQualificationDeletedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationDeleting, changeReason: null, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Equal($"Mandatory qualification deleted for {specialism.GetTitle()}", bodyText);
+    }
+
+    [Fact]
+    public async Task ProcessWithoutSpecialismOrStartDateRendersCorrectly()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
+            .WithSpecialism(null)
+            .WithStartDate(null)));
+        var mq = person.Qualifications!.OfType<MandatoryQualification>().Single();
+
+        var @event = new MandatoryQualificationDeletedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = person.PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(
+                mq,
+                providerNameHint: mq.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
+        };
+
+        var process = await TestData.CreateProcessAsync(ProcessType.MandatoryQualificationDeleting, changeReason: null, events: @event);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Equal("Mandatory qualification deleted", bodyText);
+    }
+
     [Theory]
     [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
     [InlineData("Added in error", null, "Added in error")]
