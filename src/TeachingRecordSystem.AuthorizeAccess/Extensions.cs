@@ -53,11 +53,14 @@ public static class Extensions
 
         // One Login has a one hour timeout on IDV journeys; we need to make sure our session cookies last that long too
         // otherwise callbacks will fail due to the missing journey.
+        // IdleTimeout only governs the server-side entry; without MaxAge the cookie is a browser-session cookie that's
+        // discarded when the browser session ends, while One Login's correlation and nonce cookies are persistent.
         services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromHours(2);
             options.Cookie.Name = "sess";
             options.Cookie.IsEssential = true;
+            options.Cookie.MaxAge = TimeSpan.FromHours(2);
         });
 
         services.AddGovUkQuestions();
