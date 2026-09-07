@@ -32,7 +32,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -78,7 +78,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -100,7 +100,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -126,7 +126,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -154,7 +154,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -184,7 +184,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -209,7 +209,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -233,7 +233,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -257,7 +257,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -281,7 +281,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -320,7 +320,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -354,7 +354,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -383,7 +383,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -401,11 +401,11 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
         var legacyEvent = await AddUpdatedEventAsync();
 
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>
@@ -417,24 +417,6 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
                 .Where(p => p.ProcessType == ProcessType.PersonInductionUpdating)
                 .ToListAsync();
             Assert.Single(processes);
-        });
-    }
-
-    [Fact]
-    public async Task Execute_DryRun_DoesNotCommitChanges()
-    {
-        // Arrange
-        var legacyEvent = await AddUpdatedEventAsync();
-
-        // Act
-        await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None));
-
-        // Assert
-        await WithDbContextAsync(async dbContext =>
-        {
-            var processEvent = await dbContext.ProcessEvents.SingleOrDefaultAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
-            Assert.Null(processEvent);
         });
     }
 
@@ -455,7 +437,7 @@ public class BackfillPersonInductionProcessesJobTests(JobFixture fixture) : JobT
 
         // Act
         await WithServiceAsync<BackfillPersonInductionProcessesJob>(
-            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+            job => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         await WithDbContextAsync(async dbContext =>

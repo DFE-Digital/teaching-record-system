@@ -29,7 +29,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
     // share its name.
     private static readonly string _legacyEventName = nameof(LegacyEvents.PersonInductionUpdatedEvent);
 
-    public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         dbContext.Database.SetCommandTimeout(0);
 
@@ -44,7 +44,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
             var cpdUserIds = await GetCpdUserIdsAsync(cancellationToken);
             await CreateEwcWalesImportsTableAsync(cancellationToken);
 
-            await BackfillAsync(cpdUserIds, dryRun, cancellationToken);
+            await BackfillAsync(cpdUserIds, cancellationToken);
         }
         finally
         {
@@ -52,7 +52,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
         }
     }
 
-    private async Task BackfillAsync(string[] cpdUserIds, bool dryRun, CancellationToken cancellationToken)
+    private async Task BackfillAsync(string[] cpdUserIds, CancellationToken cancellationToken)
     {
         var lastCreated = DateTime.MinValue.ToUniversalTime();
         var lastEventId = Guid.Empty;
@@ -85,14 +85,6 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                     new NpgsqlParameter("toEventId", NpgsqlDbType.Uuid) { Value = batchEndEventId }
                 ],
                 cancellationToken);
-
-            if (dryRun)
-            {
-                // Rolling back every batch would leave the loop with the same work to do forever, so a dry run
-                // covers the first batch only.
-                await transaction.RollbackAsync(cancellationToken);
-                return;
-            }
 
             await transaction.CommitAsync(cancellationToken);
 
