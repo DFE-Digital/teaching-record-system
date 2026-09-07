@@ -28,7 +28,12 @@
         }
     </p>
 
-    <p class="govuk-body" data-testid="change-request-evidence">
-        <vc:evidence-file-link evidence-file="@evidenceFile" />
-    </p>
+    <govuk-summary-list data-testid="change-request-evidence">
+        <row>
+            <key>Evidence</key>
+            <value>
+                <vc:evidence-file-link evidence-file="@evidenceFile" />
+            </value>
+        </row>
+    </govuk-summary-list>
 </timeline-entry>
