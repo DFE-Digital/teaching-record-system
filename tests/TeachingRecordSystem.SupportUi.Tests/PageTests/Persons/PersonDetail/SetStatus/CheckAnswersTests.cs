@@ -3,7 +3,6 @@ using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.SetStatus;
 
@@ -262,23 +261,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
             Assert.Equal(targetStatus, updatedPersonRecord.Status);
         });
 
-        var raisedBy = GetCurrentUserId();
-
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<PersonStatusUpdatedEvent>(e);
-
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, actualEvent.PersonId);
-            Assert.Equal(targetStatus, actualEvent.Status);
-            Assert.Equal(targetStatus == PersonStatus.Deactivated
-                ? PersonStatus.Active
-                : PersonStatus.Deactivated, actualEvent.OldStatus);
-            Assert.Equal("Another reason", actualEvent.Reason);
-            Assert.Equal(ChangeReasonDetails, actualEvent.ReasonDetail);
-            Assert.Equal(evidenceFileId, actualEvent.EvidenceFile!.FileId);
-            Assert.Equal("evidence.pdf", actualEvent.EvidenceFile.Name);
-        });
+        EventObserver.AssertNoEventsSaved();
 
         Events.AssertProcessesCreated(p =>
         {
