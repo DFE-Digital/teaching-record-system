@@ -126,14 +126,108 @@ public class BackfillTeacherPensionsSupportTaskProcessesJobTests(JobFixture fixt
         });
     }
 
-    private async Task<LegacyEvents.SupportTaskCreatedEvent> AddLegacyCreatedEventAsync(SupportTask supportTask)
+    [Fact]
+    public async Task Execute_LegacyEventWithoutASupportTaskReference_RecoversTheTaskFromThePerson()
     {
+        // Arrange
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync();
+        var legacyEvent = await AddLegacyCreatedEventAsync(supportTask, withoutReference: true);
+        var processId = await AddImportProcessAsync(supportTask.PersonId!.Value, legacyEvent.CreatedUtc);
+
+        // Act
+        await WithServiceAsync<BackfillTeacherPensionsSupportTaskProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleOrDefaultAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+            Assert.NotNull(processEvent);
+            Assert.Equal(processId, processEvent.ProcessId);
+
+            // The reference is missing from the payload, so it's taken from the task the event was raised against.
+            var createdEvent = Assert.IsType<SupportTaskCreatedEvent>(processEvent.Payload);
+            Assert.Equal(supportTask.SupportTaskReference, createdEvent.SupportTask.SupportTaskReference);
+            Assert.Equal(supportTask.SupportTaskReference, Assert.Single(processEvent.SupportTaskReferences));
+
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processId);
+            Assert.Contains(supportTask.SupportTaskReference, process.SupportTaskReferences);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventWithoutASupportTaskReferenceAndSeveralTasksForThePerson_PicksTheOneFromTheSameImport()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            applicationUser.UserId,
+            t => t.WithSupportTaskData("first.csv", integrationTransactionId: 1));
+
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+            person.PersonId,
+            applicationUser.UserId,
+            t => t.WithSupportTaskData("second.csv", integrationTransactionId: 2));
+
+        var legacyEvent = await AddLegacyCreatedEventAsync(supportTask, withoutReference: true);
+        await AddImportProcessAsync(person.PersonId, legacyEvent.CreatedUtc);
+
+        // Act
+        await WithServiceAsync<BackfillTeacherPensionsSupportTaskProcessesJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleAsync(pe => pe.ProcessEventId == legacyEvent.EventId);
+
+            var createdEvent = Assert.IsType<SupportTaskCreatedEvent>(processEvent.Payload);
+            Assert.Equal(supportTask.SupportTaskReference, createdEvent.SupportTask.SupportTaskReference);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_LegacyEventWithoutASupportTaskReferenceOrAMatchingTask_Throws()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync();
+        var personId = supportTask.PersonId!.Value;
+        var legacyEvent = await AddLegacyCreatedEventAsync(supportTask, withoutReference: true);
+        await AddImportProcessAsync(personId, legacyEvent.CreatedUtc);
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            await dbContext.SupportTasks
+                .Where(t => t.SupportTaskReference == supportTask.SupportTaskReference)
+                .ExecuteDeleteAsync();
+        });
+
+        // Act
+        var exception = await Record.ExceptionAsync(() =>
+            WithServiceAsync<BackfillTeacherPensionsSupportTaskProcessesJob>(
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None)));
+
+        // Assert
+        Assert.NotNull(exception);
+        Assert.IsType<InvalidOperationException>(exception);
+        Assert.Contains(personId.ToString(), exception.Message);
+    }
+
+    private async Task<LegacyEvents.SupportTaskCreatedEvent> AddLegacyCreatedEventAsync(
+        SupportTask supportTask,
+        bool withoutReference = false)
+    {
+        var eventSupportTask = EventModels.SupportTask.FromModel(supportTask);
+
         var legacyEvent = new LegacyEvents.SupportTaskCreatedEvent
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = supportTask.CreatedOn,
             RaisedBy = ApplicationUser.CapitaTpsImportUser.UserId,
-            SupportTask = EventModels.SupportTask.FromModel(supportTask)
+            SupportTask = withoutReference ? eventSupportTask with { SupportTaskReference = null! } : eventSupportTask
         };
 
         await WithDbContextAsync(async dbContext =>
