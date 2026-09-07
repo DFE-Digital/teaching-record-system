@@ -81,13 +81,19 @@ public class Program
         if (builder.Environment.IsProduction())
         {
             app.UseDfeAnalytics();
-            app.UseMiddleware<AddAnalyticsDataMiddleware>();
         }
 
         app.UseRouting();
         app.UseTransactions();
 
         app.UseSession();
+
+        if (builder.Environment.IsProduction())
+        {
+            // Must come after UseRouting() and UseSession(); the journey instance is resolved from the journey
+            // metadata on the matched endpoint and from the session, neither of which exists any earlier.
+            app.UseMiddleware<AddAnalyticsDataMiddleware>();
+        }
 
         app.UseAuthentication();
         app.UseAuthorization();
