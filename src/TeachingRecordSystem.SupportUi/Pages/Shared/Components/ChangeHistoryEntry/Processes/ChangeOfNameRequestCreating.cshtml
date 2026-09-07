@@ -1,14 +1,34 @@
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Models.SupportTasks
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
+@inject SupportUiLinkGenerator LinkGenerator
 @model ChangeHistoryEntryViewModel
 @{
     var supportTaskCreatedEvent = Model.GetEvent<SupportTaskCreatedEvent>();
+    var supportTaskReference = supportTaskCreatedEvent.SupportTask.SupportTaskReference;
     var changeRequestData = (ChangeNameRequestData)supportTaskCreatedEvent.SupportTask.Data;
     var requestedName = string.JoinNonEmpty(' ', changeRequestData.FirstName, changeRequestData.MiddleName, changeRequestData.LastName);
+    var evidenceFile = new UploadedEvidenceFile(changeRequestData.EvidenceFileId, changeRequestData.EvidenceFileName);
 }
 
-<timeline-entry title="Change of Name request created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Change of name request submitted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     <p class="govuk-body" data-testid="change-request-context">
-        Request to change name to <strong>@requestedName</strong>.
+        @if (Model.Context.ContextType == ChangeHistoryContextType.SupportTask)
+        {
+            var personId = supportTaskCreatedEvent.SupportTask.PersonId!.Value;
+            var trn = Model.Context.GetPersonInfo(personId).Trn;
+
+            @:Change of name request submitted to change to <strong>@requestedName</strong> for TRN <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personId)" data-testid="person-link">@trn</a>.
+        }
+        else
+        {
+            @:<a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Change of name request</a> submitted to change to <strong>@requestedName</strong>.
+        }
+    </p>
+
+    <p class="govuk-body" data-testid="change-request-evidence">
+        <vc:evidence-file-link evidence-file="@evidenceFile" />
     </p>
 </timeline-entry>
