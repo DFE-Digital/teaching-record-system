@@ -96,5 +96,8 @@ public enum ProcessType
     NotifyingEytsAwardee = 94,
     NotifyingQtlsAwardee = 95,
     NotifyingInductionCompletee = 96,
-    NotifyingLapsedQtlsHolder = 97
+    NotifyingLapsedQtlsHolder = 97,
+    PersonInductionUpdating = 98,
+    PersonCpdInductionUpdating = 99,
+    PersonWelshInductionUpdating = 100
 }

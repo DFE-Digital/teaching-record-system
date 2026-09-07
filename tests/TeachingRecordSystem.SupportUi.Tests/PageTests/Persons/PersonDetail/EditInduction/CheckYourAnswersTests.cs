@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -624,22 +625,26 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
             Assert.Equal(state.ExemptionReasonIds, updatedPersonRecord!.InductionExemptionReasonIds);
         });
 
-        var RaisedBy = GetCurrentUserId();
-
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var actualInductionUpdatedEvent = Assert.IsType<LegacyEvents.PersonInductionUpdatedEvent>(e);
+            Assert.Equal(ProcessType.PersonInductionUpdating, p.ProcessContext.ProcessType);
+            Assert.Equal(GetCurrentUserId(), p.ProcessContext.UserId);
 
-            Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, TimeProvider.UtcNow);
-            Assert.Equal(actualInductionUpdatedEvent.PersonId, person.PersonId);
-            Assert.Equal(actualInductionUpdatedEvent.Induction.Status, state.InductionStatus);
-            Assert.Equal(actualInductionUpdatedEvent.Induction.StartDate, state.StartDate);
-            Assert.Equal(actualInductionUpdatedEvent.Induction.CompletedDate, state.CompletedDate);
-            Assert.Equal(actualInductionUpdatedEvent.Induction.ExemptionReasonIds, state.ExemptionReasonIds);
-            Assert.Equal(actualInductionUpdatedEvent.ChangeReason, state.ChangeReason!.GetDisplayName());
-            Assert.Equal(actualInductionUpdatedEvent.ChangeReasonDetail, state.ChangeReasonDetail);
-            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile!.FileId, state.Evidence.UploadedEvidenceFile!.FileId);
-            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile.Name, state.Evidence.UploadedEvidenceFile!.FileName);
+            var changeReason = p.ProcessContext.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+            Assert.Equal(state.ChangeReason!.GetDisplayName(), changeReason?.Reason);
+            Assert.Equal(state.ChangeReasonDetail, changeReason?.Details);
+            Assert.Equal(state.AdditionalInformation, changeReason?.AdditionalInformation);
+            Assert.Equal(state.Evidence.UploadedEvidenceFile!.FileId, changeReason?.EvidenceFile?.FileId);
+            Assert.Equal(state.Evidence.UploadedEvidenceFile!.FileName, changeReason?.EvidenceFile?.Name);
+
+            p.AssertProcessHasEvents<PersonInductionUpdatedEvent>(actualInductionUpdatedEvent =>
+            {
+                Assert.Equal(person.PersonId, actualInductionUpdatedEvent.PersonId);
+                Assert.Equal(state.InductionStatus, actualInductionUpdatedEvent.Induction.Status);
+                Assert.Equal(state.StartDate, actualInductionUpdatedEvent.Induction.StartDate);
+                Assert.Equal(state.CompletedDate, actualInductionUpdatedEvent.Induction.CompletedDate);
+                Assert.Equal(state.ExemptionReasonIds, actualInductionUpdatedEvent.Induction.ExemptionReasonIds);
+            });
         });
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));

@@ -15,6 +15,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Alerts;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.InductionExemptions;
+using TeachingRecordSystem.Core.Services.Inductions;
 using TeachingRecordSystem.Core.Services.MandatoryQualifications;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notes;
@@ -121,6 +122,7 @@ public static class Extensions
             .AddRoutesToProfessionalStatusService()
             .AddUserService()
             .AddInductionExemptionService()
+            .AddInductionService()
             .AddOneLoginService();
 
         return services;
