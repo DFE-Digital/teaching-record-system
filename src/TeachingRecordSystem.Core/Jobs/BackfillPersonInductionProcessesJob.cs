@@ -22,6 +22,9 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
 {
     private const int BatchSize = 5000;
 
+    // Schema-qualified so neither the drop nor the lookup can reach a permanent table that happens to share the name.
+    private const string EwcWalesImportsTable = "pg_temp.ewc_wales_induction_imports";
+
     // This matches the EventName value stored in the events table for the legacy event; the new event happens to
     // share its name.
     private static readonly string _legacyEventName = nameof(LegacyEvents.PersonInductionUpdatedEvent);
@@ -30,6 +33,27 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
     {
         dbContext.Database.SetCommandTimeout(0);
 
+        // The temp table below belongs to the session, so the connection has to stay open for the whole run rather
+        // than being opened and closed around each command.
+        await dbContext.Database.OpenConnectionAsync(cancellationToken);
+
+        try
+        {
+            // Both of the tells that aren't in the payload itself are fixed sets, so they're read once here instead
+            // of being joined to on every batch.
+            var cpdUserIds = await GetCpdUserIdsAsync(cancellationToken);
+            await CreateEwcWalesImportsTableAsync(cancellationToken);
+
+            await BackfillAsync(cpdUserIds, dryRun, cancellationToken);
+        }
+        finally
+        {
+            await dbContext.Database.CloseConnectionAsync();
+        }
+    }
+
+    private async Task BackfillAsync(string[] cpdUserIds, bool dryRun, CancellationToken cancellationToken)
+    {
         var lastCreated = DateTime.MinValue.ToUniversalTime();
         var lastEventId = Guid.Empty;
         long totalMigrated = 0;
@@ -53,7 +77,7 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                     new NpgsqlParameter("legacyEventName", _legacyEventName),
                     new NpgsqlParameter("cpdProcessType", (int)ProcessType.PersonCpdInductionUpdating),
                     new NpgsqlParameter("welshProcessType", (int)ProcessType.PersonWelshInductionUpdating),
-                    new NpgsqlParameter("ewcWalesInterfaceType", (int)IntegrationTransactionInterfaceType.EwcWales),
+                    new NpgsqlParameter("cpdUserIds", NpgsqlDbType.Array | NpgsqlDbType.Text) { Value = cpdUserIds },
                     new NpgsqlParameter("processType", (int)ProcessType.PersonInductionUpdating),
                     new NpgsqlParameter("fromCreated", NpgsqlDbType.TimestampTz) { Value = lastCreated },
                     new NpgsqlParameter("fromEventId", NpgsqlDbType.Uuid) { Value = lastEventId },
@@ -85,6 +109,47 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
 
         logger.LogInformation("Back-filled {Migrated} {EventName} event(s).", totalMigrated, _legacyEventName);
     }
+
+    // The CPD operation runs as its client's application user and the role that lets it be called is on that user
+    // row, so the handful of ids can be looked up once. RaisedBy is compared as text below - matching how the ids
+    // are written into the payload - which also means the object form (a DQT user) simply matches nothing instead
+    // of needing a uuid cast that would throw on it.
+    private async Task<string[]> GetCpdUserIdsAsync(CancellationToken cancellationToken)
+    {
+        var userIds = await dbContext.ApplicationUsers
+            .Where(u => u.ApiRoles!.Contains(ApiRoles.SetCpdInduction))
+            .Select(u => u.UserId)
+            .ToArrayAsync(cancellationToken);
+
+        return userIds.Select(id => id.ToString()).ToArray();
+    }
+
+    // integration_transaction_records has no index on person_id - the foreign key doesn't create one - so the
+    // per-event lookup would scan the whole table, which the TPS imports alone make large. Narrowing it to the EWC
+    // Wales induction rows once, into an indexed temp table, turns that into an index probe.
+    //
+    // A snapshot taken at the start is enough: the write paths no longer produce legacy events, so no new rows can
+    // arrive for this job to attribute while it runs.
+    private Task CreateEwcWalesImportsTableAsync(CancellationToken cancellationToken) =>
+        dbContext.Database.ExecuteSqlRawAsync(
+            $"""
+             DROP TABLE IF EXISTS {EwcWalesImportsTable};
+
+             CREATE TEMP TABLE {EwcWalesImportsTable} AS
+             SELECT itr.person_id, itr.created_date
+             FROM integration_transaction_records itr
+             JOIN integration_transactions it
+                 ON it.integration_transaction_id = itr.integration_transaction_id
+             WHERE it.interface_type = @ewcWalesInterfaceType
+               AND it.file_name ILIKE 'IND%'
+               AND itr.person_id IS NOT NULL;
+
+             CREATE INDEX ON {EwcWalesImportsTable} (person_id, created_date);
+
+             ANALYZE {EwcWalesImportsTable};
+             """,
+            [new NpgsqlParameter("ewcWalesInterfaceType", (int)IntegrationTransactionInterfaceType.EwcWales)],
+            cancellationToken);
 
     private async Task<(DateTime Created, Guid EventId)?> GetBatchEndAsync(
         DateTime lastCreated,
@@ -160,9 +225,6 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
                  END AS dqt_user_name,
                  {ProcessTypeSql} AS process_type
              FROM events e
-             -- Joined on text so the object form of RaisedBy (a DQT user) simply matches nothing, rather than
-             -- putting a uuid cast that would throw on it behind a condition Postgres is free to reorder.
-             LEFT JOIN users u ON u.user_id::text = e.payload->>'RaisedBy'
              WHERE e.event_name = @legacyEventName
                AND e.created >= @fromCreated
                AND (e.created > @fromCreated OR e.event_id > @fromEventId)
@@ -231,17 +293,13 @@ public class BackfillPersonInductionProcessesJob(TrsDbContext dbContext, ILogger
         CASE WHEN e.payload->'Induction'->'CpdCpdModifiedOn'
                   IS DISTINCT FROM e.payload->'OldInduction'->'CpdCpdModifiedOn'
              THEN @cpdProcessType
-             WHEN '{ApiRoles.SetCpdInduction}' = ANY(u.api_roles) THEN @cpdProcessType
+             WHEN e.payload->>'RaisedBy' = ANY(@cpdUserIds) THEN @cpdProcessType
              WHEN EXISTS (
                  SELECT 1
-                 FROM integration_transaction_records itr
-                 JOIN integration_transactions it
-                     ON it.integration_transaction_id = itr.integration_transaction_id
-                 WHERE itr.person_id = (e.payload->>'PersonId')::uuid
-                   AND it.interface_type = @ewcWalesInterfaceType
-                   AND it.file_name ILIKE 'IND%'
-                   AND e.created <= itr.created_date
-                   AND e.created > itr.created_date - interval '1 minute')
+                 FROM {EwcWalesImportsTable} i
+                 WHERE i.person_id = (e.payload->>'PersonId')::uuid
+                   AND e.created <= i.created_date
+                   AND e.created > i.created_date - interval '1 minute')
              THEN @welshProcessType
              ELSE @processType
          END
