@@ -1,6 +1,22 @@
 @model ChangeHistoryEntryViewModel
+@{
+    var hasCreatedEvent = Model.TryGetEvent<PersonCreatedEvent>(out var createdEvent);
+}
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+<timeline-entry title="TRN request activated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="trn-request-summary">
+        @if (hasCreatedEvent)
+        {
+            @:Record created when a dormant TRN request was activated.
+        }
+        else
+        {
+            @:A dormant TRN request was activated and matched to this record.
+        }
+    </p>
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (hasCreatedEvent)
+    {
+        <partial name="~/Pages/Shared/Components/ChangeHistoryEntry/_PersonDetailsSummary.cshtml" model="@createdEvent!.Details" />
+    }
 </timeline-entry>

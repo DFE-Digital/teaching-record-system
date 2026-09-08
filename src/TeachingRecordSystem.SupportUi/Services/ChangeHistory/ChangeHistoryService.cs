@@ -22,7 +22,6 @@ public class ChangeHistoryService(
         {
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
             nameof(LegacyEvents.PersonDetailsUpdatedEvent),
-            nameof(LegacyEvents.PersonCreatedEvent),
             nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
             nameof(LegacyEvents.PersonStatusUpdatedEvent),
             nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
@@ -82,6 +81,7 @@ public class ChangeHistoryService(
 
         var processTypesToQuery = new[]
         {
+            ProcessType.PersonCreating,
             ProcessType.PersonCreatingInDqt,
             ProcessType.PersonImportingIntoDqt,
             ProcessType.PersonUpdatingInDqt,
@@ -133,7 +133,11 @@ public class ChangeHistoryService(
             ProcessType.OneLoginUserPersonConnecting,
             ProcessType.OneLoginUserPersonDisconnecting,
             ProcessType.NotifyingTrnRecipient,
-            ProcessType.TrnAllocating
+            ProcessType.TeacherPensionsRecordImporting,
+            ProcessType.TrnAllocating,
+            ProcessType.TrnRequestCreating,
+            ProcessType.TrnRequestResolving,
+            ProcessType.TrnRequestActivating
         };
 
         var processes = await dbContext.Processes
