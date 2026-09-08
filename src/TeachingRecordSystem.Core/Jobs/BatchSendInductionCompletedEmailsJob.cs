@@ -18,11 +18,23 @@ public class BatchSendInductionCompletedEmailsJob(
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
         await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
+        // process_events has no index over the event name and creation date, so the query below scans the table;
+        // that takes longer than the default command timeout allows.
+        dbContext.Database.SetCommandTimeout(0);
+
         var lastPassedEndUtc = await dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.PassedEndUtc, cancellationToken: cancellationToken) ??
             jobOptionsAccessor.Value.InitialLastPassedEndUtc;
 
         // Look for new induction awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
         var passedEndUtc = timeProvider.Today.AddDays(-(jobOptionsAccessor.Value.EmailDelayDays + 1)).ToDateTime();
+
+        // A run that has a long gap to catch up on does all of that work in one transaction, so cap how much of
+        // the gap a single run takes; the runs that follow work through the rest a batch at a time.
+        var maxPassedEndUtc = lastPassedEndUtc.AddDays(jobOptionsAccessor.Value.MaxBatchDays);
+        if (passedEndUtc > maxPassedEndUtc)
+        {
+            passedEndUtc = maxPassedEndUtc;
+        }
 
         var executed = timeProvider.UtcNow;
         var startDate = lastPassedEndUtc;
