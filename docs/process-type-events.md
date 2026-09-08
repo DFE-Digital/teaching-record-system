@@ -114,6 +114,11 @@ API `CreateTrnRequest`.
 | `SupportTaskCreatedEvent` | Sometimes | Auto-resolution finds potential duplicates (a `TrnRequest` task) or the matched record needs further checks (a `TrnRequestManualChecksNeeded` task). |
 | `OneLoginUserUpdatedEvent` | Sometimes | The request carries a verified One Login user that is connected to the resolved person. |
 
+The API wrote its support task creations straight to the legacy `events` table until December 2025.
+[`BackfillTrnRequestSupportTaskProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnRequestSupportTaskProcessesJob.cs)
+back-fills those as processes of this type, holding the `SupportTaskCreatedEvent` alone: TRN request creation
+itself never had a legacy event, so there is nothing else left to recover.
+
 ### `TrnRequestActivating` (43)
 API `ActivateTrnRequest`.
 
@@ -135,6 +140,11 @@ Support UI *Resolve TRN request*.
 | `PersonDetailsUpdatedEvent` | Sometimes | The support user merges into an existing record and updates its attributes. |
 | `SupportTaskCreatedEvent` | Sometimes | The matched record needs further checks (a `TrnRequestManualChecksNeeded` task). |
 | `OneLoginUserUpdatedEvent` | Sometimes | A verified One Login user on the request is connected to the resolved person. |
+
+Resolutions from before December 2025 recorded only the legacy `ApiTrnRequestSupportTaskUpdatedEvent`, which is
+still to be converted. Where one of them created a manual checks needed task,
+[`BackfillTrnRequestSupportTaskProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnRequestSupportTaskProcessesJob.cs)
+back-fills a process of this type holding that `SupportTaskCreatedEvent` alone.
 
 ### `TrnRequestManualChecksNeededTaskCompleting` (20)
 Support UI *TRN request manual checks needed → confirm*.
@@ -574,17 +584,20 @@ CLI `webhook-endpoint delete`.
 ## NPQ TRN requests (legacy)
 
 The NPQ TRN request journey was removed from the Support UI, so nothing produces these process types any
-more. They cover the requests that were handled while it existed, plus the older ones
+more. They cover the requests that were handled while it existed, plus the older ones back-filled from the
+legacy events:
 [`BackfillNpqTrnRequestProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNpqTrnRequestProcessesJob.cs)
-back-filled from the legacy `NpqTrnRequestSupportTaskResolvedEvent` / `NpqTrnRequestSupportTaskRejectedEvent`
-events. The tables below describe what those processes hold.
+from `NpqTrnRequestSupportTaskResolvedEvent` / `NpqTrnRequestSupportTaskRejectedEvent`, and
+[`BackfillTrnRequestSupportTaskProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnRequestSupportTaskProcessesJob.cs)
+from the `SupportTaskCreatedEvent`s the 'request a TRN' pages wrote before they moved onto the event pipeline.
+The tables below describe what those processes hold.
 
 ### `NpqTrnRequestTaskCreating` (15)
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `SupportTaskCreatedEvent` | Always | — |
-| `TrnRequestCreatedEvent` | Always | — |
+| `TrnRequestCreatedEvent` | Always | Only on a process the pages created — TRN request creation never had a legacy event, so the back-filled ones hold the `SupportTaskCreatedEvent` alone. |
 
 ### `NpqTrnRequestApproving` (18)
 
