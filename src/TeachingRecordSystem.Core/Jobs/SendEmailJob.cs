@@ -62,14 +62,6 @@ public class SendEmailJob(TrsDbContext dbContext, IEventPublisher eventPublisher
 
         email.SentOn = timeProvider.UtcNow;
 
-        dbContext.AddEventWithoutBroadcast(new LegacyEvents.EmailSentEvent
-        {
-            EventId = Guid.NewGuid(),
-            Email = EventModels.Email.FromModel(email),
-            CreatedUtc = timeProvider.UtcNow,
-            RaisedBy = SystemUser.SystemUserId
-        });
-
         await dbContext.SaveChangesAsync();
     }
 }
