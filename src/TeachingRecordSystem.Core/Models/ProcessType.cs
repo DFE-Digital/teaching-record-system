@@ -99,5 +99,6 @@ public enum ProcessType
     NotifyingLapsedQtlsHolder = 97,
     PersonInductionUpdating = 98,
     PersonCpdInductionUpdating = 99,
-    PersonWelshInductionUpdating = 100
+    PersonWelshInductionUpdating = 100,
+    InductionMigratingFromDqt = 101
 }

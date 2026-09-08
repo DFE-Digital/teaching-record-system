@@ -21,7 +21,6 @@ public class ChangeHistoryService(
         var eventTypes = new[]
         {
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
-            nameof(LegacyEvents.InductionMigratedEvent),
             nameof(LegacyEvents.PersonDetailsUpdatedEvent),
             nameof(LegacyEvents.PersonCreatedEvent),
             nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
@@ -125,6 +124,7 @@ public class ChangeHistoryService(
             ProcessType.PersonInductionUpdating,
             ProcessType.PersonCpdInductionUpdating,
             ProcessType.PersonWelshInductionUpdating,
+            ProcessType.InductionMigratingFromDqt,
             ProcessType.NoteCreating,
             ProcessType.PersonOneLoginUserDisconnecting,
             ProcessType.PersonOneLoginUserConnecting,
