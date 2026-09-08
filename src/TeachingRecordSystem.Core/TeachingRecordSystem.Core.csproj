@@ -59,6 +59,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_resolve_record_by_trn_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v3.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v4.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_split_names_v5.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_attrs_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_support_task_subject_names_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v3.sql" />
