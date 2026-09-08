@@ -2,7 +2,6 @@ using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
-using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
@@ -28,7 +27,7 @@ public class ChangeLogInductionEventTests : TestBase
     [InlineData(DqtInductionFields.ExemptionReason)]
     [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate)]
     [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.ExemptionReason)]
-    public async Task Person_WithInductionMigratedEvent_RendersExpectedContent(DqtInductionFields populatedFields)
+    public async Task Person_WithInductionMigratingFromDqtProcess_RendersExpectedContent(DqtInductionFields populatedFields)
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
@@ -53,12 +52,9 @@ public class ChangeLogInductionEventTests : TestBase
             InductionExemptionReason = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? Option.Some(inductionExemptionReason.ToString()) : Option.None<string?>()
         };
 
-        var migratedEvent = new LegacyEvents.InductionMigratedEvent
+        var migratedEvent = new InductionMigratedEvent
         {
             EventId = Guid.NewGuid(),
-            Key = $"{induction.InductionId}-Migrated",
-            CreatedUtc = TimeProvider.UtcNow,
-            RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
             InductionStatus = migratedInductionStatus,
             InductionExemptionReasonId = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? migratedInductionExemptionReasonId : null,
@@ -68,11 +64,7 @@ public class ChangeLogInductionEventTests : TestBase
             DqtInductionStatus = dqtInductionStatus
         };
 
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(migratedEvent);
-            await dbContext.SaveChangesAsync();
-        });
+        var processId = await CreateInductionMigratingFromDqtProcessAsync(person.PersonId, createdByDqtUser, migratedEvent);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -82,40 +74,43 @@ public class ChangeLogInductionEventTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Collection(
-            doc.GetAllElementsByTestId("timeline-item-induction-migrated-event"),
-            item =>
-            {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
-                Assert.Equal(TimeProvider.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
-                if (populatedFields.HasFlag(DqtInductionFields.StartDate))
-                {
-                    Assert.Equal(startDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("start-date"));
-                }
-                if (populatedFields.HasFlag(DqtInductionFields.CompletionDate))
-                {
-                    Assert.Equal(completionDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("completed-date")?.TrimmedText());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("completed-date"));
-                }
-                Assert.Equal(migratedInductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TrimmedText());
-                //Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("dqt-induction-status")?.TrimmedTextContent());
-                if (populatedFields.HasFlag(DqtInductionFields.ExemptionReason))
-                {
-                    Assert.Equal(exemptionReason.Name, item.GetElementByTestId("exemption-reason")?.TrimmedText());
-                    Assert.Equal(inductionExemptionReason.ToString(), item.GetElementByTestId("dqt-exemption-reason")?.TrimmedText());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("exemption-reason"));
-                }
-            });
+        var item = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
+        Assert.NotNull(item);
+
+        var date = item.GetElementsByClassName("moj-timeline__date").SingleOrDefault();
+        Assert.Contains($"By {createdByDqtUser.DqtUserName} on", date?.TrimmedText().ReplaceLineEndings(" "));
+
+        if (populatedFields.HasFlag(DqtInductionFields.StartDate))
+        {
+            Assert.Equal(startDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(item.GetElementByTestId("start-date"));
+        }
+
+        if (populatedFields.HasFlag(DqtInductionFields.CompletionDate))
+        {
+            Assert.Equal(completionDate?.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("completed-date")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(item.GetElementByTestId("completed-date"));
+        }
+
+        Assert.Equal(migratedInductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TrimmedText());
+        Assert.Equal(dqtInductionStatus, item.GetElementByTestId("dqt-induction-status")?.TrimmedText());
+
+        if (populatedFields.HasFlag(DqtInductionFields.ExemptionReason))
+        {
+            Assert.Equal(exemptionReason.Name, item.GetElementByTestId("exemption-reason")?.TrimmedText());
+            Assert.Equal(inductionExemptionReason.ToString(), item.GetElementByTestId("dqt-exemption-reason")?.TrimmedText());
+        }
+        else
+        {
+            Assert.Null(item.GetElementByTestId("exemption-reason"));
+            Assert.Null(item.GetElementByTestId("dqt-exemption-reason"));
+        }
     }
 
     [Theory]
@@ -381,6 +376,48 @@ public class ChangeLogInductionEventTests : TestBase
         Assert.Equal(InductionStatus.Passed.GetTitle(), item.GetElementByTestId("induction-status")?.TrimmedText());
         Assert.Equal(InductionStatus.InProgress.GetTitle(), item.GetElementByTestId("old-induction-status")?.TrimmedText());
         Assert.Equal(completedDate.ToString(WebConstants.DateDisplayFormat), item.GetElementByTestId("completed-date")?.TrimmedText());
+    }
+
+    private async Task<Guid> CreateInductionMigratingFromDqtProcessAsync(
+        Guid personId,
+        EventModels.RaisedByUserInfo raisedBy,
+        InductionMigratedEvent migratedEvent)
+    {
+        var processId = Guid.NewGuid();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Processes.Add(new Process
+            {
+                ProcessId = processId,
+                ProcessType = ProcessType.InductionMigratingFromDqt,
+                CreatedOn = TimeProvider.UtcNow,
+                UpdatedOn = TimeProvider.UtcNow,
+                UserId = raisedBy.UserId,
+                DqtUserId = raisedBy.DqtUserId,
+                DqtUserName = raisedBy.DqtUserName,
+                PersonIds = [personId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                ChangeReason = null
+            });
+
+            dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+            {
+                ProcessEventId = migratedEvent.EventId,
+                ProcessId = processId,
+                EventName = nameof(InductionMigratedEvent),
+                Payload = migratedEvent,
+                PersonIds = [personId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                CreatedOn = TimeProvider.UtcNow
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        return processId;
     }
 
     private async Task<Guid> CreateInductionUpdatingProcessAsync(
