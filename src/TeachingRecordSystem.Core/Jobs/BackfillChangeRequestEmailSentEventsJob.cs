@@ -21,12 +21,24 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
         ProcessType.ChangeOfDateOfBirthRequestRejecting
     ];
 
+    // The rejection templates were replaced with ones carrying a rejection reason on 2025-10-22 (#2661).
+    // EmailTemplateIds only names the templates we still send, so the retired ids live here; without them the
+    // matcher can't find the email a rejection from before the swap actually sent.
+    private const string RetiredChangeOfNameRejectedEmailConfirmation = "bc790721-11c7-42e0-8f88-41ea96296602";
+    private const string RetiredChangeOfDateOfBirthRejectedEmailConfirmation = "abe622ac-79b0-40b3-a29d-94f359a0f03e";
+
+    // In prod the last email on a retired template went out at 07:36 that day and the first on a new one at
+    // 18:19, so any point between the two puts every rejection on the right side of the swap.
+    private static readonly DateTime _rejectionTemplatesChangedOn = new(2025, 10, 22, 12, 0, 0, DateTimeKind.Utc);
+
     private static readonly string[] _emailTemplateIds =
     [
         EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation,
         EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation,
         EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation,
-        EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation
+        EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation,
+        RetiredChangeOfNameRejectedEmailConfirmation,
+        RetiredChangeOfDateOfBirthRejectedEmailConfirmation
     ];
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
@@ -71,25 +83,33 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
             var personDetailsUpdatedEvent = payloads.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
             var isApproval = process.ProcessType is ProcessType.ChangeOfNameRequestApproving or ProcessType.ChangeOfDateOfBirthRequestApproving;
 
-            var (requestEmailAddress, templateId) = supportTask.Data switch
+            var (requestEmailAddress, currentTemplateId, retiredTemplateId) = supportTask.Data switch
             {
                 ChangeNameRequestData data => (
                     data.EmailAddress,
                     isApproval
                         ? EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation
-                        : EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation),
+                        : EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation,
+                    isApproval ? null : RetiredChangeOfNameRejectedEmailConfirmation),
                 ChangeDateOfBirthRequestData data => (
                     data.EmailAddress,
                     isApproval
                         ? EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation
-                        : EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation),
-                _ => (null, null)
+                        : EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation,
+                    isApproval ? null : RetiredChangeOfDateOfBirthRejectedEmailConfirmation),
+                _ => (null, null, null)
             };
 
-            if (templateId is null)
+            if (currentTemplateId is null)
             {
                 continue;
             }
+
+            // A rejection from before the swap went out on the retired template. Only rejections have one, so
+            // this leaves approvals alone.
+            var sentBeforeTemplateChange = retiredTemplateId is not null && process.CreatedOn < _rejectionTemplatesChangedOn;
+            var templateId = sentBeforeTemplateChange ? retiredTemplateId! : currentTemplateId;
+            var otherTemplateId = sentBeforeTemplateChange ? currentTemplateId : retiredTemplateId;
 
             // The address on the record may have changed since, so fall back to the one it held at the time
             // rather than whatever is on it now. A process that changed the person's details carries that
@@ -113,7 +133,10 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
                 continue;
             }
 
-            var email = emailMatcher.Match(templateId, emailAddress, process.CreatedOn);
+            // The email goes out from a background job, so a rejection either side of the swap could have had
+            // its email sent on the template from the other side of it.
+            var email = emailMatcher.Match(templateId, emailAddress, process.CreatedOn)
+                ?? (otherTemplateId is not null ? emailMatcher.Match(otherTemplateId, emailAddress, process.CreatedOn) : null);
 
             if (email is null)
             {
@@ -122,7 +145,11 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
                     EmailId = Guid.NewGuid(),
                     TemplateId = templateId,
                     EmailAddress = emailAddress,
-                    Personalization = CreatePersonalization(firstName, isApproval ? null : supportTaskUpdatedEvent.RejectionReason),
+                    // The retired templates had no reason field, so a rejection from before the swap didn't
+                    // carry one.
+                    Personalization = CreatePersonalization(
+                        firstName,
+                        isApproval || sentBeforeTemplateChange ? null : supportTaskUpdatedEvent.RejectionReason),
                     SentOn = process.CreatedOn
                 };
 

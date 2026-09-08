@@ -7,6 +7,12 @@ namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : JobTestBase(fixture)
 {
+    // The rejection template the Support UI used before #2661 swapped it for one with a reason field.
+    private const string RetiredChangeOfNameRejectedEmailConfirmation = "bc790721-11c7-42e0-8f88-41ea96296602";
+
+    private static readonly DateTimeOffset _beforeRejectionTemplatesChanged = new(2025, 10, 1, 9, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _afterRejectionTemplatesChanged = new(2025, 11, 1, 9, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public async Task Execute_ApprovingProcessWithoutEmailSentEvent_LinksToTheEmailThatWasSent()
     {
@@ -82,6 +88,8 @@ public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : 
     public async Task Execute_RejectingProcessWithNoEmailToMatch_AddsOneWithTheRejectionReasonWording()
     {
         // Arrange
+        TimeProvider.SetUtcNow(_afterRejectionTemplatesChanged);
+
         var emailAddress = TestData.GenerateUniqueEmail();
         var person = await TestData.CreatePersonAsync();
 
@@ -107,6 +115,76 @@ public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : 
             Assert.Equal(
                 "This is because you provided the wrong type of document.",
                 email.Personalization[ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey]);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_RejectingProcessFromBeforeTheTemplatesChanged_LinksToTheEmailSentOnTheRetiredTemplate()
+    {
+        // Arrange
+        TimeProvider.SetUtcNow(_beforeRejectionTemplatesChanged);
+
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var person = await TestData.CreatePersonAsync();
+
+        var process = await CreateChangeNameRequestProcessAsync(
+            person,
+            ProcessType.ChangeOfNameRequestRejecting,
+            emailAddress,
+            rejectionReason: ChangeRequestRejectReason.WrongTypeOfDocument.GetDisplayName(),
+            newFirstName: null);
+
+        var existingEmail = await AddEmailAsync(
+            RetiredChangeOfNameRejectedEmailConfirmation,
+            emailAddress,
+            sentOn: process.CreatedOn.AddMinutes(1));
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestEmailSentEventsJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, process.ProcessId);
+            Assert.Equal(existingEmail.EmailId, emailSentEvent.Email.EmailId);
+
+            var emails = await dbContext.Emails.Where(e => e.EmailAddress == emailAddress).ToListAsync();
+            Assert.Equal(existingEmail.EmailId, Assert.Single(emails).EmailId);
+        });
+    }
+
+    [Fact]
+    public async Task Execute_RejectingProcessFromBeforeTheTemplatesChangedWithNoEmailToMatch_AddsOneWithoutARejectionReason()
+    {
+        // Arrange
+        TimeProvider.SetUtcNow(_beforeRejectionTemplatesChanged);
+
+        var emailAddress = TestData.GenerateUniqueEmail();
+        var person = await TestData.CreatePersonAsync();
+
+        var process = await CreateChangeNameRequestProcessAsync(
+            person,
+            ProcessType.ChangeOfNameRequestRejecting,
+            emailAddress,
+            rejectionReason: ChangeRequestRejectReason.WrongTypeOfDocument.GetDisplayName(),
+            newFirstName: null);
+
+        // Act
+        await WithServiceAsync<BackfillChangeRequestEmailSentEventsJob>(
+            job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None));
+
+        // Assert
+        await WithDbContextAsync(async dbContext =>
+        {
+            var emailSentEvent = await GetEmailSentEventAsync(dbContext, process.ProcessId);
+
+            var email = await dbContext.Emails.SingleAsync(e => e.EmailId == emailSentEvent.Email.EmailId);
+            Assert.Equal(RetiredChangeOfNameRejectedEmailConfirmation, email.TemplateId);
+            Assert.Equal(person.FirstName, email.Personalization[ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey]);
+
+            // The retired template had no reason field.
+            Assert.DoesNotContain(ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey, email.Personalization);
         });
     }
 
