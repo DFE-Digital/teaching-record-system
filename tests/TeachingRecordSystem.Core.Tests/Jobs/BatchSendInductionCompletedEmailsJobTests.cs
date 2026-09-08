@@ -142,6 +142,40 @@ public class BatchSendInductionCompletedEmailsJobTests(JobFixture fixture) : Job
                 Times.Once);
     }
 
+    [Fact]
+    public async Task Execute_WithLongGapToCatchUpOn_LimitsWindowToMaxBatchDays()
+    {
+        // Arrange
+        var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
+
+        var jobOptions = Options.Create(
+            new BatchSendInductionCompletedEmailsJobOptions()
+            {
+                EmailDelayDays = 3,
+                InitialLastPassedEndUtc = TimeProvider.Today.AddDays(-5).ToDateTime(),
+                MaxBatchDays = 1,
+                JobSchedule = Cron.Never()
+            });
+
+        var lastPassedEndUtc = await WithDbContextAsync(dbContext =>
+            dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.PassedEndUtc)) ??
+            jobOptions.Value.InitialLastPassedEndUtc;
+
+        // Move well beyond the batch the job is allowed to take in one run, so the window has to be capped.
+        TimeProvider.Advance(TimeSpan.FromDays(60));
+
+        // Act
+        await WithServiceAsync<BatchSendInductionCompletedEmailsJob>(
+            job => job.ExecuteAsync(CancellationToken.None),
+            jobOptions,
+            backgroundJobScheduler.Object);
+
+        // Assert
+        var passedEndUtc = await WithDbContextAsync(dbContext =>
+            dbContext.InductionCompletedEmailsJobs.MaxAsync(j => j.PassedEndUtc));
+        Assert.Equal(lastPassedEndUtc.AddDays(jobOptions.Value.MaxBatchDays), passedEndUtc);
+    }
+
     private static EventModels.Induction CreateInduction(
         InductionStatus status,
         DateOnly? startDate,
