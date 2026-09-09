@@ -344,6 +344,16 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillOverseasNpqTrnEmailSentEventsJob>(
+                nameof(BackfillOverseasNpqTrnEmailSentEventsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<RepairOverseasNpqPersonCreationProcessesJob>(
+                nameof(RepairOverseasNpqPersonCreationProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.AddOrUpdate<BackfillPersonInductionProcessesJob>(
                 nameof(BackfillPersonInductionProcessesJob),
                 job => job.ExecuteAsync(CancellationToken.None),
