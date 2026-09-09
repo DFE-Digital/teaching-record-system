@@ -8,10 +8,13 @@
     <p class="govuk-body">
         Record updated for @name
     </p>
-    <govuk-details class="govuk-!-margin-bottom-2">
-        <govuk-details-summary>Record details</govuk-details-summary>
-        <govuk-details-text>
-            <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
-        </govuk-details-text>
-    </govuk-details>
+    @if (updatedEvent.Changes != PersonUpdatedInDqtEventChanges.None)
+    {
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Record details</govuk-details-summary>
+            <govuk-details-text>
+                <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
+            </govuk-details-text>
+        </govuk-details>
+    }
 </timeline-entry>

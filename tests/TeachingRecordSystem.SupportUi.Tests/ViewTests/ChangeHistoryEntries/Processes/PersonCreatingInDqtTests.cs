@@ -46,7 +46,7 @@ public class PersonCreatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
     }
 
     [Fact]
-    public async Task WithoutOptionalDetails_OmitsRows()
+    public async Task WithoutAnyDetails_OmitsRecordDetails()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -71,9 +71,7 @@ public class PersonCreatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
         Assert.Contains("Record created for", bodyText);
 
         var recordDetails = entry.QuerySelector("details");
-        Assert.NotNull(recordDetails);
-
-        entry.AssertSummaryListHasRows();
+        Assert.Null(recordDetails);
     }
 
     private async Task<IHtmlElement> PublishPersonCreatedEventAsync(

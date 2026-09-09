@@ -38,134 +38,143 @@
         <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
-        <div data-testid="details">
-            <govuk-summary-list>
-                @if (updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
-                {
-                    <row>
-                        <key>Name</key>
-                        <value use-empty-fallback>@name</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
-                {
-                    <row>
-                        <key>Date of birth</key>
-                        <value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
-                {
-                    <row>
-                        <key>Email address</key>
-                        <value use-empty-fallback>@email</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
-                {
-                    <row>
-                        <key>National Insurance number</key>
-                        <value use-empty-fallback>@nino</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
-                {
-                    <row>
-                        <key>Gender</key>
-                        <value use-empty-fallback>@details.Gender?.GetDisplayName()</value>
-                    </row>
-                }
-            </govuk-summary-list>
-        </div>
-
-        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
-                    @if (!string.IsNullOrEmpty(updatedEvent.NameChangeReason))
-                    {
-                        <row>
-                            <key>Name change</key>
-                            <value use-empty-fallback>@updatedEvent.NameChangeReason</value>
-                        </row>
-                        <row>
-                            <key>Evidence</key>
-                            <value>
-                                <vc:event-evidence-file-link evidence-file="@updatedEvent.NameChangeEvidenceFile" />
-                            </value>
-                        </row>
-                    }
-                    @if (!string.IsNullOrEmpty(updatedEvent.DetailsChangeReason))
-                    {
-                        <row>
-                            <key>@(string.IsNullOrEmpty(updatedEvent.NameChangeReason) ? "Personal details change" : "Other personal details change")</key>
-                            <value use-empty-fallback>@updatedEvent.DetailsChangeReason</value>
-                        </row>
-                        <row>
-                            <key>Reason details</key>
-                            <value>
-                                @if (updatedEvent.DetailsChangeReasonDetail is not null)
-                                {
-                                    @Html.ConvertNewlinesToLineBreaks(updatedEvent.DetailsChangeReasonDetail)
-                                }
-                                else
-                                {
-                                    <span use-empty-fallback></span>
-                                }
-                            </value>
-                        </row>
-                        <row>
-                            <key>Evidence</key>
-                            <value>
-                                <vc:event-evidence-file-link evidence-file="@updatedEvent.DetailsChangeEvidenceFile" />
-                            </value>
-                        </row>
-                    }
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
-
-        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
-            <govuk-details-summary>Previous data</govuk-details-summary>
-            <govuk-details-text>
+        @if (updatedEvent.Changes != PersonDetailsUpdatedEventChanges.None)
+        {
+            <div data-testid="details">
                 <govuk-summary-list>
                     @if (updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
                     {
                         <row>
                             <key>Name</key>
-                            <value use-empty-fallback>@oldName</value>
+                            <value use-empty-fallback>@name</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
                     {
                         <row>
                             <key>Date of birth</key>
-                            <value use-empty-fallback>@oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                            <value use-empty-fallback>@details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
                     {
                         <row>
                             <key>Email address</key>
-                            <value use-empty-fallback>@oldEmail</value>
+                            <value use-empty-fallback>@email</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
                     {
                         <row>
                             <key>National Insurance number</key>
-                            <value use-empty-fallback>@oldNino</value>
+                            <value use-empty-fallback>@nino</value>
                         </row>
                     }
                     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
                     {
                         <row>
                             <key>Gender</key>
-                            <value use-empty-fallback>@oldDetails.Gender?.GetDisplayName()</value>
+                            <value use-empty-fallback>@details.Gender?.GetDisplayName()</value>
                         </row>
                     }
                 </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(updatedEvent.NameChangeReason) || !string.IsNullOrEmpty(updatedEvent.DetailsChangeReason))
+        {
+            <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+                <govuk-details-summary>Reason for change</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        @if (!string.IsNullOrEmpty(updatedEvent.NameChangeReason))
+                        {
+                            <row>
+                                <key>Name change</key>
+                                <value use-empty-fallback>@updatedEvent.NameChangeReason</value>
+                            </row>
+                            <row>
+                                <key>Evidence</key>
+                                <value>
+                                    <vc:event-evidence-file-link evidence-file="@updatedEvent.NameChangeEvidenceFile" />
+                                </value>
+                            </row>
+                        }
+                        @if (!string.IsNullOrEmpty(updatedEvent.DetailsChangeReason))
+                        {
+                            <row>
+                                <key>@(string.IsNullOrEmpty(updatedEvent.NameChangeReason) ? "Personal details change" : "Other personal details change")</key>
+                                <value use-empty-fallback>@updatedEvent.DetailsChangeReason</value>
+                            </row>
+                            <row>
+                                <key>Reason details</key>
+                                <value>
+                                    @if (updatedEvent.DetailsChangeReasonDetail is not null)
+                                    {
+                                        @Html.ConvertNewlinesToLineBreaks(updatedEvent.DetailsChangeReasonDetail)
+                                    }
+                                    else
+                                    {
+                                        <span use-empty-fallback></span>
+                                    }
+                                </value>
+                            </row>
+                            <row>
+                                <key>Evidence</key>
+                                <value>
+                                    <vc:event-evidence-file-link evidence-file="@updatedEvent.DetailsChangeEvidenceFile" />
+                                </value>
+                            </row>
+                        }
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        }
+
+        @if (updatedEvent.Changes != PersonDetailsUpdatedEventChanges.None)
+        {
+            <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
+                <govuk-details-summary>Previous data</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        @if (updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                        {
+                            <row>
+                                <key>Name</key>
+                                <value use-empty-fallback>@oldName</value>
+                            </row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+                        {
+                            <row>
+                                <key>Date of birth</key>
+                                <value use-empty-fallback>@oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                            </row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+                        {
+                            <row>
+                                <key>Email address</key>
+                                <value use-empty-fallback>@oldEmail</value>
+                            </row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+                        {
+                            <row>
+                                <key>National Insurance number</key>
+                                <value use-empty-fallback>@oldNino</value>
+                            </row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                        {
+                            <row>
+                                <key>Gender</key>
+                                <value use-empty-fallback>@oldDetails.Gender?.GetDisplayName()</value>
+                            </row>
+                        }
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        }
     </div>
 </div>

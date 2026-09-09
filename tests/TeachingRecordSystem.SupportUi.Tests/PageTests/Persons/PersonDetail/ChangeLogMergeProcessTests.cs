@@ -277,8 +277,8 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
-        item.AssertSummaryListRowDoesNotExist("details", "Name");
-        item.AssertSummaryListRowDoesNotExist("previous-details", "Name");
+        Assert.Null(item.GetElementByTestId("details"));
+        Assert.Null(item.GetElementByTestId("previous-details"));
     }
 
     private Task<Process> CreateProcessAsync(

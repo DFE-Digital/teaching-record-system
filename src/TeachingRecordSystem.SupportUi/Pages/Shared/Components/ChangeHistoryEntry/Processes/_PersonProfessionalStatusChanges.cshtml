@@ -7,9 +7,19 @@
 @{
     var attributesEvent = Model.TryGetEvent<PersonProfessionalStatusAttributesUpdatedEvent>(out var a) ? a : null;
     var inductionEvent = Model.TryGetEvent<PersonInductionUpdatedEvent>(out var i) ? i : null;
+
+    var attributeChanges = attributesEvent?.Changes ?? PersonProfessionalStatusAttributesUpdatedEventChanges.None;
+
+    // The exemption reason flags have no rows here, so an induction event that only carries those has nothing to show.
+    var inductionChanges = (inductionEvent?.Changes ?? PersonInductionUpdatedEventChanges.None) &
+        (PersonInductionUpdatedEventChanges.InductionStatus |
+         PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption |
+         PersonInductionUpdatedEventChanges.InductionStartDate |
+         PersonInductionUpdatedEventChanges.InductionCompletedDate);
 }
 
-@if (attributesEvent is not null || inductionEvent is not null)
+@if (attributeChanges != PersonProfessionalStatusAttributesUpdatedEventChanges.None ||
+    inductionChanges != PersonInductionUpdatedEventChanges.None)
 {
     <govuk-summary-list data-testid="person-changes">
         @if (attributesEvent is not null)

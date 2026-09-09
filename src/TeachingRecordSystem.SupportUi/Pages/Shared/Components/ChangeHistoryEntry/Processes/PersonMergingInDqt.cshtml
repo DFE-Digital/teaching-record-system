@@ -28,8 +28,8 @@
         }
     </p>
 
-    @* Render the updated-event details only when an updated event exists and we're viewing the retained person *@
-    @if (updatedEvent is not null && !thisRecordWasDeactivated)
+    @* Render the updated-event details only when the updated event has changes to show and we're viewing the retained person *@
+    @if (updatedEvent is not null && updatedEvent.Changes != PersonUpdatedInDqtEventChanges.None && !thisRecordWasDeactivated)
     {
         <govuk-details class="govuk-!-margin-bottom-2">
             <govuk-details-summary>Merged details</govuk-details-summary>
