@@ -217,10 +217,6 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
                 Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
                 Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
             }
-        },
-        e2 =>
-        {
-            var emailEvent = Assert.IsType<LegacyEvents.EmailSentEvent>(e2);
         });
 
         Events.AssertProcessesCreated(p =>

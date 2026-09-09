@@ -115,6 +115,19 @@ public class BackfillChangeRequestApprovalProcessesJob(TrsDbContext dbContext)
                 ? requestEmailAddress
                 : personAttributes.EmailAddress ?? string.Empty;
 
+            // Nothing to send to means nothing was sent; inventing an email with an empty address would
+            // assert a send that can't have happened.
+            if (string.IsNullOrEmpty(emailAddress))
+            {
+                CreateProcessAndProcessEvents(
+                    legacyEvent,
+                    processType,
+                    [supportTaskUpdatedEvent, personDetailsUpdatedEvent]);
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+                continue;
+            }
+
             var email = emailMatcher.Match(emailTemplateId, emailAddress, legacyEvent.Created);
 
             if (email is null)

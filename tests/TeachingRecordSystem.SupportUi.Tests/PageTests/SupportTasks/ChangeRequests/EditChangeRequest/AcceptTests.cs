@@ -193,7 +193,7 @@ public class AcceptTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             }
         });
 
-        EventObserver.AssertEventsSaved(e => Assert.IsType<LegacyEvents.EmailSentEvent>(e));
+        EventObserver.AssertNoEventsSaved();
 
         Events.AssertProcessesCreated(p =>
         {

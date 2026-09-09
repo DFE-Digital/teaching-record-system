@@ -26,7 +26,9 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
         EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation,
         EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation,
         EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation,
-        EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation
+        EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation,
+        RetiredEmailTemplateIds.ChangeOfNameRequestRejectedEmailConfirmation,
+        RetiredEmailTemplateIds.ChangeOfDateOfBirthRequestRejectedEmailConfirmation
     ];
 
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
@@ -71,25 +73,33 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
             var personDetailsUpdatedEvent = payloads.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
             var isApproval = process.ProcessType is ProcessType.ChangeOfNameRequestApproving or ProcessType.ChangeOfDateOfBirthRequestApproving;
 
-            var (requestEmailAddress, templateId) = supportTask.Data switch
+            var (requestEmailAddress, currentTemplateId, retiredTemplateId) = supportTask.Data switch
             {
                 ChangeNameRequestData data => (
                     data.EmailAddress,
                     isApproval
                         ? EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation
-                        : EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation),
+                        : EmailTemplateIds.GetAnIdentityChangeOfNameRejectedEmailConfirmation,
+                    isApproval ? null : RetiredEmailTemplateIds.ChangeOfNameRequestRejectedEmailConfirmation),
                 ChangeDateOfBirthRequestData data => (
                     data.EmailAddress,
                     isApproval
                         ? EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation
-                        : EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation),
-                _ => (null, null)
+                        : EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthRejectedEmailConfirmation,
+                    isApproval ? null : RetiredEmailTemplateIds.ChangeOfDateOfBirthRequestRejectedEmailConfirmation),
+                _ => (null, null, null)
             };
 
-            if (templateId is null)
+            if (currentTemplateId is null)
             {
                 continue;
             }
+
+            // A rejection from before the swap went out on the retired template. Only rejections have one, so
+            // this leaves approvals alone.
+            var sentBeforeTemplateChange = retiredTemplateId is not null && process.CreatedOn < RetiredEmailTemplateIds.RejectionTemplatesChangedOn;
+            var templateId = sentBeforeTemplateChange ? retiredTemplateId! : currentTemplateId;
+            var otherTemplateId = sentBeforeTemplateChange ? currentTemplateId : retiredTemplateId;
 
             // The address on the record may have changed since, so fall back to the one it held at the time
             // rather than whatever is on it now. A process that changed the person's details carries that
@@ -113,7 +123,10 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
                 continue;
             }
 
-            var email = emailMatcher.Match(templateId, emailAddress, process.CreatedOn);
+            // The email goes out from a background job, so a rejection either side of the swap could have had
+            // its email sent on the template from the other side of it.
+            var email = emailMatcher.Match(templateId, emailAddress, process.CreatedOn)
+                ?? (otherTemplateId is not null ? emailMatcher.Match(otherTemplateId, emailAddress, process.CreatedOn) : null);
 
             if (email is null)
             {
@@ -122,7 +135,11 @@ public class BackfillChangeRequestEmailSentEventsJob(TrsDbContext dbContext)
                     EmailId = Guid.NewGuid(),
                     TemplateId = templateId,
                     EmailAddress = emailAddress,
-                    Personalization = CreatePersonalization(firstName, isApproval ? null : supportTaskUpdatedEvent.RejectionReason),
+                    // The retired templates had no reason field, so a rejection from before the swap didn't
+                    // carry one.
+                    Personalization = CreatePersonalization(
+                        firstName,
+                        isApproval || sentBeforeTemplateChange ? null : supportTaskUpdatedEvent.RejectionReason),
                     SentOn = process.CreatedOn
                 };
 

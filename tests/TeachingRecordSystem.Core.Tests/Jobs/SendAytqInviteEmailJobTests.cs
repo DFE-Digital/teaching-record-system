@@ -57,16 +57,6 @@ public class SendAytqInviteEmailJobTests(JobFixture fixture) : JobTestBase(fixtu
         var updatedEmail = await WithDbContextAsync(dbContext => dbContext.Emails.SingleAsync(e => e.EmailId == email.EmailId));
         Assert.Equal(TimeProvider.UtcNow, updatedEmail.SentOn);
 
-        var events = await WithDbContextAsync(dbContext => dbContext.Events
-            .Where(e => e.EventName == nameof(LegacyEvents.EmailSentEvent))
-            .ToListAsync());
-
-        var legacyEmailSentEvent = events
-            .Select(e => (LegacyEvents.EmailSentEvent)e.ToEventBase())
-            .SingleOrDefault(e => e.Email.EmailId == email.EmailId);
-
-        Assert.NotNull(legacyEmailSentEvent);
-
         Events.AssertProcessesCreated(x =>
         {
             Assert.Equal(expectedProcessType, x.ProcessContext.ProcessType);
