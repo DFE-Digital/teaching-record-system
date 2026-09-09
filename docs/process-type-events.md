@@ -735,6 +735,13 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | --- | --- | --- |
 | `DqtContactInductionStatusChangedEvent` | Always | — |
 
+### `PersonMigratingFromDqt` (1)
+The one-off migration of person records from DQT into TRS. Back-filled from the legacy `PersonMigratedEvent`; nothing writes this type any more. The events were written straight into the `events` table by `CreatePersonMigratedEventsJob` and carried no `RaisedBy`, so the back-filled processes are attributed to the system user.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonMigratedEvent` | Always | — |
+
 ### `InductionMigratingFromDqt` (101)
 The one-off migration of induction from DQT onto the person record. Back-filled from the legacy `InductionMigratedEvent`; nothing writes this type any more.
 
