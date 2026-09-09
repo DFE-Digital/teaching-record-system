@@ -239,6 +239,11 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<RepairChangeRequestRejectionEmailsJob>(
+                nameof(RepairChangeRequestRejectionEmailsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.AddOrUpdate<BackfillTeacherPensionsSupportTaskProcessesJob>(
                 $"{nameof(BackfillTeacherPensionsSupportTaskProcessesJob)} (dry-run)",
                 job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
