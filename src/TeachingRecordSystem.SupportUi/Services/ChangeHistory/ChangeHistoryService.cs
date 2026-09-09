@@ -88,6 +88,7 @@ public class ChangeHistoryService(
             ProcessType.PersonReactivatingInDqt,
             ProcessType.PersonMergingInDqt,
             ProcessType.PersonMerging,
+            ProcessType.PersonUnmerging,
             ProcessType.PersonDeactivating,
             ProcessType.PersonReactivating,
             ProcessType.AlertCreating,

@@ -17,7 +17,8 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateImportCapitaFileCommand(configuration),
     Commands.CreateImportClaimTestDataCommand(configuration),
     Commands.CorrectQualificationStartDate(configuration),
-    Commands.CreateAppContentCommand(configuration)
+    Commands.CreateAppContentCommand(configuration),
+    Commands.CreatePersonCommand(configuration)
 };
 
 var parseResult = rootCommand.Parse(args);
