@@ -170,6 +170,7 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
     {
         modelBuilder.HasPostgresExtension("pg_trgm");
         modelBuilder.HasPostgresExtension("btree_gin");
+        modelBuilder.HasPostgresExtension("unaccent");
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsDbContext).Assembly);
 
