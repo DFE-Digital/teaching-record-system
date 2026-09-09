@@ -1,7 +1,7 @@
 using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
 namespace TeachingRecordSystem.Core.Services.WorkforceData;
 
@@ -9,7 +9,7 @@ public class TpsCsvExtractProcessor(
     IDbContextFactory<TrsDbContext> dbContextFactory,
     TimeProvider timeProvider)
 {
-    private const string TempEventsTableSuffix = "tps_extract_events";
+    private const string TempProcessesTableSuffix = "tps_extract";
 
     public async Task ProcessNonMatchingTrnsAsync(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
@@ -247,7 +247,7 @@ public class TpsCsvExtractProcessor(
             """;
 
         bool hasRecordsToUpdate = false;
-        var events = new List<EventBase>();
+        var processes = new List<Process>();
 
         do
         {
@@ -282,17 +282,15 @@ public class TpsCsvExtractProcessor(
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = item.PersonId,
-                    TpsEmployment = EventModels.TpsEmployment.FromModel(personEmployment),
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId
+                    TpsEmployment = EventModels.TpsEmployment.FromModel(personEmployment)
                 };
 
-                events.Add(createdEvent);
+                processes.Add(CreateProcess(ProcessType.TpsEmploymentCreating, createdEvent, timeProvider.UtcNow));
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
+            await transaction.SaveProcessesAsync(processes, TempProcessesTableSuffix, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
-            events.Clear();
+            processes.Clear();
         }
         while (hasRecordsToUpdate);
     }
@@ -419,7 +417,7 @@ public class TpsCsvExtractProcessor(
             """;
 
         bool hasRecordsToUpdate = false;
-        var events = new List<EventBase>();
+        var processes = new List<Process>();
 
         do
         {
@@ -483,18 +481,16 @@ public class TpsCsvExtractProcessor(
                             EmployerEmailAddress = item.CurrentEmployerEmailAddress,
                             Key = item.Key
                         },
-                        Changes = changes,
-                        CreatedUtc = timeProvider.UtcNow,
-                        RaisedBy = SystemUser.SystemUserId
+                        Changes = changes
                     };
 
-                    events.Add(updatedEvent);
+                    processes.Add(CreateProcess(ProcessType.TpsEmploymentUpdating, updatedEvent, timeProvider.UtcNow));
                 }
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
+            await transaction.SaveProcessesAsync(processes, TempProcessesTableSuffix, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
-            events.Clear();
+            processes.Clear();
         }
         while (hasRecordsToUpdate);
     }
@@ -597,7 +593,7 @@ public class TpsCsvExtractProcessor(
             """;
 
         bool hasRecordsToUpdate = false;
-        var events = new List<EventBase>();
+        var processes = new List<Process>();
 
         do
         {
@@ -647,17 +643,15 @@ public class TpsCsvExtractProcessor(
                         EmployerEmailAddress = item.EmployerEmailAddress,
                         Key = item.Key
                     },
-                    Changes = TpsEmploymentUpdatedEventChanges.EstablishmentId,
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId
+                    Changes = TpsEmploymentUpdatedEventChanges.EstablishmentId
                 };
 
-                events.Add(updatedEvent);
+                processes.Add(CreateProcess(ProcessType.TpsEmploymentUpdating, updatedEvent, timeProvider.UtcNow));
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
+            await transaction.SaveProcessesAsync(processes, TempProcessesTableSuffix, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
-            events.Clear();
+            processes.Clear();
         }
         while (hasRecordsToUpdate);
     }
@@ -714,7 +708,7 @@ public class TpsCsvExtractProcessor(
             """;
 
         bool hasRecordsToUpdate = false;
-        var events = new List<EventBase>();
+        var processes = new List<Process>();
 
         do
         {
@@ -764,17 +758,15 @@ public class TpsCsvExtractProcessor(
                         EmployerEmailAddress = item.EmployerEmailAddress,
                         Key = item.Key
                     },
-                    Changes = TpsEmploymentUpdatedEventChanges.EndDate,
-                    CreatedUtc = timeProvider.UtcNow,
-                    RaisedBy = SystemUser.SystemUserId
+                    Changes = TpsEmploymentUpdatedEventChanges.EndDate
                 };
 
-                events.Add(updatedEvent);
+                processes.Add(CreateProcess(ProcessType.TpsEmploymentUpdating, updatedEvent, timeProvider.UtcNow));
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken, 120);
+            await transaction.SaveProcessesAsync(processes, TempProcessesTableSuffix, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
-            events.Clear();
+            processes.Clear();
         }
         while (hasRecordsToUpdate);
     }
@@ -830,7 +822,7 @@ public class TpsCsvExtractProcessor(
             """;
 
         bool hasRecordsToUpdate = false;
-        var events = new List<EventBase>();
+        var processes = new List<Process>();
 
         do
         {
@@ -885,19 +877,51 @@ public class TpsCsvExtractProcessor(
                             EmployerEmailAddress = item.NewEmployerEmailAddress,
                             Key = item.Key
                         },
-                        Changes = changes,
-                        CreatedUtc = timeProvider.UtcNow,
-                        RaisedBy = SystemUser.SystemUserId
+                        Changes = changes
                     };
 
-                    events.Add(updatedEvent);
+                    processes.Add(CreateProcess(ProcessType.TpsEmploymentUpdating, updatedEvent, timeProvider.UtcNow));
                 }
             }
 
-            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, timeProvider, cancellationToken);
+            await transaction.SaveProcessesAsync(processes, TempProcessesTableSuffix, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
-            events.Clear();
+            processes.Clear();
         }
         while (hasRecordsToUpdate);
+    }
+
+    private static Process CreateProcess(ProcessType processType, IEvent @event, DateTime now)
+    {
+        var processId = Guid.NewGuid();
+
+        return new Process
+        {
+            ProcessId = processId,
+            ProcessType = processType,
+            CreatedOn = now,
+            UpdatedOn = now,
+            UserId = SystemUser.SystemUserId,
+            DqtUserId = null,
+            DqtUserName = null,
+            PersonIds = [.. @event.PersonIds],
+            OneLoginUserSubjects = [],
+            SupportTaskReferences = [],
+            ChangeReason = null,
+            Events =
+            [
+                new ProcessEvent
+                {
+                    ProcessEventId = @event.EventId,
+                    ProcessId = processId,
+                    EventName = @event.GetType().Name,
+                    Payload = @event,
+                    PersonIds = @event.PersonIds,
+                    OneLoginUserSubjects = @event.OneLoginUserSubjects,
+                    SupportTaskReferences = @event.SupportTaskReferences,
+                    CreatedOn = now
+                }
+            ]
+        };
     }
 }
