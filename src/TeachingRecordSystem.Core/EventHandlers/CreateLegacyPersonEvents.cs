@@ -4,38 +4,10 @@ using TeachingRecordSystem.Core.Events.ChangeReasons;
 namespace TeachingRecordSystem.Core.EventHandlers;
 
 public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
-    IEventHandler<PersonCreatedEvent>,
     IEventHandler<PersonDetailsUpdatedEvent>,
     IEventHandler<PersonDeactivatedEvent>,
     IEventHandler<PersonReactivatedEvent>
 {
-    public async Task HandleEventAsync(PersonCreatedEvent @event, ProcessContext processContext, IEventScope eventScope)
-    {
-        if (processContext.ProcessType is ProcessType.PersonCreating
-            or ProcessType.TeacherPensionsRecordImporting)
-        {
-            var changeReason = processContext.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
-
-            var legacyEvent = new LegacyEvents.PersonCreatedEvent
-            {
-                EventId = @event.EventId,
-                CreatedUtc = processContext.Now,
-                RaisedBy = processContext.Process.UserId!,
-                PersonId = @event.PersonId,
-                PersonAttributes = @event.Details,
-                CreateReason = changeReason?.Reason,
-                CreateReasonDetail = changeReason?.Details,
-                CreateAdditionalInformation = changeReason?.AdditionalInformation,
-                EvidenceFile = changeReason?.EvidenceFile,
-                TrnRequestMetadata = @event.TrnRequestMetadata
-            };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-    }
-
     public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
         if (processContext.ProcessType is ProcessType.PersonDetailsUpdating)
