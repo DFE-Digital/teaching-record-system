@@ -440,6 +440,81 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
     }
 
     [Fact]
+    public async Task UpdateLatestEstablishmentVersions_WithMoreEstablishmentChangesThanFitInASinglePage_UpdatesAllPersonEmploymentRecords()
+    {
+        // Arrange
+        // The la code and establishment number are randomised so that the records created by this test are the only ones
+        // in their (la code, establishment number) group; records left behind by previous runs stay pointed at their own
+        // group's latest establishment and so aren't picked up again.
+        var localAuthorityCode = Guid.NewGuid().ToString("N")[..3];
+        var establishmentNumber = Guid.NewGuid().ToString("N")[..4];
+        var person = await TestData.CreatePersonAsync();
+        var closedEstablishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: localAuthorityCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 2);
+        var openEstablishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: localAuthorityCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 1);
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var firstStartDate = new DateOnly(2020, 01, 01);
+        var employmentCount = 1001;  // The processor pages through the changes 1000 at a time
+
+        var tpsEmploymentIds = await WithDbContextAsync(async dbContext =>
+        {
+            var tpsEmployments = Enumerable.Range(0, employmentCount)
+                .Select(i =>
+                {
+                    var startDate = firstStartDate.AddDays(i);
+
+                    return new TpsEmployment
+                    {
+                        TpsEmploymentId = Guid.NewGuid(),
+                        PersonId = person.PersonId,
+                        EstablishmentId = closedEstablishment.EstablishmentId,
+                        StartDate = startDate,
+                        EndDate = null,
+                        EmploymentType = EmploymentType.FullTime,
+                        WithdrawalConfirmed = false,
+                        LastKnownTpsEmployedDate = startDate.AddMonths(1),
+                        LastExtractDate = new DateOnly(2024, 03, 25),
+                        NationalInsuranceNumber = nationalInsuranceNumber,
+                        PersonPostcode = personPostcode,
+                        PersonEmailAddress = null,
+                        EmployerPostcode = null,
+                        EmployerEmailAddress = null,
+                        CreatedOn = TimeProvider.GetUtcNow().UtcDateTime,
+                        UpdatedOn = TimeProvider.GetUtcNow().UtcDateTime,
+                        Key = $"{person.Trn}.{localAuthorityCode}.{establishmentNumber}.{startDate:yyyyMMdd}"
+                    };
+                })
+                .ToArray();
+
+            dbContext.TpsEmployments.AddRange(tpsEmployments);
+            await dbContext.SaveChangesAsync();
+
+            return tpsEmployments.Select(e => e.TpsEmploymentId).ToArray();
+        });
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            DbContextFactory,
+            TimeProvider);
+        await processor.UpdateLatestEstablishmentVersionsAsync(CancellationToken.None);
+
+        // Assert
+        using var dbContext = DbContextFactory.CreateDbContext();
+        var updatedPersonEmployments = await dbContext.TpsEmployments.Where(e => tpsEmploymentIds.Contains(e.TpsEmploymentId)).ToListAsync();
+        Assert.Equal(employmentCount, updatedPersonEmployments.Count);
+        Assert.All(updatedPersonEmployments, e => Assert.Equal(openEstablishment.EstablishmentId, e.EstablishmentId));
+
+        var updatedEvents = await dbContext.Events
+            .Where(e => e.EventName == nameof(LegacyEvents.TpsEmploymentUpdatedEvent) && e.PersonId == person.PersonId)
+            .ToListAsync();
+        var tpsEmploymentIdsWithUpdatedEvent = updatedEvents
+            .Select(e => (LegacyEvents.TpsEmploymentUpdatedEvent)e.ToEventBase())
+            .Select(e => e.TpsEmployment.PersonEmploymentId)
+            .ToHashSet();
+        Assert.All(tpsEmploymentIds, id => Assert.Contains(id, tpsEmploymentIdsWithUpdatedEvent));
+    }
+
+    [Fact]
     public async Task ProcessEndedEmployments_WithLastKnownEmployedDateGreaterThanThreeMonthsBeforeLastExtractDate_SetsEndDateOnPersonEmploymentRecord()
     {
         // Arrange
