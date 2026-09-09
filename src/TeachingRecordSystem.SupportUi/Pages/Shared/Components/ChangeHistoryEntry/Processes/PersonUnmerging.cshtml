@@ -1,0 +1,24 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
+@inject PersonInfoCache PersonInfoCache
+@model ChangeHistoryEntryViewModel
+@{
+    var unmergedEvent = Model.GetEvent<PersonUnmergedEvent>();
+
+    var unmergedPersonId = unmergedEvent.PersonId;
+    var unmergedFromPersonId = unmergedEvent.UnmergedFromPersonId;
+
+    var thisRecordWasUnmerged = Model.Context.ContextType is ChangeHistoryContextType.Person &&
+        Model.Context.PersonId == unmergedPersonId;
+
+    var unmergedPersonTrn = (await PersonInfoCache.GetPersonInfoAsync(unmergedPersonId))?.Trn;
+    var unmergedFromPersonTrn = (await PersonInfoCache.GetPersonInfoAsync(unmergedFromPersonId))?.Trn;
+
+    var title = thisRecordWasUnmerged
+        ? $"Record un-merged from TRN {unmergedFromPersonTrn} and reactivated"
+        : $"TRN {unmergedPersonTrn} un-merged from this record";
+}
+
+<timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+</timeline-entry>

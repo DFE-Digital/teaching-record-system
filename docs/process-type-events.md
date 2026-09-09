@@ -100,6 +100,17 @@ Merges from before the journey moved onto `PersonService` were back-filled from 
 [`BackfillPersonMergeProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonMergeProcessesJob.cs). Those
 processes carry the two person events but no `OneLoginUserUpdatedEvent`, which the legacy event never recorded.
 
+### `PersonUnmerging` (102)
+`trscli person unmerge`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonUnmergedEvent` | Always | — |
+
+The command only reverses the deactivation and the link back to the retained record. The details the merge copied onto
+the retained record and any One Login users it re-pointed are deliberately left alone, so no `PersonDetailsUpdatedEvent`
+or `OneLoginUserUpdatedEvent` is emitted.
+
 ### `TeacherPensionsRecordImporting` (28)
 [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs) (Teachers' Pensions import).
 

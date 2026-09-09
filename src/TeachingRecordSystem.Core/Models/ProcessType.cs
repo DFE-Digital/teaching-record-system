@@ -100,5 +100,6 @@ public enum ProcessType
     PersonInductionUpdating = 98,
     PersonCpdInductionUpdating = 99,
     PersonWelshInductionUpdating = 100,
-    InductionMigratingFromDqt = 101
+    InductionMigratingFromDqt = 101,
+    PersonUnmerging = 102
 }
