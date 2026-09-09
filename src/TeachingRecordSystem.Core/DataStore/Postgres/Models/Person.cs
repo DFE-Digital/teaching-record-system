@@ -71,36 +71,6 @@ public class Person
     public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
     public DateOnly? DateOfDeath { get; set; }
 
-    public void SetStatus(
-        PersonStatus targetStatus,
-        string? reason,
-        string? reasonDetail,
-        string? additionalInformation,
-        EventModels.File? evidenceFile,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        out LegacyEvents.PersonStatusUpdatedEvent @event)
-    {
-        var oldStatus = Status;
-        Status = targetStatus;
-        UpdatedOn = now;
-
-        @event = new()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Status = Status,
-            OldStatus = oldStatus,
-            Reason = reason,
-            ReasonDetail = reasonDetail,
-            EvidenceFile = evidenceFile,
-            DateOfDeath = null,
-            AdditionalInformation = additionalInformation
-        };
-    }
-
     public bool SetCpdInductionStatus(
         InductionStatus status,
         DateOnly? startDate,

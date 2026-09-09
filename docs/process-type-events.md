@@ -38,7 +38,8 @@ API `SetPii`; Support UI *Edit details*.
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when at least one detail actually changes. |
 
 ### `PersonDeactivating` (26)
-Support UI *Set status → deactivate*.
+Support UI *Set status → deactivate*; [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs)
+when the imported Teachers' Pensions row carries a date of death.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
@@ -50,6 +51,13 @@ Support UI *Set status → reactivate*.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `PersonReactivatedEvent` | Always | — |
+
+Status changes from before these journeys moved onto `PersonService` were back-filled from the legacy
+`PersonStatusUpdatedEvent`s by
+[`BackfillPersonStatusProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonStatusProcessesJob.cs), which
+picks the process type from the status the legacy event recorded. Those processes carry the reason, reason details,
+additional information and evidence on the process `ChangeReason`. A back-filled `PersonReactivatedEvent` only ever
+flags `PersonStatus`, because the legacy event never recorded the date of death the reactivation cleared.
 
 ### `PersonInductionUpdating` (98)
 Support UI *Edit induction*. The two systems that drive induction themselves get their own types below, so this one is a support user changing the record by hand.

@@ -1,0 +1,37 @@
+@using TeachingRecordSystem.Core.Events.ChangeReasons
+@model ChangeHistoryEntryViewModel
+@{
+    var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+}
+
+<timeline-entry title="Record reactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+        <govuk-details-summary>Reason for reactivation</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <row>
+                    <key>Reason</key>
+                    <value data-testid="reason" use-empty-fallback>@changeReason?.Reason</value>
+                </row>
+                <row>
+                    <key>Reason details</key>
+                    <value data-testid="reason-detail" use-empty-fallback>
+                        @Html.ConvertNewlinesToLineBreaks(changeReason?.Details)
+                    </value>
+                </row>
+                <row>
+                    <key>Additional information</key>
+                    <value data-testid="additional-information" use-empty-fallback>
+                        @Html.ConvertNewlinesToLineBreaks(changeReason?.AdditionalInformation)
+                    </value>
+                </row>
+                <row>
+                    <key>Evidence</key>
+                    <value data-testid="evidence">
+                        <vc:event-evidence-file-link evidence-file="@changeReason?.EvidenceFile" />
+                    </value>
+                </row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</timeline-entry>

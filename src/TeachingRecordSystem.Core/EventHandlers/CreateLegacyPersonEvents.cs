@@ -4,9 +4,7 @@ using TeachingRecordSystem.Core.Events.ChangeReasons;
 namespace TeachingRecordSystem.Core.EventHandlers;
 
 public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
-    IEventHandler<PersonDetailsUpdatedEvent>,
-    IEventHandler<PersonDeactivatedEvent>,
-    IEventHandler<PersonReactivatedEvent>
+    IEventHandler<PersonDetailsUpdatedEvent>
 {
     public async Task HandleEventAsync(PersonDetailsUpdatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
@@ -28,60 +26,6 @@ public class CreateLegacyPersonEvents(TrsDbContext dbContext) :
                 DetailsChangeReason = changeReason?.Reason,
                 DetailsChangeReasonDetail = changeReason?.Details,
                 DetailsChangeEvidenceFile = changeReason?.EvidenceFile
-            };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-    }
-
-    public async Task HandleEventAsync(PersonDeactivatedEvent @event, ProcessContext processContext, IEventScope eventScope)
-    {
-        if (processContext.ProcessType is ProcessType.PersonDeactivating)
-        {
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
-
-            var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
-            {
-                EventId = @event.EventId,
-                CreatedUtc = processContext.Now,
-                RaisedBy = processContext.Process.UserId!,
-                PersonId = @event.PersonId,
-                OldStatus = PersonStatus.Active,
-                Status = PersonStatus.Deactivated,
-                DateOfDeath = @event.DateOfDeath,
-                Reason = changeReason.Reason,
-                ReasonDetail = changeReason.Details,
-                EvidenceFile = changeReason.EvidenceFile,
-                AdditionalInformation = changeReason.AdditionalInformation
-            };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-    }
-
-    public async Task HandleEventAsync(PersonReactivatedEvent @event, ProcessContext processContext, IEventScope eventScope)
-    {
-        if (processContext.ProcessType is ProcessType.PersonReactivating)
-        {
-            var changeReason = (ChangeReasonWithDetailsAndEvidence)processContext.Process.ChangeReason!;
-
-            var legacyEvent = new LegacyEvents.PersonStatusUpdatedEvent
-            {
-                EventId = @event.EventId,
-                CreatedUtc = processContext.Now,
-                RaisedBy = processContext.Process.UserId!,
-                PersonId = @event.PersonId,
-                OldStatus = PersonStatus.Deactivated,
-                Status = PersonStatus.Active,
-                DateOfDeath = null,
-                Reason = changeReason.Reason,
-                ReasonDetail = changeReason.Details,
-                EvidenceFile = changeReason.EvidenceFile,
-                AdditionalInformation = changeReason.AdditionalInformation
             };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);
