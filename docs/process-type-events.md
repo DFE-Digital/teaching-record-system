@@ -29,6 +29,19 @@ Support UI *Add person*.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `PersonCreatedEvent` | Always | — |
+| `EmailSentEvent` | Sometimes | Back-filled only, onto the 45 overseas NPQ TRN allocations described below. *Add person* sends no email. |
+
+45 of these processes did not come from *Add person*. They are the person creations from the since-removed
+`AllocateTrnsToOverseasNpqApplicantsJob`, re-typed here from `TeacherPensionsRecordImporting` (28) by
+[`RepairOverseasNpqPersonCreationProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/RepairOverseasNpqPersonCreationProcessesJob.cs);
+that job's note explains why. They carry no `ChangeReason`, so the "Reason for creating record" block on their
+change history entry is empty.
+
+[`BackfillOverseasNpqTrnEmailSentEventsJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillOverseasNpqTrnEmailSentEventsJob.cs)
+attaches that run's 'TRN generated for NPQ' emails to them, since the allocation put the TRN on the record at
+the moment the record was created. The back-filled `EmailSentEvent` points at the `emails` row the send
+actually used — matched exactly on the TRN in the email's personalization, not on template and address — so it
+carries the real address, personalization and `SentOn`.
 
 ### `PersonDetailsUpdating` (25)
 API `SetPii`; Support UI *Edit details*.
@@ -118,6 +131,16 @@ or `OneLoginUserUpdatedEvent` is emitted.
 | --- | --- | --- |
 | `PersonCreatedEvent` | Sometimes | The imported TPS record does not already exist in TRS, so a new person is created. |
 | `SupportTaskCreatedEvent` | Sometimes | The newly created person potentially matches an existing record (a `TeacherPensionsPotentialDuplicate` task). |
+
+45 processes of this type were not Teachers' Pensions imports at all. They were created by the since-removed
+`AllocateTrnsToOverseasNpqApplicantsJob` on 2025-11-06, which allocated TRNs to overseas NPQ applicants and
+recorded a legacy `PersonCreatedEvent` with no process; something later back-filled those events onto
+per-person processes and typed them `TeacherPensionsRecordImporting`, so the people involved showed a
+"Record imported from Teachers' Pensions" entry for a record that arrived by a different route.
+[`RepairOverseasNpqPersonCreationProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/RepairOverseasNpqPersonCreationProcessesJob.cs)
+re-types them to `PersonCreating` (24), keyed on a signature a real import cannot produce: raised by the
+system user rather than the Capita Teachers' Pensions user, holding a `PersonCreatedEvent` alone, for a
+person not stamped `created_by_tps`.
 
 ---
 
@@ -626,7 +649,7 @@ The tables below describe what those processes hold.
 | `TrnRequestUpdatedEvent` | Always | — |
 | `PersonCreatedEvent` | Sometimes | The support user chooses to create a new record. |
 | `PersonDetailsUpdatedEvent` | Sometimes | The support user merges into an existing record and updates its attributes. |
-| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. Only ever on a process the journey created — the email was introduced after the journey was already running as a process, so the back-filled ones never have one. |
+| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. Only ever on a process the journey created — the email was introduced after the journey was already running as a process, so the back-filled ones never have one. The same template was also sent by the bulk overseas NPQ TRN allocation; those sends belong to a person creation elsewhere, and are covered under `PersonCreating` (24). |
 
 ### `NpqTrnRequestRejecting` (19)
 
