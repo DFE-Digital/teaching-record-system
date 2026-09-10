@@ -142,6 +142,27 @@ re-types them to `PersonCreating` (24), keyed on a signature a real import canno
 system user rather than the Capita Teachers' Pensions user, holding a `PersonCreatedEvent` alone, for a
 person not stamped `created_by_tps`.
 
+### `TpsEmploymentCreating` (103)
+[`TpsCsvExtractProcessor`](../src/TeachingRecordSystem.Core/Services/WorkforceData/TpsCsvExtractProcessor.cs)
+(the monthly Teachers' Pensions workforce data extract), one process per employment record it creates.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TpsEmploymentCreatedEvent` | Always | — |
+
+### `TpsEmploymentUpdating` (104)
+[`TpsCsvExtractProcessor`](../src/TeachingRecordSystem.Core/Services/WorkforceData/TpsCsvExtractProcessor.cs),
+one process per employment record it changes — from the extract itself, from an establishment or end date being
+re-derived, or from the employer email address back-fill.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TpsEmploymentUpdatedEvent` | Always | — |
+
+Employment records changed before the extract processor moved onto processes were back-filled from the legacy
+`TpsEmploymentCreatedEvent`s and `TpsEmploymentUpdatedEvent`s by
+[`BackfillTpsEmploymentProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTpsEmploymentProcessesJob.cs).
+
 ---
 
 ## TRN requests

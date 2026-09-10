@@ -379,6 +379,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillTpsEmploymentProcessesJob>(
+                nameof(BackfillTpsEmploymentProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("BackfillSupportTasksInReportingDb");
 
             recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob (dry-run)");
