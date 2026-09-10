@@ -38,11 +38,14 @@
     var oldNino = NationalInsuranceNumber.TryParse(oldDetails?.NationalInsuranceNumber, out var oldParsedNino) ? oldParsedNino.ToDisplayString() : oldDetails?.NationalInsuranceNumber;
 
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
+
+    // The attribute changes belong to the retained record, so they're not shown on the deactivated one; a merge that
+    // left the retained record's details alone has no rows to show at all.
+    var showDetailChanges = !thisRecordWasDeactivated && changes != PersonDetailsUpdatedEventChanges.None;
 }
 
 <timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @* The attribute changes belong to the retained record, so they're not shown on the deactivated one. *@
-    @if (!thisRecordWasDeactivated)
+    @if (showDetailChanges)
     {
         <div data-testid="details">
             <govuk-summary-list>
@@ -106,7 +109,7 @@
         </govuk-details>
     }
 
-    @if (!thisRecordWasDeactivated)
+    @if (showDetailChanges)
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
             <govuk-details-summary>Previous data</govuk-details-summary>

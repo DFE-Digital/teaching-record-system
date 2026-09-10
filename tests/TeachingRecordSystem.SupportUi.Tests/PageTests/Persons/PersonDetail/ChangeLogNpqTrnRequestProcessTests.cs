@@ -228,7 +228,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
         Assert.NotNull(item);
 
         // Creating a record isn't a change to an existing one, so there's nothing to show as changed or previous.
-        item.AssertSummaryListRowDoesNotExist("details", "Name");
+        Assert.Null(item.GetElementByTestId("details"));
         Assert.Null(item.GetElementByTestId("previous-details"));
 
         item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(RecordCreatedReason, v.TrimmedText()));
@@ -272,7 +272,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
 
-        item.AssertSummaryListRowDoesNotExist("details", "Name");
+        Assert.Null(item.GetElementByTestId("details"));
         Assert.Null(item.GetElementByTestId("previous-details"));
 
         item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(RecordMergedReason, v.TrimmedText()));

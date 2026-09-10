@@ -22,6 +22,8 @@
     var requestDataName = string.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
     var requestDataPreviousName = string.JoinNonEmpty(' ', requestData.PreviousFirstName, requestData.PreviousLastName);
 
+    // A resolution that didn't change any of the record's attributes has no rows to list.
+    var displayedChanges = updatedEvent.Changes & ApiTrnRequestSupportTaskUpdatedEventChanges.AllChanges;
 }
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">
     <div class="moj-timeline__header">
@@ -32,40 +34,43 @@
         <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedGmtTimestamp</time>
     </p>
     <div class="moj-timeline__description">
-        <div data-testid="details">
-            <govuk-summary-list>
-                @if (updatedEvent.Changes.HasAnyFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNameChange)) {
-                    <row>
-                        <key>Name</key>
-                        <value use-empty-fallback>@name</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth)) {
-                    <row>
-                        <key>Date of birth</key>
-                        <value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress)) {
-                    <row>
-                        <key>Email address</key>
-                        <value use-empty-fallback>@attributes.EmailAddress</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber)) {
-                    <row>
-                        <key>National Insurance number</key>
-                        <value use-empty-fallback>@attributes.NationalInsuranceNumber</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender)) {
-                    <row>
-                        <key>Gender</key>
-                        <value use-empty-fallback>@attributes.Gender?.GetDisplayName()</value>
-                    </row>
-                }
-            </govuk-summary-list>
-        </div>
+        @if (displayedChanges != ApiTrnRequestSupportTaskUpdatedEventChanges.None)
+        {
+            <div data-testid="details">
+                <govuk-summary-list>
+                    @if (updatedEvent.Changes.HasAnyFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNameChange)) {
+                        <row>
+                            <key>Name</key>
+                            <value use-empty-fallback>@name</value>
+                        </row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth)) {
+                        <row>
+                            <key>Date of birth</key>
+                            <value use-empty-fallback>@attributes.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                        </row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress)) {
+                        <row>
+                            <key>Email address</key>
+                            <value use-empty-fallback>@attributes.EmailAddress</value>
+                        </row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber)) {
+                        <row>
+                            <key>National Insurance number</key>
+                            <value use-empty-fallback>@attributes.NationalInsuranceNumber</value>
+                        </row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender)) {
+                        <row>
+                            <key>Gender</key>
+                            <value use-empty-fallback>@attributes.Gender?.GetDisplayName()</value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </div>
+        }
 
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
             <govuk-details-summary>Reason for change</govuk-details-summary>
@@ -140,7 +145,7 @@
             </govuk-details-text>
         </govuk-details>
 
-        @if (oldAttributes != null)
+        @if (oldAttributes != null && displayedChanges != ApiTrnRequestSupportTaskUpdatedEventChanges.None)
         {
             <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
                 <govuk-details-summary>Previous details</govuk-details-summary>

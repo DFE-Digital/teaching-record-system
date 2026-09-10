@@ -36,6 +36,20 @@ public class PersonMergingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
     }
 
     [Fact]
+    public async Task WithoutDetailsChanges_OmitsDetails()
+    {
+        // Arrange
+        var (retainedPerson, _, process) = await CreateMergeAsync(withDetailsUpdate: false);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, retainedPerson.PersonId);
+
+        // Assert
+        Assert.Null(entry.GetElementByTestId("details"));
+        Assert.Null(entry.GetElementByTestId("previous-details"));
+    }
+
+    [Fact]
     public async Task ProcessRendersInOneLoginContext()
     {
         // A merge that re-points a One Login user puts the process on that user's change history, where there's
@@ -54,12 +68,37 @@ public class PersonMergingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         AssertTitle(entry, $"Record merged with TRN {deactivatedPerson.Trn}");
     }
 
-    private async Task<(Person RetainedPerson, Person DeactivatedPerson, Process Process)> CreateMergeAsync()
+    private async Task<(Person RetainedPerson, Person DeactivatedPerson, Process Process)> CreateMergeAsync(
+        bool withDetailsUpdate = true)
     {
         var user = await TestData.CreateUserAsync();
         var retainedPerson = await TestData.CreatePersonAsync();
         var deactivatedPerson = await TestData.CreatePersonAsync();
         var newLastName = TestData.GenerateChangedLastName(retainedPerson.LastName);
+
+        List<IEvent> events =
+        [
+            new PersonDeactivatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = deactivatedPerson.PersonId,
+                MergedWithPersonId = retainedPerson.PersonId,
+                Changes = PersonDeactivatedEventChanges.MergedWithPersonId,
+                DateOfDeath = null
+            }
+        ];
+
+        if (withDetailsUpdate)
+        {
+            events.Add(new PersonDetailsUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = retainedPerson.PersonId,
+                PersonDetails = CreatePersonDetails(retainedPerson.FirstName, retainedPerson.MiddleName, newLastName, retainedPerson.DateOfBirth),
+                OldPersonDetails = CreatePersonDetails(retainedPerson.FirstName, retainedPerson.MiddleName, retainedPerson.LastName, retainedPerson.DateOfBirth),
+                Changes = PersonDetailsUpdatedEventChanges.LastName
+            });
+        }
 
         var process = await TestData.CreateProcessAsync(
             ProcessType.PersonMerging,
@@ -71,22 +110,7 @@ public class PersonMergingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
                 EvidenceFile = null,
                 AdditionalInformation = null
             },
-            new PersonDeactivatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = deactivatedPerson.PersonId,
-                MergedWithPersonId = retainedPerson.PersonId,
-                Changes = PersonDeactivatedEventChanges.MergedWithPersonId,
-                DateOfDeath = null
-            },
-            new PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = retainedPerson.PersonId,
-                PersonDetails = CreatePersonDetails(retainedPerson.FirstName, retainedPerson.MiddleName, newLastName, retainedPerson.DateOfBirth),
-                OldPersonDetails = CreatePersonDetails(retainedPerson.FirstName, retainedPerson.MiddleName, retainedPerson.LastName, retainedPerson.DateOfBirth),
-                Changes = PersonDetailsUpdatedEventChanges.LastName
-            });
+            events.ToArray());
 
         return (retainedPerson, deactivatedPerson, process);
     }

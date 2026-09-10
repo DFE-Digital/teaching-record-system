@@ -48,45 +48,49 @@
 }
 
 <timeline-entry title="@title" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    <div data-testid="details">
-        <govuk-summary-list>
-            @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
-            {
-                <row>
-                    <key>Name</key>
-                    <value use-empty-fallback>@name</value>
-                </row>
-            }
-            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
-            {
-                <row>
-                    <key>Date of birth</key>
-                    <value use-empty-fallback>@attributes!.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
-            {
-                <row>
-                    <key>Email address</key>
-                    <value use-empty-fallback>@attributes!.EmailAddress</value>
-                </row>
-            }
-            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
-            {
-                <row>
-                    <key>National Insurance number</key>
-                    <value use-empty-fallback>@attributes!.NationalInsuranceNumber</value>
-                </row>
-            }
-            @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
-            {
-                <row>
-                    <key>Gender</key>
-                    <value use-empty-fallback>@attributes!.Gender?.GetDisplayName()</value>
-                </row>
-            }
-        </govuk-summary-list>
-    </div>
+    @* A record created from the request has no details updated event, so there are no changed attributes to list. *@
+    @if (changes != PersonDetailsUpdatedEventChanges.None)
+    {
+        <div data-testid="details">
+            <govuk-summary-list>
+                @if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                {
+                    <row>
+                        <key>Name</key>
+                        <value use-empty-fallback>@name</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+                {
+                    <row>
+                        <key>Date of birth</key>
+                        <value use-empty-fallback>@attributes!.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+                {
+                    <row>
+                        <key>Email address</key>
+                        <value use-empty-fallback>@attributes!.EmailAddress</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+                {
+                    <row>
+                        <key>National Insurance number</key>
+                        <value use-empty-fallback>@attributes!.NationalInsuranceNumber</value>
+                    </row>
+                }
+                @if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
+                {
+                    <row>
+                        <key>Gender</key>
+                        <value use-empty-fallback>@attributes!.Gender?.GetDisplayName()</value>
+                    </row>
+                }
+            </govuk-summary-list>
+        </div>
+    }
 
     <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
         <govuk-details-summary>@changeReasonHeading</govuk-details-summary>
