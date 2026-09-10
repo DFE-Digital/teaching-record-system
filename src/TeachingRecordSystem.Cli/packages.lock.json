@@ -635,29 +635,29 @@
       },
       "OpenIddict.Abstractions": {
         "type": "Transitive",
-        "resolved": "7.6.1",
-        "contentHash": "UXUGk6rQmHK8rRPvLL4Af6o22rc+moUtpPvGmtp61FCu/cSqLUY+O9aQMiiuY1aRHFPBHyWJH6ZhcD7ixAIxUg==",
+        "resolved": "7.7.0",
+        "contentHash": "wNqOO+Yftp9X7ytlD1d3i/Z3WiAHNH7CNs+spHnnvxWBy0PadnR+m4gMr2d87aB0mXZlkC9Kc71B5uw+C1aceQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
-          "Microsoft.Extensions.Primitives": "10.0.10",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.11",
+          "Microsoft.Extensions.Primitives": "10.0.11",
           "Microsoft.IdentityModel.Tokens": "8.19.2"
         }
       },
       "OpenIddict.Core": {
         "type": "Transitive",
-        "resolved": "7.6.1",
-        "contentHash": "/ucKlp5Fw4zGF/VwdPLdPGpbPwiApBIl6lFR/92vjz0QJ6AdDFlFpsxTx+Ltjp66RIO1/VbayDGRjA9KIubrCw==",
+        "resolved": "7.7.0",
+        "contentHash": "2U0hu/on1TnrWqwMnjIpEM870nRKmWW3WzaF+6ProG494DW7bnvBD/4wGjN1iIld5aTWplK+gT+5WTU7MYWjLQ==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "10.0.10",
-          "Microsoft.Extensions.Logging": "10.0.10",
-          "Microsoft.Extensions.Options": "10.0.10",
-          "OpenIddict.Abstractions": "7.6.1"
+          "Microsoft.Extensions.Caching.Memory": "10.0.11",
+          "Microsoft.Extensions.Logging": "10.0.11",
+          "Microsoft.Extensions.Options": "10.0.11",
+          "OpenIddict.Abstractions": "7.7.0"
         }
       },
       "OpenIddict.EntityFrameworkCore.Models": {
         "type": "Transitive",
-        "resolved": "7.6.1",
-        "contentHash": "K7QcWqI/CnBdgc3VdCWiaHbCzOOknRyL+mW6KAv1rWTkd3Fs31555XG1gWO7gFX01pdR+DaUWNHkZP0hV0L4xw=="
+        "resolved": "7.7.0",
+        "contentHash": "Ios00zCukWvrCifpY0DO1lrVCpDpUYq3YdHwQNgjdFpLqiQFgWBwH/KnmXKv5hL6Frhpf9qEhX0lnRPzCbCSEQ=="
       },
       "StructuredFieldValues": {
         "type": "Transitive",
@@ -809,7 +809,7 @@
           "Npgsql.DependencyInjection": "[10.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
           "OneOf": "[3.0.271, )",
-          "OpenIddict.EntityFrameworkCore": "[7.6.1, )",
+          "OpenIddict.EntityFrameworkCore": "[7.7.0, )",
           "Optional": "[4.0.0, )",
           "Polly.Core": "[8.7.0, )",
           "Scrutor": "[7.0.0, )",
@@ -1235,13 +1235,13 @@
       },
       "OpenIddict.EntityFrameworkCore": {
         "type": "CentralTransitive",
-        "requested": "[7.6.1, )",
-        "resolved": "7.6.1",
-        "contentHash": "OAUbs0ca9R0nf/SlAoM+FGeYSZf2oIqIEky/aNQ+Pg6BGaasG+c8ax2cwPoIcNIaARHJLyjMMGZ8/YTq53PTjA==",
+        "requested": "[7.7.0, )",
+        "resolved": "7.7.0",
+        "contentHash": "8XlJJccN0JmBr/8UpZPD3gKqASe+1oovO9LPGUaLvmExM1Dcb/2TDf2G8/rG01GbJj0WPQlSdlEWsjfQxgB7Mw==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.10",
-          "OpenIddict.Core": "7.6.1",
-          "OpenIddict.EntityFrameworkCore.Models": "7.6.1"
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.11",
+          "OpenIddict.Core": "7.7.0",
+          "OpenIddict.EntityFrameworkCore.Models": "7.7.0"
         }
       },
       "Optional": {
