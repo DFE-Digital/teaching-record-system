@@ -606,6 +606,7 @@ public class TpsCsvExtractProcessor(
             dbContext.Database.UseTransaction(transaction);
             await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEstablishment>(querySql).AsAsyncEnumerable())
             {
+                hasRecordsToUpdate = true;
                 var updatedEvent = new TpsEmploymentUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
