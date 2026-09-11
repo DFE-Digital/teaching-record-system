@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.ApiSchema.V3;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Infrastructure.Json;
@@ -126,6 +127,42 @@ public class WebhookMessageFactory(
 
             return wrappedMapper.MapEventAsync(@event);
         }
+    }
+
+    // Creates a message that isn't tied to a domain event, so it can be sent to a specific endpoint on demand
+    // (e.g. to let an integrator test their signature verification without triggering a 'real' event).
+    public async Task<WebhookMessage> CreatePingMessageAsync(Guid webhookEndpointId)
+    {
+        var endpoint = await dbContext.WebhookEndpoints
+            .SingleAsync(e => e.WebhookEndpointId == webhookEndpointId);
+
+        var data = new PingNotification { PingId = Guid.NewGuid() };
+        var serializedPayload = JsonSerializer.SerializeToElement(data, _serializerOptions);
+
+        var id = Guid.NewGuid();
+
+        var message = new WebhookMessage
+        {
+            WebhookMessageId = id,
+            WebhookEndpointId = endpoint.WebhookEndpointId,
+            CloudEventId = id.ToString(),
+            CloudEventType = PingNotification.CloudEventType,
+            Timestamp = timeProvider.UtcNow,
+            ApiVersion = endpoint.ApiVersion,
+            Data = serializedPayload,
+            NextDeliveryAttempt = timeProvider.UtcNow,
+            Delivered = null,
+            DeliveryAttempts = [],
+            DeliveryErrors = []
+        };
+
+        dbContext.WebhookMessages.Add(message);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.Entry(message).State = EntityState.Detached;
+        message.WebhookEndpoint = endpoint;
+
+        return message;
     }
 
     private interface IEventMapper

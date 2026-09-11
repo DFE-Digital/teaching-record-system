@@ -86,6 +86,7 @@ public sealed class HostFixture : InitializeDbFixture
     public TimeProvider TimeProvider { get; }
     public TestData TestData { get; }
     public WebhookMessageRecorder WebhookMessageRecorder { get; }
+    public Guid WebhookEndpointId { get; private set; }
 
     public override async ValueTask InitializeAsync()
     {
@@ -212,9 +213,11 @@ public sealed class HostFixture : InitializeDbFixture
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
+        WebhookEndpointId = Guid.NewGuid();
+
         dbContext.WebhookEndpoints.Add(new Core.DataStore.Postgres.Models.WebhookEndpoint
         {
-            WebhookEndpointId = Guid.NewGuid(),
+            WebhookEndpointId = WebhookEndpointId,
             ApplicationUserId = DeferredRecordMatchingPolicyApplicationUserId,
             Address = _webhookReceiver.FullyQualifiedEndpoint,
             ApiVersion = VersionRegistry.V3MinorVersions.V20260416,
@@ -225,6 +228,26 @@ public sealed class HostFixture : InitializeDbFixture
         });
 
         await dbContext.SaveChangesAsync();
+    }
+
+    // Creates a ping message for the seeded webhook receiver endpoint and drives it through the real
+    // WebhookDeliveryService queue-processing logic, so the ping message follows exactly the same path
+    // it would in the Worker app, up to and including delivery to the receiving endpoint.
+    public async Task SendPingMessageAsync()
+    {
+        using var scope = ApiHostServices.CreateScope();
+
+        var webhookMessageFactory = scope.ServiceProvider.GetRequiredService<WebhookMessageFactory>();
+        await webhookMessageFactory.CreatePingMessageAsync(WebhookEndpointId);
+
+        var webhookDeliveryService = scope.ServiceProvider.GetRequiredService<WebhookDeliveryService>();
+
+        WebhookDeliveryService.SendMessagesResult result;
+        do
+        {
+            result = await webhookDeliveryService.SendMessagesAsync();
+        }
+        while (result.MoreRecords);
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -249,6 +272,10 @@ public sealed class HostFixture : InitializeDbFixture
         });
 
         WebhookSender.Register(services);
+
+        // Register WebhookDeliveryService as a plain singleton (not as an IHostedService) so tests can resolve
+        // it and invoke SendMessagesAsync() directly on demand, rather than waiting for its background timer.
+        services.AddSingleton<WebhookDeliveryService>();
 
         // Replace CreateWebhookMessages with SendWebhookMessagesEventHandler;
         // we want to dispatch webhook messages immediately instead of queueing them
