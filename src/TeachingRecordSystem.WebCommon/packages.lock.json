@@ -150,21 +150,21 @@
       },
       "NSign.Client": {
         "type": "Direct",
-        "requested": "[1.2.4, )",
-        "resolved": "1.2.4",
-        "contentHash": "KEtltC11s8EXRGfAomu1dzUwzMEZ5mC0ZkwVBH5BE3jNZig+z5UpTxGBmDblSDcOmkPwgZd2+ZKT1jbYH2l0QQ==",
+        "requested": "[1.2.5, )",
+        "resolved": "1.2.5",
+        "contentHash": "d2iB3v7iLPgbWV9YnBBIjHYNrMTuIJO3A83wqOvTRPNKv8iCNJQOExiGcx23I1H7dOLD8F7ZeMpsfJdK0jULwg==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.4",
+          "NSign.Abstractions": "1.2.5",
           "StructuredFieldValues": "0.7.7"
         }
       },
       "NSign.SignatureProviders": {
         "type": "Direct",
-        "requested": "[1.2.4, )",
-        "resolved": "1.2.4",
-        "contentHash": "ElFmVZ6gpN1wo+l6rI7vd2gT2E25baWHZ9glILidYoa/xmDvYD7HvXc/wKSjG4DbL6zfJLidyzwo4TBWYfF3Mg==",
+        "requested": "[1.2.5, )",
+        "resolved": "1.2.5",
+        "contentHash": "E4Y5rv3ARtkEmIkgNVxEjet46EMZkALIVieSK7qJShRTYu99WC32UVHW8gonnTGFFkAK5XQ0nYhFX/5mD/iSuA==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.4"
+          "NSign.Abstractions": "1.2.5"
         }
       },
       "OpenIddict.EntityFrameworkCore": {
@@ -584,8 +584,8 @@
       },
       "NSign.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.2.4",
-        "contentHash": "7u+Rvo1DeHoRo7+KUD4IrsjK30miSd9gYEcwXL30T5NPXxeN/NIFTzdrNljCMl9o87eZ5SkgnDuDbDfl0OKRYQ==",
+        "resolved": "1.2.5",
+        "contentHash": "NAjUnMYxKBR/Bj3m5WfcA6DQXWBnoVlKpmEuSyY44+kFXxLnw20ZrLZXNGavLs7eG4DuhTl8On8Gd6VYIOSg1g==",
         "dependencies": {
           "StructuredFieldValues": "0.7.7"
         }
@@ -786,8 +786,8 @@
           "Microsoft.EntityFrameworkCore.InMemory": "[10.0.11, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.11, )",
           "Microsoft.Extensions.Azure": "[1.14.1, )",
-          "NSign.Client": "[1.2.4, )",
-          "NSign.SignatureProviders": "[1.2.4, )",
+          "NSign.Client": "[1.2.5, )",
+          "NSign.SignatureProviders": "[1.2.5, )",
           "Npgsql.DependencyInjection": "[10.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
           "OneOf": "[3.0.271, )",

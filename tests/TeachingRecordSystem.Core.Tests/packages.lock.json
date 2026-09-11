@@ -42,11 +42,11 @@
       },
       "NSign.AspNetCore": {
         "type": "Direct",
-        "requested": "[1.2.4, )",
-        "resolved": "1.2.4",
-        "contentHash": "o0Bc9WEkkwepz+seeo5SlCpkPabQVxPEuPTA52wIvd4U3YnsJTSyZtrolfZRvWIM8Yk4VvZZAEvPHCaY9QKeqg==",
+        "requested": "[1.2.5, )",
+        "resolved": "1.2.5",
+        "contentHash": "jD2yygrzcHBYkEygfi91/87CAiIgkRN50yWqHKez5bOBr7u51sKZrKAEtAv3zMS0IaplZTBzPXhCITLj2P5TpA==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.4",
+          "NSign.Abstractions": "1.2.5",
           "StructuredFieldValues": "0.7.7"
         }
       },
@@ -782,12 +782,12 @@
       },
       "NSign.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.2.4",
-        "contentHash": "7u+Rvo1DeHoRo7+KUD4IrsjK30miSd9gYEcwXL30T5NPXxeN/NIFTzdrNljCMl9o87eZ5SkgnDuDbDfl0OKRYQ==",
+        "resolved": "1.2.5",
+        "contentHash": "NAjUnMYxKBR/Bj3m5WfcA6DQXWBnoVlKpmEuSyY44+kFXxLnw20ZrLZXNGavLs7eG4DuhTl8On8Gd6VYIOSg1g==",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.8",
-          "Microsoft.Extensions.Options": "10.0.8",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.8",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.11",
+          "Microsoft.Extensions.Options": "10.0.11",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.11",
           "StructuredFieldValues": "0.7.7"
         }
       },
