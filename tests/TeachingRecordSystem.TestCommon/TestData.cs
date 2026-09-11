@@ -9,9 +9,16 @@ public partial class TestData(
     TimeProvider timeProvider)
 {
     private static readonly Lock _gate = new();
-    private static readonly HashSet<string> _emails = [];
     private static readonly HashSet<string> _mobileNumbers = [];
-    private static int _applicationUserNumber = 1;
+    private static int _applicationUserNumber;
+    private static int _emailNumber;
+    private static int _ukprnNumber;
+
+    // Rows written by earlier runs stay in the database by design, so a value only being unique within this run isn't
+    // enough. Tokens fixed for the run, one textual and one numeric, keep generated values clear of them without having
+    // to ask the database what's already there.
+    private static readonly string _runToken = Guid.NewGuid().ToString("N")[..6];
+    private static readonly int _runNumber = Random.Shared.Next(10000, 99999);
 
     // https://stackoverflow.com/a/30290754
     public static byte[] JpegImage { get; } =
@@ -41,7 +48,9 @@ public partial class TestData(
 
     public string GenerateApplicationUserName() => Faker.Company.Name();
 
-    public string GenerateApplicationUserShortName() => $"app-{Interlocked.Increment(ref _applicationUserNumber)}";
+    public string GenerateApplicationUserShortName() => $"app-{_runToken}-{Interlocked.Increment(ref _applicationUserNumber)}";
+
+    public string GenerateUkprn() => $"{_runNumber:D5}{Interlocked.Increment(ref _ukprnNumber):D3}";
 
     public string GenerateChangedApplicationUserName(string currentName)
     {
@@ -234,18 +243,12 @@ public partial class TestData(
 
     public string GenerateUniqueEmail()
     {
-        string email;
+        // Faker picks from a small enough pool that the same address comes up again across runs, so make the local part
+        // unique rather than generating until we find one this run hasn't used.
+        var email = Faker.Internet.Email();
+        var atIndex = email.IndexOf('@');
 
-        lock (_gate)
-        {
-            do
-            {
-                email = Faker.Internet.Email();
-            }
-            while (!_emails.Add(email));
-        }
-
-        return email;
+        return $"{email[..atIndex]}.{_runToken}{Interlocked.Increment(ref _emailNumber)}{email[atIndex..]}";
     }
 
     public string GenerateUniqueMobileNumber()
