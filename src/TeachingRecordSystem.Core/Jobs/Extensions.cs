@@ -177,6 +177,11 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<PersonUnaccentNamesJob>(
+                nameof(PersonUnaccentNamesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("BackfillUsersInReportingDb");
 
             recurringJobManager.AddOrUpdate<BackfillUserProcessesJob>(
