@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -15,21 +16,23 @@ namespace TeachingRecordSystem.TestCommon;
 public sealed class DbHelper : IAsyncDisposable
 {
     private const int DefaultTestContainersPostgresPort = 43007;
-    private const string SchemaVersionFileName = ".tests-schema-version.txt";
+    private const string MaintenanceDatabaseName = "postgres";
     private static readonly string SeedingSourceFilePath =
         Path.Combine("src", "TeachingRecordSystem.Core", "DataStore", "Postgres", "TrsDbContext.Seeding.cs");
 
     private readonly IServiceProvider _serviceProvider;
     private readonly PostgreSqlContainer? _postgresContainer;
+    private readonly string _connectionString;
 
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema;
 
-    private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer)
+    private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer, string connectionString)
     {
         _serviceProvider = serviceProvider;
         _postgresContainer = postgresContainer;
+        _connectionString = connectionString;
     }
 
     public static DbHelper Instance { get; } = CreateInstance();
@@ -63,7 +66,7 @@ public sealed class DbHelper : IAsyncDisposable
         services.AddDatabase(connectionString);
         var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
-        return new DbHelper(serviceProvider, postgresContainer);
+        return new DbHelper(serviceProvider, postgresContainer, connectionString);
     }
 
     public async Task InitializeAsync()
@@ -123,12 +126,11 @@ public sealed class DbHelper : IAsyncDisposable
 
         var connection = dbContext.Database.GetDbConnection();
 
-        var repositoryRootPath = GetRepositoryRootPath();
-        var cachedMigrationsVersionPath = Path.Combine(repositoryRootPath, SchemaVersionFileName);
+        var currentDbVersion = GetDbVersion(dbContext, GetRepositoryRootPath());
 
-        var currentDbVersion = GetDbVersion(dbContext, repositoryRootPath);
-
-        if (currentDbVersion == GetPreviousMigrationsVersion())
+        // Deliberately the connection string we were configured with rather than the one EF hands back, which has had
+        // the password stripped out of it and so can't be used to open a connection of our own.
+        if (currentDbVersion == await GetStoredDbVersionAsync(_connectionString))
         {
             return;
         }
@@ -136,15 +138,37 @@ public sealed class DbHelper : IAsyncDisposable
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.MigrateAsync();
 
-        WriteMigrationsVersion();
-
         await connection.OpenAsync();
+        await StoreDbVersionAsync(connection, currentDbVersion);
         await EnsureRespawnerAsync(connection);
+    }
 
-        string? GetPreviousMigrationsVersion() =>
-            File.Exists(cachedMigrationsVersionPath) ? File.ReadAllText(cachedMigrationsVersionPath) : null;
+    // The version is stored on the database itself rather than alongside the repository so that it can never describe a
+    // database other than the one the tests are about to use; dropping or replacing the database takes the version with it.
+    private static async Task<string?> GetStoredDbVersionAsync(string connectionString)
+    {
+        var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+        var databaseName = connectionStringBuilder.Database!;
+        connectionStringBuilder.Database = MaintenanceDatabaseName;
 
-        void WriteMigrationsVersion() => File.WriteAllText(cachedMigrationsVersionPath, currentDbVersion);
+        // pg_database is a shared catalog so the comment is readable without connecting to the database it belongs to;
+        // connecting to it here would leave a pooled connection open and DROP DATABASE below would fail.
+        await using var connection = new NpgsqlConnection(connectionStringBuilder.ConnectionString);
+        await connection.OpenAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "select shobj_description(oid, 'pg_database') from pg_database where datname = @databaseName";
+        command.Parameters.AddWithValue("databaseName", databaseName);
+
+        return await command.ExecuteScalarAsync() as string;
+    }
+
+    private static async Task StoreDbVersionAsync(DbConnection connection, string version)
+    {
+        await using var command = connection.CreateCommand();
+        // COMMENT ON doesn't accept parameters; the version is always the hex output of a hash so it's safe to inline.
+        command.CommandText = $"comment on database \"{connection.Database}\" is '{version}'";
+        await command.ExecuteNonQueryAsync();
     }
 
     private static string GetDbVersion(TrsDbContext dbContext, string repositoryRootPath)
