@@ -5,10 +5,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Respawn;
+using Respawn.Graph;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using Testcontainers.PostgreSql;
+using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -19,6 +21,14 @@ public sealed class DbHelper : IAsyncDisposable
     private const string MaintenanceDatabaseName = "postgres";
     private static readonly string SeedingSourceFilePath =
         Path.Combine("src", "TeachingRecordSystem.Core", "DataStore", "Postgres", "TrsDbContext.Seeding.cs");
+
+    // Reference data that SeedDbAsync writes rather than the migrations; it needs the same protection from Respawn as
+    // the data seeded by TrsDbContext.
+    private static readonly Type[] TestSeededEntityTypes = [typeof(TrainingProvider), typeof(TrnRange)];
+
+    // Tests write rows of their own to these tables alongside the seed data, so they have to be cleared down like any
+    // other; SeedDbAsync puts the seed data back afterwards.
+    private static readonly Type[] ClearedAndReseededEntityTypes = [typeof(SystemUser), typeof(Establishment)];
 
     private readonly IServiceProvider _serviceProvider;
     private readonly PostgreSqlContainer? _postgresContainer;
@@ -207,27 +217,30 @@ public sealed class DbHelper : IAsyncDisposable
             new RespawnerOptions()
             {
                 DbAdapter = DbAdapter.Postgres,
-                TablesToIgnore = [
-                    "mandatory_qualification_providers",
-                    "establishment_sources",
-                    "tps_establishment_types",
-                    "alert_types",
-                    "alert_categories",
-                    "induction_exemption_reasons",
-                    "route_to_professional_status_types",
-                    "countries",
-                    "training_subjects",
-                    "degree_types",
-                    "training_providers",
-                    "support_task_types",
-                    "induction_statuses",
-                    "trn_ranges"
-                ]
+                TablesToIgnore = GetTablesToIgnore()
             });
+
+    private Table[] GetTablesToIgnore()
+    {
+        using var dbContext = DbContextFactory.CreateDbContext();
+
+        return TrsDbContext.SeededEntityTypes
+            .Concat(TestSeededEntityTypes)
+            .Except(ClearedAndReseededEntityTypes)
+            .Select(t => dbContext.Model.FindEntityType(t)!.GetTableName()!)
+            .Distinct()
+            .Select(t => new Table(t))
+            .ToArray();
+    }
 
     private async Task SeedDbAsync(TrsDbContext dbContext)
     {
         await SeedLookupData.EnsureTestTrainingProvidersAsync(dbContext);
+
+        foreach (var entityType in ClearedAndReseededEntityTypes)
+        {
+            await dbContext.SeedDataForEntityTypeAsync(entityType);
+        }
 
         var existingUserIds = await dbContext.Set<UserBase>().Select(u => u.UserId).ToArrayAsync();
 
@@ -239,7 +252,6 @@ public sealed class DbHelper : IAsyncDisposable
             }
         }
 
-        AddUserIfNotExists(SystemUser.Instance);
         AddUserIfNotExists(ApplicationUser.CapitaTpsImportUser);
 
         if (!await dbContext.Set<TrnRange>().AnyAsync())

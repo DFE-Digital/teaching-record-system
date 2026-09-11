@@ -5,40 +5,48 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public partial class TrsDbContext
 {
+    // Order matters here; the seed data has foreign keys between these sets.
+    private static readonly SeedSet[] _seedSets =
+    [
+        SeedSet.Create(GetAlertCategories),
+        SeedSet.Create(GetAlertTypes),
+        SeedSet.Create(GetCountries),
+        SeedSet.Create(GetInductionExemptionReasons),
+        SeedSet.Create(GetSupportTaskTypes),
+        SeedSet.Create(GetDegreeTypes),
+        SeedSet.Create(GetEstablishmentSources),
+        SeedSet.Create(GetInductionStatusInfo),
+        SeedSet.Create(GetMandatoryQualificationProviders),
+        SeedSet.Create(GetRouteToProfessionalStatusTypes),
+        SeedSet.Create(GetTpsEstablishmentTypes),
+        SeedSet.Create(GetTrainingSubjects),
+        SeedSet.Create(GetSystemUsers),
+        SeedSet.Create(GetEstablishments)
+    ];
+
+    // The seed data is only written when the database is migrated, so tests need to know which types it covers to be able
+    // to keep them out of the data they clear down between tests.
+    public static IReadOnlyCollection<Type> SeededEntityTypes { get; } = _seedSets.Select(s => s.EntityType).ToArray();
+
+    // Tests clear down the tables they write to between tests, which takes the seed data with it; this lets them put back
+    // the seed data for a single type without re-applying all of it.
+    public Task SeedDataForEntityTypeAsync(Type entityType, CancellationToken cancellationToken = default) =>
+        _seedSets.Single(s => s.EntityType == entityType).InsertAsync(this, cancellationToken);
+
     private void SeedData()
     {
-        this.BulkInsertOrUpdate(GetAlertCategories());
-        this.BulkInsertOrUpdate(GetAlertTypes());
-        this.BulkInsertOrUpdate(GetCountries());
-        this.BulkInsertOrUpdate(GetInductionExemptionReasons());
-        this.BulkInsertOrUpdate(GetSupportTaskTypes());
-        this.BulkInsertOrUpdate(GetDegreeTypes());
-        this.BulkInsertOrUpdate(GetEstablishmentSources());
-        this.BulkInsertOrUpdate(GetInductionStatusInfo());
-        this.BulkInsertOrUpdate(GetMandatoryQualificationProviders());
-        this.BulkInsertOrUpdate(GetRouteToProfessionalStatusTypes());
-        this.BulkInsertOrUpdate(GetTpsEstablishmentTypes());
-        this.BulkInsertOrUpdate(GetTrainingSubjects());
-        this.BulkInsertOrUpdate(GetSystemUsers());
-        this.BulkInsertOrUpdate(GetEstablishments());
+        foreach (var seedSet in _seedSets)
+        {
+            seedSet.Insert(this);
+        }
     }
 
     private async Task SeedDataAsync(CancellationToken cancellationToken = default)
     {
-        await this.BulkInsertOrUpdateAsync(GetAlertCategories(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetAlertTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetCountries(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetInductionExemptionReasons(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetSupportTaskTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetDegreeTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetEstablishmentSources(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetInductionStatusInfo(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetMandatoryQualificationProviders(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetRouteToProfessionalStatusTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetTpsEstablishmentTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetTrainingSubjects(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetSystemUsers(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetEstablishments(), cancellationToken: cancellationToken);
+        foreach (var seedSet in _seedSets)
+        {
+            await seedSet.InsertAsync(this, cancellationToken);
+        }
     }
 
     private static List<AlertCategory> GetAlertCategories()
@@ -2461,5 +2469,24 @@ public partial class TrsDbContext
             new() { EstablishmentId = new Guid("ec4bce73-deb9-4a74-8a82-b84aa151747e"), Urn = null, LaCode = "677", LaName = null, EstablishmentNumber = "9099", EstablishmentName = "Blaenau Gwent", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 },
             new() { EstablishmentId = new Guid("afffe7e0-8722-439b-90f7-05d856dc78a9"), Urn = null, LaCode = "928", LaName = null, EstablishmentNumber = "8007", EstablishmentName = "Northampton College Corporation", EstablishmentTypeCode = null, EstablishmentTypeName = null, EstablishmentTypeGroupCode = null, EstablishmentTypeGroupName = null, EstablishmentStatusCode = null, EstablishmentStatusName = null, PhaseOfEducationCode = null, PhaseOfEducationName = null, NumberOfPupils = null, FreeSchoolMealsPercentage = null, Street = null, Locality = null, Address3 = null, Town = null, County = null, Postcode = null, EstablishmentSourceId = 2 }
         ];
+    }
+
+    private sealed class SeedSet(
+        Type entityType,
+        Action<TrsDbContext> insert,
+        Func<TrsDbContext, CancellationToken, Task> insertAsync)
+    {
+        public Type EntityType { get; } = entityType;
+
+        public static SeedSet Create<T>(Func<List<T>> getEntities) where T : class =>
+            new(
+                typeof(T),
+                dbContext => dbContext.BulkInsertOrUpdate(getEntities()),
+                (dbContext, cancellationToken) => dbContext.BulkInsertOrUpdateAsync(getEntities(), cancellationToken: cancellationToken));
+
+        public void Insert(TrsDbContext dbContext) => insert(dbContext);
+
+        public Task InsertAsync(TrsDbContext dbContext, CancellationToken cancellationToken) =>
+            insertAsync(dbContext, cancellationToken);
     }
 }
