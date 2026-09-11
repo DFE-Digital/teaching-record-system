@@ -30,6 +30,8 @@ public sealed class DbHelper : IAsyncDisposable
     // other; SeedDbAsync puts the seed data back afterwards.
     private static readonly Type[] ClearedAndReseededEntityTypes = [typeof(SystemUser), typeof(Establishment)];
 
+    private static readonly Lazy<DbHelper> _instance = new(CreateInstance);
+
     private readonly IServiceProvider _serviceProvider;
     private readonly PostgreSqlContainer? _postgresContainer;
     private readonly string _connectionString;
@@ -45,7 +47,9 @@ public sealed class DbHelper : IAsyncDisposable
         _connectionString = connectionString;
     }
 
-    public static DbHelper Instance { get; } = CreateInstance();
+    // Lazy rather than a field initialiser so that a failure here surfaces as itself, rather than as a
+    // TypeInitializationException raised from whichever member of this type happened to be touched first.
+    public static DbHelper Instance => _instance.Value;
 
     public IDbContextFactory<TrsDbContext> DbContextFactory => _serviceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
@@ -57,26 +61,47 @@ public sealed class DbHelper : IAsyncDisposable
 
     private static DbHelper CreateInstance()
     {
-        var configuration = TestConfiguration.GetConfiguration();
+        string? connectionString = null;
 
-        var connectionString = configuration.GetPostgresConnectionString();
-
-        PostgreSqlContainer? postgresContainer = null;
-        var useTestContainers = configuration.GetValue<bool>("UseTestContainers");
-        if (useTestContainers)
+        try
         {
-            postgresContainer = new PostgreSqlBuilder("postgres:17")
-                .WithDatabase("trs")
-                .WithReuse(true)
-                .WithPortBinding(GetTestContainersPostgresPort(configuration), 5432)
-                .Build();
+            var configuration = TestConfiguration.GetConfiguration();
+
+            connectionString = configuration.GetPostgresConnectionString();
+
+            PostgreSqlContainer? postgresContainer = null;
+            var useTestContainers = configuration.GetValue<bool>("UseTestContainers");
+            if (useTestContainers)
+            {
+                postgresContainer = new PostgreSqlBuilder("postgres:17")
+                    .WithDatabase("trs")
+                    .WithReuse(true)
+                    .WithPortBinding(GetTestContainersPostgresPort(configuration), 5432)
+                    .Build();
+            }
+
+            var services = new ServiceCollection();
+            services.AddDatabase(connectionString);
+            var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+
+            return new DbHelper(serviceProvider, postgresContainer, connectionString);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to set up the test database{DescribeTarget(connectionString)}.", ex);
         }
 
-        var services = new ServiceCollection();
-        services.AddDatabase(connectionString);
-        var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+        // The connection string carries a password, so say where we were pointed without quoting it back
+        static string DescribeTarget(string? connectionString)
+        {
+            if (connectionString is null)
+            {
+                return "";
+            }
 
-        return new DbHelper(serviceProvider, postgresContainer, connectionString);
+            var builder = new NpgsqlConnectionStringBuilder(connectionString);
+            return $" '{builder.Database}' on {builder.Host}:{builder.Port}";
+        }
     }
 
     public async Task InitializeAsync()
