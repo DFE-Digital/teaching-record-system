@@ -128,7 +128,7 @@ public class WebhookMessageFactory(
             return wrappedMapper.MapEventAsync(@event);
         }
     }
-    
+
     public async Task<WebhookMessage> CreatePingMessageAsync(Guid webhookEndpointId)
     {
         var endpoint = await dbContext.WebhookEndpoints
