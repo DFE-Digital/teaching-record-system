@@ -120,6 +120,33 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
         Assert.Equal(endpoint.WebhookEndpointId, deletedEvent.WebhookEndpoint.WebhookEndpointId);
     }
 
+    [Fact]
+    public async Task Ping_QueuesPingMessageForDelivery()
+    {
+        // Arrange
+        var endpoint = await CreateWebhookEndpointAsync();
+
+        var command = GetSubcommand("ping");
+        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId}");
+
+        // Act
+        var result = await parseResult.InvokeAsync();
+
+        // Assert
+        // Delivery is handled asynchronously by WebhookDeliveryService, so this test only verifies that
+        // the ping message is created and queued for delivery.
+        Assert.Equal(0, result);
+
+        var message = await WithDbContextAsync(async dbContext =>
+            await dbContext.WebhookMessages.SingleAsync(m => m.WebhookEndpointId == endpoint.WebhookEndpointId));
+
+        Assert.Equal("ping", message.CloudEventType);
+        Assert.NotNull(message.NextDeliveryAttempt);
+        Assert.Null(message.Delivered);
+        Assert.Empty(message.DeliveryAttempts);
+        Assert.Empty(message.DeliveryErrors);
+    }
+
     private Command GetSubcommand(string name) =>
         Commands.CreateWebhookEndpointCommand(Configuration).Subcommands.Single(c => c.Name == name);
 
