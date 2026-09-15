@@ -39,6 +39,10 @@ test:
 test-changed *ARGS:
   @dotnet run scripts/TestChanged.cs -- {{ARGS}}
 
+# Drop the databases the tests have created, including any left behind by deleted worktrees
+drop-test-databases:
+  @dotnet run scripts/DropTestDatabases.cs
+
 # Format the .NET solution and Terraform code
 format:
   @dotnet format --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
