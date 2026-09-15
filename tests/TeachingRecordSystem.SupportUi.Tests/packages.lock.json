@@ -1081,7 +1081,7 @@
         "dependencies": {
           "Faker.Net": "[2.0.163, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "Microsoft.Extensions.TimeProvider.Testing": "[10.9.0, )",
+          "Microsoft.Extensions.TimeProvider.Testing": "[10.10.0, )",
           "Moq": "[4.20.72, )",
           "Respawn": "[7.0.0, )",
           "SSH.NET": "[2026.0.0, )",
@@ -1498,9 +1498,9 @@
       },
       "Microsoft.Extensions.TimeProvider.Testing": {
         "type": "CentralTransitive",
-        "requested": "[10.9.0, )",
-        "resolved": "10.9.0",
-        "contentHash": "0If8xc915BgRpYmKB9tOOOprvHMt8Tue6kiD8ARgVf8Ok6PNUxkJScKT7QUp7+RllR4RN2DNACgaxioy9BJxeQ=="
+        "requested": "[10.10.0, )",
+        "resolved": "10.10.0",
+        "contentHash": "8duZdxuO3Oo8tlyQXVq1drXee6GJC9DjUU97Pq3YaIqf92jrAHsWxbbRKwvjQI48Mer3IANwUKF0elqvHeY4Rw=="
       },
       "Microsoft.Graph": {
         "type": "CentralTransitive",
