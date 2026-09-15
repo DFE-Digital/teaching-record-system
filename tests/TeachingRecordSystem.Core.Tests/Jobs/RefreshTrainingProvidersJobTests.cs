@@ -12,9 +12,9 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Arrange
         var publishApiClient = new Mock<IPublishApiClient>();
         var provider1Name = "Test Training Provider 1";
-        var provider1Ukprn = "12345678";
+        var provider1Ukprn = TestData.GenerateUkprn();
         var provider2Name = "Test Training Provider 2";
-        var provider2Ukprn = "87654321";
+        var provider2Ukprn = TestData.GenerateUkprn();
         var providersExpected = new List<ProviderResource>
         {
             new ProviderResource
@@ -72,7 +72,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         var existingProvider = new TrainingProvider
         {
             TrainingProviderId = Guid.NewGuid(),
-            Ukprn = "12345679",
+            Ukprn = TestData.GenerateUkprn(),
             Name = "Test Training Provider 1",
             IsActive = false
         };
@@ -121,12 +121,12 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Arrange
         var publishApiClient = new Mock<IPublishApiClient>();
         var newProviderName = "New Training Provider";
-        var newProviderUkprn = "76543210";
+        var newProviderUkprn = TestData.GenerateUkprn();
 
         var existingProvider = new TrainingProvider
         {
             TrainingProviderId = Guid.NewGuid(),
-            Ukprn = "12345670",
+            Ukprn = TestData.GenerateUkprn(),
             Name = "Test Training Provider 1",
             IsActive = true
         };
@@ -161,20 +161,16 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == existingProvider.Ukprn || p.Ukprn == newProviderUkprn).OrderBy(p => p.Ukprn).ToListAsync();
-            Assert.Collection(trainingProvidersActual,
-                p =>
-                {
-                    Assert.Equal(existingProvider.Ukprn, p.Ukprn);
-                    Assert.Equal(existingProvider.Name, p.Name);
-                    Assert.False(p.IsActive);
-                },
-                p =>
-                {
-                    Assert.Equal(newProviderUkprn, p.Ukprn);
-                    Assert.Equal(newProviderName, p.Name);
-                    Assert.True(p.IsActive);
-                });
+            var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == existingProvider.Ukprn || p.Ukprn == newProviderUkprn).ToListAsync();
+            Assert.Equal(2, trainingProvidersActual.Count);
+
+            var deactivatedProvider = trainingProvidersActual.Single(p => p.Ukprn == existingProvider.Ukprn);
+            Assert.Equal(existingProvider.Name, deactivatedProvider.Name);
+            Assert.False(deactivatedProvider.IsActive);
+
+            var addedProvider = trainingProvidersActual.Single(p => p.Ukprn == newProviderUkprn);
+            Assert.Equal(newProviderName, addedProvider.Name);
+            Assert.True(addedProvider.IsActive);
         });
     }
 }
