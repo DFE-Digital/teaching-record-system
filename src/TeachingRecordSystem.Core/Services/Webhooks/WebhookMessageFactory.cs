@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.ApiSchema.V3;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260915.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Infrastructure.Json;
