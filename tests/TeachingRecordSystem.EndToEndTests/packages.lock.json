@@ -1415,8 +1415,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "6.10.0",
-        "contentHash": "jDiLbMSNuwMNJmJc5l8XaO3bgHxTbBkttqqSLQTDP415ucNM4F/Ckktg3L/Ww6v2Skcwt7wFC7vSW+f8W12Vqg=="
+        "resolved": "6.11.0",
+        "contentHash": "TsT5Gj77PTh3lHQGS+8dLxucTmiZEfLxkqRygIHwYQXRXmMC4fFDbf1AoQe8LXOOFDYhPM2SNf8TTfexvkP0nQ=="
       },
       "Serilog.Extensions.Logging": {
         "type": "Transitive",
@@ -1822,7 +1822,7 @@
           "NSign.Client": "[1.2.4, )",
           "NSign.SignatureProviders": "[1.2.4, )",
           "OpenIddict.EntityFrameworkCore": "[7.7.0, )",
-          "Sentry.AspNetCore": "[6.10.0, )",
+          "Sentry.AspNetCore": "[6.11.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
@@ -2574,23 +2574,23 @@
       },
       "Sentry.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[6.10.0, )",
-        "resolved": "6.10.0",
-        "contentHash": "QftEgnzR3oM5Rb3VY7FkZLOUcqLGI+ciGO8+ScnMwNchlRkk0Tm+TLMRdS6SZASbVwkmrUW/SOMPGRgO3dcLeA==",
+        "requested": "[6.11.0, )",
+        "resolved": "6.11.0",
+        "contentHash": "4yYpmdroeis+bibI0YEj+DhA6Q00v6GhQ1Tl8S6KdxVrqAWlvwjsVt8hloeiJCUqe9vGQop/A2zbcNxE9aCQmw==",
         "dependencies": {
-          "Sentry.Extensions.Logging": "6.10.0"
+          "Sentry.Extensions.Logging": "6.11.0"
         }
       },
       "Sentry.Extensions.Logging": {
         "type": "CentralTransitive",
-        "requested": "[6.10.0, )",
-        "resolved": "6.10.0",
-        "contentHash": "QQ4J9we3ZSTdnvP52b+GRAoVnnCy/ZKDBvRA9B4lyVD1VQnyC70HDgbzfhQk98Zm+SaH7F/UR137zAC2Vi2Wsw==",
+        "requested": "[6.11.0, )",
+        "resolved": "6.11.0",
+        "contentHash": "ztK8OQVUoyb5SX49jFfBu4A/67VneE6w4gKqiUycYDCNPrtJo4pz5Ho5eow5sfe+1Sm8sMQqpu+Lvykfh4HqMg==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "10.0.0",
           "Microsoft.Extensions.Http": "10.0.0",
           "Microsoft.Extensions.Logging.Configuration": "10.0.0",
-          "Sentry": "6.10.0"
+          "Sentry": "6.11.0"
         }
       },
       "Serilog": {
