@@ -71,7 +71,7 @@ jobs:
         working-directory: terraform/aks
 
       - name: Lint
-        uses: reviewdog/action-tflint@54a5e5aed57dcfbb4662ec548de876df33d6288d # Pinned at v1.25.0
+        uses: reviewdog/action-tflint@ac21f7671251b29bbeb280ede595cb9c5b8710c7 # Pinned at v1.26.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tflint_rulesets: azurerm
