@@ -70,7 +70,7 @@
                 </row>
                 <row>
                     <key>Created on</key>
-                    <value use-empty-fallback>@requestData.CreatedOn.ToString(WebConstants.DateAndTimeDisplayFormat)</value>
+                    <value use-empty-fallback>@requestData.CreatedOn.ToGmt().ToString(WebConstants.DateAndTimeDisplayFormat)</value>
                 </row>
                 <row>
                     <key>Name</key>

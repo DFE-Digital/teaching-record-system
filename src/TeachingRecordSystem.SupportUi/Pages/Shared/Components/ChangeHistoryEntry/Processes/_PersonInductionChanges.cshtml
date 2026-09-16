@@ -181,7 +181,7 @@
                     {
                         <row>
                             <key>CPD modified on</key>
-                            <value data-testid="old-cpd-modified-on" use-empty-fallback>@oldInduction.CpdCpdModifiedOn.ValueOrDefault()!.ToString(TimelineItem.TimestampFormat)</value>
+                            <value data-testid="old-cpd-modified-on" use-empty-fallback>@oldInduction.CpdCpdModifiedOn.ValueOrDefault()!.ToGmt().ToString(TimelineItem.TimestampFormat)</value>
                         </row>
                     }
                 </govuk-summary-list>

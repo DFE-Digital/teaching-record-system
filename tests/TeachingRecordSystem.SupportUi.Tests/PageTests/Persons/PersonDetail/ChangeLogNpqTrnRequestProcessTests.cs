@@ -178,7 +178,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
 
         item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(TimeProvider.UtcNow.ToString(WebConstants.DateAndTimeDisplayFormat), v.TrimmedText()));
+        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(TimeProvider.NowGmt.ToString(WebConstants.DateAndTimeDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
         item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));

@@ -47,7 +47,7 @@ internal static class ChangeHistoryTestExtensions
         Assert.Equal(expectedTitle, title?.TrimmedText());
 
         var date = changeHistoryItem.GetElementsByClassName("moj-timeline__date").SingleOrDefault();
-        var expectedDateBlock = $"By {expectedUserName} on {expectedTimestamp:d MMMMM yyyy 'at' h:mm tt}";
+        var expectedDateBlock = $"By {expectedUserName} on {expectedTimestamp.ToGmt():d MMMMM yyyy 'at' h:mm tt}";
         Assert.Equal(expectedDateBlock, date?.TrimmedText().ReplaceLineEndings(" "), ignoreAllWhiteSpace: true);
 
         if (expectedSummaryListRows.Count > 0)
