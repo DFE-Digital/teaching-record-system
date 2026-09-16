@@ -1,4 +1,6 @@
 using System.CommandLine;
+using TeachingRecordSystem.Core.ApiSchema;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
 
@@ -42,6 +44,11 @@ public class ResetTrnRequestTests(IServiceProvider services) : CommandTestBase(s
         // Arrange
         var (applicationUserId, trnRequest, closedSupportTaskReference) =
             await CreateResolvedTrnRequestAsync(SupportTaskStatus.Closed);
+
+        // An endpoint subscribed to the events this command emits makes it map them for webhooks, which is where
+        // the mappers - and so their dependencies - get resolved from the container the command builds.
+        var webhookEndpointId = await CreateWebhookEndpointAsync(TrnRequestCompletedNotification.CloudEventType);
+
         var output = new StringWriter();
 
         // Act
@@ -67,7 +74,36 @@ public class ResetTrnRequestTests(IServiceProvider services) : CommandTestBase(s
             Assert.Equal(SupportTaskType.TrnRequest, newSupportTask.SupportTaskType);
             Assert.Equal(SupportTaskStatus.Open, newSupportTask.Status);
             Assert.Contains($"Created new {SupportTaskType.TrnRequest} support task: {newSupportTask.SupportTaskReference}", output.ToString());
+
+            // The request went back to Pending, so there's nothing to notify a trn_request.completed subscriber about.
+            Assert.False(await dbContext.WebhookMessages.AnyAsync(m => m.WebhookEndpointId == webhookEndpointId));
         });
+    }
+
+    private async Task<Guid> CreateWebhookEndpointAsync(string cloudEventType)
+    {
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var now = DateTime.UtcNow;
+
+        var endpoint = new WebhookEndpoint
+        {
+            WebhookEndpointId = Guid.NewGuid(),
+            ApplicationUserId = applicationUser.UserId,
+            Address = $"https://webhooks.example.com/{Guid.NewGuid()}",
+            ApiVersion = VersionRegistry.V3MinorVersions.V20260915,
+            CloudEventTypes = [cloudEventType],
+            Enabled = true,
+            CreatedOn = now,
+            UpdatedOn = now
+        };
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.WebhookEndpoints.Add(endpoint);
+            await dbContext.SaveChangesAsync();
+        });
+
+        return endpoint.WebhookEndpointId;
     }
 
     // Builds a request that resolves to one of two people who match on name and date of birth, so matching returns

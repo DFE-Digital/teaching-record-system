@@ -114,7 +114,6 @@ public static class Extensions
             .AddTrnRequestService(configuration)
             .AddEventPublisher()
             .AddSupportTaskServices()
-            .AddSingleton<PersonInfoCache>()
             .AddNoteService()
             .AddPersonService()
             .AddAlertService()
@@ -217,7 +216,10 @@ public static class Extensions
     {
         services
             .AddTransient<WebhookMessageFactory>()
-            .AddSingleton<EventMapperRegistry>();
+            .AddSingleton<EventMapperRegistry>()
+            // Event mappers are activated from the container as messages are created, so their dependencies have to
+            // be registered anywhere webhook messages can be created - including the containers CLI commands build.
+            .AddSingleton<PersonInfoCache>();
 
         return services;
     }
