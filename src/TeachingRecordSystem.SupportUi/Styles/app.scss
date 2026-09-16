@@ -73,6 +73,12 @@
   table-layout: fixed;
 }
 
+// The MOJ styles make the sortable column header button a flex container, so when a heading wraps
+// onto multiple lines the direction indicator gets squashed along with the text; keep it full size.
+[aria-sort] button svg {
+  flex-shrink: 0;
+}
+
 .trs-\!-inline {
   display: inline;
 }
