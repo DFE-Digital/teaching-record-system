@@ -34,7 +34,7 @@ else
             <div class="moj-timeline">
                 @foreach (var note in Model.Notes)
                 {
-                    <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
+                    <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn">
                         @note.Content
                     </timeline-entry>
                 }

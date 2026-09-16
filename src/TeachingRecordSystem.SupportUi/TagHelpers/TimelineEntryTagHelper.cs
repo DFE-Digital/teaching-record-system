@@ -5,6 +5,7 @@ namespace TeachingRecordSystem.SupportUi.TagHelpers;
 
 public class TimelineEntryTagHelper : TagHelper
 {
+    // Assigned a UTC timestamp; it's converted to GMT for display.
     public DateTime Timestamp { get; set; }
 
     public string? By { get; set; }
@@ -39,7 +40,7 @@ public class TimelineEntryTagHelper : TagHelper
 
         var time = new TagBuilder("time");
         time.MergeAttribute("timestamp", Timestamp.ToString("O"));
-        time.InnerHtml.Append(Timestamp.ToString("d MMMMM yyyy 'at' h:mm tt"));
+        time.InnerHtml.Append(Timestamp.ToGmt().ToString("d MMMMM yyyy 'at' h:mm tt"));
         by.InnerHtml.AppendHtml(time);
 
         date.InnerHtml.AppendHtml(by);
