@@ -37,11 +37,22 @@ public class ResetTrnRequestTests(IServiceProvider services) : CommandTestBase(s
     }
 
     [Fact]
-    public async Task ResetTrnRequest_ValidInvocation_ResetsRequestAndCreatesSupportTask()
+    public Task ResetTrnRequest_RequestHasPotentialMatches_ResetsRequestAndCreatesSupportTask() =>
+        AssertResetsRequestAndCreatesSupportTaskAsync(MatchScenario.PotentialMatches);
+
+    [Fact]
+    public Task ResetTrnRequest_RequestHasADefiniteMatch_ResetsRequestAndCreatesSupportTask() =>
+        AssertResetsRequestAndCreatesSupportTaskAsync(MatchScenario.DefiniteMatch);
+
+    [Fact]
+    public Task ResetTrnRequest_RequestHasNoMatches_ResetsRequestAndCreatesSupportTask() =>
+        AssertResetsRequestAndCreatesSupportTaskAsync(MatchScenario.NoMatches);
+
+    private async Task AssertResetsRequestAndCreatesSupportTaskAsync(MatchScenario matchScenario)
     {
         // Arrange
         var (applicationUserId, trnRequest, closedSupportTaskReference) =
-            await CreateResolvedTrnRequestAsync(SupportTaskStatus.Closed);
+            await CreateResolvedTrnRequestAsync(SupportTaskStatus.Closed, matchScenario);
         var output = new StringWriter();
 
         // Act
@@ -58,6 +69,10 @@ public class ResetTrnRequestTests(IServiceProvider services) : CommandTestBase(s
             Assert.Equal(TrnRequestStatus.Pending, updatedRequest.Status);
             Assert.Null(updatedRequest.ResolvedPersonId);
 
+            // Matching runs again as part of the reset and only flags a potential duplicate when it finds
+            // more than one candidate, which also confirms each scenario set up the outcome it intended.
+            Assert.Equal(matchScenario is MatchScenario.PotentialMatches, updatedRequest.PotentialDuplicate);
+
             var newSupportTask = await dbContext.SupportTasks
                 .SingleAsync(t =>
                     t.TrnRequestApplicationUserId == applicationUserId &&
@@ -70,22 +85,47 @@ public class ResetTrnRequestTests(IServiceProvider services) : CommandTestBase(s
         });
     }
 
-    // Builds a request that resolves to one of two people who match on name and date of birth, so matching returns
-    // potential matches rather than a definite match.
+    private enum MatchScenario
+    {
+        NoMatches,
+        PotentialMatches,
+        DefiniteMatch
+    }
+
     private async Task<(Guid ApplicationUserId, TrnRequestMetadata TrnRequest, string SupportTaskReference)> CreateResolvedTrnRequestAsync(
-        SupportTaskStatus supportTaskStatus)
+        SupportTaskStatus supportTaskStatus,
+        MatchScenario matchScenario = MatchScenario.PotentialMatches)
     {
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var firstName = TestData.GenerateFirstName();
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = TestData.GenerateDateOfBirth();
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
 
-        var people = await Task.WhenAll(
-            Enumerable.Range(0, 2).Select(_ => TestData.CreatePersonAsync(p => p
-                .WithFirstName(firstName)
-                .WithLastName(lastName)
-                .WithDateOfBirth(dateOfBirth))));
+        // How many people share the request's details decides the outcome: two leaves every candidate a potential
+        // match, one that also shares the national insurance number is a definite match, and none leaves matching
+        // with nothing to find.
+        var matchingPeopleCount = matchScenario switch
+        {
+            MatchScenario.NoMatches => 0,
+            MatchScenario.DefiniteMatch => 1,
+            _ => 2
+        };
+
+        var matchingPeople = await Task.WhenAll(
+            Enumerable.Range(0, matchingPeopleCount).Select(_ => TestData.CreatePersonAsync(p =>
+            {
+                p.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth);
+
+                if (matchScenario is MatchScenario.DefiniteMatch)
+                {
+                    p.WithNationalInsuranceNumber(nationalInsuranceNumber);
+                }
+            })));
+
+        // The request still has to resolve to someone; with no matching people that's an unrelated record.
+        var resolvedPerson = matchingPeople.FirstOrDefault() ?? await TestData.CreatePersonAsync();
 
         var createResult = await TestData.CreateTrnRequestSupportTaskAsync(
             applicationUser.UserId,
@@ -93,8 +133,9 @@ public class ResetTrnRequestTests(IServiceProvider services) : CommandTestBase(s
                 .WithFirstName(firstName)
                 .WithLastName(lastName)
                 .WithDateOfBirth(dateOfBirth)
-                .WithMatchedPersons(people.Select(p => p.PersonId).ToArray())
-                .WithResolvedPersonId(people[0].PersonId)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber)
+                .WithMatchedPersons(matchingPeople.Select(p => p.PersonId).ToArray())
+                .WithResolvedPersonId(resolvedPerson.PersonId)
                 .WithStatus(supportTaskStatus));
 
         return (applicationUser.UserId, createResult.TrnRequest, createResult.SupportTask.SupportTaskReference);

@@ -90,13 +90,10 @@ public partial class Commands
 
                 var now = timeProvider.UtcNow;
 
-                var matchResult = await trnRequestService.MatchPersonsAsync(request);
-
-                // We only handle PotentialMatches for now
-                if (matchResult.Outcome is not MatchPersonsResultOutcome.PotentialMatches)
-                {
-                    throw new NotImplementedException();
-                }
+                // Matching is re-run for its side effect on the request's PotentialDuplicate flag, which is saved
+                // below. The outcome itself isn't needed: the support task doesn't store the matches, and the
+                // resolve journey matches again when it's opened, handling all three outcomes.
+                await trnRequestService.MatchPersonsAsync(request);
 
                 var eventPublisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
 
