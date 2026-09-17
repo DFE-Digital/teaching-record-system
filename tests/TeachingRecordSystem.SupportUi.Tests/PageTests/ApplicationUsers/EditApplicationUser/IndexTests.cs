@@ -193,7 +193,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
+    // xunit.analyzers doesn't flatten the nested ValueTuple that the compiler generates for tuples with more
+    // than 7 elements, so it miscounts this data source's arguments. xunit unpacks them correctly at runtime.
+#pragma warning disable xUnit1037
     [MemberData(nameof(GetInvalidOidcDetailsData))]
+#pragma warning restore xUnit1037
     public async Task Post_WithOidcClientButInvalidDetails_RendersExpectedError(
         string clientId,
         string clientSecret,
