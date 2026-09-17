@@ -774,7 +774,7 @@
           "EFCore.NamingConventions": "[10.0.0, )",
           "EntityFrameworkCore.Projectables": "[6.0.6, )",
           "FluentValidation": "[12.1.1, )",
-          "GovukNotify": "[8.1.0, )",
+          "GovukNotify": "[8.2.0, )",
           "Hangfire.Core": "[1.8.25, )",
           "Hangfire.NetCore": "[1.8.25, )",
           "Hangfire.PostgreSql": "[1.21.1, )",
@@ -900,9 +900,9 @@
       },
       "GovukNotify": {
         "type": "CentralTransitive",
-        "requested": "[8.1.0, )",
-        "resolved": "8.1.0",
-        "contentHash": "lQI8TYhwzVWdyi12ZebXRNq6l5yc1L4R48FsjEml297Zx+3pRLFdxnySzYfl3aDiGUoqG8UiVEsL65zI2TpJBg==",
+        "requested": "[8.2.0, )",
+        "resolved": "8.2.0",
+        "contentHash": "Ov85ZovEX1o4nXlKDUICft1ST4CCSfzJp9kBbDr0yBxGdwtznADF0zS35CsjCHwoplcKKk51rs8WvHndbWXp1Q==",
         "dependencies": {
           "JWT": "[11.0.0, 12.0.0]",
           "Newtonsoft.Json": "[13.0.4, 14.0.0]"
