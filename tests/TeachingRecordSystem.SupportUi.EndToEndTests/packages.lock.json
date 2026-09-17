@@ -1084,8 +1084,8 @@
           "SSH.NET": "[2026.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "Testcontainers.PostgreSql": "[4.15.0, )",
-          "xunit.v3.assert": "[4.0.0, )",
-          "xunit.v3.extensibility.core": "[4.0.0, )"
+          "xunit.v3.assert": "[4.0.1, )",
+          "xunit.v3.extensibility.core": "[4.0.1, )"
         }
       },
       "teachingrecordsystem.webcommon": {
@@ -1778,13 +1778,13 @@
       },
       "xunit.v3.assert": {
         "type": "CentralTransitive",
-        "requested": "[4.0.0, )",
+        "requested": "[4.0.1, )",
         "resolved": "4.0.1",
         "contentHash": "nC7d3cY06Oo7hkdwWPZkBR0Ud75xNhgx0P7i0GmMMZC3puCGlc4szFiT30biH03IN/eDnr8h+nv3A1UD17bk/A=="
       },
       "xunit.v3.extensibility.core": {
         "type": "CentralTransitive",
-        "requested": "[4.0.0, )",
+        "requested": "[4.0.1, )",
         "resolved": "4.0.1",
         "contentHash": "J0d5OfFcp920nZxCRIvU14+TZhiSPQR0wvqEMZ3MRiJLPu1VmYlcRNkmcSW0i1DwkB81gAHc+fHUQf/cU64MYg==",
         "dependencies": {
