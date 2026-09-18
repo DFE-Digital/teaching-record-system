@@ -16,6 +16,8 @@ public sealed class DbHelper : IAsyncDisposable
 {
     private const int DefaultTestContainersPostgresPort = 43007;
     private const string SchemaVersionFileName = ".tests-schema-version.txt";
+    private static readonly string SeedingSourceFilePath =
+        Path.Combine("src", "TeachingRecordSystem.Core", "DataStore", "Postgres", "TrsDbContext.Seeding.cs");
 
     private readonly IServiceProvider _serviceProvider;
     private readonly PostgreSqlContainer? _postgresContainer;
@@ -121,9 +123,10 @@ public sealed class DbHelper : IAsyncDisposable
 
         var connection = dbContext.Database.GetDbConnection();
 
-        var cachedMigrationsVersionPath = Path.Combine(GetRepositoryRootPath(), SchemaVersionFileName);
+        var repositoryRootPath = GetRepositoryRootPath();
+        var cachedMigrationsVersionPath = Path.Combine(repositoryRootPath, SchemaVersionFileName);
 
-        var currentDbVersion = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(dbContext.Database.GenerateCreateScript())));
+        var currentDbVersion = GetDbVersion(dbContext, repositoryRootPath);
 
         if (currentDbVersion == GetPreviousMigrationsVersion())
         {
@@ -142,6 +145,19 @@ public sealed class DbHelper : IAsyncDisposable
             File.Exists(cachedMigrationsVersionPath) ? File.ReadAllText(cachedMigrationsVersionPath) : null;
 
         void WriteMigrationsVersion() => File.WriteAllText(cachedMigrationsVersionPath, currentDbVersion);
+    }
+
+    private static string GetDbVersion(TrsDbContext dbContext, string repositoryRootPath)
+    {
+        // The seed data is only written when EF migrates the database, so changing it without also changing the schema
+        // would otherwise leave every existing test database with the old reference data.
+        var seedingSourcePath = Path.Combine(repositoryRootPath, SeedingSourceFilePath);
+
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        hash.AppendData(Encoding.UTF8.GetBytes(dbContext.Database.GenerateCreateScript()));
+        hash.AppendData(File.ReadAllBytes(seedingSourcePath));
+
+        return Convert.ToHexString(hash.GetHashAndReset());
     }
 
     private static string GetRepositoryRootPath()
