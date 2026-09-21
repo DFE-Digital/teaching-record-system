@@ -50,13 +50,13 @@
     @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
     {
         <p class="govuk-body" data-testid="induction-status">
-            Induction status changed from @ToDisplayValueOrFallback(inductionEvent.OldInduction.Status.GetDisplayName()) to @ToDisplayValueOrFallback(inductionEvent.Induction.Status.GetDisplayName())
+            Induction status changed from @ToDisplayValueOrFallback(inductionEvent.OldInduction.Status.GetTitle()) to @ToDisplayValueOrFallback(inductionEvent.Induction.Status.GetTitle())
         </p>
     }
     @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption))
     {
         <p class="govuk-body" data-testid="induction-status-without-exemption">
-            Induction status without exemption changed from @ToDisplayValueOrFallback(inductionEvent.OldInduction.StatusWithoutExemption.GetDisplayName()) to @ToDisplayValueOrFallback(inductionEvent.Induction.StatusWithoutExemption.GetDisplayName())
+            Induction status without exemption changed from @ToDisplayValueOrFallback(inductionEvent.OldInduction.StatusWithoutExemption.GetTitle()) to @ToDisplayValueOrFallback(inductionEvent.Induction.StatusWithoutExemption.GetTitle())
         </p>
     }
     @if (inductionEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))

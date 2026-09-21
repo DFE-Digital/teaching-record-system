@@ -57,7 +57,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
         Assert.Equal("Not provided", timelineItem.GetElementByTestId("award-date")?.TrimmedText());
-        Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
+        Assert.Equal(status.GetTitle(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal(route.Name, timelineItem.GetElementByTestId("route-name")?.TrimmedText());
         Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(endDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
@@ -300,7 +300,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
         AssertRaisedBy(timelineItem, updatedByUser.Name);
-        Assert.Equal($"Status changed from {oldStatus.GetDisplayName()} to {status.GetDisplayName()}", timelineItem.GetElementByTestId("status")?.TrimmedText());
+        Assert.Equal($"Status changed from {oldStatus.GetTitle()} to {status.GetTitle()}", timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal($"QTS date changed from None to {awardDate.ToString(WebConstants.DateDisplayFormat)}", timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
@@ -448,7 +448,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         Assert.Equal($"QTS date changed from {holdsFrom.ToString(WebConstants.DateDisplayFormat)} to None", timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
         Assert.Equal(holdsFrom.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
-        Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
+        Assert.Equal(status.GetTitle(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal($"{route.Name} deleted", timelineItem.GetElementByTestId("route-name")?.TrimmedText());
         Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(endDate.ToString(WebConstants.DateDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
@@ -746,7 +746,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusMigratingFromDqt);
         AssertRaisedBy(timelineItem, createdByUser.Name);
         Assert.Equal(populateOptional ? awardDate.ToString(WebConstants.DateDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("award-date")?.TrimmedText());
-        Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
+        Assert.Equal(status.GetTitle(), timelineItem.GetElementByTestId("status")?.TrimmedText());
         Assert.Equal($"{route.Name} migrated", timelineItem.GetElementByTestId("route-name")?.TrimmedText());
         Assert.Equal(populateOptional ? startDate.ToString(WebConstants.DateDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(populateOptional ? endDate.ToString(WebConstants.DateDisplayFormat) : WebConstants.EmptyFallbackContent, timelineItem.GetElementByTestId("end-date")!.TrimmedText());

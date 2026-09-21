@@ -65,7 +65,7 @@ public class PersonImportingIntoDqtTests(HostFixture hostFixture) : ChangeHistor
             ("Date of death", _dateOfDeath.ToString(WebConstants.DateDisplayFormat)),
             ("QTS held since", person.QtsDate!.Value.ToString(WebConstants.DateDisplayFormat)),
             ("EYTS held since", person.EytsDate!.Value.ToString(WebConstants.DateDisplayFormat)),
-            ("Induction status", person.InductionStatus.GetDisplayName()),
+            ("Induction status", person.InductionStatus.GetTitle()),
             ("DQT induction status", person.InductionStatus.ToDqtInductionStatus(out _)));
     }
 

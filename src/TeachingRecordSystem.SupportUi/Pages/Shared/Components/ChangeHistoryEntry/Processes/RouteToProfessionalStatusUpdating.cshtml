@@ -55,7 +55,7 @@
                 @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
                 {
                     <p class="govuk-body" data-testid="status">
-                        Status changed from @ToDisplayValueOrFallback(oldDetails.Status.GetDisplayName()) to @ToDisplayValueOrFallback(professionalStatus.Status.GetDisplayName())
+                        Status changed from @ToDisplayValueOrFallback(oldDetails.Status.GetTitle()) to @ToDisplayValueOrFallback(professionalStatus.Status.GetTitle())
                     </p>
                 }
                 @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.StartDate))
