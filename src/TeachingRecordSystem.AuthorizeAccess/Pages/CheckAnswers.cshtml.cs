@@ -44,6 +44,13 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // The user may have been verified or connected to a teaching record in another journey while this
+        // page was open, which makes a support request redundant
+        if (await coordinator.TryAdvanceIfVerifiedOrConnectedAsync() is { } nextPage)
+        {
+            return nextPage.ToActionResult();
+        }
+
         var state = coordinator.State;
 
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;

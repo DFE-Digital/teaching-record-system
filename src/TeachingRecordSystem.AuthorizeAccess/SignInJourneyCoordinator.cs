@@ -315,6 +315,46 @@ public class SignInJourneyCoordinator(
         return null;
     }
 
+    // A journey instance outlives the state it captured when the user signed in; they may have been verified
+    // or connected to a teaching record in another journey since. Refreshes the state from the One Login user
+    // and returns the page to continue at if that's happened, otherwise null.
+    public async Task<IResult?> TryAdvanceIfVerifiedOrConnectedAsync()
+    {
+        if (State.OneLoginAuthenticationTicket is null)
+        {
+            throw new InvalidOperationException("User is not authenticated with One Login.");
+        }
+
+        var subject = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+
+        var oneLoginUser = await dbContext.OneLoginUsers
+            .Include(u => u.Person)
+            .SingleAsync(u => u.Subject == subject);
+
+        var newlyVerified = oneLoginUser.VerificationRoute is not null && !State.IdentityVerified;
+        var connectedTrn = oneLoginUser.Person?.Trn;
+
+        if (!newlyVerified && connectedTrn is null)
+        {
+            return null;
+        }
+
+        UpdateState(state =>
+        {
+            if (newlyVerified)
+            {
+                state.SetVerified(oneLoginUser.VerifiedNames!, oneLoginUser.VerifiedDatesOfBirth!);
+            }
+
+            if (connectedTrn is not null)
+            {
+                Complete(state, connectedTrn);
+            }
+        });
+
+        return GetNextPage();
+    }
+
     private RedirectHttpResult SquashPathAndAdvanceTo(string url, bool includeRedirectUri = true, params IEnumerable<string> additionalStepUrls)
     {
         var urls = new List<string> { url };
