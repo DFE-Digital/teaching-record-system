@@ -25,7 +25,7 @@
                 @foreach (var x in p.Events)
                 {
                     <div>
-                        <p class="govuk-body">@x.EventName</p>
+                        <p class="govuk-body" data-testid="timeline-item-event-name">@x.EventName</p>
                         <pre class="trs-event-payload">@x.GetFormattedJsonPayload()</pre>
                     </div>
                 }
