@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Html
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Events.ChangeReasons
 @using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
@@ -31,217 +32,134 @@
     var hasRouteRows = displayedChanges != RouteToProfessionalStatusUpdatedEventChanges.None ||
         professionalStatus.SourceApplicationReference is not null;
 }
+@functions {
+    private static IHtmlContent ToDisplayValueOrFallback(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return new HtmlString("<span class=\"trs-empty-fallback\">None</span>");
+        }
+
+        return new HtmlString(System.Net.WebUtility.HtmlEncode(value));
+    }
+}
 
 <timeline-entry title="Route updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @if (hasRouteRows)
-    {
-        <govuk-summary-list>
-            @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
-            {
-                <row>
-                    <key>Status</key>
-                    <value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.StartDate))
-            {
-                <row>
-                    <key>Start date</key>
-                    <value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
-            {
-                <row>
-                    <key>End date</key>
-                    <value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom))
-            {
-                <row>
-                    <key>Held since</key>
-                    <value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
-            {
-                <row>
-                    <key>Induction exemption</key>
-                    <value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingProvider))
-            {
-                <row>
-                    <key>Training provider</key>
-                    <value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.DegreeType))
-            {
-                <row>
-                    <key>Degree type</key>
-                    <value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingCountry))
-            {
-                <row>
-                    <key>Country</key>
-                    <value data-testid="country" use-empty-fallback>@country?.Name</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
-            {
-                <row>
-                    <key>Age range</key>
-                    <value data-testid="age-range" use-empty-fallback>@ageRangeFromTo</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
-            {
-                <row>
-                    <key>Age range</key>
-                    <value data-testid="age-range-type" use-empty-fallback>@ageRangeType?.GetDisplayName()</value>
-                </row>
-            }
-            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
-            {
-                <row>
-                    <key>Subjects</key>
-                    <value data-testid="subjects" use-empty-fallback><list-text-items text-items="@subjects" /></value>
-                </row>
-            }
-            @if (professionalStatus.SourceApplicationReference is not null)
-            {
-                <row>
-                    <key>Source application reference</key>
-                    <value data-testId="source-application-reference" use-empty-fallback>
-                        @professionalStatus.SourceApplicationReference
-                    </value>
-                </row>
-            }
-        </govuk-summary-list>
-    }
-    <govuk-details class="govuk-!-margin-bottom-2">
-        <govuk-details-summary>Reason for change</govuk-details-summary>
-        <govuk-details-text>
-            <govuk-summary-list>
-                <row>
-                    <key>Reason</key>
-                    <value data-testid="reason" use-empty-fallback>@changeReason?.Reason</value>
-                </row>
-                <row>
-                    <key>Reason details</key>
-                    <value use-empty-fallback data-testid="reason-detail">
-                        @Html.ConvertNewlinesToLineBreaks(changeReason?.Details)
-                    </value>
-                </row>
-                <row>
-                    <key>Additional information</key>
-                    <value use-empty-fallback data-testid="additional-detail">
-                        @Html.ConvertNewlinesToLineBreaks(changeReason?.AdditionalInformation)
-                    </value>
-                </row>
-                <row>
-                    <key>Evidence</key>
-                    <value>
-                        <vc:event-evidence-file-link evidence-file="@changeReason?.EvidenceFile" />
-                    </value>
-                </row>
-            </govuk-summary-list>
-        </govuk-details-text>
-    </govuk-details>
+    <p class="govuk-body" data-testid="route-name">@routeType.Name</p>
     @if (hasRouteRows)
     {
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-summary>Route details</govuk-details-summary>
+            <govuk-details-text>
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
+                {
+                    <p class="govuk-body" data-testid="status">
+                        Status changed from @ToDisplayValueOrFallback(oldDetails.Status.GetDisplayName()) to @ToDisplayValueOrFallback(professionalStatus.Status.GetDisplayName())
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.StartDate))
+                {
+                    <p class="govuk-body" data-testid="start-date">
+                        Start date changed from @ToDisplayValueOrFallback(oldDetails.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(professionalStatus.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat))
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
+                {
+                    <p class="govuk-body" data-testid="end-date">
+                        End date changed from @ToDisplayValueOrFallback(oldDetails.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(professionalStatus.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat))
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom))
+                {
+                    <p class="govuk-body" data-testid="award-date">
+                        Held since changed from @ToDisplayValueOrFallback(oldDetails.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(professionalStatus.HoldsFrom?.ToString(WebConstants.DateDisplayFormat))
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
+                {
+                    <p class="govuk-body" data-testid="exemption">
+                        Induction exemption changed from @ToDisplayValueOrFallback(oldDetails.ExemptFromInduction.HasValue ? oldDetails.ExemptFromInduction.Value ? "Yes" : "No" : null) to @ToDisplayValueOrFallback(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingProvider))
+                {
+                    <p class="govuk-body" data-testid="training-provider">
+                        Training provider changed from @ToDisplayValueOrFallback(oldTrainingProvider?.Name) to @ToDisplayValueOrFallback(trainingProvider?.Name)
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.DegreeType))
+                {
+                    <p class="govuk-body" data-testid="degree-type">
+                        Degree type changed from @ToDisplayValueOrFallback(oldDegreeType?.Name) to @ToDisplayValueOrFallback(degreeType?.Name)
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingCountry))
+                {
+                    <p class="govuk-body" data-testid="country">
+                        Country changed from @ToDisplayValueOrFallback(oldCountry?.Name) to @ToDisplayValueOrFallback(country?.Name)
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
+                {
+                    <p class="govuk-body" data-testid="age-range">
+                        Age range changed from @ToDisplayValueOrFallback(oldAgeRangeFromTo) to @ToDisplayValueOrFallback(ageRangeFromTo)
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
+                {
+                    <p class="govuk-body" data-testid="age-range-type">
+                        Age range changed from @ToDisplayValueOrFallback(oldAgeRangeType?.GetDisplayName()) to @ToDisplayValueOrFallback(ageRangeType?.GetDisplayName())
+                    </p>
+                }
+                @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
+                {
+                    <p class="govuk-body" data-testid="subjects">
+                        Subjects changed from @ToDisplayValueOrFallback(oldSubjects is not null ? string.Join(", ", oldSubjects) : null) to @ToDisplayValueOrFallback(subjects is not null ? string.Join(", ", subjects) : null)
+                    </p>
+                }
+                @if (professionalStatus.SourceApplicationReference is not null)
+                {
+                    <p class="govuk-body" data-testid="source-application-reference">
+                        Source application reference: @professionalStatus.SourceApplicationReference
+                    </p>
+                }
+            </govuk-details-text>
+        </govuk-details>
+    }
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
+                    <row>
+                        <key>Reason</key>
+                        <value use-empty-fallback data-testid="reason">
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
+                        </value>
+                    </row>
+                    @if (!string.IsNullOrEmpty(changeReason.AdditionalInformation))
                     {
                         <row>
-                            <key>Status</key>
-                            <value data-testid="old-status" use-empty-fallback>@oldDetails.Status.GetDisplayName()</value>
+                            <key>Additional information</key>
+                            <value use-empty-fallback data-testid="additional-information">
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                            </value>
                         </row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.StartDate))
+                    @if (changeReason.EvidenceFile is not null)
                     {
                         <row>
-                            <key>Start date</key>
-                            <value data-testid="old-start-date" use-empty-fallback>@oldDetails.TrainingStartDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
-                    {
-                        <row>
-                            <key>End date</key>
-                            <value data-testid="old-end-date" use-empty-fallback>@oldDetails.TrainingEndDate?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom))
-                    {
-                        <row>
-                            <key>Held since</key>
-                            <value data-testid="old-award-date" use-empty-fallback>@oldDetails.HoldsFrom?.ToString(WebConstants.DateDisplayFormat)</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
-                    {
-                        <row>
-                            <key>Induction exemption</key>
-                            <value data-testid="old-exemption" use-empty-fallback>@(oldDetails.ExemptFromInduction.HasValue ? oldDetails.ExemptFromInduction.Value ? "Yes" : "No" : null)</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingProvider))
-                    {
-                        <row>
-                            <key>Training provider</key>
-                            <value data-testid="old-training-provider" use-empty-fallback>@oldTrainingProvider?.Name</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.DegreeType))
-                    {
-                        <row>
-                            <key>Degree type</key>
-                            <value data-testid="old-degree-type" use-empty-fallback>@oldDegreeType?.Name</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingCountry))
-                    {
-                        <row>
-                            <key>Country</key>
-                            <value data-testid="old-country" use-empty-fallback>@oldCountry?.Name</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
-                    {
-                        <row>
-                            <key>Age range</key>
-                            <value data-testid="old-age-range" use-empty-fallback>@oldAgeRangeFromTo</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
-                    {
-                        <row>
-                            <key>Age range</key>
-                            <value data-testid="old-age-range-type" use-empty-fallback>@oldAgeRangeType?.GetDisplayName()</value>
-                        </row>
-                    }
-                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
-                    {
-                        <row>
-                            <key>Subjects </key>
-                            <value data-testId="old-subjects" use-empty-fallback><list-text-items text-items="@oldSubjects" /></value>
-                        </row>
-                    }
-                    @if (professionalStatus.SourceApplicationReference is not null)
-                    {
-                        <row>
-                            <key>Source application reference</key>
-                            <value data-testId="old-source-application-reference" use-empty-fallback>
-                                @oldDetails.SourceApplicationReference
+                            <key>Evidence</key>
+                            <value>
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
                             </value>
                         </row>
                     }
