@@ -495,7 +495,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
                 await SetupInstanceStateForUnverifiedUserInAnotherJourneyAsync(coordinator, oneLoginUser);
 
-                await SetOneLoginUserVerifiedAsync(oneLoginUser.Subject, connectToPersonId: person.PersonId);
+                await SetOneLoginUserConnectedAsync(oneLoginUser.Subject, person.PersonId);
 
                 var redirectUri = coordinator.State.RedirectUri;
                 var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.CheckAnswers(coordinator.InstanceId));
@@ -532,27 +532,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             trainingProviderId: trainingProvider.TrainingProviderId,
             subjectId: subject.TrainingSubjectId);
     }
-
-    private Task SetOneLoginUserVerifiedAsync(string subject, Guid? connectToPersonId = null) =>
-        WithDbContextAsync(async dbContext =>
-        {
-            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject);
-
-            oneLoginUser.SetVerified(
-                TimeProvider.UtcNow,
-                OneLoginUserVerificationRoute.OneLogin,
-                verifiedByApplicationUserId: null,
-                verifiedNames: [[TestData.GenerateFirstName(), TestData.GenerateLastName()]],
-                verifiedDatesOfBirth: [TestData.GenerateDateOfBirth()],
-                coreIdentityClaimVc: null);
-
-            if (connectToPersonId is { } personId)
-            {
-                oneLoginUser.SetMatched(TimeProvider.UtcNow, personId, OneLoginUserMatchRoute.Interactive, matchedAttributes: null);
-            }
-
-            await dbContext.SaveChangesAsync();
-        });
 
     private async Task AssertNoSupportTaskCreatedAsync(string oneLoginUserSubject)
     {

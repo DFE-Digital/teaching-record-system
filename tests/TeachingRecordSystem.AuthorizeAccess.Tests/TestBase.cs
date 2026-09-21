@@ -213,6 +213,41 @@ public abstract class TestBase
         return trnToken;
     }
 
+    // Stands in for the user being verified in another journey while this one is open
+    protected Task SetOneLoginUserVerifiedAsync(string subject) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject);
+            SetVerified(oneLoginUser);
+            await dbContext.SaveChangesAsync();
+        });
+
+    // Stands in for the user being connected to a teaching record in another journey while this one is open
+    protected Task SetOneLoginUserConnectedAsync(string subject, Guid personId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject);
+            SetVerified(oneLoginUser);
+            oneLoginUser.SetMatched(TimeProvider.UtcNow, personId, OneLoginUserMatchRoute.Interactive, matchedAttributes: null);
+            await dbContext.SaveChangesAsync();
+        });
+
+    private void SetVerified(OneLoginUser oneLoginUser)
+    {
+        if (oneLoginUser.VerificationRoute is not null)
+        {
+            return;
+        }
+
+        oneLoginUser.SetVerified(
+            TimeProvider.UtcNow,
+            OneLoginUserVerificationRoute.OneLogin,
+            verifiedByApplicationUserId: null,
+            verifiedNames: [[TestData.GenerateFirstName(), TestData.GenerateLastName()]],
+            verifiedDatesOfBirth: [TestData.GenerateDateOfBirth()],
+            coreIdentityClaimVc: null);
+    }
+
     protected static class StepUrls
     {
         public const string NotVerified = "/not-verified";

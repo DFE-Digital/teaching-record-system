@@ -274,6 +274,12 @@ public class SignInJourneyCoordinator(
             throw new InvalidOperationException("Cannot match to a teaching record without a verified One Login user.");
         }
 
+        // Matching again would overwrite a match made in another journey since this one captured its state
+        if (await TryAdvanceIfVerifiedOrConnectedAsync() is { } nextPage)
+        {
+            return nextPage.ToActionResult();
+        }
+
         if (!State.IdentityVerified)
         {
             return null;
