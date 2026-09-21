@@ -18,43 +18,52 @@
 }
 
 <timeline-entry title="Route deleted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    <govuk-details class="govuk-!-margin-bottom-2">
-        <govuk-details-summary>Reason for deletion</govuk-details-summary>
-        <govuk-details-text>
-            <govuk-summary-list>
-                <row>
-                    <key>Reason</key>
-                    <value data-testid="reason" use-empty-fallback>@changeReason?.Reason</value>
-                </row>
-                <row>
-                    <key>Reason details</key>
-                    <value use-empty-fallback data-testid="reason-detail">
-                        @Html.ConvertNewlinesToLineBreaks(changeReason?.Details)
-                    </value>
-                </row>
-                <row>
-                    <key>Additional information</key>
-                    <value use-empty-fallback data-testid="additional-information">
-                        @Html.ConvertNewlinesToLineBreaks(changeReason?.AdditionalInformation)
-                    </value>
-                </row>
-                <row>
-                    <key>Evidence</key>
-                    <value>
-                        <vc:event-evidence-file-link evidence-file="@changeReason?.EvidenceFile" />
-                    </value>
-                </row>
-            </govuk-summary-list>
-        </govuk-details-text>
-    </govuk-details>
+    <p class="govuk-body" data-testid="route-name">@routeType.Name deleted</p>
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for deletion</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason</key>
+                        <value use-empty-fallback data-testid="reason">
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
+                        </value>
+                    </row>
+                    @if (!string.IsNullOrEmpty(changeReason.AdditionalInformation))
+                    {
+                        <row>
+                            <key>Additional information</key>
+                            <value use-empty-fallback data-testid="additional-information">
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                            </value>
+                        </row>
+                    }
+                    @if (changeReason.EvidenceFile is not null)
+                    {
+                        <row>
+                            <key>Evidence</key>
+                            <value>
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    }
     <govuk-details class="govuk-!-margin-bottom-2">
     <govuk-details-summary>Deleted data</govuk-details-summary>
         <govuk-details-text>
             <govuk-summary-list>
-            <row>
-                <key>Route</key>
-                <value data-testid="route" use-empty-fallback>@routeType.Name</value>
-            </row>
             <row>
                 <key>Status</key>
                 <value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</value>
