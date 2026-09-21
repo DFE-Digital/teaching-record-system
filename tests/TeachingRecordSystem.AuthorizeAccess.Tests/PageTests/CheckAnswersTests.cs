@@ -456,6 +456,91 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
+    [Fact]
+    public Task Post_UnverifiedUserVerifiedInAnotherJourney_DoesNotCreateSupportTaskAndRedirectsToConnect() =>
+        WithJourneyCoordinatorAsync(
+            CreateSignInJourneyState,
+            async coordinator =>
+            {
+                // Arrange
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+                await SetupInstanceStateForUnverifiedUserInAnotherJourneyAsync(coordinator, oneLoginUser);
+
+                await SetOneLoginUserVerifiedAsync(oneLoginUser.Subject);
+
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.CheckAnswers(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(JourneyUrls.Connect(coordinator.InstanceId), response.Headers.Location?.OriginalString);
+
+                Assert.True(coordinator.State.IdentityVerified);
+                Assert.Null(coordinator.State.CreatedSupportTaskReference);
+                await AssertNoSupportTaskCreatedAsync(oneLoginUser.Subject);
+            });
+
+    [Fact]
+    public async Task Post_UnverifiedUserConnectedInAnotherJourney_DoesNotCreateSupportTaskAndCompletesSignIn()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        await WithJourneyCoordinatorAsync(
+            CreateSignInJourneyState,
+            async coordinator =>
+            {
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+                await SetupInstanceStateForUnverifiedUserInAnotherJourneyAsync(coordinator, oneLoginUser);
+
+                await SetOneLoginUserConnectedAsync(oneLoginUser.Subject, person.PersonId);
+
+                var redirectUri = coordinator.State.RedirectUri;
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.CheckAnswers(coordinator.InstanceId));
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(redirectUri, response.Headers.Location?.OriginalString);
+
+                Assert.NotNull(coordinator.State.AuthenticationTicket);
+                Assert.Null(coordinator.State.CreatedSupportTaskReference);
+                await AssertNoSupportTaskCreatedAsync(oneLoginUser.Subject);
+            });
+    }
+
+    private async Task SetupInstanceStateForUnverifiedUserInAnotherJourneyAsync(
+        SignInJourneyCoordinator coordinator,
+        OneLoginUser oneLoginUser)
+    {
+        var trainingProvider = await GetTrainingProviderAsync();
+        var subject = await GetTrainingSubjectAsync();
+
+        await SetupInstanceStateForUnverifiedUserAsync(
+            coordinator,
+            oneLoginUser,
+            firstName: null,
+            lastName: null,
+            dateOfBirth: null,
+            nationalInsuranceNumber: TestData.GenerateNationalInsuranceNumber(),
+            trn: "0000000",
+            qtsYearReceived: TimeProvider.UtcNow.Year.ToString(),
+            trainingProviderId: trainingProvider.TrainingProviderId,
+            subjectId: subject.TrainingSubjectId);
+    }
+
+    private async Task AssertNoSupportTaskCreatedAsync(string oneLoginUserSubject)
+    {
+        var supportTaskCreated = await WithDbContextAsync(dbContext =>
+            dbContext.SupportTasks.AnyAsync(t => t.OneLoginUserSubject == oneLoginUserSubject));
+
+        Assert.False(supportTaskCreated);
+    }
+
     private async Task SetupInstanceStateForVerifiedUserAsync(
         SignInJourneyCoordinator coordinator,
         OneLoginUser oneLoginUser,
