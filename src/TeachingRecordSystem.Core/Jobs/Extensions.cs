@@ -127,6 +127,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(CapitaExportNewJob.JobSchedule));
 
+            recurringJobManager.AddOrUpdate<CapitaExportMissingTrnJob>(
+                nameof(CapitaExportMissingTrnJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.AddOrUpdate<CapitaExportAmendJob>(
                 nameof(CapitaExportAmendJob),
                 job => job.ExecuteAsync(CancellationToken.None),
