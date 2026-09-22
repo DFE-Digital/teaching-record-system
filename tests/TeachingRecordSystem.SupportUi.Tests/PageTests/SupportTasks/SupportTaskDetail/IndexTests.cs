@@ -336,6 +336,26 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(expandZendeskTickets, details.HasAttribute("open"));
     }
 
+    [Fact]
+    public async Task Get_ZendeskTicketUrlWithFragment_DisplaysPathAndFragment()
+    {
+        // Arrange
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r
+            .WithZendeskTickets("https://becomingateacher.zendesk.com/agent/#/tickets/692354"));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/{supportTask.SupportTaskReference}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var details = doc.GetElementByTestId("zendesk-tickets");
+        Assert.NotNull(details);
+        Assert.Contains("/agent/#/tickets/692354", details.TextContent);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
