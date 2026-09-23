@@ -171,7 +171,11 @@ public class Index(
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
-    public static string GetZendeskTicketDisplayText(string url) => new Uri(url).LocalPath;
+    public static string GetZendeskTicketDisplayText(string url)
+    {
+        var uri = new Uri(url);
+        return uri.PathAndQuery + uri.Fragment;
+    }
 
     public record Note(string Content, DateTime CreatedOn, string CreatedBy);
 }
