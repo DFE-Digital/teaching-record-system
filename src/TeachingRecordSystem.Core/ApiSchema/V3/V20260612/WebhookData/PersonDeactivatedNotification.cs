@@ -16,7 +16,7 @@ public record PersonDeactivatedNotificationPersonInfo
 public class PersonDeactivatedNotificationMapper(PersonInfoCache personInfoCache) :
     IEventMapper<PersonDeactivatedEvent, PersonDeactivatedNotification>
 {
-    public async Task<PersonDeactivatedNotification?> MapEventAsync(PersonDeactivatedEvent @event)
+    public async Task<PersonDeactivatedNotification?> MapEventAsync(PersonDeactivatedEvent @event, EventMapperContext context)
     {
         var deactivatedPerson = await personInfoCache.GetRequiredPersonInfoAsync(@event.PersonId);
         var mergedWithPerson = @event.MergedWithPersonId is Guid mergedWithPersonId ? await personInfoCache.GetRequiredPersonInfoAsync(mergedWithPersonId) : null;

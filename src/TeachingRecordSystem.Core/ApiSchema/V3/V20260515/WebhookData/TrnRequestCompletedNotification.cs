@@ -17,12 +17,18 @@ public class TrnRequestCompletedNotificationMapper(
     PersonInfoCache personInfoCache) :
     IEventMapper<TrnRequestUpdatedEvent, TrnRequestCompletedNotification>
 {
-    public async Task<TrnRequestCompletedNotification?> MapEventAsync(TrnRequestUpdatedEvent @event)
+    public async Task<TrnRequestCompletedNotification?> MapEventAsync(TrnRequestUpdatedEvent @event, EventMapperContext context)
     {
         var statusChanged = (@event.Changes & TrnRequestUpdatedChanges.Status) != 0;
         var newStatusIsCompleted = @event.TrnRequest.Status == CoreTrnRequestStatus.Completed;
 
         if (!statusChanged || !newStatusIsCompleted)
+        {
+            return null;
+        }
+
+        // Only the application that made the TRN request should be notified that it's been completed
+        if (@event.TrnRequest.ApplicationUserId != context.ApplicationUserId)
         {
             return null;
         }

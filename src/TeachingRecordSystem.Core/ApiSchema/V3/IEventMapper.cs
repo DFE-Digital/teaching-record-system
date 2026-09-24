@@ -4,5 +4,5 @@ public interface IEventMapper<TEvent, TData>
     where TEvent : IEvent
     where TData : IWebhookMessageData
 {
-    Task<TData?> MapEventAsync(TEvent @event);
+    Task<TData?> MapEventAsync(TEvent @event, EventMapperContext context);
 }
