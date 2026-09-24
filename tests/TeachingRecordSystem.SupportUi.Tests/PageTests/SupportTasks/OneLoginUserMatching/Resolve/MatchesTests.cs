@@ -65,6 +65,65 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public async Task Get_ValidRequestWithQtsDetails_ShowsRequestQtsDetails(bool isRecordMatchingOnlySupportTask)
+    {
+        // Arrange
+        var matchedPerson = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).SingleRandom();
+        var yearQtsReceived = TimeProvider.UtcNow.Year.ToString();
+        var supportTask = isRecordMatchingOnlySupportTask ?
+            await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+                oneLoginUser.Subject, t => t
+                    .WithVerifiedNames([matchedPerson.FirstName, matchedPerson.LastName])
+                    .WithVerifiedDateOfBirth(matchedPerson.DateOfBirth!.Value)
+                    .WithStatedTrn(matchedPerson.Trn!)
+                    .WithYearQtsReceived(yearQtsReceived)
+                    .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                    .WithSubjectId(subject.TrainingSubjectId)) :
+            await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+                oneLoginUser.Subject, t => t
+                    .WithStatedFirstName(matchedPerson.FirstName)
+                    .WithStatedLastName(matchedPerson.LastName)
+                    .WithStatedDateOfBirth(matchedPerson.DateOfBirth!.Value)
+                    .WithStatedTrn(matchedPerson.Trn!)
+                    .WithYearQtsReceived(yearQtsReceived)
+                    .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+                    .WithSubjectId(subject.TrainingSubjectId));
+
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
+            state => state.Verified = true,
+            new MatchPersonResult(
+                matchedPerson.PersonId,
+                matchedPerson.Trn,
+                [
+                    KeyValuePair.Create(PersonMatchedAttribute.FirstName, matchedPerson.FirstName),
+                    KeyValuePair.Create(PersonMatchedAttribute.LastName, matchedPerson.LastName),
+                    KeyValuePair.Create(PersonMatchedAttribute.DateOfBirth, matchedPerson.DateOfBirth!.Value.ToString("yyyy-MM-dd")),
+                    KeyValuePair.Create(PersonMatchedAttribute.Trn, matchedPerson.Trn)
+                ]));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var requestDetails = doc.GetElementByTestId("request");
+        Assert.NotNull(requestDetails);
+        Assert.Equal(yearQtsReceived, requestDetails.GetSummaryListValueByKey("Year received"));
+        Assert.Equal(trainingProvider.Name, requestDetails.GetSummaryListValueByKey("Provider"));
+        Assert.Equal(subject.Name, requestDetails.GetSummaryListValueByKey("Subject"));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public async Task Get_ValidRequest_WithNonNormalizedTrnAndNino_ShowsNormalizedValues(bool isRecordMatchingOnlySupportTask)
     {
         // Arrange
