@@ -22,7 +22,7 @@ public record OneLoginUserConnectedPersonInfo
 public class OneLoginUserUpdatedNotificationMapper(PersonInfoCache personInfoCache) :
     IEventMapper<OneLoginUserUpdatedEvent, OneLoginUserUpdatedNotification>
 {
-    public async Task<OneLoginUserUpdatedNotification?> MapEventAsync(OneLoginUserUpdatedEvent @event)
+    public async Task<OneLoginUserUpdatedNotification?> MapEventAsync(OneLoginUserUpdatedEvent @event, EventMapperContext context)
     {
         var emailChanged = (@event.Changes & OneLoginUserUpdatedEventChanges.EmailAddress) != 0;
         var personChanged = (@event.Changes & OneLoginUserUpdatedEventChanges.PersonId) != 0;

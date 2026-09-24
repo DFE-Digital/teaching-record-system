@@ -74,33 +74,40 @@ public class WebhookMessageFactory(
                 continue;
             }
 
-            var payload = await MapEventAsync(mapperType, dataType!);
-            if (payload is null)
+            var mapper = CreateMapper(mapperType, dataType!);
+
+            foreach (var applicationUserEndpoints in endpointCloudEventTypeVersions[(version, cloudEventType)].GroupBy(e => e.ApplicationUserId))
             {
-                continue;
-            }
+                var context = new EventMapperContext { ApplicationUserId = applicationUserEndpoints.Key };
 
-            var serializedPayload = JsonSerializer.SerializeToElement(payload, _serializerOptions);
-
-            messages.AddRange(endpointCloudEventTypeVersions[(version, cloudEventType)].Select(ep =>
-            {
-                var id = Guid.NewGuid();
-
-                return new WebhookMessage
+                var payload = await mapper.MapEventAsync(@event, context);
+                if (payload is null)
                 {
-                    WebhookMessageId = id,
-                    WebhookEndpointId = ep.WebhookEndpointId,
-                    CloudEventId = id.ToString(),
-                    CloudEventType = cloudEventType,
-                    Timestamp = timeProvider.UtcNow,
-                    ApiVersion = version,
-                    Data = serializedPayload,
-                    NextDeliveryAttempt = timeProvider.UtcNow,
-                    Delivered = null,
-                    DeliveryAttempts = [],
-                    DeliveryErrors = []
-                };
-            }));
+                    continue;
+                }
+
+                var serializedPayload = JsonSerializer.SerializeToElement(payload, _serializerOptions);
+
+                messages.AddRange(applicationUserEndpoints.Select(ep =>
+                {
+                    var id = Guid.NewGuid();
+
+                    return new WebhookMessage
+                    {
+                        WebhookMessageId = id,
+                        WebhookEndpointId = ep.WebhookEndpointId,
+                        CloudEventId = id.ToString(),
+                        CloudEventType = cloudEventType,
+                        Timestamp = timeProvider.UtcNow,
+                        ApiVersion = version,
+                        Data = serializedPayload,
+                        NextDeliveryAttempt = timeProvider.UtcNow,
+                        Delivered = null,
+                        DeliveryAttempts = [],
+                        DeliveryErrors = []
+                    };
+                }));
+            }
         }
 
         dbContext.WebhookMessages.AddRange(messages);
@@ -114,18 +121,16 @@ public class WebhookMessageFactory(
 
         return messages;
 
-        Task<object?> MapEventAsync(Type mapperType, Type dataType)
+        IEventMapper CreateMapper(Type mapperType, Type dataType)
         {
             var mapper = ActivatorUtilities.CreateInstance(serviceProvider, mapperType);
 
             var eventType = @event.GetType();
 
-            var wrappedMapper = (IEventMapper)ActivatorUtilities.CreateInstance(
+            return (IEventMapper)ActivatorUtilities.CreateInstance(
                 serviceProvider,
                 typeof(WrappedMapper<,>).MakeGenericType(eventType, dataType),
                 mapper);
-
-            return wrappedMapper.MapEventAsync(@event);
         }
     }
 
@@ -165,14 +170,14 @@ public class WebhookMessageFactory(
 
     private interface IEventMapper
     {
-        Task<object?> MapEventAsync(IEvent @event);
+        Task<object?> MapEventAsync(IEvent @event, EventMapperContext context);
     }
 
     private class WrappedMapper<TEvent, TData>(IEventMapper<TEvent, TData> innerMapper) : IEventMapper
         where TEvent : IEvent
         where TData : IWebhookMessageData
     {
-        public async Task<object?> MapEventAsync(IEvent @event) =>
-            await innerMapper.MapEventAsync((TEvent)@event);
+        public async Task<object?> MapEventAsync(IEvent @event, EventMapperContext context) =>
+            await innerMapper.MapEventAsync((TEvent)@event, context);
     }
 }

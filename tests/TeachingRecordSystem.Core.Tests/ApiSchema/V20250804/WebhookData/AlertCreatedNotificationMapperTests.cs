@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 
@@ -29,7 +30,7 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
 
             // Assert
             Assert.NotNull(notification);
@@ -65,7 +66,7 @@ public class AlertCreatedNotificationMapperTests(ServiceFixture fixture) : Servi
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
 
             // Assert
             Assert.Null(notification);

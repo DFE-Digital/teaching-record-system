@@ -1,5 +1,7 @@
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.WebhookData;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260915.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -57,4 +59,58 @@ public class WebhookMessageFactoryTests(ServiceFixture fixture) : ServiceTestBas
             await dbContext.WebhookMessages.SingleAsync(m => m.WebhookMessageId == message.WebhookMessageId));
         Assert.Equal(PingNotification.CloudEventType, savedMessage.CloudEventType);
     }
+
+    [Fact]
+    public async Task CreateMessagesAsync_TrnRequestCompleted_OnlyCreatesMessagesForTrnRequestApplicationUsersEndpoints()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var otherApplicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (_, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+        var trnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata) with { Status = TrnRequestStatus.Completed };
+
+        var @event = new TrnRequestUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            SourceApplicationUserId = applicationUser.UserId,
+            RequestId = trnRequest.RequestId,
+            Changes = TrnRequestUpdatedChanges.Status,
+            TrnRequest = trnRequest,
+            OldTrnRequest = trnRequest with { Status = TrnRequestStatus.Pending },
+            ReasonDetails = null
+        };
+
+        var (endpoint, _) = await WithDbContextAsync(async dbContext =>
+        {
+            var e = CreateTrnRequestCompletedEndpoint(applicationUser.UserId);
+            var other = CreateTrnRequestCompletedEndpoint(otherApplicationUser.UserId);
+            dbContext.WebhookEndpoints.AddRange(e, other);
+            await dbContext.SaveChangesAsync();
+            return (e, other);
+        });
+
+        Services.GetRequiredService<IMemoryCache>().Remove(CacheKeys.EnabledWebhookEndpoints());
+
+        // Act
+        var messages = await WithServiceAsync<WebhookMessageFactory, IEnumerable<WebhookMessage>>(
+            factory => factory.CreateMessagesAsync(@event));
+
+        // Assert
+        var message = Assert.Single(messages);
+        Assert.Equal(endpoint.WebhookEndpointId, message.WebhookEndpointId);
+        Assert.Equal(TrnRequestCompletedNotification.CloudEventType, message.CloudEventType);
+    }
+
+    private static WebhookEndpoint CreateTrnRequestCompletedEndpoint(Guid applicationUserId) => new()
+    {
+        WebhookEndpointId = Guid.NewGuid(),
+        ApplicationUserId = applicationUserId,
+        Address = $"https://webhooks.example.com/{Guid.NewGuid()}",
+        ApiVersion = "20260515",
+        CloudEventTypes = [TrnRequestCompletedNotification.CloudEventType],
+        Enabled = true,
+        CreatedOn = DateTime.UtcNow,
+        UpdatedOn = DateTime.UtcNow
+    };
 }

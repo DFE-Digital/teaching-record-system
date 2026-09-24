@@ -1,5 +1,6 @@
 using System.Diagnostics;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
+using TeachingRecordSystem.Core.ApiSchema.V3;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 using TrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
 
@@ -51,13 +52,13 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
 
             // Assert
             Assert.NotNull(notification);
             Assert.Equal(trnRequest.RequestId, notification.TrnRequest.RequestId);
             Assert.Equal(person.Trn, notification.TrnRequest.Trn);
-            Assert.Equal(Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestCompletedNotificationTrnRequestStatus.Completed, notification.TrnRequest.Status);
+            Assert.Equal(Core.ApiSchema.V3.V20260515.Dtos.TrnRequestStatus.Completed, notification.TrnRequest.Status);
             Assert.True(notification.TrnRequest.PotentialDuplicate);
             Assert.NotNull(notification.TrnRequest.AccessYourTeachingQualificationsLink);
         });
@@ -103,13 +104,13 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
 
             // Assert
             Assert.NotNull(notification);
             Assert.Equal(trnRequest.RequestId, notification.TrnRequest.RequestId);
             Assert.Equal(person.Trn, notification.TrnRequest.Trn);
-            Assert.Equal(Core.ApiSchema.V3.V20260224.WebhookData.TrnRequestCompletedNotificationTrnRequestStatus.Completed, notification.TrnRequest.Status);
+            Assert.Equal(Core.ApiSchema.V3.V20260515.Dtos.TrnRequestStatus.Completed, notification.TrnRequest.Status);
             Assert.True(notification.TrnRequest.PotentialDuplicate);
             Assert.NotNull(notification.TrnRequest.AccessYourTeachingQualificationsLink);
         });
@@ -143,7 +144,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
 
             // Assert
             Assert.Null(notification);
@@ -189,7 +190,37 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
+
+            // Assert
+            Assert.Null(notification);
+        });
+
+    [Fact]
+    public Task MapEventAsync_ContextIsForDifferentApplicationUser_ReturnsNull() =>
+        WithServiceAsync<TrnRequestCompletedNotificationMapper>(async mapper =>
+        {
+            // Arrange
+            var applicationUser = await TestData.CreateApplicationUserAsync();
+            var otherApplicationUser = await TestData.CreateApplicationUserAsync();
+
+            var (_, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+            var trnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata) with { Status = TrnRequestStatus.Completed };
+
+            var @event = new TrnRequestUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SourceApplicationUserId = applicationUser.UserId,
+                RequestId = trnRequest.RequestId,
+                Changes = TrnRequestUpdatedChanges.Status,
+                TrnRequest = trnRequest,
+                OldTrnRequest = trnRequest with { Status = TrnRequestStatus.Pending },
+                ReasonDetails = null
+            };
+
+            // Act
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = otherApplicationUser.UserId });
 
             // Assert
             Assert.Null(notification);
