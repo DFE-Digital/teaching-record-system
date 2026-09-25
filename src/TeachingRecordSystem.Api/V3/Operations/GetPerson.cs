@@ -276,6 +276,13 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             induction = Option.Some(mappedInduction.Induction);
         }
 
+        var nationalInsuranceNumber = person.NationalInsuranceNumber;
+        if (string.IsNullOrEmpty(nationalInsuranceNumber))
+        {
+            var otherNationalInsuranceNumbers = dbContext.Entry(person).Property<string[]?>("national_insurance_numbers").CurrentValue;
+            nationalInsuranceNumber = otherNationalInsuranceNumbers?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
+        }
+
         return new GetPersonResult()
         {
             Trn = person.Trn,
@@ -283,7 +290,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             MiddleName = person.MiddleName,
             LastName = person.LastName,
             DateOfBirth = person.DateOfBirth!.Value,
-            NationalInsuranceNumber = person.NationalInsuranceNumber,
+            NationalInsuranceNumber = nationalInsuranceNumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some(pendingDetailChanges!.Value.PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some(pendingDetailChanges!.Value.PendingDateOfBirthRequest) : default,
             Qts = QtsInfo.Create(person),
