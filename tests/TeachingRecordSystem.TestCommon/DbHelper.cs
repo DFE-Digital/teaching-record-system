@@ -136,7 +136,7 @@ public sealed class DbHelper : IAsyncDisposable
 
         var connection = dbContext.Database.GetDbConnection();
 
-        var currentDbVersion = GetDbVersion(dbContext, GetRepositoryRootPath());
+        var currentDbVersion = GetDbVersion(dbContext);
 
         // Deliberately the connection string we were configured with rather than the one EF hands back, which has had
         // the password stripped out of it and so can't be used to open a connection of our own.
@@ -181,34 +181,17 @@ public sealed class DbHelper : IAsyncDisposable
         await command.ExecuteNonQueryAsync();
     }
 
-    private static string GetDbVersion(TrsDbContext dbContext, string repositoryRootPath)
+    private static string GetDbVersion(TrsDbContext dbContext)
     {
         // The seed data is only written when EF migrates the database, so changing it without also changing the schema
         // would otherwise leave every existing test database with the old reference data.
-        var seedingSourcePath = Path.Combine(repositoryRootPath, SeedingSourceFilePath);
+        var seedingSourcePath = Path.Combine(TestPaths.RepositoryRoot, SeedingSourceFilePath);
 
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         hash.AppendData(Encoding.UTF8.GetBytes(dbContext.Database.GenerateCreateScript()));
         hash.AppendData(File.ReadAllBytes(seedingSourcePath));
 
         return Convert.ToHexString(hash.GetHashAndReset());
-    }
-
-    private static string GetRepositoryRootPath()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, "TeachingRecordSystem.slnx")))
-            {
-                return directory.FullName;
-            }
-
-            directory = directory.Parent;
-        }
-
-        throw new InvalidOperationException($"Could not find the repository root from '{AppContext.BaseDirectory}'.");
     }
 
     private async Task EnsureRespawnerAsync(DbConnection connection) =>
