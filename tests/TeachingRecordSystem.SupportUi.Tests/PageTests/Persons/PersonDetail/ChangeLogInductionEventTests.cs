@@ -215,8 +215,8 @@ public class ChangeLogInductionEventTests : TestBase
         if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
         {
             var startDateText = item.GetElementByTestId("start-date")?.TrimmedText();
-            Assert.Contains(previousValueIsDefault ? "None" : oldStartDate?.ToString(WebConstants.DateDisplayFormat), startDateText);
-            Assert.Contains(newValueIsDefault ? "None" : startDate?.ToString(WebConstants.DateDisplayFormat), startDateText);
+            Assert.Contains(previousValueIsDefault ? "None" : oldStartDate!.Value.ToString(WebConstants.DateDisplayFormat), startDateText);
+            Assert.Contains(newValueIsDefault ? "None" : startDate!.Value.ToString(WebConstants.DateDisplayFormat), startDateText);
         }
         else
         {
@@ -226,8 +226,8 @@ public class ChangeLogInductionEventTests : TestBase
         if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
         {
             var completedDateText = item.GetElementByTestId("completed-date")?.TrimmedText();
-            Assert.Contains(previousValueIsDefault ? "None" : oldCompletedDate?.ToString(WebConstants.DateDisplayFormat), completedDateText);
-            Assert.Contains(newValueIsDefault ? "None" : completedDate?.ToString(WebConstants.DateDisplayFormat), completedDateText);
+            Assert.Contains(previousValueIsDefault ? "None" : oldCompletedDate!.Value.ToString(WebConstants.DateDisplayFormat), completedDateText);
+            Assert.Contains(newValueIsDefault ? "None" : completedDate!.Value.ToString(WebConstants.DateDisplayFormat), completedDateText);
         }
         else
         {
