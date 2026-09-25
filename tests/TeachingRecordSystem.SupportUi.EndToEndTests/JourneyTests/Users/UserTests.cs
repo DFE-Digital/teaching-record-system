@@ -42,7 +42,7 @@ public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPageAsync();
+        await page.GoToUsersPageAsync(user.Email!);
 
         await page.AssertOnUsersPageAsync();
 
@@ -68,7 +68,7 @@ public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPageAsync();
+        await page.GoToUsersPageAsync(user.Email!);
 
         await page.AssertOnUsersPageAsync();
 
@@ -100,7 +100,7 @@ public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPageAsync();
+        await page.GoToUsersPageAsync(user.Email!);
 
         await page.AssertOnUsersPageAsync();
 
