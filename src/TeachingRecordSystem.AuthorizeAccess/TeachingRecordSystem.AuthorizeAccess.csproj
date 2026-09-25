@@ -49,4 +49,11 @@
     </ItemGroup>
   </Target>
 
+  <Target Name="IncludeAccessibleAutocompleteInContent" AfterTargets="LibraryManagerRestore">
+    <ItemGroup>
+      <Content Remove="wwwroot\lib\accessible-autocomplete\**" />
+      <Content Include="wwwroot\lib\accessible-autocomplete\**" />
+    </ItemGroup>
+  </Target>
+
 </Project>
