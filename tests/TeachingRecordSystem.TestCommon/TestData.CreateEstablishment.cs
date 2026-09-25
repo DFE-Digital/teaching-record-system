@@ -2,9 +2,25 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    private static int _lastEstablishmentUrn = 100000;
+    private static readonly Lock _establishmentUrnGate = new();
+    private static int _lastEstablishmentUrn;
 
-    public int GenerateEstablishmentUrn() => Interlocked.Increment(ref _lastEstablishmentUrn);
+    public int GenerateEstablishmentUrn()
+    {
+        lock (_establishmentUrnGate)
+        {
+            if (_lastEstablishmentUrn == 0)
+            {
+                // Establishments from earlier runs are still in the database, and matching on LA code and establishment
+                // number breaks ties on the highest URN, so carry on above whatever is already there rather than
+                // starting from the same number every run.
+                using var dbContext = DbContextFactory.CreateDbContext();
+                _lastEstablishmentUrn = Math.Max(100000, dbContext.Establishments.Max(e => e.Urn) ?? 0);
+            }
+
+            return ++_lastEstablishmentUrn;
+        }
+    }
 
     public async Task<Core.DataStore.Postgres.Models.Establishment> CreateEstablishmentAsync(
         string localAuthorityCode,
