@@ -22,6 +22,7 @@
     <PackageReference Include="Microsoft.Identity.Web" />
     <PackageReference Include="Microsoft.Identity.Web.GraphServiceClientBeta" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,5 +34,12 @@
     <Content Remove="sasscompiler.json" />
     <None Include="sasscompiler.json" />
   </ItemGroup>
+
+  <Target Name="IncludeAccessibleAutocompleteInContent" AfterTargets="LibraryManagerRestore">
+    <ItemGroup>
+      <Content Remove="wwwroot\lib\accessible-autocomplete\**" />
+      <Content Include="wwwroot\lib\accessible-autocomplete\**" />
+    </ItemGroup>
+  </Target>
 
 </Project>

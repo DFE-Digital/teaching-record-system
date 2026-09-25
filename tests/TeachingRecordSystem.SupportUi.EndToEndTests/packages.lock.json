@@ -1069,6 +1069,7 @@
           "Microsoft.Identity.Web": "[4.14.2, )",
           "Microsoft.Identity.Web.GraphServiceClientBeta": "[4.12.2, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.22.0, )",
+          "Microsoft.Web.LibraryManager.Build": "[3.0.114, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "TeachingRecordSystem.WebCommon": "[1.0.0, )"
         }
@@ -1536,6 +1537,12 @@
           "Microsoft.IdentityModel.Protocols": "8.22.0",
           "System.IdentityModel.Tokens.Jwt": "8.22.0"
         }
+      },
+      "Microsoft.Web.LibraryManager.Build": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.114, )",
+        "resolved": "3.0.114",
+        "contentHash": "9E7B1ixZR2to7ZTPZKIcTfQwGKuBu11F7tFykmi2X+icjTy6bJY9N/LLJ9tAW7PhaAmgM15o3t7P9aBg0kbUxw=="
       },
       "Mime-Detective": {
         "type": "CentralTransitive",

@@ -126,6 +126,12 @@
         "resolved": "18.7.23",
         "contentHash": "dyj6z8m+LFjpeH69hdnciCcRCmD0YgMlvuQEywiEshjqj/blgQ+PuWX8Vd5gkWQFoBN4e+TFxx6DvGNSv/gIKg=="
       },
+      "Microsoft.Web.LibraryManager.Build": {
+        "type": "Direct",
+        "requested": "[3.0.114, )",
+        "resolved": "3.0.114",
+        "contentHash": "9E7B1ixZR2to7ZTPZKIcTfQwGKuBu11F7tFykmi2X+icjTy6bJY9N/LLJ9tAW7PhaAmgM15o3t7P9aBg0kbUxw=="
+      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.61.0",
