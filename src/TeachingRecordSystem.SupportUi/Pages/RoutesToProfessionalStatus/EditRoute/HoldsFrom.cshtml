@@ -14,7 +14,7 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
 
-            <govuk-date-input for="HoldsFrom">
+            <govuk-date-input for="HoldsFrom" error-message-prefix="The date they first held this professional status">
                  <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" >
                     @ViewBag.Title
                 </govuk-date-input-fieldset-legend>

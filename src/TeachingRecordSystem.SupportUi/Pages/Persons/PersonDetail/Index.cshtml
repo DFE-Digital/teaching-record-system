@@ -21,8 +21,8 @@
 @if (Model.ConnectedOneLoginUsers?.Length > 0)
 {
     <govuk-summary-card data-testid="associated-one-login-users">
-        <title>Connected GOV.UK One Login details
-        </title>
+        <card-title>Connected GOV.UK One Login details
+        </card-title>
         <govuk-summary-list>
             @foreach (var user in Model.ConnectedOneLoginUsers)
             {
@@ -66,7 +66,7 @@
 @if (Model.PersonProfessionalStatus is not null)
 {
     <govuk-summary-card>
-        <title data-testid="professional-status-details">Professional status details</title>
+        <card-title data-testid="professional-status-details">Professional status details</card-title>
         <govuk-summary-list>
             <row>
                 <key>Qualified teacher status (QTS)</key>

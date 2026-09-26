@@ -24,9 +24,9 @@
 
             <div class="trs-potential-duplicates @(showDuplicatesSideBySide ? "trs-potential-duplicates--side-by-side" : "")">
                 <govuk-summary-card data-testid="request" class="trs-potential-duplicates__item">
-                    <title>
+                    <card-title>
                         Teachers&rsquo; Pensions record
-                    </title>
+                    </card-title>
                     <card-actions>
                         <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.SupportTask!.PersonId!.Value)" target="_blank">
                             View record
@@ -78,9 +78,9 @@
                 @foreach (var (match, hasNameMismatch) in Model.PotentialDuplicatesWithNameMatchingInfo)
                 {
                     <govuk-summary-card data-testid="match" class="trs-potential-duplicates__item">
-                        <title>
+                        <card-title>
                             Record @match.Identifier
-                        </title>
+                        </card-title>
                         <card-actions>
                             <action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
                                 View record
