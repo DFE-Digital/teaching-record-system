@@ -28,13 +28,13 @@
                 }
             }
             <govuk-checkboxes for="ExemptionReasonIds">
-                <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
+                <hint class="trs-checkboxes_hint">Select all that apply</hint>
                 @foreach (var category in Model.ExemptionReasons)
                 {
-                    <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@category.Key.GetDisplayName()</govuk-checkboxes-divider>
+                    <divider class="trs-checkboxes__divider--heading-s">@category.Key.GetDisplayName()</divider>
                     @foreach (var exemptionReason in category.Value)
                     {
-                        <govuk-checkboxes-item value="@exemptionReason.InductionExemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReason.InductionExemptionReasonId)">@exemptionReason.Name</govuk-checkboxes-item>
+                        <checkboxes-item value="@exemptionReason.InductionExemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReason.InductionExemptionReasonId)">@exemptionReason.Name</checkboxes-item>
                     }
                 }
             </govuk-checkboxes>

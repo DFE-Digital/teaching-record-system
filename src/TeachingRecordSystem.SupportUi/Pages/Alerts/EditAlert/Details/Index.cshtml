@@ -17,12 +17,12 @@
             <span class="govuk-caption-l">Edit alert - @Model.PersonName</span>
 
             <govuk-character-count for="Details" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows" data-testid="details">
-                <govuk-character-count-label class="govuk-label--l" is-page-heading="true">
+                <label class="govuk-label--l" is-page-heading="true">
                     @ViewBag.Title
-                </govuk-character-count-label>
-                <govuk-character-count-hint>
+                </label>
+                <hint>
                     For example, include any restrictions it places on a teacher.
-                </govuk-character-count-hint>
+                </hint>
             </govuk-character-count>
 
             <div class="govuk-button-group">

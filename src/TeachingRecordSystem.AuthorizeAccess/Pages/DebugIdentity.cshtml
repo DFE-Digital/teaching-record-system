@@ -18,22 +18,22 @@
             <govuk-input for="Email" type="email" disabled="true" />
 
             <govuk-checkboxes for="AttemptedIdentityVerification">
-                <govuk-checkboxes-item value="@true" disabled="@Model.IdentityVerified">Attempted identity verification</govuk-checkboxes-item>
+                <checkboxes-item value="@true" disabled="@Model.IdentityVerified">Attempted identity verification</checkboxes-item>
             </govuk-checkboxes>
 
             <govuk-checkboxes for="IdentityVerified">
-                <govuk-checkboxes-item value="@true" disabled="@Model.IdentityVerified">
+                <checkboxes-item value="@true" disabled="@Model.IdentityVerified">
                     Identity verified
                     @if (Model.IdentityVerified)
                     {
                         <text> (already verified in database)</text>
                     }
 
-                    <govuk-checkboxes-item-conditional>
+                    <conditional>
                         <govuk-textarea for="VerifiedNames" disabled="@Model.IdentityVerified" />
                         <govuk-textarea for="VerifiedDatesOfBirth" disabled="@Model.IdentityVerified" />
-                    </govuk-checkboxes-item-conditional>
-                </govuk-checkboxes-item>
+                    </conditional>
+                </checkboxes-item>
             </govuk-checkboxes>
 
             <div class="govuk-!-margin-bottom-5">

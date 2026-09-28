@@ -8,21 +8,21 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="post">
             <govuk-radios for="HaveQts">
-                <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</govuk-radios-fieldset-legend>
-                <govuk-radios-hint>
+                <legend is-page-heading="true" class="govuk-fieldset__legend--l">@ViewBag.Title</legend>
+                <hint>
                     Qualified teacher status (QTS) is a legal requirement to teach in many English schools and is considered desirable for teachers in the majority of schools in England.
-                </govuk-radios-hint>
-                <govuk-radios-item value="@true">Yes</govuk-radios-item>
-                <govuk-radios-item value="@false">No</govuk-radios-item>
+                </hint>
+                <radios-item value="@true">Yes</radios-item>
+                <radios-item value="@false">No</radios-item>
             </govuk-radios>
 
             <govuk-details>
-                <govuk-details-summary>Why are we asking this?</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Why are we asking this?</summary>
+                <text>
                     <p class="govuk-body">
                         Providing this data gives us additional information to help us match you to your teaching record.
                     </p>
-                </govuk-details-text>
+                </text>
             </govuk-details>
 
             <govuk-button type="submit">Continue</govuk-button>

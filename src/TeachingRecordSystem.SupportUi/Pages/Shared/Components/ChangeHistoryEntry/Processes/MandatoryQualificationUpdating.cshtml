@@ -56,8 +56,8 @@
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Reason for change</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Reason details</key>
@@ -88,7 +88,7 @@
                         </row>
                     }
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 </timeline-entry>

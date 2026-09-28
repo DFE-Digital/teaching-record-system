@@ -38,12 +38,12 @@
                             @if (Model.Facets![SupportTaskSearchFacet.Sources].Count > 0)
                             {
                                 <govuk-checkboxes for="Sources" class="govuk-checkboxes--small">
-                                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s"/>
+                                    <legend class="govuk-fieldset__legend--s"/>
                                     @foreach (var source in Model.Facets![SupportTaskSearchFacet.Sources].Keys.Cast<SupportTaskSource>().OrderBy(u => u.UserName))
                                     {
-                                        <govuk-checkboxes-item value="@source.UserId">
+                                        <checkboxes-item value="@source.UserId">
                                             @source.UserName (@Model.Facets![SupportTaskSearchFacet.Sources][source])
-                                        </govuk-checkboxes-item>
+                                        </checkboxes-item>
                                     }
                                 </govuk-checkboxes>
                             }

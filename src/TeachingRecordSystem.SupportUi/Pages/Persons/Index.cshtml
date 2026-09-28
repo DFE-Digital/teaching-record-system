@@ -16,13 +16,13 @@
         <form method="get" asp-antiforgery="false" data-testid="search-form">
             <span class="govuk-caption-l">Search</span>
             <govuk-input for="Search" label-class="govuk-label--l" data-testid="search-input" type="search">
-                <govuk-input-label>@ViewBag.Title</govuk-input-label>
-                <govuk-input-hint>
+                <label>@ViewBag.Title</label>
+                <hint>
                     Enter a name, email address, date of birth or TRN
-                </govuk-input-hint>
-                <govuk-input-after-input>
+                </hint>
+                <after-input>
                     <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                </govuk-input-after-input>
+                </after-input>
             </govuk-input>
         </form>
 
@@ -47,21 +47,21 @@
                 <div class="trs-horizontal-filters__container">
                     <div class="trs-horizontal-filters__options">
                         <govuk-checkboxes for="IncludeActive">
-                            <govuk-checkboxes-item value="@true">
+                            <checkboxes-item value="@true">
                                 @PersonStatus.Active.GetDisplayName() (@Model.Facets![nameof(Model.IncludeActive)].GetValueOrDefault(true, 0))
-                            </govuk-checkboxes-item>
+                            </checkboxes-item>
                         </govuk-checkboxes>
 
                         <govuk-checkboxes for="IncludeDeactivated">
-                            <govuk-checkboxes-item value="@true">
+                            <checkboxes-item value="@true">
                                 @PersonStatus.Deactivated.GetDisplayName() (@Model.Facets![nameof(Model.IncludeDeactivated)].GetValueOrDefault(true, 0))
-                            </govuk-checkboxes-item>
+                            </checkboxes-item>
                         </govuk-checkboxes>
 
                         <govuk-checkboxes for="IncludeOneLoginUser">
-                            <govuk-checkboxes-item value="@true">
+                            <checkboxes-item value="@true">
                                 GOV.UK One Login (@Model.Facets![nameof(Model.IncludeOneLoginUser)].GetValueOrDefault(true, 0))
-                            </govuk-checkboxes-item>
+                            </checkboxes-item>
                         </govuk-checkboxes>
                     </div>
                     <div class="trs-horizontal-filters__actions">

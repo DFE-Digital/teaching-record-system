@@ -11,10 +11,10 @@
     @if (updatedEvent.Changes != PersonUpdatedInDqtEventChanges.None)
     {
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Record details</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Record details</summary>
+            <text>
                 <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 </timeline-entry>

@@ -20,19 +20,17 @@
             </govuk-warning-text>
 
             <govuk-radios for="Reason">
-                <govuk-radios-item value="@OneLoginUserNotConnectingReason.NoMatchingRecord">
+                <radios-item value="@OneLoginUserNotConnectingReason.NoMatchingRecord">
                     @OneLoginUserNotConnectingReason.NoMatchingRecord.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@OneLoginUserNotConnectingReason.AnotherReason">
+                </radios-item>
+                <radios-item value="@OneLoginUserNotConnectingReason.AnotherReason">
                     @OneLoginUserNotConnectingReason.AnotherReason.GetDisplayName()
-                    <govuk-radios-item-conditional>
-                        <govuk-radios-item-conditional>
-                            <govuk-character-count for="AdditionalDetails" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount">
-                                <govuk-character-count-label>Enter details</govuk-character-count-label>
-                            </govuk-character-count>
-                        </govuk-radios-item-conditional>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
+                    <conditional>
+                        <govuk-character-count for="AdditionalDetails" max-length="@UiDefaults.ReasonDetailsMaxCharacterCount">
+                            <label>Enter details</label>
+                        </govuk-character-count>
+                    </conditional>
+                </radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

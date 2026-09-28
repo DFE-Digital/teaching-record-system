@@ -46,36 +46,36 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="SubjectId1" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true">
+                <label is-page-heading="true">
                     @ViewBag.Title
-                </govuk-select-label>
-                <govuk-select-hint>Start typing the name of the subject</govuk-select-hint>
-                <govuk-select-item value=""></govuk-select-item>
+                </label>
+                <hint>Start typing the name of the subject</hint>
+                <select-item value=""></select-item>
                 @foreach (var subject in Model.Subjects)
                 {
-                    <govuk-select-item value="@subject.Id" selected="@Model.SubjectId1==subject.Id">@subject.DisplayName</govuk-select-item>
+                    <select-item value="@subject.Id" selected="@Model.SubjectId1==subject.Id">@subject.DisplayName</select-item>
                 }
             </govuk-select>
             <govuk-details>
-                <govuk-details-summary>Add additional subjects</govuk-details-summary>
-                <govuk-details-text>
+                <summary>Add additional subjects</summary>
+                <text>
                     <govuk-select for="SubjectId2" label-class="govuk-label">
-                        <govuk-select-label>Second subject (optional)</govuk-select-label>
-                        <govuk-select-item value=""></govuk-select-item>
+                        <label>Second subject (optional)</label>
+                        <select-item value=""></select-item>
                         @foreach (var subject in Model.Subjects)
                         {
-                            <govuk-select-item value="@subject.Id" selected="@Model.SubjectId2==subject.Id">@subject.DisplayName</govuk-select-item>
+                            <select-item value="@subject.Id" selected="@Model.SubjectId2==subject.Id">@subject.DisplayName</select-item>
                         }
                     </govuk-select>
                     <govuk-select for="SubjectId3" label-class="govuk-label">
-                        <govuk-select-label>Third subject (optional)</govuk-select-label>
-                        <govuk-select-item value=""></govuk-select-item>
+                        <label>Third subject (optional)</label>
+                        <select-item value=""></select-item>
                         @foreach (var subject in Model.Subjects)
                         {
-                            <govuk-select-item value="@subject.Id" selected="@Model.SubjectId3==subject.Id">@subject.DisplayName</govuk-select-item>
+                            <select-item value="@subject.Id" selected="@Model.SubjectId3==subject.Id">@subject.DisplayName</select-item>
                         }
                     </govuk-select>
-                </govuk-details-text>
+                </text>
             </govuk-details>
 
             <div class="govuk-button-group">

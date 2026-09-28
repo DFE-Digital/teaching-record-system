@@ -32,10 +32,10 @@
     @if (updatedEvent is not null && updatedEvent.Changes != PersonUpdatedInDqtEventChanges.None && !thisRecordWasDeactivated)
     {
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Merged details</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Merged details</summary>
+            <text>
                 <partial name="./_PersonUpdatedInDqtEvent.cshtml" model="updatedEvent" />
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 </timeline-entry>

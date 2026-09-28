@@ -18,8 +18,8 @@
     @if (hasDetails)
     {
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Record details</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Record details</summary>
+            <text>
                 <govuk-summary-list>
                     @if (importedEvent.Details.Trn is string trn)
                     {
@@ -99,7 +99,7 @@
                         </row>
                     }
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 </timeline-entry>

@@ -27,15 +27,15 @@
             <form method="get" asp-antiforgery="false">
                 <div class="govuk-!-margin-bottom-4">
                     <govuk-input for="Search" type="search">
-                        <govuk-input-label>
+                        <label>
                             <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search</h2>
-                        </govuk-input-label>
-                        <govuk-input-hint>
+                        </label>
+                        <hint>
                             Enter a name, email address or request date, for example 31/3/2025
-                        </govuk-input-hint>
-                        <govuk-input-after-input>
+                        </hint>
+                        <after-input>
                             <govuk-button class="govuk-!-margin-bottom-0 govuk-!-margin-left-2 trs-!-height-full" type="submit">Search</govuk-button>
-                        </govuk-input-after-input>
+                        </after-input>
                     </govuk-input>
                 </div>
             </form>
@@ -56,10 +56,10 @@
                                 <govuk-checkboxes for="ApplicationUserIds">
                                     @foreach (var source in Model.ResultsBySourceApplication!)
                                     {
-                                        <govuk-checkboxes-item value="@source.ApplicationUserId"
+                                        <checkboxes-item value="@source.ApplicationUserId"
                                                                checked="@(Model.ApplicationUserIds?.Contains(source.ApplicationUserId) is true)">
                                             @source.Name (@source.Count)
-                                        </govuk-checkboxes-item>
+                                        </checkboxes-item>
                                     }
                                 </govuk-checkboxes>
                             </div>
