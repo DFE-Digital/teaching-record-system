@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
                 options.AddOperationTransformer(new RemoveOperationTagsTransformer());
                 options.AddOperationTransformer(new SetOperationIdTransformer());
                 options.AddOperationTransformer(new SetContentTypesTransformer());
+                options.AddSchemaTransformer(new UnwrapOptionPropertiesTransformer());
 
                 if (minorVersion is not null)
                 {

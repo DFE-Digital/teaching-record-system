@@ -59,6 +59,61 @@ public class SwaggerTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.DoesNotContain("PersonDeactivatedNotification", schemaNames);
     }
 
+    [Fact]
+    public async Task Get_SwaggerEndpoint_DocumentsOptionPropertiesAsOptionalValueType()
+    {
+        // Arrange
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{VersionRegistry.V3MinorVersions.VNext}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty("UpdateAlertRequestBody");
+        Assert.False(schema.TryGetProperty("required", out _));
+        var properties = schema.GetProperty("properties");
+        // Option<DateOnly>
+        Assert.Equal("string", properties.GetProperty("startDate").GetProperty("type").GetString());
+        Assert.Equal("date", properties.GetProperty("startDate").GetProperty("format").GetString());
+        // Option<DateOnly?>
+        Assert.Equal(["null", "string"], GetTypes(properties.GetProperty("endDate")));
+        Assert.Equal("date", properties.GetProperty("endDate").GetProperty("format").GetString());
+        // Option<string?>
+        Assert.Equal(["null", "string"], GetTypes(properties.GetProperty("details")));
+    }
+
+    [Fact]
+    public async Task Get_SwaggerEndpoint_DocumentsNullableObjectOptionPropertyAsNullableReference()
+    {
+        // Arrange
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{VersionRegistry.V3MinorVersions.V20240101}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty("GetTeacherResponse");
+        Assert.DoesNotContain("induction", schema.GetProperty("required").EnumerateArray().Select(e => e.GetString()));
+        // Option<GetTeacherResponseInduction?>
+        var oneOf = schema.GetProperty("properties").GetProperty("induction").GetProperty("oneOf").EnumerateArray().ToArray();
+        Assert.Collection(
+            oneOf,
+            s => Assert.Equal("null", s.GetProperty("type").GetString()),
+            s => Assert.Equal("#/components/schemas/GetTeacherResponseInduction", s.GetProperty("$ref").GetString()));
+    }
+
+    private static string?[] GetTypes(JsonElement schema) =>
+        schema.GetProperty("type").EnumerateArray().Select(e => e.GetString()).Order().ToArray();
+
+    private static async Task<JsonDocument> GetDocumentAsync(HttpResponseMessage response)
+    {
+        Assert.Equal(200, (int)response.StatusCode);
+
+        return JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+    }
+
     private static async Task<IReadOnlyCollection<string>> GetSchemaNamesAsync(HttpResponseMessage response)
     {
         Assert.Equal(200, (int)response.StatusCode);
