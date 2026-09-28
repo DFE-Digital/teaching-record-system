@@ -27,7 +27,7 @@ internal class AddMinorVersionHeaderTransformer(string minorVersion) : IOpenApiD
                     Name = VersionRegistry.MinorVersionHeaderName,
                     Required = true,
                     In = ParameterLocation.Header,
-                    Schema = new OpenApiSchema { Id = headerValueSchemaName }
+                    Schema = new OpenApiSchemaReference(headerValueSchemaName, document)
                 });
             }
         }

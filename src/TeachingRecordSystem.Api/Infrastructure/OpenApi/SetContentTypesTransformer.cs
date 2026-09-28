@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -20,7 +21,12 @@ internal class SetContentTypesTransformer : IOpenApiOperationTransformer
             }
         }
 
-        foreach (var (_, response) in operation.Responses ?? [])
+        var problemDetailsStatusCodes = context.Description.SupportedResponseTypes
+            .Where(r => r.Type is not null && r.Type.IsAssignableTo(typeof(ProblemDetails)))
+            .Select(r => r.StatusCode.ToString())
+            .ToHashSet();
+
+        foreach (var (statusCode, response) in operation.Responses ?? [])
         {
             if (response.Content is not null)
             {
@@ -30,7 +36,7 @@ internal class SetContentTypesTransformer : IOpenApiOperationTransformer
                     {
                         response.Content.Remove(contentType);
                     }
-                    else if (contentType == "application/json" && response.Content[contentType].Schema?.DynamicRef is "#/components/schemas/ProblemDetails")
+                    else if (contentType == "application/json" && problemDetailsStatusCodes.Contains(statusCode))
                     {
                         response.Content.Add("application/problem+json", response.Content[contentType]);
                         response.Content.Remove(contentType);

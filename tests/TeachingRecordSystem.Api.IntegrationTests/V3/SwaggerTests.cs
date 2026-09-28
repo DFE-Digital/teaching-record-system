@@ -141,6 +141,59 @@ public class SwaggerTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains("Passed", schema.GetProperty("enum").EnumerateArray().Select(e => e.GetString()));
     }
 
+    [Fact]
+    public async Task Get_SwaggerEndpoint_AddsVersionHeaderParameterReferencingVersionSchema()
+    {
+        // Arrange
+        var minorVersion = VersionRegistry.V3MinorVersions.V20250627;
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{minorVersion}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var parameter = document.RootElement.GetProperty("paths").GetProperty("/v3/persons/{trn}").GetProperty("get").GetProperty("parameters")
+            .EnumerateArray().Single(p => p.GetProperty("name").GetString() == VersionRegistry.MinorVersionHeaderName);
+        Assert.True(parameter.GetProperty("required").GetBoolean());
+        Assert.Equal("#/components/schemas/VersionHeader", parameter.GetProperty("schema").GetProperty("$ref").GetString());
+        var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty("VersionHeader");
+        Assert.Equal(minorVersion, schema.GetProperty("const").GetString());
+    }
+
+    [Fact]
+    public async Task Get_SwaggerEndpoint_DocumentsProblemDetailsResponsesAsProblemJson()
+    {
+        // Arrange
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{VersionRegistry.V3MinorVersions.V20250627}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var content = document.RootElement.GetProperty("paths").GetProperty("/v3/persons/{trn}").GetProperty("get").GetProperty("responses")
+            .GetProperty("404").GetProperty("content");
+        var mediaType = Assert.Single(content.EnumerateObject());
+        Assert.Equal("application/problem+json", mediaType.Name);
+        Assert.Equal("#/components/schemas/ProblemDetails", mediaType.Value.GetProperty("schema").GetProperty("$ref").GetString());
+    }
+
+    [Fact]
+    public async Task Get_SwaggerEndpoint_ReferencesComponentsFromWebhookMessageSchemas()
+    {
+        // Arrange
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{VersionRegistry.V3MinorVersions.V20250804}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty("AlertCreatedNotification");
+        Assert.Equal("#/components/schemas/Alert", schema.GetProperty("properties").GetProperty("alert").GetProperty("$ref").GetString());
+    }
+
     private static string?[] GetTypes(JsonElement schema) =>
         schema.GetProperty("type").EnumerateArray().Select(e => e.GetString()).Order().ToArray();
 

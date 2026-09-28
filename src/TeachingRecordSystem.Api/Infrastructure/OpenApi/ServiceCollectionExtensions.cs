@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
                 options.AddOperationTransformer(new RemoveOperationTagsTransformer());
                 options.AddOperationTransformer(new SetOperationIdTransformer());
                 options.AddOperationTransformer(new SetContentTypesTransformer());
+                options.AddOperationTransformer(new SetRequiredParametersTransformer());
                 options.AddSchemaTransformer(new UnwrapOptionPropertiesTransformer());
                 options.AddSchemaTransformer(new OneOfSchemaTransformer());
 
