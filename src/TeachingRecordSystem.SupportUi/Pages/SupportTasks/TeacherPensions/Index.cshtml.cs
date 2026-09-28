@@ -42,7 +42,7 @@ public class IndexModel(SupportTaskSearchService supportTaskSearchService, Suppo
 
         Pagination = PaginationViewModel.Create(
             Results,
-            pageNumber => linkGenerator.SupportTasks.TeacherPensions.Index(SortBy, SortDirection, pageNumber));
+            pageNumber => linkGenerator.SupportTasks.TeacherPensions.Index(Search, SortBy, SortDirection, pageNumber));
 
         return Page();
     }

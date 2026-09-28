@@ -5,8 +5,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
 
 public class TeacherPensionsLinkGenerator(LinkGenerator linkGenerator)
 {
-    public string Index(TeachersPensionsPotentialDuplicatesSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
-        linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Index", routeValues: new { sortBy, sortDirection, pageNumber });
+    public string Index(
+        string? search = null,
+        TeachersPensionsPotentialDuplicatesSortByOption? sortBy = null,
+        SortDirection? sortDirection = null,
+        int? pageNumber = null) =>
+        linkGenerator.GetRequiredPathByPage("/SupportTasks/TeacherPensions/Index", routeValues: new { search, sortBy, sortDirection, pageNumber });
 
     public ResolveTeacherPensionsPotentialDuplicateLinkGenerator Resolve { get; } = new(linkGenerator);
 }
