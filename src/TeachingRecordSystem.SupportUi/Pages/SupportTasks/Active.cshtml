@@ -118,147 +118,143 @@
 }
 else
 {
-    <table class="govuk-table trs-table-layout-fixed" sortable>
-        <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header trs-!-width-35">
-                    <div class="govuk-checkboxes__item govuk-checkboxes--small trs-select-row trs-requires-js">
-                        <partial name="_SelectAllTasks" model="@Model.GetSelectAllViewModel(swapOutOfBand: false)" />
-                        <label for="select-all-tasks" class="govuk-label govuk-checkboxes__label">
-                            <span class="govuk-visually-hidden">Select all tasks on this page</span>
+    <govuk-table class="trs-table-layout-fixed" sortable data-testid="results">
+        <table-head>
+            <table-head-cell class="trs-!-width-35">
+                <div class="govuk-checkboxes__item govuk-checkboxes--small trs-select-row trs-requires-js">
+                    <partial name="_SelectAllTasks" model="@Model.GetSelectAllViewModel(swapOutOfBand: false)" />
+                    <label for="select-all-tasks" class="govuk-label govuk-checkboxes__label">
+                        <span class="govuk-visually-hidden">Select all tasks on this page</span>
+                    </label>
+                </div>
+            </table-head-cell>
+            <table-head-cell
+                sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
+                link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))"
+                use-htmx="true"
+                hx-include="@Model.SelectedTaskInputsSelector"
+                hx-select="main"
+                hx-target="main"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Task
+            </table-head-cell>
+            <table-head-cell class="trs-!-width-150"
+                sort-direction="@(Model.SortBy == SupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
+                link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.RequestedOn, direction))"
+                use-htmx="true"
+                hx-include="@Model.SelectedTaskInputsSelector"
+                hx-select="main"
+                hx-target="main"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Requested on
+            </table-head-cell>
+            <table-head-cell class="trs-!-width-150"
+                sort-direction="@(Model.SortBy == SupportTasksSortByOption.TaskType ? Model.SortDirection : null)"
+                link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))"
+                use-htmx="true"
+                hx-include="@Model.SelectedTaskInputsSelector"
+                hx-select="main"
+                hx-target="main"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Type
+            </table-head-cell>
+            <table-head-cell class="trs-!-width-120"
+                sort-direction="@(Model.SortBy == SupportTasksSortByOption.Status ? Model.SortDirection : null)"
+                link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Status, direction))"
+                use-htmx="true"
+                hx-include="@Model.SelectedTaskInputsSelector"
+                hx-select="main"
+                hx-target="main"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Status
+            </table-head-cell>
+            <table-head-cell class="trs-!-width-130"
+                sort-direction="@(Model.SortBy == SupportTasksSortByOption.AssignedTo ? Model.SortDirection : null)"
+                link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.AssignedTo, direction))"
+                use-htmx="true"
+                hx-include="@Model.SelectedTaskInputsSelector"
+                hx-select="main"
+                hx-target="main"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Assigned to
+            </table-head-cell>
+            <table-head-cell class="trs-!-width-90"
+                sort-direction="@(Model.SortBy == SupportTasksSortByOption.Source ? Model.SortDirection : null)"
+                link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Source, direction))"
+                use-htmx="true"
+                hx-include="@Model.SelectedTaskInputsSelector"
+                hx-select="main"
+                hx-target="main"
+                hx-swap="outerHTML"
+                hx-push-url="true">
+                Source
+            </table-head-cell>
+            <table-head-cell class="trs-!-width-90">
+                Action
+            </table-head-cell>
+        </table-head>
+        @foreach (var result in Model.Results!)
+        {
+            var isSelected = Model.IsSelected(result.SupportTaskReference);
+
+            <table-row data-testid="task:@result.SupportTaskReference">
+                <table-cell>
+                    <div class="govuk-checkboxes__item govuk-checkboxes--small trs-select-row">
+                        <input type="checkbox"
+                               class="govuk-checkboxes__input"
+                               id="AssignSupportTask-@(result.SupportTaskReference)"
+                               value="@result.SupportTaskReference"
+                               name="SupportTaskReference"
+                               form="assign-tasks-form"
+                               data-selects-row
+                               checked="@(isSelected ? "checked" : null)"
+                               hx-get="@Model.SelectionBannerUrl"
+                               hx-include="@Model.RowCheckboxIncludeSelector"
+                               hx-target="#selected-tasks-banner"
+                               hx-swap="innerHTML" />
+                        <label for="AssignSupportTask-@(result.SupportTaskReference)" class="govuk-label govuk-checkboxes__label">
+                            <span class="govuk-visually-hidden">Select @result.SupportTaskReference</span>
                         </label>
                     </div>
-                </th>
-                <th scope="col" class="govuk-table__header"
-                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.Subject ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Subject, direction))"
-                    use-htmx="true"
-                    hx-include="@Model.SelectedTaskInputsSelector"
-                    hx-select="main"
-                    hx-target="main"
-                    hx-swap="outerHTML"
-                    hx-push-url="true">
-                    Task
-                </th>
-                <th scope="col" class="govuk-table__header trs-!-width-150"
-                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.RequestedOn ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.RequestedOn, direction))"
-                    use-htmx="true"
-                    hx-include="@Model.SelectedTaskInputsSelector"
-                    hx-select="main"
-                    hx-target="main"
-                    hx-swap="outerHTML"
-                    hx-push-url="true">
-                    Requested on
-                </th>
-                <th scope="col" class="govuk-table__header trs-!-width-150"
-                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.TaskType ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.TaskType, direction))"
-                    use-htmx="true"
-                    hx-include="@Model.SelectedTaskInputsSelector"
-                    hx-select="main"
-                    hx-target="main"
-                    hx-swap="outerHTML"
-                    hx-push-url="true">
-                    Type
-                </th>
-                <th scope="col" class="govuk-table__header trs-!-width-120"
-                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.Status ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Status, direction))"
-                    use-htmx="true"
-                    hx-include="@Model.SelectedTaskInputsSelector"
-                    hx-select="main"
-                    hx-target="main"
-                    hx-swap="outerHTML"
-                    hx-push-url="true">
-                    Status
-                </th>
-                <th scope="col" class="govuk-table__header trs-!-width-130"
-                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.AssignedTo ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.AssignedTo, direction))"
-                    use-htmx="true"
-                    hx-include="@Model.SelectedTaskInputsSelector"
-                    hx-select="main"
-                    hx-target="main"
-                    hx-swap="outerHTML"
-                    hx-push-url="true">
-                    Assigned to
-                </th>
-                <th scope="col" class="govuk-table__header trs-!-width-90"
-                    sort-direction="@(Model.SortBy == SupportTasksSortByOption.Source ? Model.SortDirection : null)"
-                    link-template="@(direction => LinkGenerator.SupportTasks.Active(Model.Type, Model.AssignedToUserId, Model.Status, SupportTasksSortByOption.Source, direction))"
-                    use-htmx="true"
-                    hx-include="@Model.SelectedTaskInputsSelector"
-                    hx-select="main"
-                    hx-target="main"
-                    hx-swap="outerHTML"
-                    hx-push-url="true">
-                    Source
-                </th>
-                <th scope="col" class="govuk-table__header trs-!-width-90">
-                    Action
-                </th>
-            </tr>
-        </thead>
-        <tbody class="govuk-table__body" data-testid="results">
-            @foreach (var result in Model.Results!)
-            {
-                var isSelected = Model.IsSelected(result.SupportTaskReference);
-
-                <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
-                    <td class="govuk-table__cell">
-                        <div class="govuk-checkboxes__item govuk-checkboxes--small trs-select-row">
-                            <input type="checkbox"
-                                   class="govuk-checkboxes__input"
-                                   id="AssignSupportTask-@(result.SupportTaskReference)"
-                                   value="@result.SupportTaskReference"
-                                   name="SupportTaskReference"
-                                   form="assign-tasks-form"
-                                   data-selects-row
-                                   checked="@(isSelected ? "checked" : null)"
-                                   hx-get="@Model.SelectionBannerUrl"
-                                   hx-include="@Model.RowCheckboxIncludeSelector"
-                                   hx-target="#selected-tasks-banner"
-                                   hx-swap="innerHTML" />
-                            <label for="AssignSupportTask-@(result.SupportTaskReference)" class="govuk-label govuk-checkboxes__label">
-                                <span class="govuk-visually-hidden">Select @result.SupportTaskReference</span>
-                            </label>
-                        </div>
-                    </td>
-                    <td class="govuk-table__cell" data-testid="task-name-and-id">
-                        <a href="@LinkGenerator.SupportTaskResolve(result.SupportTaskReference, result.SupportTaskType, returnUrl)" class="govuk-link trs-task-link">
-                            <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
-                            <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
-                        </a>
-                    </td>
-                    <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateShortDisplayFormat)</td>
-                    <td class="govuk-table__cell">@result.SupportTaskType.GetTitle()</td>
-                    <td class="govuk-table__cell" data-testid="status">
-                        <support-task-status-tag status="@result.Status"/>
-                    </td>
-                    <td class="govuk-table__cell" data-testid="assigned-to" use-empty-fallback="Unassigned">
-                        @(result.AssignedToUserId == Model.CurrentUserId ? "Myself" : result.AssignedToName)
-                    </td>
-                    <td class="govuk-table__cell" data-testid="source">
-                        @if (result.SourceApplicationName is not null)
-                        {
-                            <tag>@result.SourceApplicationName</tag>
-                        }
-                        else
-                        {
-                            <span use-empty-fallback="Not applicable"></span>
-                        }
-                    </td>
-                    <td class="govuk-table__cell">
-                        <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference, returnUrl: returnUrl)"
-                           class="govuk-link">
-                            Manage
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                </table-cell>
+                <table-cell data-testid="task-name-and-id">
+                    <a href="@LinkGenerator.SupportTaskResolve(result.SupportTaskReference, result.SupportTaskType, returnUrl)" class="govuk-link trs-task-link">
+                        <span class="trs-task-link__name" data-testid="task-name">@result.Subject</span>
+                        <span class="trs-task-link__reference" data-testid="task-reference">@result.SupportTaskReference</span>
+                    </a>
+                </table-cell>
+                <table-cell data-testid="requested-on">@result.CreatedOn.ToString(WebConstants.DateShortDisplayFormat)</table-cell>
+                <table-cell>@result.SupportTaskType.GetTitle()</table-cell>
+                <table-cell data-testid="status">
+                    <support-task-status-tag status="@result.Status"/>
+                </table-cell>
+                <table-cell data-testid="assigned-to" use-empty-fallback="Unassigned">
+                    @(result.AssignedToUserId == Model.CurrentUserId ? "Myself" : result.AssignedToName)
+                </table-cell>
+                <table-cell data-testid="source">
+                    @if (result.SourceApplicationName is not null)
+                    {
+                        <tag>@result.SourceApplicationName</tag>
+                    }
+                    else
+                    {
+                        <span use-empty-fallback="Not applicable"></span>
+                    }
+                </table-cell>
+                <table-cell>
+                    <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(result.SupportTaskReference, returnUrl: returnUrl)"
+                       class="govuk-link">
+                        Manage
+                    </a>
+                </table-cell>
+            </table-row>
+        }
+    </govuk-table>
 }
 
 @* htmx snapshots innerHTML for its history cache, and clicking a checkbox sets the property but
