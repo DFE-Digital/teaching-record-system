@@ -18,7 +18,7 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-card>
-                <title>Personal details</title>
+                <card-title>Personal details</card-title>
                 <govuk-summary-list>
                     <row>
                         <key>Full name</key>
@@ -59,7 +59,7 @@
             </govuk-summary-card>
 
             <govuk-summary-card>
-                <title>@(Model.NameChangeReason is not null && Model.OtherDetailsChangeReason is not null ? "Reasons for change" : "Reason for change")</title>
+                <card-title>@(Model.NameChangeReason is not null && Model.OtherDetailsChangeReason is not null ? "Reasons for change" : "Reason for change")</card-title>
                 <govuk-summary-list>
                     @if (Model.NameChangeReason is not null)
                     {
