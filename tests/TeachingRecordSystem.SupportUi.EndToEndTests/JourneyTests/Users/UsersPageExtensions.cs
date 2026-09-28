@@ -13,6 +13,9 @@ public static class UsersPageExtensions
     public static Task GoToUsersPageAsync(this IPage page) =>
         page.GotoAsync($"/users");
 
+    public static Task GoToUsersPageAsync(this IPage page, string keywords) =>
+        page.GotoAsync($"/users?keywords={Uri.EscapeDataString(keywords)}");
+
     public static Task AssertOnLegacyUsersPageAsync(this IPage page) =>
         page.WaitForUrlPathAsync($"/legacy-users");
 
