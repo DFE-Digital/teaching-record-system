@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20240416.Controllers;
 public class TeachersController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [EndpointName("GetTeacherByTrn"),
+    [OperationId("GetTeacherByTrn"),
         EndpointSummary("Get teacher details by TRN"),
         EndpointDescription("Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]

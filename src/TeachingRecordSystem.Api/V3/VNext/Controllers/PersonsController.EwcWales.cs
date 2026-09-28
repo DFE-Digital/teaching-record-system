@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/welsh-induction")]
-    [EndpointName("SetPersonWelshInductionStatus"),
+    [OperationId("SetPersonWelshInductionStatus"),
         EndpointSummary("Set person induction status"),
         EndpointDescription("Sets the induction details of the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]

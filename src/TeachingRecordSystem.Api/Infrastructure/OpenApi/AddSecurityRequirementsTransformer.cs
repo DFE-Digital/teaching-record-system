@@ -25,7 +25,7 @@ internal class AddSecurityRequirementsTransformer : IOpenApiOperationTransformer
             requirement = new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecuritySchemeReference(SecuritySchemes.ApiKey),
+                    new OpenApiSecuritySchemeReference(SecuritySchemes.ApiKey, context.Document),
                     []
                 }
             };
@@ -35,7 +35,7 @@ internal class AddSecurityRequirementsTransformer : IOpenApiOperationTransformer
             requirement = new OpenApiSecurityRequirement
             {
                 {
-                    new OpenApiSecuritySchemeReference(SecuritySchemes.GetAnIdentityAccessToken),
+                    new OpenApiSecuritySchemeReference(SecuritySchemes.GetAnIdentityAccessToken, context.Document),
                     ["trn"]  // The OAuth scopes required
                 }
             };

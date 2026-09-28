@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/professional-statuses/{reference}")]
-    [EndpointName("SetProfessionalStatus"),
+    [OperationId("SetProfessionalStatus"),
         EndpointSummary("Sets a professional status"),
         EndpointDescription("Sets a professional status for the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
@@ -52,7 +52,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpPut("{trn}")]
-    [EndpointName("Set PII"),
+    [OperationId("Set PII"),
         EndpointSummary("Set a persons PII"),
         EndpointDescription("Sets a persons personally identifiable information with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]

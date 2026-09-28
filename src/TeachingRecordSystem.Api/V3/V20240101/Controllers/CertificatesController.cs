@@ -10,7 +10,7 @@ public class CertificatesController : ControllerBase
 {
     [HttpGet]
     [Route("qts")]
-    [EndpointName("GetQtsCertificate"),
+    [OperationId("GetQtsCertificate"),
         EndpointSummary("Get QTS Certificate"),
         EndpointDescription("Returns a PDF of the QTS Certificate for the authenticated teacher.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
@@ -18,7 +18,7 @@ public class CertificatesController : ControllerBase
 
     [HttpGet]
     [Route("eyts")]
-    [EndpointName("GetEytsCertificate"),
+    [OperationId("GetEytsCertificate"),
         EndpointSummary("Get EYTS Certificate"),
         EndpointDescription("Returns a PDF of the EYTS Certificate for the authenticated teacher.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
@@ -26,7 +26,7 @@ public class CertificatesController : ControllerBase
 
     [HttpGet]
     [Route("induction")]
-    [EndpointName("GetInductionCertificate"),
+    [OperationId("GetInductionCertificate"),
         EndpointSummary("Induction Certificate"),
         EndpointDescription("Returns a PDF of the Induction Certificate for the authenticated teacher.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]
@@ -34,7 +34,7 @@ public class CertificatesController : ControllerBase
 
     [HttpGet]
     [Route("npq/{qualificationId}")]
-    [EndpointName("GetNpqCertificate"),
+    [OperationId("GetNpqCertificate"),
         EndpointSummary("NPQ Certificate"),
         EndpointDescription("Returns a PDF of the NPQ Certificate associated with the provided qualification ID.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status410Gone)]

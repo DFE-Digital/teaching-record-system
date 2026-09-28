@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.Dtos;
@@ -11,10 +10,9 @@ namespace TeachingRecordSystem.Api.V3.V20260515.Controllers;
 public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
     [HttpGet]
-    [SwaggerOperation(
-        OperationId = "GetTrnRequest",
-        Summary = "Get the authenticated person's TRN request",
-        Description = "Gets the TRN request for the authenticated person.")]
+    [OperationId("GetTrnRequest"),
+        EndpointSummary("Get the authenticated person's TRN request"),
+        EndpointDescription("Gets the TRN request for the authenticated person.")]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -35,10 +33,9 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrent
     }
 
     [HttpPut("activate")]
-    [SwaggerOperation(
-        OperationId = "ActivateTrnRequest",
-        Summary = "Activate dormant TRN request",
-        Description = "Activates the dormant request created by Teacher Auth.")]
+    [OperationId("ActivateTrnRequest"),
+        EndpointSummary("Activate dormant TRN request"),
+        EndpointDescription("Activates the dormant request created by Teacher Auth.")]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     public async Task<IActionResult> ActivateAsync()

@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.Api.V3.V20240814.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("find")]
-    [EndpointName("FindPersons"),
+    [OperationId("FindPersons"),
         EndpointSummary("Find persons"),
         EndpointDescription("Finds persons matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
@@ -25,7 +25,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpGet("")]
-    [EndpointName("FindPerson"),
+    [OperationId("FindPerson"),
         EndpointSummary("Find person"),
         EndpointDescription("Finds a person matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]

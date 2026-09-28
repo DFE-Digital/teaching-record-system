@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 public class TrnRequestsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("")]
-    [EndpointName("CreateTrnRequest"),
+    [OperationId("CreateTrnRequest"),
         EndpointSummary("Creates a TRN request"),
         EndpointDescription("""
         Creates a new TRN request using the personally identifiable information in the request body.
@@ -48,7 +48,7 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher) : Contr
     }
 
     [HttpGet("")]
-    [EndpointName("GetTrnRequest"),
+    [OperationId("GetTrnRequest"),
         EndpointSummary("Get the TRN request's details"),
         EndpointDescription("""
                       Gets the TRN request for the requestId specified in the query string.

@@ -18,7 +18,7 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("find")]
-    [EndpointName("FindTeachers"),
+    [OperationId("FindTeachers"),
         EndpointSummary("Find teachers"),
         EndpointDescription("Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
@@ -30,7 +30,7 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("{trn}")]
-    [EndpointName("GetTeacher"),
+    [OperationId("GetTeacher"),
         EndpointSummary("Get teacher"),
         EndpointDescription("Gets an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]

@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
                 options.AddDocumentTransformer(new AddSecuritySchemesTransformer(configuration));
                 options.AddOperationTransformer(new AddSecurityRequirementsTransformer());
                 options.AddOperationTransformer(new RemoveOperationTagsTransformer());
+                options.AddOperationTransformer(new SetOperationIdTransformer());
                 options.AddOperationTransformer(new SetContentTypesTransformer());
 
                 if (minorVersion is not null)

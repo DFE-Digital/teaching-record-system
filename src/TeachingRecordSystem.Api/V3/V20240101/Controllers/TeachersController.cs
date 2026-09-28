@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 public class TeachersController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [EndpointName("GetTeacherByTrn"),
+    [OperationId("GetTeacherByTrn"),
         EndpointSummary("Get teacher details by TRN"),
         EndpointDescription("Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
@@ -43,7 +43,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     }
 
     [HttpPost("name-changes")]
-    [EndpointName("CreateNameChange"),
+    [OperationId("CreateNameChange"),
         EndpointSummary("Create name change request"),
         EndpointDescription("Creates a name change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
@@ -69,7 +69,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     }
 
     [HttpPost("date-of-birth-changes")]
-    [EndpointName("CreateDobChange"),
+    [OperationId("CreateDobChange"),
         EndpointSummary("Create DOB change request"),
         EndpointDescription("Creates a date of birth change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
@@ -93,7 +93,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     }
 
     [HttpGet("")]
-    [EndpointName("FindTeachers"),
+    [OperationId("FindTeachers"),
         EndpointSummary("Find teachers"),
         EndpointDescription("Finds teachers with a TRN matching the specified criteria.")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]

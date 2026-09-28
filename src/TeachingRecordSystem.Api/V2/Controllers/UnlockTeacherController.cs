@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 public class UnlockTeacherController : ControllerBase
 {
     [HttpPut("{teacherId}")]
-    [EndpointName("UnlockTeacher"),
+    [OperationId("UnlockTeacher"),
         EndpointSummary("Unlock teacher"),
         EndpointDescription("Unlocks the teacher record allowing the teacher to sign in to the portals")]
     [ProducesResponseType(typeof(UnlockTeacherResponse), StatusCodes.Status200OK)]

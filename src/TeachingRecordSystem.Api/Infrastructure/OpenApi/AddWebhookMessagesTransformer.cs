@@ -23,6 +23,7 @@ internal class AddWebhookMessagesTransformer(string minorVersion) : IOpenApiDocu
                 throw new InvalidOperationException($"Webhook message type {messageType.FullName} does not have a valid CloudEventType property.");
 
             var schema = await context.GetOrCreateSchemaAsync(messageType, cancellationToken: cancellationToken);
+            document.AddComponent(messageType.Name, schema);
 
             var path = new OpenApiPathItem
             {
@@ -36,7 +37,7 @@ internal class AddWebhookMessagesTransformer(string minorVersion) : IOpenApiDocu
                             {
                                 ["application/json"] = new()
                                 {
-                                    Schema = schema
+                                    Schema = new OpenApiSchemaReference(messageType.Name, document)
                                 }
                             }
                         },

@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20250327.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [EndpointName("GetPersonByTrn"),
+    [OperationId("GetPersonByTrn"),
         EndpointSummary("Get person details by TRN"),
         EndpointDescription("Gets the details of the person corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
@@ -55,7 +55,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpPost("find")]
-    [EndpointName("FindPersons"),
+    [OperationId("FindPersons"),
         EndpointSummary("Find persons"),
         EndpointDescription("Finds persons matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
@@ -69,7 +69,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpGet("")]
-    [EndpointName("FindPerson"),
+    [OperationId("FindPerson"),
         EndpointSummary("Find person"),
         EndpointDescription("Finds a person matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]

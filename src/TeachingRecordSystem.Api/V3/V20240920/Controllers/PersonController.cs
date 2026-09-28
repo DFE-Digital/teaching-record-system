@@ -15,7 +15,7 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
 {
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [HttpGet]
-    [EndpointName("GetCurrentPerson"),
+    [OperationId("GetCurrentPerson"),
         EndpointSummary("Get the authenticated person's details"),
         EndpointDescription("Gets the details for the authenticated person.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]

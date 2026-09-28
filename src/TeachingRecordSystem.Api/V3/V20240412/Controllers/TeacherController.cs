@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.Api.V3.V20240412.Controllers;
 public class TeacherController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("name-changes")]
-    [EndpointName("CreateNameChange"),
+    [OperationId("CreateNameChange"),
         EndpointSummary("Create name change request"),
         EndpointDescription("Creates a name change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
@@ -37,7 +37,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpPost("date-of-birth-changes")]
-    [EndpointName("CreateDobChange"),
+    [OperationId("CreateDobChange"),
         EndpointSummary("Create DOB change request"),
         EndpointDescription("Creates a date of birth change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]

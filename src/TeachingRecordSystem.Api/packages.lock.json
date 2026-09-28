@@ -80,12 +80,13 @@
       },
       "Scalar.AspNetCore.Microsoft": {
         "type": "Direct",
-        "requested": "[2.12.48, )",
-        "resolved": "2.12.48",
-        "contentHash": "5fEghat590opJTpe1varGt/UFxDcAT2xYTmaadME3Cmi5xI6fBUUxfLFH5uIWKappGbIrir52uuF8vKU/BJUaQ==",
+        "requested": "[2.17.10, )",
+        "resolved": "2.17.10",
+        "contentHash": "eDDGRmHXBggKWrx7BHc6J9lrY/Uee0eMMfKERXVbj/DeVCTK1QLSmLPD7ZzJqz4b15nH76QZQx6YnGaGntgJcw==",
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": "10.0.0",
-          "Scalar.AspNetCore": "2.12.48"
+          "Microsoft.OpenApi": "2.7.5",
+          "Scalar.AspNetCore": "2.17.10"
         }
       },
       "System.IdentityModel.Tokens.Jwt": {
@@ -528,8 +529,8 @@
       },
       "Scalar.AspNetCore": {
         "type": "Transitive",
-        "resolved": "2.12.48",
-        "contentHash": "fsKAEPpI4rZjFaezPbnXgRBYlGxIOC1D+iSIkhb2ozjayc4MMoYt/Tuw7sySZJ/yfMw/fVqbrlz8PwAyxjo5/w=="
+        "resolved": "2.17.10",
+        "contentHash": "lASwa/do5YYLNp+EQ/LTfm9gxBykypyzQh52aJNYnYkMfFJDwsQ+W7+mKSFejfxA1jGaorFPSeUQHHslnBsdtA=="
       },
       "Sentry": {
         "type": "Transitive",

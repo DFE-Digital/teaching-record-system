@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 public class IttProvidersController(IMediator mediator) : ControllerBase
 {
     [HttpGet("")]
-    [EndpointName("GetIttProviders"),
+    [OperationId("GetIttProviders"),
         EndpointSummary("Get ITT Providers"),
         EndpointDescription("Gets the list of ITT providers")]
     [ProducesResponseType(typeof(GetIttProvidersResponse), StatusCodes.Status200OK)]

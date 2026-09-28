@@ -15,7 +15,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
 {
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [HttpGet]
-    [EndpointName("GetCurrentTeacher"),
+    [OperationId("GetCurrentTeacher"),
         EndpointSummary("Get the current teacher's details"),
         EndpointDescription("Gets the details for the authenticated teacher.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]

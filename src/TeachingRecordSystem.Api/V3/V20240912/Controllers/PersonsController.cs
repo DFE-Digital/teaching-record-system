@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.Api.V3.V20240912.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPut("{trn}/qtls")]
-    [EndpointName("SetQtls"),
+    [OperationId("SetQtls"),
         EndpointSummary("Set QTLS status for a teacher"),
         EndpointDescription("Sets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
@@ -29,7 +29,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpGet("{trn}/qtls")]
-    [EndpointName("GetQtls"),
+    [OperationId("GetQtls"),
         EndpointSummary("Get QTLS status for a teacher"),
         EndpointDescription("Gets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]

@@ -10,7 +10,7 @@ public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBa
 {
     [HttpGet("{trn}")]
     [ActionName("GetTrn")]
-    [EndpointName("GetTrn"),
+    [OperationId("GetTrn"),
         EndpointSummary("Get a TRN"),
         EndpointDescription("Checks if the specified TRN exists.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]

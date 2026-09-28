@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 public class AlertsController : ControllerBase
 {
     [HttpPost("")]
-    [EndpointName("CreateAlert"),
+    [OperationId("CreateAlert"),
         EndpointSummary("Create an alert"),
         EndpointDescription("Creates an alert for the specified person.")]
     [ProducesResponseType(typeof(AlertResponse), StatusCodes.Status200OK)]
@@ -19,7 +19,7 @@ public class AlertsController : ControllerBase
     public IActionResult CreateAlert([FromBody] CreateAlertRequestBody request) => throw new NotImplementedException();
 
     [HttpGet("{alertId}")]
-    [EndpointName("GetAlert"),
+    [OperationId("GetAlert"),
         EndpointSummary("Get an alert"),
         EndpointDescription("Gets the specified alert.")]
     [ProducesResponseType(typeof(AlertResponse), StatusCodes.Status200OK)]
@@ -27,7 +27,7 @@ public class AlertsController : ControllerBase
     public IActionResult GetAlert([FromRoute] Guid alertId) => throw new NotImplementedException();
 
     [HttpPatch("{alertId}")]
-    [EndpointName("UpdateAlert"),
+    [OperationId("UpdateAlert"),
         EndpointSummary("Update an alert"),
         EndpointDescription("Updates the specified alert.")]
     [ProducesResponseType(typeof(AlertResponse), StatusCodes.Status200OK)]
@@ -36,7 +36,7 @@ public class AlertsController : ControllerBase
     public IActionResult UpdateAlert([FromRoute] Guid alertId, [FromBody] UpdateAlertRequestBody request) => throw new NotImplementedException();
 
     [HttpDelete("{alertId}")]
-    [EndpointName("DeleteAlert"),
+    [OperationId("DeleteAlert"),
         EndpointSummary("Delete an alert"),
         EndpointDescription("Deletes a the specified alert.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]

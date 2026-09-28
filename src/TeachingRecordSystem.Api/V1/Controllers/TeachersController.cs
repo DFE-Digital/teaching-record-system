@@ -19,7 +19,7 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("{trn}")]
-    [EndpointName("GetTeacher"),
+    [OperationId("GetTeacher"),
         EndpointSummary("Get teacher"),
         EndpointDescription("Gets a teacher by their DOB and either TRN or NINO")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]

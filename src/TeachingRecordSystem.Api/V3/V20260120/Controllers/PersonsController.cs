@@ -13,7 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20260120.Controllers;
 public class PersonsController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpGet("{trn}")]
-    [EndpointName("GetPersonByTrn"),
+    [OperationId("GetPersonByTrn"),
         EndpointSummary("Get person details by TRN"),
         EndpointDescription("Gets the details of the person corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
