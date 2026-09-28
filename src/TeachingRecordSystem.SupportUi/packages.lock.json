@@ -4,9 +4,9 @@
     "net10.0": {
       "AspNetCore.SassCompiler": {
         "type": "Direct",
-        "requested": "[1.103.0, )",
-        "resolved": "1.103.0",
-        "contentHash": "c9KytDdq1ZG2sMJRrveuPgUQX4o+KXzlNjTHLSbNFP2qbBbZLyyqUzpCFwRfywgRbum34N9VRMw+c/Rjbzuntg=="
+        "requested": "[1.103.1, )",
+        "resolved": "1.103.1",
+        "contentHash": "D8cONnRjT0oPWCqI71lWCN4u1ZrFMyHq2ZS9XTjkXW6Vv5/2PMvc2LMyQseHQxJtNoTY7eqeMxHBB5HbWVZa8g=="
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
