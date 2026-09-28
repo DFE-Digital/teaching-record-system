@@ -78,7 +78,7 @@
 
         @if (Model.Pagination is not null)
         {
-            <partial name="_Pagination" model="@Model.Pagination" />
+            <govuk-pagination current-page="@Model.Pagination!.CurrentPage" total-pages="@Model.Pagination.LastPage" generate-page-href="@Model.Pagination.GetPageLink" />
         }
     </div>
 </div>

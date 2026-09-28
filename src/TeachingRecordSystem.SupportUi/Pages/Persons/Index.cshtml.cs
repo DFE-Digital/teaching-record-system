@@ -63,7 +63,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
             if (oneLoginUser is null)
             {
-                SearchResults = new ResultPage<PersonInfo>([], 0, PageSize, PageNumber ?? 1);
+                SearchResults = new ResultPage<PersonInfo>([], ResultPage.ResolveCurrentPage(PageNumber, PageSize, 0), PageSize, 0);
                 Pagination = PaginationViewModel.Create(
                     SearchResults,
                     pageNumber => linkGenerator.Persons.Index(Search, IncludeActive, IncludeDeactivated, IncludeOneLoginUser, SortBy, SortDirection, pageNumber));
