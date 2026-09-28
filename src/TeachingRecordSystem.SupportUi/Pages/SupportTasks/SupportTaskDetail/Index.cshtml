@@ -149,43 +149,39 @@
                 <govuk-details open="@Model.ExpandZendeskTickets" data-testid="zendesk-tickets">
                     <summary>View tickets</summary>
                     <text>
-                        <table class="govuk-table">
-                            <thead class="govuk-table__head">
-                            <tr class="govuk-table__row">
-                                <th scope="col" class="govuk-table__header govuk-!-width-one-half">
-                                    Link to ticket
-                                </th>
-                                <th scope="col" class="govuk-table__header">
-                                    Action
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                            @foreach (var ticketUrl in Model.ZendeskTickets)
-                            {
-                                <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell">@Index.GetZendeskTicketDisplayText(ticketUrl)</td>
-                                    <td class="govuk-table__cell">
-                                        <div class="govuk-button-group govuk-!-margin-bottom-0">
-                                            <govuk-button type="button"
-                                                          class="govuk-button--secondary trs-requires-js govuk-!-margin-bottom-0"
-                                                          data-clipboard-text="@ticketUrl">
-                                                Copy to clipboard
-                                            </govuk-button>
+                        <govuk-table>
+                        <table-head>
+                            <table-head-cell class="govuk-!-width-one-half">
+                                Link to ticket
+                            </table-head-cell>
+                            <table-head-cell>
+                                Action
+                            </table-head-cell>
+                        </table-head>
+                        @foreach (var ticketUrl in Model.ZendeskTickets)
+                        {
+                            <table-row>
+                                <table-cell>@Index.GetZendeskTicketDisplayText(ticketUrl)</table-cell>
+                                <table-cell>
+                                    <div class="govuk-button-group govuk-!-margin-bottom-0">
+                                        <govuk-button type="button"
+                                                      class="govuk-button--secondary trs-requires-js govuk-!-margin-bottom-0"
+                                                      data-clipboard-text="@ticketUrl">
+                                            Copy to clipboard
+                                        </govuk-button>
 
-                                            <a
-                                                href="@ticketUrl"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="govuk-link">
-                                                View ticket (opens in new tab)
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
+                                        <a
+                                            href="@ticketUrl"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="govuk-link">
+                                            View ticket (opens in new tab)
+                                        </a>
+                                    </div>
+                                </table-cell>
+                            </table-row>
+                        }
+                        </govuk-table>
                     </text>
                 </govuk-details>
             }

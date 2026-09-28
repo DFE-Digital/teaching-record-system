@@ -60,31 +60,27 @@
     @if (Model.Row.Status is IntegrationTransactionRecordStatus.Warning or IntegrationTransactionRecordStatus.Failure)
     {
         <div class="govuk-grid-column-full">
-            <table class="govuk-table">
-                <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Row data</td>
-                        <td class="govuk-table__cell">@Model.Row!.RowData</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Failure message</td>
-                        <td class="govuk-table__cell">@Model.Row.FailureMessage</td>
-                    </tr>
-                </tbody>
-            </table>
+            <govuk-table>
+                <table-row>
+                    <table-cell class="govuk-!-font-weight-bold" data-testid="name">Row data</table-cell>
+                    <table-cell>@Model.Row!.RowData</table-cell>
+                </table-row>
+                <table-row>
+                    <table-cell class="govuk-!-font-weight-bold" data-testid="name">Failure message</table-cell>
+                    <table-cell>@Model.Row.FailureMessage</table-cell>
+                </table-row>
+            </govuk-table>
         </div>
     }
     else if (Model.Row.Status == IntegrationTransactionRecordStatus.Success && Model.Row.Duplicate == true)
     {
         <div class="govuk-grid-column-full">
-            <table class="govuk-table">
-                <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Duplicate status</td>
-                        <td class="govuk-table__cell">Duplicate</td>
-                    </tr>
-                </tbody>
-            </table>
+            <govuk-table>
+                <table-row>
+                    <table-cell class="govuk-!-font-weight-bold" data-testid="name">Duplicate status</table-cell>
+                    <table-cell>Duplicate</table-cell>
+                </table-row>
+            </govuk-table>
         </div>
     }
 

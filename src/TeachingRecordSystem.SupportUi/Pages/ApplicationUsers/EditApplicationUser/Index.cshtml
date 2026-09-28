@@ -32,49 +32,45 @@
             </govuk-checkboxes>
 
             <h2 class="govuk-heading-m">API keys</h2>
-            <table class="govuk-table govuk-!-margin-bottom-3" data-testid="ApiKeysTable">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">Key ID</th>
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Expires</th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @if (Model.ApiKeys!.Length > 0)
+            <govuk-table class="govuk-!-margin-bottom-3" data-testid="ApiKeysTable">
+                <table-head>
+                    <table-head-cell>Key ID</table-head-cell>
+                    <table-head-cell class="govuk-!-width-one-third">Expires</table-head-cell>
+                </table-head>
+                @if (Model.ApiKeys!.Length > 0)
+                {
+                    @foreach (var key in Model.ApiKeys)
                     {
-                        @foreach (var key in Model.ApiKeys)
-                        {
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <a href="@LinkGenerator.ApiKeys.EditApiKey.Index(key.ApiKeyId)" class="govuk-link trs-monospace" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
-                                </td>
-                                <td class="govuk-table__cell" data-testid="Expiry">
-                                    @if (key.Expires is DateTime expires)
-                                    {
-                                        <time datetime="@expires.ToString("s")">
-                                            <span class="@(expires < TimeProvider.UtcNow ? "govuk-caption-m" : "")">
-                                                @expires.ToString("dd/MM/yyyy HH:mm")
-                                            </span>
-                                        </time>
-                                    }
-                                    else
-                                    {
-                                        <div class="govuk-caption-m">No expiration</div>
-                                    }
-                                </td>
-                            </tr>
-                        }
+                        <table-row>
+                            <table-cell>
+                                <a href="@LinkGenerator.ApiKeys.EditApiKey.Index(key.ApiKeyId)" class="govuk-link trs-monospace" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
+                            </table-cell>
+                            <table-cell data-testid="Expiry">
+                                @if (key.Expires is DateTime expires)
+                                {
+                                    <time datetime="@expires.ToString("s")">
+                                        <span class="@(expires < TimeProvider.UtcNow ? "govuk-caption-m" : "")">
+                                            @expires.ToString("dd/MM/yyyy HH:mm")
+                                        </span>
+                                    </time>
+                                }
+                                else
+                                {
+                                    <div class="govuk-caption-m">No expiration</div>
+                                }
+                            </table-cell>
+                        </table-row>
                     }
-                    else
-                    {
-                        <tr class="govuk-table__row">
-                            <td class="govuk-table__cell" colspan="2">
-                                <div class="govuk-caption-m">No API keys</div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                }
+                else
+                {
+                    <table-row>
+                        <table-cell colspan="2">
+                            <div class="govuk-caption-m">No API keys</div>
+                        </table-cell>
+                    </table-row>
+                }
+            </govuk-table>
 
             <div class="govuk-!-margin-bottom-1">
                 <govuk-button-link href="@LinkGenerator.ApiKeys.AddApiKey.Index(Model.UserId)" class="govuk-button--secondary" data-testid="AddApiKey">Add API key</govuk-button-link>
