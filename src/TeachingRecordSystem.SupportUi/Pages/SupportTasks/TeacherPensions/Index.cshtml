@@ -57,22 +57,22 @@
                     <table-head>
                         <table-head-cell class="govuk-!-width-one-quarter"
                             sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Name ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.Name, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(search: Model.Search, TeachersPensionsPotentialDuplicatesSortByOption.Name, direction))">
                             Name
                         </table-head-cell>
                         <table-head-cell
                             sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(search: Model.Search, TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn, direction))">
                             Date created
                         </table-head-cell>
                         <table-head-cell class="trs-!-width-150"
                             sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.Filename ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.Filename, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(search: Model.Search, TeachersPensionsPotentialDuplicatesSortByOption.Filename, direction))">
                             File name
                         </table-head-cell>
                         <table-head-cell class="trs-!-width-150"
                             sort-direction="@(Model.SortBy == TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId ? Model.SortDirection : null)"
-                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId, direction))">
+                            link-template="@(direction => LinkGenerator.SupportTasks.TeacherPensions.Index(search: Model.Search, TeachersPensionsPotentialDuplicatesSortByOption.InterfaceId, direction))">
                             Interface ID
                         </table-head-cell>
                     </table-head>
@@ -93,6 +93,8 @@
                         </table-row>
                     }
                     </govuk-table>
+
+                    <govuk-pagination current-page="@Model.Pagination!.CurrentPage" total-pages="@Model.Pagination.LastPage" generate-page-href="@Model.Pagination.GetPageLink" />
                 }
             </div>
         </div>
