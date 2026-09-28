@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.OpenApi;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using Constants = TeachingRecordSystem.Api.Infrastructure.ApplicationModel.Constants;
@@ -34,6 +35,11 @@ public static class ServiceCollectionExtensions
                 options.AddOperationTransformer(new SetOperationIdTransformer());
                 options.AddOperationTransformer(new SetContentTypesTransformer());
                 options.AddSchemaTransformer(new UnwrapOptionPropertiesTransformer());
+                options.AddSchemaTransformer(new OneOfSchemaTransformer());
+
+                // Inline OneOf<T0, T1> schemas rather than adding a component for each combination of types
+                options.CreateSchemaReferenceId = typeInfo =>
+                    OneOfSchemaTransformer.IsOneOfType(typeInfo.Type) ? null : OpenApiOptions.CreateDefaultSchemaReferenceId(typeInfo);
 
                 if (minorVersion is not null)
                 {

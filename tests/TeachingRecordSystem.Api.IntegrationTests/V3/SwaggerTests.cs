@@ -104,6 +104,43 @@ public class SwaggerTests(HostFixture hostFixture) : TestBase(hostFixture)
             s => Assert.Equal("#/components/schemas/GetTeacherResponseInduction", s.GetProperty("$ref").GetString()));
     }
 
+    [Fact]
+    public async Task Get_SwaggerEndpoint_DocumentsOneOfPropertyAsAnyOfItsTypes()
+    {
+        // Arrange
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{VersionRegistry.V3MinorVersions.V20250627}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var schemas = document.RootElement.GetProperty("components").GetProperty("schemas");
+        Assert.DoesNotContain(schemas.EnumerateObject(), s => s.Name.StartsWith("OneOf"));
+        // Option<OneOf<IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>>>
+        var anyOf = schemas.GetProperty("GetPersonResponse").GetProperty("properties").GetProperty("routesToProfessionalStatuses")
+            .GetProperty("anyOf").EnumerateArray().ToArray();
+        Assert.Collection(
+            anyOf,
+            s => Assert.Equal("#/components/schemas/GetPersonResponseRouteToProfessionalStatus", s.GetProperty("items").GetProperty("$ref").GetString()),
+            s => Assert.Equal("#/components/schemas/GetPersonResponseRouteToProfessionalStatusForAppropriateBody", s.GetProperty("items").GetProperty("$ref").GetString()));
+    }
+
+    [Fact]
+    public async Task Get_SwaggerEndpoint_DocumentsEnumsAsStrings()
+    {
+        // Arrange
+        var httpClient = HostFixture.CreateClient();
+
+        // Act
+        var response = await httpClient.GetAsync($"swagger/v3_{VersionRegistry.V3MinorVersions.V20250627}.json");
+
+        // Assert
+        using var document = await GetDocumentAsync(response);
+        var schema = document.RootElement.GetProperty("components").GetProperty("schemas").GetProperty("InductionStatus");
+        Assert.Contains("Passed", schema.GetProperty("enum").EnumerateArray().Select(e => e.GetString()));
+    }
+
     private static string?[] GetTypes(JsonElement schema) =>
         schema.GetProperty("type").EnumerateArray().Select(e => e.GetString()).Order().ToArray();
 
