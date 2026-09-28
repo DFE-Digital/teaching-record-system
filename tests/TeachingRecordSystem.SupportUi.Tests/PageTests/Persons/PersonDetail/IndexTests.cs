@@ -665,6 +665,60 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
+    [InlineData(PersonStatus.Deactivated, true)]
+    [InlineData(PersonStatus.Deactivated, false)]
+    [InlineData(PersonStatus.Active, false)]
+    public async Task Get_PersonStatusAndMerge_ShowsActiveMergedRecordLinkAsExpected(PersonStatus status, bool merged)
+    {
+        // Arrange
+        var retainedPerson = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.Status = status;
+            person.MergedWithPersonId = merged ? retainedPerson.PersonId : null;
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var message = doc.GetElementByTestId("deactivated-message");
+        var link = doc.GetElementByTestId("active-merged-record-link") as IHtmlAnchorElement;
+
+        if (status == PersonStatus.Deactivated)
+        {
+            Assert.NotNull(message);
+            Assert.Contains("This record has been deactivated", message.TrimmedText());
+            Assert.Equal("!", message.QuerySelector(".govuk-warning-text__icon")?.TrimmedText());
+            Assert.Equal(doc.GetElementByTestId("page-title"), message.PreviousElementSibling);
+        }
+        else
+        {
+            Assert.Null(message);
+        }
+
+        if (merged)
+        {
+            Assert.NotNull(link);
+            Assert.Equal($"/persons/{retainedPerson.PersonId}", link.GetAttribute("href"));
+            Assert.Equal("View active merged record (opens in a new tab)", link.TrimmedText());
+            Assert.Equal("_blank", link.Target);
+            Assert.Equal(message, link.ParentElement!.PreviousElementSibling);
+        }
+        else
+        {
+            Assert.Null(link);
+        }
+    }
+
+    [Theory]
     [InlineData(PersonStatus.Active, true)]
     [InlineData(PersonStatus.Deactivated, false)]
     public async Task Get_PersonStatus_ShowsConnectOneLoginButtonAsExpected(PersonStatus currentStatus, bool expectConnectButtonToBeShown)
