@@ -49,14 +49,14 @@ public class SubjectSpecialismsModel(
         SubjectId3 = journey.State.TrainingSubjectIds.ElementAtOrDefault(2);
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var subjects = new[] { SubjectId1, SubjectId2, SubjectId3 }.Where(s => s.HasValue).Select(s => s!.Value).ToArray();
 
@@ -67,6 +67,8 @@ public class SubjectSpecialismsModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         SubjectSpecialismRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.SubjectSpecialisms);
         Subjects = (await referenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()

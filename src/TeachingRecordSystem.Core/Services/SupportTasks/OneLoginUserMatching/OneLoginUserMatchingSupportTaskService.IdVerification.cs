@@ -8,7 +8,8 @@ public partial class OneLoginUserMatchingSupportTaskService
 {
     public async Task<SupportTask> CreateVerificationSupportTaskAsync(
         CreateOneLoginUserIdVerificationSupportTaskOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var supportTask = await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
@@ -38,19 +39,20 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Subject = SupportTask.Subject.FromOneLoginUser(options.StatedFirstName, options.StatedLastName),
                 SourceApplicationUserId = options.ClientApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return supportTask;
     }
 
-    public async Task ResolveVerificationSupportTaskAsync(NotVerifiedOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(NotVerifiedOutcomeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
+        var appContent = await GetAppContentAsync(data.ClientApplicationUserId, cancellationToken);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
@@ -66,7 +68,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserIdVerification_NotVerified
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
         var reason = options.RejectReason is OneLoginIdVerificationRejectReason.AnotherReason
@@ -78,17 +81,18 @@ public partial class OneLoginUserMatchingSupportTaskService
             name,
             reason,
             appContent?.OneLoginNotVerifiedEmailTemplateId,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
     }
 
-    public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithMatchesOutcomeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var applicationUser = await GetApplicationUserAsync(supportTask);
+        var applicationUser = await GetApplicationUserAsync(supportTask, cancellationToken);
         var recordMatchingPolicy = applicationUser.RecordMatchingPolicy;
         var appContent = applicationUser.AppContent;
 
@@ -101,7 +105,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
                 CoreIdentityClaimVc = null
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (recordMatchingPolicy == RecordMatchingPolicy.Deferred && appContent?.OneLoginNotConnectedEmailTemplateId is { } templateId)
         {
@@ -115,7 +120,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 name,
                 reason,
                 templateId,
-                processContext);
+                processContext,
+                cancellationToken: cancellationToken);
         }
 
         await supportTaskService.UpdateSupportTaskAsync(
@@ -132,17 +138,18 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithMatches
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
-    public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithoutMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(VerifiedOnlyWithoutMatchesOutcomeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
+        var appContent = await GetAppContentAsync(data.ClientApplicationUserId, cancellationToken);
 
         await oneLoginService.SetUserVerifiedAsync(
             new SetUserVerifiedOptions
@@ -153,7 +160,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 VerifiedNames = [[data.StatedFirstName, data.StatedLastName]],
                 CoreIdentityClaimVc = null
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
@@ -167,7 +175,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedOnlyWithoutMatches
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
 
@@ -176,17 +185,18 @@ public partial class OneLoginUserMatchingSupportTaskService
             name,
             appContent?.OneLoginCannotFindRecordEmailTemplateId,
             appContent?.SupportEmailAddressNotifyId,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
     }
 
-    public async Task ResolveVerificationSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveVerificationSupportTaskAsync(VerifiedAndConnectedOutcomeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserIdVerificationData>();
 
-        var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
+        var appContent = await GetAppContentAsync(data.ClientApplicationUserId, cancellationToken);
 
         await oneLoginService.SetUserVerifiedAndMatchedAsync(
             new SetUserVerifiedAndMatchedOptions
@@ -200,14 +210,15 @@ public partial class OneLoginUserMatchingSupportTaskService
                 MatchRoute = OneLoginUserMatchRoute.SupportUi,
                 MatchedAttributes = options.MatchedAttributes
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var name = $"{data.StatedFirstName} {data.StatedLastName}";
         await oneLoginService.EnqueueRecordMatchedEmailAsync(
             supportTask.OneLoginUser!.EmailAddress!,
             name,
             appContent?.OneLoginRecordMatchedEmailTemplateId,
-            appContent?.SupportEmailAddressNotifyId, processContext);
+            appContent?.SupportEmailAddressNotifyId, processContext, cancellationToken);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserIdVerificationData>
@@ -222,7 +233,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserIdVerification_VerifiedAndConnected
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
     private void ThrowIfSupportTaskIsClosed(SupportTask supportTask)

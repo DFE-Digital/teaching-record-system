@@ -124,7 +124,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AzureActiveDirectoryUserServiceMock.Verify(mock => mock.GetUserByEmailAsync(email + "@education.gov.uk"));
+        AzureActiveDirectoryUserServiceMock.Verify(mock => mock.GetUserByEmailAsync(email + "@education.gov.uk", It.IsAny<CancellationToken>()));
     }
 
     [Fact]
@@ -198,6 +198,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private void ConfigureUserServiceMock(string email, User? user) =>
         AzureActiveDirectoryUserServiceMock
-            .Setup(mock => mock.GetUserByEmailAsync(email))
+            .Setup(mock => mock.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 }

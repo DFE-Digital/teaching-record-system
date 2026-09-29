@@ -41,14 +41,14 @@ public class DegreeTypeModel(
         DegreeTypeId = journey.State.DegreeTypeId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state => state.DegreeTypeId = DegreeTypeId);
 
@@ -57,6 +57,8 @@ public class DegreeTypeModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         DegreeTypeRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.DegreeType);
         DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
 

@@ -19,25 +19,25 @@ public class BlobStorageFileService : IFileService
         _hostEnvironment = hostEnvironment;
     }
 
-    public async Task<Guid> UploadFileAsync(Stream stream, string? contentType, Guid? fileIdOverride = null)
+    public async Task<Guid> UploadFileAsync(Stream stream, string? contentType, Guid? fileIdOverride = null, CancellationToken cancellationToken = default)
     {
         var fileId = fileIdOverride ?? Guid.NewGuid();
-        var blobClient = await GetBlobClientAsync(fileId);
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
 
-        await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null);
+        await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null, cancellationToken: cancellationToken);
         return fileId;
     }
 
-    public async Task<bool> UploadFileAsync(string fileName, Stream stream, string? contentType)
+    public async Task<bool> UploadFileAsync(string fileName, Stream stream, string? contentType, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileName);
-        var response = await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null);
+        var blobClient = await GetBlobClientAsync(fileName, cancellationToken);
+        var response = await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null, cancellationToken: cancellationToken);
         return response.GetRawResponse().Status == 201;
     }
 
-    public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+    public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
 
         var sasBuilder = new BlobSasBuilder
         {
@@ -51,48 +51,49 @@ public class BlobStorageFileService : IFileService
         return blobClient.GenerateSasUri(sasBuilder).ToString();
     }
 
-    public async Task<string?> TryGetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+    public async Task<string?> TryGetFileUrlAsync(Guid fileId, TimeSpan expiresAfter, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
-        if (!await blobClient.ExistsAsync())
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
+        if (!await blobClient.ExistsAsync(cancellationToken))
         {
             return null;
         }
 
-        return await GetFileUrlAsync(fileId, expiresAfter);
+        return await GetFileUrlAsync(fileId, expiresAfter, cancellationToken);
     }
 
-    public async Task<Stream> OpenReadStreamAsync(Guid fileId)
+    public async Task<Stream> OpenReadStreamAsync(Guid fileId, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
-        var stream = await blobClient.OpenReadAsync();
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
+        var stream = await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
         return stream;
     }
 
-    public async Task<bool> DeleteFileAsync(Guid fileId)
+    public async Task<bool> DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
-        var deleted = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
+        var deleted = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
         return deleted;
     }
 
-    private Task<BlobClient> GetBlobClientAsync(Guid fileId)
+    private Task<BlobClient> GetBlobClientAsync(Guid fileId, CancellationToken cancellationToken)
     {
-        return GetBlobClientAsync(fileId.ToString());
+        return GetBlobClientAsync(fileId.ToString(), cancellationToken);
     }
 
-    private async Task<BlobClient> GetBlobClientAsync(string fileName)
+    private async Task<BlobClient> GetBlobClientAsync(string fileName, CancellationToken cancellationToken)
     {
-        await EnsureBlobContainerClientAsync();
+        await EnsureBlobContainerClientAsync(cancellationToken);
         return _blobContainerClient!.GetBlobClient(fileName);
     }
 
-    private async Task EnsureBlobContainerClientAsync()
+    private async Task EnsureBlobContainerClientAsync(CancellationToken cancellationToken)
     {
         if (_blobContainerClient is null)
         {
-            _blobContainerClient = _blobServiceClient.GetBlobContainerClient(UploadsContainerName);
-            await _blobContainerClient.CreateIfNotExistsAsync();
+            var blobContainerClient = _blobServiceClient.GetBlobContainerClient(UploadsContainerName);
+            await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+            _blobContainerClient = blobContainerClient;
         }
     }
 }

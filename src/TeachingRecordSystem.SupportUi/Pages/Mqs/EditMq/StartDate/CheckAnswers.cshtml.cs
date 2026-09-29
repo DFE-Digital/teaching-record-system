@@ -58,11 +58,11 @@ public class CheckAnswersModel(
         AdditionalInformation = journey.State.AdditionalInformation;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
         var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
@@ -85,7 +85,8 @@ public class CheckAnswersModel(
                 QualificationId = qualification.QualificationId,
                 StartDate = Option.Some(NewStartDate)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Mandatory qualification changed");
@@ -93,9 +94,9 @@ public class CheckAnswersModel(
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

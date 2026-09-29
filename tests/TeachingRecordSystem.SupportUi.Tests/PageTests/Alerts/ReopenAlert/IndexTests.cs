@@ -386,7 +386,7 @@ public class IndexTests(HostFixture hostFixture) : ReopenAlertTestBase(hostFixtu
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Null(GetJourneyInstanceState(journeyInstance));
-        FileServiceMock.Verify(s => s.DeleteFileAsync(evidenceFileId), Times.Once());
+        FileServiceMock.Verify(s => s.DeleteFileAsync(evidenceFileId, It.IsAny<CancellationToken>()), Times.Once());
     }
 
     [Theory]

@@ -22,7 +22,8 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAsync(
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
+        CancellationToken cancellationToken)
     {
         var command = new GetPersonCommand(
             Trn: User.FindFirstValue("trn")!,
@@ -34,7 +35,7 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
                 ApplyLegacyAlertsBehavior = true
             });
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(GetPersonResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
@@ -49,7 +50,8 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     public async Task<IActionResult> CreateNameChangeAsync(
-        [FromBody] CreateNameChangeRequestRequest request)
+        [FromBody] CreateNameChangeRequestRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new CreateNameChangeRequestCommand()
         {
@@ -62,7 +64,7 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
             EmailAddress = request.EmailAddress
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(CreateNameChangeResponse.Create(r)));
     }
@@ -76,7 +78,8 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync(
-        [FromBody] CreateDateOfBirthChangeRequestRequest request)
+        [FromBody] CreateDateOfBirthChangeRequestRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new CreateDateOfBirthChangeRequestCommand()
         {
@@ -87,7 +90,7 @@ public class PersonController(ICommandDispatcher commandDispatcher) : Controller
             EmailAddress = request.EmailAddress
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(CreateDateOfBirthChangeResponse.Create(r)));
     }

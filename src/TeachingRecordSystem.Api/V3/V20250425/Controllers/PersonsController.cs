@@ -25,7 +25,8 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     public async Task<IActionResult> SetProfessionalStatusAsync(
         [FromRoute] string trn,
         [FromRoute(Name = "reference")] string sourceApplicationReference,
-        [FromBody] SetProfessionalStatusRequest request)
+        [FromBody] SetProfessionalStatusRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new SetRouteToProfessionalStatusCommand(
             trn,
@@ -47,7 +48,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
             request.DegreeTypeId,
             request.IsExemptFromInduction);
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
@@ -63,7 +64,8 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> SetPiiAsync(
         [FromRoute] string trn,
-        [FromBody] SetPiiRequest request)
+        [FromBody] SetPiiRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new SetPiiCommand()
         {
@@ -77,7 +79,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
             Gender = request.Gender is Gender gender ? Core.Models.Gender.Create(gender) : null
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);

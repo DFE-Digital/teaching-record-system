@@ -63,13 +63,15 @@ public class MergeModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink();
 
         var personAId = journey.State.PersonAId!.Value;
         var personBId = journey.State.PersonBId!.Value;
         var primaryPersonId = journey.State.PrimaryPersonId!.Value;
 
-        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync(personAId, personBId);
+        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync([personAId, personBId], cancellationToken);
 
         var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
 
@@ -142,11 +144,11 @@ public class MergeModel(
         Evidence = journey.State.Evidence;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (_potentialDuplicates!.Any(p => p.IsInvalid))
@@ -191,9 +193,9 @@ public class MergeModel(
 
         // Upload the evidence file before validating so that it's retained if the form is re-rendered
         // with errors.
-        await evidenceUploadManager.UploadAsync(Evidence);
+        await evidenceUploadManager.UploadAsync(Evidence, cancellationToken);
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.MergePerson.CheckAnswers(journey.InstanceId),

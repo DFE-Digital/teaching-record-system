@@ -79,7 +79,7 @@ public class Index(
         Status = _supportTask.Status;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (!_supportTask!.IsOutstanding)
         {
@@ -104,7 +104,8 @@ public class Index(
                 Status = Status,
                 AssignToUserId = AssignedToUserId == UnassignedUserId ? null : AssignedToUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (updated)
         {
@@ -116,6 +117,8 @@ public class Index(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         Subject = _supportTask.GetSubject();
@@ -135,7 +138,7 @@ public class Index(
             .Where(t => t.SupportTaskReference == SupportTaskReference)
             .OrderByDescending(t => t.CreatedOn)
             .Select(t => new Note(t.Content, t.CreatedOn, t.CreatedBy!.Name))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         ZendeskTickets = _supportTask.ZendeskTickets;
 
@@ -144,7 +147,8 @@ public class Index(
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
             includeCurrentAssignees: false,
-            includeUserId: _supportTask.AssignedToUserId);
+            includeUserId: _supportTask.AssignedToUserId,
+            cancellationToken: cancellationToken);
 
         ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
 
@@ -155,7 +159,7 @@ public class Index(
         BackLink = this.GetReturnUrlOrDefault(
             IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
 
-        ChangeHistory = (await changeHistoryService.GetChangeHistoryBySupportTaskAsync(SupportTaskReference))
+        ChangeHistory = (await changeHistoryService.GetChangeHistoryBySupportTaskAsync(SupportTaskReference, cancellationToken))
             .Select(e => new ChangeHistoryEntryViewModel
             {
                 Context = e.Context,

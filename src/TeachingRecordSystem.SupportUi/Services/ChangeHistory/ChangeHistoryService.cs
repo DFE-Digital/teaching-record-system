@@ -16,7 +16,8 @@ public class ChangeHistoryService(
     public async Task<ResultPage<TimelineItem>> GetChangeHistoryByPersonAsync(
         Guid personId,
         ClaimsPrincipal user,
-        PaginationOptions paginationOptions)
+        PaginationOptions paginationOptions,
+        CancellationToken cancellationToken = default)
     {
         var eventTypes = new[]
         {
@@ -34,7 +35,7 @@ public class ChangeHistoryService(
                 AlertType: at,
                 CanRead: (await authorizationService.AuthorizeAsync(user, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Read))) is { Succeeded: true }))
             .Where(t => t.CanRead)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var alertTypeIdsWithReadPermission = alertTypesWithReadPermission.Select(at => at.AlertType.AlertTypeId).ToArray();
 
@@ -75,7 +76,7 @@ public class ChangeHistoryService(
                         OR (e.payload->> 'ChangeReason')::int != {LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept}
                     )
                 """)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var processTypesToQuery = new[]
         {
@@ -147,7 +148,7 @@ public class ChangeHistoryService(
             .Where(p => p.PersonIds.Contains(personId) && processTypesToQuery.Contains(p.ProcessType))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         // Filter alert processes by alert type permissions
         var alertProcessTypes = new[]
@@ -186,7 +187,7 @@ public class ChangeHistoryService(
                 || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
         }).ToList();
 
-        var contextData = await GetContextDataAsync(filteredProcesses);
+        var contextData = await GetContextDataAsync(filteredProcesses, cancellationToken);
         var context = ChangeHistoryContext.ForPerson(personId, contextData.AllPersons, contextData.AllOneLoginUsers);
 
         var allResults = eventsWithUser.Select(e => MapLegacyEvent(e, personId))
@@ -205,7 +206,8 @@ public class ChangeHistoryService(
     }
 
     public async Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(
-        string supportTaskReference)
+        string supportTaskReference,
+        CancellationToken cancellationToken = default)
     {
         var results = await dbContext.Processes
             .Where(p => p.SupportTaskReferences.Contains(supportTaskReference))
@@ -219,9 +221,9 @@ public class ChangeHistoryService(
                     {
                         Name = process.User != null ? process.User.Name : process.DqtUserName!
                     }))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
-        var contextData = await GetContextDataAsync(results.Select(r => r.Process).AsReadOnly());
+        var contextData = await GetContextDataAsync(results.Select(r => r.Process).AsReadOnly(), cancellationToken);
         var context = ChangeHistoryContext.ForSupportTask(supportTaskReference, contextData.AllPersons, contextData.AllOneLoginUsers);
 
         return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context)).AsReadOnly();
@@ -229,7 +231,8 @@ public class ChangeHistoryService(
 
     public async Task<ResultPage<ProcessChangeHistoryEntry>> GetChangeHistoryByOneLoginUserAsync(
         string oneLoginUserSubject,
-        PaginationOptions paginationOptions)
+        PaginationOptions paginationOptions,
+        CancellationToken cancellationToken = default)
     {
         var query = dbContext.Processes
             .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject))
@@ -237,16 +240,16 @@ public class ChangeHistoryService(
             .Include(p => p.Events).AsSplitQuery()
             .OrderByDescending(p => p.CreatedOn);
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         var results = await query
             .Select(process =>
                 new Result(
                     process,
                     new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount, cancellationToken);
 
-        var contextData = await GetContextDataAsync(results.Select(r => r.Process));
+        var contextData = await GetContextDataAsync(results.Select(r => r.Process), cancellationToken);
         var context = ChangeHistoryContext.ForOneLoginUser(oneLoginUserSubject, contextData.AllPersons, contextData.AllOneLoginUsers);
 
         return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context));
@@ -273,7 +276,7 @@ public class ChangeHistoryService(
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.LegacyEvent, personId, timelineEvent.Event.CreatedUtc, timelineEvent)!;
     }
 
-    public async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults)
+    public async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults, CancellationToken cancellationToken = default)
     {
         var allPersonIds = allResults
             .SelectMany(r =>
@@ -297,14 +300,14 @@ public class ChangeHistoryService(
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => allPersonIds.Contains(p.PersonId))
             .Select(p => new ChangeHistoryContext.PersonInfo(p.PersonId, p.Trn, p.FirstName, p.LastName))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var allOneLoginUserSubjects = allResults.SelectMany(r => r.OneLoginUserSubjects).Distinct().ToArray();
 
         var allOneLoginUsers = await dbContext.OneLoginUsers
             .Where(u => allOneLoginUserSubjects.Contains(u.Subject))
             .Select(u => new ChangeHistoryContext.OneLoginUserInfo(u.Subject, u.EmailAddress))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         return new(
             allPersons.ToDictionary(p => p.PersonId, p => p),

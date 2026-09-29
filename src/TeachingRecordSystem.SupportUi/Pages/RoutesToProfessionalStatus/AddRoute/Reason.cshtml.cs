@@ -58,18 +58,18 @@ public class ReasonModel(AddRouteJourneyCoordinator journey, EvidenceUploadManag
         Evidence = journey.State.ChangeReasonDetail.Evidence;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         // Upload the evidence file before validating so that it's retained if the form is re-rendered
         // with errors.
-        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData);
+        await evidenceUploadManager.ValidateAndUploadAsync<ReasonModel>(m => m.Evidence, ViewData, cancellationToken);
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return await journey.AnswerAndAdvanceAsync(AddRoutePage.ChangeReason, state =>
         {

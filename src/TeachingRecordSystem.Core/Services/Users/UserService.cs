@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Services.Users;
 
 public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 {
-    public async Task<User> CreateUserAsync(CreateUserOptions options, ProcessContext processContext)
+    public async Task<User> CreateUserAsync(CreateUserOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var user = new User
         {
@@ -18,7 +18,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         };
 
         dbContext.Users.Add(user);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new UserAddedEvent
@@ -26,14 +26,15 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 EventId = Guid.NewGuid(),
                 User = EventModels.User.FromModel(user)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return user;
     }
 
-    public async Task<UserUpdatedEventChanges> UpdateUserAsync(UpdateUserOptions options, ProcessContext processContext)
+    public async Task<UserUpdatedEventChanges> UpdateUserAsync(UpdateUserOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.Users.FindOrThrowAsync(options.UserId);
+        var user = await dbContext.Users.FindOrThrowAsync(options.UserId, cancellationToken);
 
         var oldUser = EventModels.User.FromModel(user);
 
@@ -49,7 +50,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
             return changes;
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new UserUpdatedEvent
@@ -58,14 +59,15 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 User = EventModels.User.FromModel(user),
                 Changes = changes
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return changes;
     }
 
-    public async Task ActivateUserAsync(Guid userId, ProcessContext processContext)
+    public async Task ActivateUserAsync(Guid userId, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.Users.FindOrThrowAsync(userId);
+        var user = await dbContext.Users.FindOrThrowAsync(userId, cancellationToken);
 
         if (user.Active)
         {
@@ -73,7 +75,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         }
 
         user.Active = true;
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new UserActivatedEvent
@@ -81,12 +83,13 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 EventId = Guid.NewGuid(),
                 User = EventModels.User.FromModel(user)
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
-    public async Task DeactivateUserAsync(DeactivateUserOptions options, ProcessContext processContext)
+    public async Task DeactivateUserAsync(DeactivateUserOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.Users.FindOrThrowAsync(options.UserId);
+        var user = await dbContext.Users.FindOrThrowAsync(options.UserId, cancellationToken);
 
         if (!user.Active)
         {
@@ -94,7 +97,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         }
 
         user.Active = false;
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new UserDeactivatedEvent
@@ -105,10 +108,11 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 DeactivatedReasonDetail = options.DeactivatedReasonDetail,
                 EvidenceFileId = options.EvidenceFileId
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
-    public async Task<ApplicationUser> CreateApplicationUserAsync(CreateApplicationUserOptions options, ProcessContext processContext)
+    public async Task<ApplicationUser> CreateApplicationUserAsync(CreateApplicationUserOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var applicationUser = new ApplicationUser
         {
@@ -119,7 +123,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         };
 
         dbContext.ApplicationUsers.Add(applicationUser);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new ApplicationUserCreatedEvent
@@ -127,14 +131,15 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 EventId = Guid.NewGuid(),
                 ApplicationUser = EventModels.ApplicationUser.FromModel(applicationUser)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return applicationUser;
     }
 
-    public async Task<ApplicationUserUpdatedEventChanges> UpdateApplicationUserAsync(UpdateApplicationUserOptions options, ProcessContext processContext)
+    public async Task<ApplicationUserUpdatedEventChanges> UpdateApplicationUserAsync(UpdateApplicationUserOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var applicationUser = await dbContext.ApplicationUsers.FindOrThrowAsync(options.UserId);
+        var applicationUser = await dbContext.ApplicationUsers.FindOrThrowAsync(options.UserId, cancellationToken);
 
         var oldApplicationUser = EventModels.ApplicationUser.FromModel(applicationUser);
 
@@ -163,7 +168,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
             return changes;
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new ApplicationUserUpdatedEvent
@@ -173,15 +178,16 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 OldApplicationUser = oldApplicationUser,
                 Changes = changes
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         // Notify TeacherAuth about changes to the application user
-        await dbContext.Database.ExecuteSqlRawAsync($"NOTIFY {ChannelNames.OneLoginClient}");
+        await dbContext.Database.ExecuteSqlRawAsync($"NOTIFY {ChannelNames.OneLoginClient}", cancellationToken);
 
         return changes;
     }
 
-    public async Task<ApiKey> CreateApiKeyAsync(CreateApiKeyOptions options, ProcessContext processContext)
+    public async Task<ApiKey> CreateApiKeyAsync(CreateApiKeyOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var apiKey = new ApiKey
         {
@@ -194,7 +200,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         };
 
         dbContext.ApiKeys.Add(apiKey);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new ApiKeyCreatedEvent
@@ -202,14 +208,15 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 EventId = Guid.NewGuid(),
                 ApiKey = EventModels.ApiKey.FromModel(apiKey)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return apiKey;
     }
 
-    public async Task<ApiKeyUpdatedEventChanges> UpdateApiKeyAsync(UpdateApiKeyOptions options, ProcessContext processContext)
+    public async Task<ApiKeyUpdatedEventChanges> UpdateApiKeyAsync(UpdateApiKeyOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var apiKey = await dbContext.ApiKeys.FindOrThrowAsync(options.ApiKeyId);
+        var apiKey = await dbContext.ApiKeys.FindOrThrowAsync(options.ApiKeyId, cancellationToken);
 
         var oldApiKey = EventModels.ApiKey.FromModel(apiKey);
 
@@ -223,7 +230,7 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
             return changes;
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new ApiKeyUpdatedEvent
@@ -233,7 +240,8 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 OldApiKey = oldApiKey,
                 Changes = changes
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return changes;
     }

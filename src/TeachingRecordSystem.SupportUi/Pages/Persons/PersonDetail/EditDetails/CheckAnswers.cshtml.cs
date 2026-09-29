@@ -45,11 +45,11 @@ public class CheckAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         var processContext = new ProcessContext(
@@ -79,7 +79,8 @@ public class CheckAnswersModel(
                 NationalInsuranceNumber = Option.Some(NationalInsuranceNumber),
                 Gender = Option.Some(Gender)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
 

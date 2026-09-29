@@ -32,7 +32,7 @@ public class ConfirmNotConnecting(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -54,7 +54,8 @@ public class ConfirmNotConnecting(
                     NotConnectingReason = journey.State.NotConnectingReason!.Value,
                     NotConnectingAdditionalDetails = journey.State.NotConnectingAdditionalDetails
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -67,7 +68,8 @@ public class ConfirmNotConnecting(
                     NotConnectingReason = journey.State.NotConnectingReason!.Value,
                     NotConnectingAdditionalDetails = journey.State.NotConnectingAdditionalDetails
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             emailSent = resolveResult.EmailSent;
         }
@@ -78,7 +80,7 @@ public class ConfirmNotConnecting(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         var personName = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
-        var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
+        var appContent = await supportTaskService.GetAppContentAsync(_supportTask, cancellationToken);
 
         var emailSentMessage = appContent?.OneLoginNotConnectedEmailSentFlashMessage is not null
             ? string.Format(appContent.OneLoginNotConnectedEmailSentFlashMessage, personName)

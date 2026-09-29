@@ -27,32 +27,30 @@ public class BlobStorageSafeFileService : ISafeFileService
         _hostEnvironment = hostEnvironment;
     }
 
-    public Task<bool> TrySafeUploadAsync(Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride = null)
+    public Task<bool> TrySafeUploadAsync(Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride = null, CancellationToken cancellationToken = default)
     {
         fileId = fileIdOverride ?? Guid.NewGuid();
         return TrySafeUploadInternalAsync(stream, contentType, fileId);
 
         async Task<bool> TrySafeUploadInternalAsync(Stream stream, string? contentType, Guid fileId)
         {
-            var blobClient = await GetBlobClientAsync(fileId);
-            await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null);
+            var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
+            await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null, cancellationToken: cancellationToken);
 
-            using var cancellationToken = new CancellationTokenSource();
-            cancellationToken.CancelAfter(PollingTimeoutMs);
-
-            var malwareScanResult = await PollForMalwareScanResultAsync(blobClient, cancellationToken.Token);
+            var malwareScanResult = await PollForMalwareScanResultAsync(blobClient, cancellationToken);
             if (malwareScanResult != MalwareScanSuccessValue)
             {
-                await blobClient.DeleteIfExistsAsync();
+                // Don't leave a file that failed the scan behind just because the caller has gone away
+                await blobClient.DeleteIfExistsAsync(cancellationToken: CancellationToken.None);
             }
 
             return malwareScanResult == MalwareScanSuccessValue;
         }
     }
 
-    public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+    public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
 
         var sasBuilder = new BlobSasBuilder
         {
@@ -66,31 +64,34 @@ public class BlobStorageSafeFileService : ISafeFileService
         return blobClient.GenerateSasUri(sasBuilder).ToString();
     }
 
-    public async Task<Stream> OpenReadStreamAsync(Guid fileId)
+    public async Task<Stream> OpenReadStreamAsync(Guid fileId, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
-        var stream = await blobClient.OpenReadAsync();
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
+        var stream = await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
         return stream;
     }
 
-    public async Task<bool> DeleteFileAsync(Guid fileId)
+    public async Task<bool> DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
     {
-        var blobClient = await GetBlobClientAsync(fileId);
-        var deleted = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+        var blobClient = await GetBlobClientAsync(fileId, cancellationToken);
+        var deleted = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
         return deleted;
     }
 
     private async Task<string?> PollForMalwareScanResultAsync(BlobClient blobClient, CancellationToken cancellationToken)
     {
-        await Task.Delay(InitialPollingDelayMs, cancellationToken);
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCts.CancelAfter(PollingTimeoutMs);
 
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(PollingPeriodMs));
 
         try
         {
-            while (await timer.WaitForNextTickAsync(cancellationToken))
+            await Task.Delay(InitialPollingDelayMs, timeoutCts.Token);
+
+            while (await timer.WaitForNextTickAsync(timeoutCts.Token))
             {
-                var blobTags = await blobClient.GetTagsAsync(cancellationToken: cancellationToken);
+                var blobTags = await blobClient.GetTagsAsync(cancellationToken: timeoutCts.Token);
                 if (blobTags.Value.Tags.TryGetValue(MalwareScanResultTag, out var malwareScanResult))
                 {
                     return malwareScanResult;
@@ -99,24 +100,25 @@ public class BlobStorageSafeFileService : ISafeFileService
 
             throw new TimeoutException();
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             throw new TimeoutException();
         }
     }
 
-    private async Task<BlobClient> GetBlobClientAsync(Guid fileId)
+    private async Task<BlobClient> GetBlobClientAsync(Guid fileId, CancellationToken cancellationToken)
     {
-        await EnsureBlobContainerClientAsync();
+        await EnsureBlobContainerClientAsync(cancellationToken);
         return _blobContainerClient!.GetBlobClient(fileId.ToString());
     }
 
-    private async Task EnsureBlobContainerClientAsync()
+    private async Task EnsureBlobContainerClientAsync(CancellationToken cancellationToken)
     {
         if (_blobContainerClient is null)
         {
-            _blobContainerClient = _blobServiceClient.GetBlobContainerClient(UploadsContainerName);
-            await _blobContainerClient.CreateIfNotExistsAsync();
+            var blobContainerClient = _blobServiceClient.GetBlobContainerClient(UploadsContainerName);
+            await blobContainerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+            _blobContainerClient = blobContainerClient;
         }
     }
 }

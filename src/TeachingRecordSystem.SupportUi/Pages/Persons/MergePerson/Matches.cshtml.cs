@@ -32,9 +32,11 @@ public class MatchesModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink();
 
-        PotentialDuplicates = await journey.GetPotentialDuplicatesAsync(journey.State.PersonAId!.Value, journey.State.PersonBId!.Value);
+        PotentialDuplicates = await journey.GetPotentialDuplicatesAsync([journey.State.PersonAId!.Value, journey.State.PersonBId!.Value], cancellationToken);
 
         foreach (var potentialDuplicate in PotentialDuplicates)
         {
@@ -73,11 +75,11 @@ public class MatchesModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (PotentialDuplicates!.Any(p => p.IsInvalid))
@@ -85,7 +87,7 @@ public class MatchesModel(
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.MergePerson.Merge(journey.InstanceId),

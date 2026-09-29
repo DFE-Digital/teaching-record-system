@@ -16,7 +16,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
     {
     }
 
-    public async Task<IActionResult> OnGetNewSanctionsAsync()
+    public async Task<IActionResult> OnGetNewSanctionsAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -49,12 +49,12 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      )
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(rows, new SanctionExtractRowMap(), $"new-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetSpentSanctionsAsync()
+    public async Task<IActionResult> OnGetSpentSanctionsAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var rows = await context.Database
@@ -86,12 +86,12 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                    ORDER BY p.trn
                    """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(rows, new SanctionExtractRowMap(), $"spent-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetAuditAlertsAsync()
+    public async Task<IActionResult> OnGetAuditAlertsAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var oneMonthAgo = now.AddMonths(-1);
@@ -127,12 +127,12 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      a.updated_on ASC
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(rows, new AuditingAlertExtractRowMap(), $"auditing-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetDupSanctionsAsync()
+    public async Task<IActionResult> OnGetDupSanctionsAsync(CancellationToken cancellationToken)
     {
         var rows = await context.Database
             .SqlQuery<DuplicateSanctionExtractRow>(
@@ -178,12 +178,12 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      a.end_date
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(rows, new DuplicateSanctionExtractRowMap(), $"dup-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetDqS07DuplicationRecordsWithAlertsAsync()
+    public async Task<IActionResult> OnGetDqS07DuplicationRecordsWithAlertsAsync(CancellationToken cancellationToken)
     {
         var rows = await context.Database
             .SqlQuery<DqS07DuplicationRecordsWithAlertsExtractRow>(
@@ -250,7 +250,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      p.date_of_birth
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,
@@ -258,7 +258,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             $"dq-s07-duplication-records-with-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetDqS08IpoWithAlertDetailsAsync()
+    public async Task<IActionResult> OnGetDqS08IpoWithAlertDetailsAsync(CancellationToken cancellationToken)
     {
         var rows = await context.Database
             .SqlQuery<DqS08IpoWithAlertDetailsExtractRow>(
@@ -290,7 +290,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      p.trn
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,
@@ -298,7 +298,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             $"dq-s08-ipo-with-alert-details-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetDqS10SoSNoProhibitionsActivePast2YearDateAsync()
+    public async Task<IActionResult> OnGetDqS10SoSNoProhibitionsActivePast2YearDateAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
@@ -334,7 +334,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      p.trn
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,
@@ -342,7 +342,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             $"dq-s10-sos-no-prohibitions-active-past-2-year-date-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetDqS11FailedInductionNoAlertsAsync()
+    public async Task<IActionResult> OnGetDqS11FailedInductionNoAlertsAsync(CancellationToken cancellationToken)
     {
         var rows = await context.Database
             .SqlQuery<DqS11FailedInductionNoAlertsExtractRow>(
@@ -382,7 +382,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      p.induction_completed_date DESC
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,
@@ -390,7 +390,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             $"dq-s11-failed-induction-no-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetDqS12DeletedAlertMonthlyAsync()
+    public async Task<IActionResult> OnGetDqS12DeletedAlertMonthlyAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var oneMonthAgo = now.AddMonths(-1);
@@ -424,7 +424,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      a.deleted_on DESC
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,
@@ -432,7 +432,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             $"dq-s12-deleted-alert-monthly-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetMonthlyTmuAlertReconciliationAsync()
+    public async Task<IActionResult> OnGetMonthlyTmuAlertReconciliationAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var oneMonthAgo = now.AddMonths(-1);
@@ -462,7 +462,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      a.start_date DESC
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,
@@ -470,7 +470,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             $"monthly-tmu-alert-reconciliation-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
-    public async Task<IActionResult> OnGetMonthlyTmuAlertReconciliationKpiProcessAsync()
+    public async Task<IActionResult> OnGetMonthlyTmuAlertReconciliationKpiProcessAsync(CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
         var oneMonthAgo = now.AddMonths(-1);
@@ -502,7 +502,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
                      a.start_date DESC
                  """
             )
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return CreateCsv(
             rows,

@@ -24,7 +24,7 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
 
     public PaginationViewModel? Pagination { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         PageNumber ??= 1;
 
@@ -35,7 +35,8 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
 
         var items = await changeHistoryService.GetChangeHistoryByOneLoginUserAsync(
             OneLoginUserSubject,
-            new PaginationOptions(PageNumber, PageSize));
+            new PaginationOptions(PageNumber, PageSize),
+            cancellationToken);
 
         ChangeHistory = items
             .Select(e => new ChangeHistoryEntryViewModel

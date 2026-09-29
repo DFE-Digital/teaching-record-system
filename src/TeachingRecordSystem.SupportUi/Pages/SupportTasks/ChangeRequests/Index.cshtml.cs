@@ -40,12 +40,12 @@ public class IndexModel(SupportTaskSearchService supportTaskSearchService, Suppo
     [BindProperty(SupportsGet = true, Name = "_f")]
     public bool FormSubmitted { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var searchOptions = new ChangeRequestsSearchOptions(Search, SortBy, SortDirection, FormSubmitted ? ChangeRequestTypes : null);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var result = await supportTaskSearchService.SearchChangeRequestsAsync(searchOptions, paginationOptions);
+        var result = await supportTaskSearchService.SearchChangeRequestsAsync(searchOptions, paginationOptions, cancellationToken);
         TotalRequestCount = result.TotalRequestCount;
         NameChangeRequestCount = result.NameChangeRequestCount;
         DateOfBirthChangeRequestCount = result.DateOfBirthChangeRequestCount;

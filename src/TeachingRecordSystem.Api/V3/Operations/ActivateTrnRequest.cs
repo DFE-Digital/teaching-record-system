@@ -12,11 +12,11 @@ public record ActivateTrnRequestResult(bool WasActivated, TrnRequestInfo TrnRequ
 public class ActivateTrnRequestHandler(TrnRequestService trnRequestService, TimeProvider timeProvider, ICurrentUserProvider currentUserProvider) :
     ICommandHandler<ActivateTrnRequestCommand, ActivateTrnRequestResult>
 {
-    public async Task<ApiResult<ActivateTrnRequestResult>> ExecuteAsync(ActivateTrnRequestCommand command)
+    public async Task<ApiResult<ActivateTrnRequestResult>> ExecuteAsync(ActivateTrnRequestCommand command, CancellationToken cancellationToken)
     {
         var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var trnRequestInfo = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId);
+        var trnRequestInfo = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId, cancellationToken);
 
         if (trnRequestInfo is null)
         {
@@ -33,7 +33,8 @@ public class ActivateTrnRequestHandler(TrnRequestService trnRequestService, Time
             trnRequestInfo = await trnRequestService.ActivateTrnRequestAsync(
                 trnRequest.ApplicationUserId,
                 trnRequest.RequestId,
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         return new ActivateTrnRequestResult(

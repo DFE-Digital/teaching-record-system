@@ -65,9 +65,9 @@ public class Assign(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         // Belt & braces check that user assignment is valid
         Guid[] extraAssignmentIds = ShowMyselfOption ? [CurrentUserId, UnassignedUserId] : [UnassignedUserId];
@@ -85,7 +85,8 @@ public class Assign(
                 SupportTaskReferences = Tasks!.Select(t => t.SupportTaskReference),
                 UserId = AssignToUserId == UnassignedUserId ? null : AssignToUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var taskCountMessage = $"{Tasks!.Count} task{(Tasks.Count is 1 ? "" : "s")}";
         TempData.SetFlashNotificationBanner(
@@ -99,6 +100,8 @@ public class Assign(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         if (SupportTaskReferences?.Length is not > 0)
         {
             context.Result = BadRequest();
@@ -121,7 +124,7 @@ public class Assign(
                 t.SupportTaskType,
                 t.Status,
                 t.SourceApplicationUser!.ShortName ?? t.SourceApplicationUser.Name))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         Tasks = tasks.AsReadOnly();
 
@@ -133,7 +136,8 @@ public class Assign(
 
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
-            includeCurrentAssignees: false);
+            includeCurrentAssignees: false,
+            cancellationToken: cancellationToken);
 
         ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
 

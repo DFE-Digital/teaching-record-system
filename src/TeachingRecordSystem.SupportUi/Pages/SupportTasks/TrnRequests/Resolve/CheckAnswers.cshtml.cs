@@ -66,7 +66,7 @@ public class CheckAnswers(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -104,7 +104,8 @@ public class CheckAnswers(
                 AttributeSources = attributeSources,
                 Comments = state.Comments
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner(
             $"{(CreatingNewRecord ? "Record created" : "Records merged")} for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",
@@ -117,6 +118,8 @@ public class CheckAnswers(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var requestData = GetRequestData();
         var state = Journey.State;
 
@@ -151,7 +154,7 @@ public class CheckAnswers(
                     p.Gender,
                     p.Trn
                 })
-                .SingleAsync();
+                .SingleAsync(cancellationToken);
 
             CreatingNewRecord = false;
             // Mirrors GetResolvedPersonAttributes: only a TrnRequest source changes the record.

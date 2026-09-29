@@ -41,12 +41,12 @@ public class DeleteOldEvidenceFilesJob
 
         foreach (var fileId in regularFilesToDelete)
         {
-            await _fileService.DeleteFileAsync(fileId);
+            await _fileService.DeleteFileAsync(fileId, cancellationToken);
         }
 
         foreach (var fileId in safeFilesToDelete)
         {
-            await _safeFileService.DeleteFileAsync(fileId);
+            await _safeFileService.DeleteFileAsync(fileId, cancellationToken);
         }
 
         if (jobMetadata != null)

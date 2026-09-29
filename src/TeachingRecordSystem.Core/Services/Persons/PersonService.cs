@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Services.Persons;
 
 public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginService, IEventPublisher eventPublisher)
 {
-    public Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false)
+    public Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false, CancellationToken cancellationToken = default)
     {
         var persons = dbContext.Persons.AsQueryable();
 
@@ -15,17 +15,17 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             persons = persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]);
         }
 
-        return persons.SingleOrDefaultAsync(p => p.PersonId == personId);
+        return persons.SingleOrDefaultAsync(p => p.PersonId == personId, cancellationToken);
     }
 
-    public async Task<Person> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext)
+    public async Task<Person> CreatePersonAsync(CreatePersonOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         TrnRequestMetadata? sourceRequest = null;
         if (options.SourceTrnRequest is (var applicationUserId, var requestId))
         {
-            sourceRequest = await dbContext.TrnRequestMetadata.FindAsync(applicationUserId, requestId);
+            sourceRequest = await dbContext.TrnRequestMetadata.FindAsync(new object?[] { applicationUserId, requestId }, cancellationToken);
 
             if (sourceRequest is null)
             {
@@ -52,7 +52,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
         };
 
         dbContext.Add(person);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new PersonCreatedEvent
@@ -63,14 +63,15 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                 TrnRequestMetadata = sourceRequest is TrnRequestMetadata metadata
                     ? EventModels.TrnRequestMetadata.FromModel(metadata)
                     : null
-            });
+            },
+            cancellationToken);
 
         return person;
     }
 
-    public async Task UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)
+    public async Task UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var person = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
+        var person = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.PersonId, cancellationToken);
 
         if (person is null)
         {
@@ -124,7 +125,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             });
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new PersonDetailsUpdatedEvent
@@ -134,12 +135,13 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                 Changes = changes,
                 OldPersonDetails = oldPersonEventModel,
                 PersonDetails = EventModels.PersonDetails.FromModel(person)
-            });
+            },
+            cancellationToken);
     }
 
-    public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext)
+    public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.PersonId, cancellationToken);
 
         if (deactivatingPerson is null)
         {
@@ -157,7 +159,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
         deactivatingPerson.Status = PersonStatus.Deactivated;
         deactivatingPerson.UpdatedOn = processContext.Now;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var changes = PersonDeactivatedEventChanges.PersonStatus | (options.DateOfDeath.HasValue ? PersonDeactivatedEventChanges.DateOfDeath : 0);
 
@@ -168,12 +170,12 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             Changes = changes,
             MergedWithPersonId = null,
             DateOfDeath = options.DateOfDeath
-        });
+        }, cancellationToken);
     }
 
-    public async Task ReactivatePersonAsync(Guid personId, ProcessContext processContext)
+    public async Task ReactivatePersonAsync(Guid personId, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var reactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == personId);
+        var reactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == personId, cancellationToken);
 
         if (reactivatingPerson is null)
         {
@@ -198,7 +200,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
         reactivatingPerson.Status = PersonStatus.Active;
         reactivatingPerson.UpdatedOn = processContext.Now;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var changes = PersonReactivatedEventChanges.PersonStatus | (oldDateOfDeath.HasValue ? PersonReactivatedEventChanges.DateOfDeath : 0);
 
@@ -207,12 +209,12 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             EventId = Guid.NewGuid(),
             PersonId = reactivatingPerson.PersonId,
             Changes = changes
-        });
+        }, cancellationToken);
     }
 
-    public async Task DeactivatePersonViaMergeAsync(DeactivatePersonViaMergeOptions options, ProcessContext processContext)
+    public async Task DeactivatePersonViaMergeAsync(DeactivatePersonViaMergeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId, cancellationToken);
 
         if (deactivatingPerson is null)
         {
@@ -226,7 +228,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId, cancellationToken);
 
         if (retainedPerson is null)
         {
@@ -246,7 +248,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
         var oneLoginUsers = await dbContext.OneLoginUsers
             .Where(o => o.PersonId == options.DeactivatingPersonId)
             .Select(o => o.Subject)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         foreach (var user in oneLoginUsers)
         {
@@ -258,10 +260,11 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = null
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new PersonDeactivatedEvent
@@ -271,12 +274,13 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                 Changes = PersonDeactivatedEventChanges.MergedWithPersonId,
                 MergedWithPersonId = options.RetainedPersonId,
                 DateOfDeath = null
-            });
+            },
+            cancellationToken);
     }
 
-    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
+    public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId, cancellationToken);
 
         if (deactivatingPerson is null)
         {
@@ -288,7 +292,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
         }
 
-        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId, cancellationToken);
 
         if (retainedPerson is null)
         {
@@ -315,17 +319,19 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                 NationalInsuranceNumber = options.NationalInsuranceNumber,
                 Gender = options.Gender
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         await DeactivatePersonViaMergeAsync(
             new DeactivatePersonViaMergeOptions(options.DeactivatingPersonId, options.RetainedPersonId),
-            processContext);
+            processContext,
+            cancellationToken);
 
         // If the deactivated person was associated with any One Login Users, transfer that association to the retained person
         var oneLoginUsers = await dbContext.OneLoginUsers
             .Where(o => o.PersonId == options.DeactivatingPersonId)
             .Select(o => o.Subject)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         foreach (var user in oneLoginUsers)
         {
@@ -337,7 +343,8 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = null
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Services.Notes;
 
 public class NoteService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 {
-    public async Task<Note> CreateNoteAsync(CreateNoteOptions options, ProcessContext processContext)
+    public async Task<Note> CreateNoteAsync(CreateNoteOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var note = new Note
         {
@@ -20,7 +20,7 @@ public class NoteService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         };
 
         dbContext.Notes.Add(note);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new NoteCreatedEvent
@@ -29,7 +29,8 @@ public class NoteService(TrsDbContext dbContext, IEventPublisher eventPublisher)
                 PersonId = note.PersonId,
                 Note = EventModels.Note.FromModel(note)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return note;
     }

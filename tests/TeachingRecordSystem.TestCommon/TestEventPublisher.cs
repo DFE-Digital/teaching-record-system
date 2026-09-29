@@ -14,7 +14,7 @@ public class TestEventPublisher : IEventPublisher
             return ValueTask.CompletedTask;
         }
 
-        public Task PublishEventAsync(IEvent @event)
+        public Task PublishEventAsync(IEvent @event, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

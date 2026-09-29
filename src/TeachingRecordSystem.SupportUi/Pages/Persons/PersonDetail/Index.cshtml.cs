@@ -28,16 +28,16 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
     public ConnectedOneLoginUserInfo[]? ConnectedOneLoginUsers { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
-        HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
+        HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen, cancellationToken);
 
         var person = await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Include(p => p.Alerts).AsSplitQuery()
             .Include(p => p.OneLoginUsers).AsSplitQuery()
-            .SingleAsync(p => p.PersonId == PersonId);
+            .SingleAsync(p => p.PersonId == PersonId, cancellationToken);
 
         Person = GetPersonInfo(person);
         PersonProfessionalStatus = GetPersonStatusInfo(person);

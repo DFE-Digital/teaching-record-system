@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.Core.Services.Inductions;
 
 public class InductionService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 {
-    public async Task<bool> SetInductionStatusAsync(SetInductionStatusOptions options, ProcessContext processContext)
+    public async Task<bool> SetInductionStatusAsync(SetInductionStatusOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var person = await GetPersonAsync(options.PersonId);
+        var person = await GetPersonAsync(options.PersonId, cancellationToken);
         var oldInduction = EventModels.Induction.FromModel(person);
 
         if (!person.SetInductionStatus(
@@ -22,16 +22,16 @@ public class InductionService(TrsDbContext dbContext, IEventPublisher eventPubli
             return false;
         }
 
-        await SaveAndPublishAsync(eventScope, person, oldInduction);
+        await SaveAndPublishAsync(eventScope, person, oldInduction, cancellationToken);
 
         return true;
     }
 
-    public async Task<bool> SetCpdInductionStatusAsync(SetCpdInductionStatusOptions options, ProcessContext processContext)
+    public async Task<bool> SetCpdInductionStatusAsync(SetCpdInductionStatusOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var person = await GetPersonAsync(options.PersonId);
+        var person = await GetPersonAsync(options.PersonId, cancellationToken);
         var oldInduction = EventModels.Induction.FromModel(person);
 
         if (!person.SetCpdInductionStatus(
@@ -44,16 +44,16 @@ public class InductionService(TrsDbContext dbContext, IEventPublisher eventPubli
             return false;
         }
 
-        await SaveAndPublishAsync(eventScope, person, oldInduction);
+        await SaveAndPublishAsync(eventScope, person, oldInduction, cancellationToken);
 
         return true;
     }
 
-    public async Task<bool> TrySetWelshInductionStatusAsync(SetWelshInductionStatusOptions options, ProcessContext processContext)
+    public async Task<bool> TrySetWelshInductionStatusAsync(SetWelshInductionStatusOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var person = await GetPersonAsync(options.PersonId);
+        var person = await GetPersonAsync(options.PersonId, cancellationToken);
         var oldInduction = EventModels.Induction.FromModel(person);
 
         if (!person.TrySetWelshInductionStatus(
@@ -65,20 +65,20 @@ public class InductionService(TrsDbContext dbContext, IEventPublisher eventPubli
             return false;
         }
 
-        await SaveAndPublishAsync(eventScope, person, oldInduction);
+        await SaveAndPublishAsync(eventScope, person, oldInduction, cancellationToken);
 
         return true;
     }
 
-    private async Task<Person> GetPersonAsync(Guid personId) =>
+    private async Task<Person> GetPersonAsync(Guid personId, CancellationToken cancellationToken) =>
         await dbContext.Persons
             .Include(p => p.Qualifications)
-            .SingleOrDefaultAsync(p => p.PersonId == personId)
+            .SingleOrDefaultAsync(p => p.PersonId == personId, cancellationToken)
             ?? throw new NotFoundException(personId, nameof(Person));
 
-    private async Task SaveAndPublishAsync(IEventScope eventScope, Person person, EventModels.Induction oldInduction)
+    private async Task SaveAndPublishAsync(IEventScope eventScope, Person person, EventModels.Induction oldInduction, CancellationToken cancellationToken)
     {
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var induction = EventModels.Induction.FromModel(person);
 
@@ -90,6 +90,7 @@ public class InductionService(TrsDbContext dbContext, IEventPublisher eventPubli
                 Induction = induction,
                 OldInduction = oldInduction,
                 Changes = PersonInductionUpdatedEvent.GetChanges(induction, oldInduction)
-            });
+            },
+            cancellationToken);
     }
 }

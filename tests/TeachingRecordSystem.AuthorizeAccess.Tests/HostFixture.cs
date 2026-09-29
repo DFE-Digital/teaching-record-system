@@ -92,13 +92,13 @@ public class HostFixture : InitializeDbFixture
                 {
                     var fileService = new Mock<IFileService>();
                     fileService
-                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Guid.NewGuid());
                     fileService
-                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                     fileService
-                        .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>()))
+                        .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
                     return fileService.Object;
                 }

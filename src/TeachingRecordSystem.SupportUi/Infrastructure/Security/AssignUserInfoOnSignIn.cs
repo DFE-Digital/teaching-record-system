@@ -21,12 +21,14 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
 
         options.Events.OnTicketReceived = async ctx =>
         {
+            var cancellationToken = ctx.HttpContext.RequestAborted;
+
             var aadUserId = ctx.Principal!.FindFirstValue("uid") ?? throw new Exception("Missing uid claim.");
             var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email) ?? throw new Exception("Missing email address claim.");
 
             using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
 
-            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == aadUserId);
+            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == aadUserId, cancellationToken);
 
             if (user is null)
             {
@@ -37,12 +39,13 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                     u.Email != null &&
                     EF.Functions.Collate(u.Email, Collations.CaseInsensitive) == email &&
                     u.Active &&
-                    u.AzureAdUserId == null);
+                    u.AzureAdUserId == null,
+                    cancellationToken);
 
                 if (user is not null)
                 {
                     user.AzureAdUserId = aadUserId;
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
             }
 
@@ -75,10 +78,10 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                 try
                 {
                     var aadUserService = ctx.HttpContext.RequestServices.GetRequiredService<IAadUserService>();
-                    var azureAdUser = (await aadUserService.GetUserByIdAsync(aadUserId))!;
+                    var azureAdUser = (await aadUserService.GetUserByIdAsync(aadUserId, cancellationToken))!;
                     user.Email = azureAdUser.Email;
                     user.Name = azureAdUser.Name;
-                    await dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
                 finally
                 {

@@ -36,7 +36,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         };
 
         publishApiClient
-            .Setup(x => x.GetAccreditedProvidersAsync())
+            .Setup(x => x.GetAccreditedProvidersAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(providersExpected);
 
         var job = new RefreshTrainingProvidersJob(publishApiClient.Object, DbContextFactory);
@@ -97,7 +97,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         };
 
         publishApiClient
-            .Setup(x => x.GetAccreditedProvidersAsync())
+            .Setup(x => x.GetAccreditedProvidersAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(providersExpected);
 
         var job = new RefreshTrainingProvidersJob(publishApiClient.Object, DbContextFactory);
@@ -150,7 +150,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         };
 
         publishApiClient
-            .Setup(x => x.GetAccreditedProvidersAsync())
+            .Setup(x => x.GetAccreditedProvidersAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(providersExpected);
 
         var job = new RefreshTrainingProvidersJob(publishApiClient.Object, DbContextFactory);

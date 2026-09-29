@@ -46,12 +46,14 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink();
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Where(u => u.Subject == journey.State.Subject)
             .Select(u => new { u.VerifiedOn, u.VerifiedNames, u.VerifiedDatesOfBirth })
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         IsOneLoginUserVerified = oneLoginUser.VerifiedOn is not null;
         OneLoginEmailAddress = journey.State.OneLoginEmailAddress;
@@ -61,22 +63,22 @@ public class CheckAnswersModel(
         await next();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
             return CancelJourney();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Where(u => u.Subject == journey.State.Subject)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         var person = await dbContext.Persons
             .Where(p => p.PersonId == PersonId)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence()
         {
@@ -110,7 +112,8 @@ public class CheckAnswersModel(
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = matchedAttributes
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -122,7 +125,8 @@ public class CheckAnswersModel(
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = matchedAttributes
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         var personName = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);

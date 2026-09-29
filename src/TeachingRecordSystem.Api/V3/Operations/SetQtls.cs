@@ -17,12 +17,12 @@ public class SetQtlsHandler(
 {
     private static readonly DateOnly QtsCutoff = new(2012, 4, 1);
 
-    public async Task<ApiResult<QtlsResult>> ExecuteAsync(SetQtlsCommand command)
+    public async Task<ApiResult<QtlsResult>> ExecuteAsync(SetQtlsCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)
             .ThenInclude(q => ((PostgresModels.RouteToProfessionalStatus?)q)!.RouteToProfessionalStatusType)
-            .SingleOrDefaultAsync(p => p.Trn == command.Trn);
+            .SingleOrDefaultAsync(p => p.Trn == command.Trn, cancellationToken);
 
         if (person is null)
         {
@@ -58,7 +58,8 @@ public class SetQtlsHandler(
                         HoldsFrom = adjustedQtsDate,
                         IsExemptFromInduction = true
                     },
-                    new ProcessContext(ProcessType.RouteToProfessionalStatusCreating, timeProvider.UtcNow, currentUserId));
+                    new ProcessContext(ProcessType.RouteToProfessionalStatusCreating, timeProvider.UtcNow, currentUserId),
+                    cancellationToken);
             }
             else
             {
@@ -68,7 +69,8 @@ public class SetQtlsHandler(
                         QualificationId = existingQualification.QualificationId,
                         HoldsFrom = Option.Some(adjustedQtsDate)
                     },
-                    new ProcessContext(ProcessType.RouteToProfessionalStatusUpdating, timeProvider.UtcNow, currentUserId));
+                    new ProcessContext(ProcessType.RouteToProfessionalStatusUpdating, timeProvider.UtcNow, currentUserId),
+                    cancellationToken);
             }
         }
         else if (existingQualification is not null)
@@ -78,7 +80,8 @@ public class SetQtlsHandler(
                 {
                     QualificationId = existingQualification.QualificationId
                 },
-                new ProcessContext(ProcessType.RouteToProfessionalStatusDeleting, timeProvider.UtcNow, currentUserId));
+                new ProcessContext(ProcessType.RouteToProfessionalStatusDeleting, timeProvider.UtcNow, currentUserId),
+                cancellationToken);
         }
 
         return new QtlsResult()

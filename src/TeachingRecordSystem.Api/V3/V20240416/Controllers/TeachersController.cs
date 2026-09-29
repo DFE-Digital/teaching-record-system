@@ -24,7 +24,8 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth)
+        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
+        CancellationToken cancellationToken)
     {
         var command = new GetPersonCommand(
             trn,
@@ -36,7 +37,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
                 ApplyLegacyAlertsBehavior = true
             });
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(GetTeacherResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)

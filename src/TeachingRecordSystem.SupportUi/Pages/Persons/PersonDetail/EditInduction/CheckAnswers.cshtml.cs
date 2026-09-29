@@ -64,11 +64,11 @@ public class CheckAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         // The start date question sends the user on to the completed date when the two fall out of
@@ -98,7 +98,8 @@ public class CheckAnswersModel(
                     Details = ChangeReasonDetail,
                     EvidenceFile = EvidenceFile?.ToEventModel(),
                     AdditionalInformation = AdditionalInformation
-                }));
+                }),
+            cancellationToken);
 
         journey.DeleteInstance();
 

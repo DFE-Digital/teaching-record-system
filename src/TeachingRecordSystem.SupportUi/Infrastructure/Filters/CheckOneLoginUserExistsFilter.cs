@@ -20,6 +20,8 @@ public class CheckOneLoginUserExistsFilter(TrsDbContext dbContext) : IAsyncResou
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var oneLoginUserSubjectParam = context.RouteData.Values["oneLoginUserSubject"] as string ?? context.HttpContext.Request.Query["oneLoginUserSubject"];
         if (string.IsNullOrEmpty(oneLoginUserSubjectParam))
         {
@@ -45,7 +47,7 @@ public class CheckOneLoginUserExistsFilter(TrsDbContext dbContext) : IAsyncResou
 
         Task<OneLoginUser?> GetOneLoginUserAsync() => dbContext.OneLoginUsers
             .FromSql($"select * from one_login_users where subject = {oneLoginUserSubjectParam} for update")
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }
 

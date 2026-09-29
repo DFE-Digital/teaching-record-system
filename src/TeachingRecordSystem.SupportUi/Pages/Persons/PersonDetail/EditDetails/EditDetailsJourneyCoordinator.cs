@@ -104,10 +104,10 @@ public class EditDetailsJourneyCoordinator(
     /// Discards the journey along with any evidence files uploaded during it and returns the URL to
     /// send the user back to.
     /// </summary>
-    public async Task<string> CancelAsync()
+    public async Task<string> CancelAsync(CancellationToken cancellationToken = default)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.NameChangeEvidence.UploadedEvidenceFile);
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.OtherDetailsChangeEvidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.NameChangeEvidence.UploadedEvidenceFile, cancellationToken);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.OtherDetailsChangeEvidence.UploadedEvidenceFile, cancellationToken);
         DeleteInstance();
         return linkGenerator.Persons.PersonDetail.Index(HttpContext.GetCurrentPersonFeature().PersonId);
     }

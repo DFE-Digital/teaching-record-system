@@ -27,7 +27,8 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
         [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber)
+        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber,
+        CancellationToken cancellationToken)
     {
         include ??= GetPersonRequestIncludes.None;
 
@@ -47,7 +48,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
                 ApplyAppropriateBodyUserRestrictions = User.IsInRole(ApiRoles.AppropriateBody)
             });
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result
             .ToActionResult(r => Ok(GetPersonResponse.Create(r)))

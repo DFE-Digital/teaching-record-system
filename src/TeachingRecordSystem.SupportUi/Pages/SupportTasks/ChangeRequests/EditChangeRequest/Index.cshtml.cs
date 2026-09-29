@@ -44,18 +44,20 @@ public class IndexModel(
     {
     }
 
-    public async Task<IActionResult> OnGetEvidenceAsync()
+    public async Task<IActionResult> OnGetEvidenceAsync(CancellationToken cancellationToken)
     {
-        var stream = await fileService.OpenReadStreamAsync(Evidence!.FileId);
+        var stream = await fileService.OpenReadStreamAsync(Evidence!.FileId, cancellationToken);
         return File(stream, Evidence.MimeType);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var person = await dbContext.Persons
             .AsNoTracking()
-            .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId);
+            .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId, cancellationToken);
         if (person is null)
         {
             context.Result = NotFound();
@@ -96,7 +98,7 @@ public class IndexModel(
             {
                 FileId = data.EvidenceFileId,
                 FileName = data.EvidenceFileName,
-                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry),
+                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry, cancellationToken),
                 MimeType = evidenceFileMimeType
             };
         }
@@ -120,7 +122,7 @@ public class IndexModel(
             {
                 FileId = data.EvidenceFileId,
                 FileName = data.EvidenceFileName,
-                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry),
+                FileUrl = await fileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry, cancellationToken),
                 MimeType = evidenceFileMimeType
             };
         }

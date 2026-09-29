@@ -21,9 +21,9 @@ public class QtsStatusModel(SignInJourneyCoordinator coordinator) : PageModel
         HaveQts = coordinator.State.HaveQts;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         coordinator.UpdateState(state => state.SetQts(HaveQts!.Value));
 

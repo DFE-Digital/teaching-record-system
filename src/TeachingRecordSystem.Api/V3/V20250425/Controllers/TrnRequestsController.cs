@@ -27,7 +27,7 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher) : Contr
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [MapError(10029, statusCode: StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateTrnRequestAsync([FromBody] CreateTrnRequestRequest request)
+    public async Task<IActionResult> CreateTrnRequestAsync([FromBody] CreateTrnRequestRequest request, CancellationToken cancellationToken)
     {
         var command = new CreateTrnRequestCommand()
         {
@@ -43,7 +43,7 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher) : Contr
             Gender = request.Person.Gender is Gender gender ? Core.Models.Gender.Create(gender) : null
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(TrnRequestInfo.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
@@ -59,10 +59,10 @@ public class TrnRequestsController(ICommandDispatcher commandDispatcher) : Contr
                       """)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTrnRequestAsync([FromQuery] string requestId)
+    public async Task<IActionResult> GetTrnRequestAsync([FromQuery] string requestId, CancellationToken cancellationToken)
     {
         var command = new GetTrnRequestCommand(requestId);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(TrnRequestInfo.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);

@@ -32,12 +32,12 @@ public class NationalInsuranceNumberModel(SignInJourneyCoordinator coordinator) 
         NationalInsuranceNumber = coordinator.State.NationalInsuranceNumber;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         coordinator.UpdateState(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
 
-        return await coordinator.TryMatchToTeachingRecordAsync() ?? coordinator.AdvanceTo(links => links.Trn());
+        return await coordinator.TryMatchToTeachingRecordAsync(cancellationToken) ?? coordinator.AdvanceTo(links => links.Trn());
     }
 }

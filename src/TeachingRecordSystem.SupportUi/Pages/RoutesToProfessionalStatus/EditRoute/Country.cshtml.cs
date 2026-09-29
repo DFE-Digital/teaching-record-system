@@ -40,14 +40,14 @@ public class CountryModel(
         TrainingCountryId = journey.State.TrainingCountryId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state => state.TrainingCountryId = TrainingCountryId);
 
@@ -56,6 +56,8 @@ public class CountryModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         CountryRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.Country);
         TrainingCountries = (await referenceDataCache.GetTrainingCountriesAsync())
             .Select(c => new CountryDisplayInfo()

@@ -6,14 +6,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
 public class EvidenceUploadManager(IFileService fileService, IModelExpressionProvider modelExpressionProvider)
 {
-    public async Task UploadAsync(EvidenceUploadModel evidence)
+    public async Task UploadAsync(EvidenceUploadModel evidence, CancellationToken cancellationToken = default)
     {
         // Delete any previously uploaded file if they're uploading a new one,
         // or choosing not to upload evidence (check for UploadEvidence != true because if
         // UploadEvidence somehow got set to null we still want to delete the file)
         if (evidence.UploadedEvidenceFile is UploadedEvidenceFile file && (evidence.EvidenceFile is not null || evidence.UploadEvidence != true))
         {
-            await fileService.DeleteFileAsync(file.FileId);
+            await fileService.DeleteFileAsync(file.FileId, cancellationToken);
             evidence.UploadedEvidenceFile = null;
         }
 
@@ -22,12 +22,12 @@ public class EvidenceUploadManager(IFileService fileService, IModelExpressionPro
         if (evidence is { UploadEvidence: true, EvidenceFile: IFormFile uploadedFile })
         {
             await using var stream = evidence.EvidenceFile.OpenReadStream();
-            var fileId = await fileService.UploadFileAsync(stream, evidence.EvidenceFile.ContentType);
+            var fileId = await fileService.UploadFileAsync(stream, evidence.EvidenceFile.ContentType, cancellationToken: cancellationToken);
             evidence.UploadedEvidenceFile = new(fileId, uploadedFile.FileName, uploadedFile.Length);
         }
     }
 
-    public async Task ValidateAndUploadAsync<TModel>(Expression<Func<TModel, EvidenceUploadModel>> evidenceExpression, ViewDataDictionary viewData)
+    public async Task ValidateAndUploadAsync<TModel>(Expression<Func<TModel, EvidenceUploadModel>> evidenceExpression, ViewDataDictionary viewData, CancellationToken cancellationToken = default)
     {
         var expressionBuilder = new ModelExpressionBuilder<TModel, EvidenceUploadModel>(modelExpressionProvider, evidenceExpression, viewData);
         var evidence = expressionBuilder.Model;
@@ -38,14 +38,14 @@ public class EvidenceUploadManager(IFileService fileService, IModelExpressionPro
             viewData.ModelState.AddModelError(expression.Name, "Select a file");
         }
 
-        await UploadAsync(evidence);
+        await UploadAsync(evidence, cancellationToken);
     }
 
-    public async Task DeleteUploadedFileAsync(UploadedEvidenceFile? evidenceFile)
+    public async Task DeleteUploadedFileAsync(UploadedEvidenceFile? evidenceFile, CancellationToken cancellationToken = default)
     {
         if (evidenceFile is UploadedEvidenceFile file)
         {
-            await fileService.DeleteFileAsync(file.FileId);
+            await fileService.DeleteFileAsync(file.FileId, cancellationToken);
         }
     }
 }

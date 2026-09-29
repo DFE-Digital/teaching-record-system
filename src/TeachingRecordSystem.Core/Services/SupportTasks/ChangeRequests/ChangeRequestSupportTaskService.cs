@@ -17,9 +17,10 @@ public class ChangeRequestSupportTaskService(
 {
     public async Task<SupportTask> CreateNameChangeRequestAsync(
         CreateNameChangeRequestSupportTaskOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var person = (await dbContext.Persons.FindAsync(options.PersonId))!;
+        var person = (await dbContext.Persons.FindAsync(new object?[] { options.PersonId }, cancellationToken))!;
 
         return await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
@@ -41,14 +42,16 @@ public class ChangeRequestSupportTaskService(
                 Subject = SupportTask.Subject.FromPerson(person),
                 SourceApplicationUserId = options.SourceApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
     public async Task<SupportTask> CreateDateOfBirthChangeRequestAsync(
         CreateDateOfBirthChangeRequestSupportTaskOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var person = (await dbContext.Persons.FindAsync(options.PersonId))!;
+        var person = (await dbContext.Persons.FindAsync(new object?[] { options.PersonId }, cancellationToken))!;
 
         return await supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
@@ -68,13 +71,14 @@ public class ChangeRequestSupportTaskService(
                 Subject = SupportTask.Subject.FromPerson(person),
                 SourceApplicationUserId = options.SourceApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
-    public async Task ApproveChangeRequestAsync(ApproveChangeRequestSupportTaskOptions options, ProcessContext processContext)
+    public async Task ApproveChangeRequestAsync(ApproveChangeRequestSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
-        var person = await dbContext.Persons.FindOrThrowAsync(supportTask.PersonId!.Value);
+        var person = await dbContext.Persons.FindOrThrowAsync(supportTask.PersonId!.Value, cancellationToken);
 
         string? requestEmailAddress;
         string emailTemplateId;
@@ -96,7 +100,8 @@ public class ChangeRequestSupportTaskService(
                     NationalInsuranceNumber = default,
                     Gender = default
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             requestEmailAddress = data.EmailAddress;
             emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfNameApprovedEmailConfirmation;
@@ -120,13 +125,14 @@ public class ChangeRequestSupportTaskService(
                     NationalInsuranceNumber = default,
                     Gender = default
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             requestEmailAddress = data.EmailAddress;
             emailTemplateId = EmailTemplateIds.GetAnIdentityChangeOfDateOfBirthApprovedEmailConfirmation;
         }
 
-        await ResolveChangeRequestAsync(supportTask, SupportRequestOutcome.Approved, rejectionReason: null, processContext);
+        await ResolveChangeRequestAsync(supportTask, SupportRequestOutcome.Approved, rejectionReason: null, processContext, cancellationToken);
 
         var emailAddress = !string.IsNullOrEmpty(requestEmailAddress) ? requestEmailAddress : person.EmailAddress;
 
@@ -140,11 +146,12 @@ public class ChangeRequestSupportTaskService(
                 {
                     { ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey, person.FirstName }
                 },
-                processContext.ProcessId);
+                processContext.ProcessId,
+                cancellationToken);
         }
     }
 
-    public async Task RejectChangeRequestAsync(RejectChangeRequestSupportTaskOptions options, ProcessContext processContext)
+    public async Task RejectChangeRequestAsync(RejectChangeRequestSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
 
@@ -152,7 +159,8 @@ public class ChangeRequestSupportTaskService(
             supportTask,
             SupportRequestOutcome.Rejected,
             options.RejectionReason.GetDisplayName()!,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
 
         var (requestEmailAddress, emailTemplateId) = supportTask.SupportTaskType switch
         {
@@ -164,7 +172,7 @@ public class ChangeRequestSupportTaskService(
                 $"Unexpected support task type: '{supportTask.SupportTaskType}'.", nameof(options))
         };
 
-        var person = await dbContext.Persons.FindOrThrowAsync(supportTask.PersonId!.Value);
+        var person = await dbContext.Persons.FindOrThrowAsync(supportTask.PersonId!.Value, cancellationToken);
         var emailAddress = !string.IsNullOrEmpty(requestEmailAddress) ? requestEmailAddress : person.EmailAddress;
 
         if (!string.IsNullOrEmpty(emailAddress))
@@ -177,7 +185,8 @@ public class ChangeRequestSupportTaskService(
                     [ChangeRequestEmailConstants.FirstNameEmailPersonalisationKey] = person.FirstName,
                     [ChangeRequestEmailConstants.RejectionReasonEmailPersonalisationKey] = GetRejectionReasonEmailText(options.RejectionReason)
                 },
-                processContext.ProcessId);
+                processContext.ProcessId,
+                cancellationToken);
         }
     }
 
@@ -189,10 +198,10 @@ public class ChangeRequestSupportTaskService(
         _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
     };
 
-    public Task CancelChangeRequestAsync(CancelChangeRequestSupportTaskOptions options, ProcessContext processContext) =>
-        ResolveChangeRequestAsync(options.SupportTask, SupportRequestOutcome.Cancelled, rejectionReason: null, processContext);
+    public Task CancelChangeRequestAsync(CancelChangeRequestSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default) =>
+        ResolveChangeRequestAsync(options.SupportTask, SupportRequestOutcome.Cancelled, rejectionReason: null, processContext, cancellationToken);
 
-    private async Task SendEmailAsync(string templateId, string emailAddress, Dictionary<string, string> personalization, Guid processId)
+    private async Task SendEmailAsync(string templateId, string emailAddress, Dictionary<string, string> personalization, Guid processId, CancellationToken cancellationToken)
     {
         var email = new Email
         {
@@ -203,7 +212,7 @@ public class ChangeRequestSupportTaskService(
         };
 
         dbContext.Emails.Add(email);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processId));
     }
@@ -212,7 +221,8 @@ public class ChangeRequestSupportTaskService(
         SupportTask supportTask,
         SupportRequestOutcome supportRequestOutcome,
         string? rejectionReason,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken)
     {
 #pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
         var outcome = (supportTask.SupportTaskType, supportRequestOutcome) switch
@@ -237,7 +247,8 @@ public class ChangeRequestSupportTaskService(
                     Outcome = outcome,
                     RejectionReason = rejectionReason
                 },
-                processContext),
+                processContext,
+                cancellationToken),
             SupportTaskType.ChangeDateOfBirthRequest => supportTaskService.UpdateSupportTaskAsync(
                 new UpdateSupportTaskOptions<ChangeDateOfBirthRequestData>
                 {
@@ -247,7 +258,8 @@ public class ChangeRequestSupportTaskService(
                     Outcome = outcome,
                     RejectionReason = rejectionReason
                 },
-                processContext),
+                processContext,
+                cancellationToken),
             _ => throw new ArgumentException(
                 $"Unexpected support task type: '{supportTask.SupportTaskType}'.", nameof(supportTask))
         };

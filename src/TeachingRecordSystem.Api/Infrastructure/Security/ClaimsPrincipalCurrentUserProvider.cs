@@ -57,7 +57,7 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
         return false;
     }
 
-    public async Task<string?> GetTrnAsync()
+    public async Task<string?> GetTrnAsync(CancellationToken cancellationToken = default)
     {
         var httpContext = httpContextAccessor.HttpContext ?? throw new Exception("No HttpContext.");
 
@@ -70,14 +70,14 @@ public class ClaimsPrincipalCurrentUserProvider(IHttpContextAccessor httpContext
         {
             var applicationUserId = GetCurrentApplicationUserId();
 
-            await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+            await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
             var trn = await (
                     from m in dbContext.TrnRequestMetadata
                     join person in dbContext.Persons on m.ResolvedPersonId equals person.PersonId
                     where m.ApplicationUserId == applicationUserId && m.RequestId == requestId
                     select person.Trn)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             return trn;
         }

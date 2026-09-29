@@ -31,12 +31,12 @@ public class IndexModel(SupportTaskSearchService supportTaskSearchService, Suppo
 
     public PaginationViewModel? Pagination { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var searchOptions = new TeachersPensionsPotentialDuplicatesSearchOptions(Search, SortBy, SortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var result = await supportTaskSearchService.SearchTeachersPensionsPotentialDuplicatesAsync(searchOptions, paginationOptions);
+        var result = await supportTaskSearchService.SearchTeachersPensionsPotentialDuplicatesAsync(searchOptions, paginationOptions, cancellationToken);
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
 

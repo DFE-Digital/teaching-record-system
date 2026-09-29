@@ -51,7 +51,7 @@ public class Matches(
         PersonId = Journey.State.PersonId;
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
@@ -62,7 +62,7 @@ public class Matches(
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
         // Verify the submitted ID is legit
@@ -72,7 +72,7 @@ public class Matches(
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var nextStepUrl = PersonId == ResolveTrnRequestState.CreateNewRecordPersonIdSentinel ?
             linkGenerator.SupportTasks.TrnRequests.Resolve.CheckAnswers(Journey.InstanceId) :
@@ -98,7 +98,7 @@ public class Matches(
         });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(Matches),
@@ -113,7 +113,8 @@ public class Matches(
                 SupportTaskReference = _supportTask!.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         Journey.DeleteInstance();
 
@@ -127,6 +128,8 @@ public class Matches(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         RequestData = GetRequestData();
@@ -162,7 +165,7 @@ public class Matches(
                     .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
-            .ToArrayAsync())
+            .ToArrayAsync(cancellationToken))
             // matchedPersonIds is ordered by best match first; ensure we maintain that order
             .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId))
             .Select((r, i) => r with

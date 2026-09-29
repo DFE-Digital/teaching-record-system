@@ -28,11 +28,11 @@ public class DetailModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         return journey.AdvanceTo(CheckAnswersUrl);
@@ -40,6 +40,8 @@ public class DetailModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var routeType = await journey.GetRouteTypeAsync();
         var state = journey.State;
 

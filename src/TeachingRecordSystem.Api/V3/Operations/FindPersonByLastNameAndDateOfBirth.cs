@@ -11,7 +11,7 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
     FindPersonsHandlerBase(dbContext, referenceDataCache),
     ICommandHandler<FindPersonByLastNameAndDateOfBirthCommand, FindPersonsResult>
 {
-    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonByLastNameAndDateOfBirthCommand command)
+    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonByLastNameAndDateOfBirthCommand command, CancellationToken cancellationToken)
     {
         var matchedPersons = await DbContext.Database.SqlQueryRaw<Result>(
                 """
@@ -25,9 +25,9 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                     new NpgsqlParameter("date_of_birth", command.DateOfBirth)
                 ]
                 // ReSharper restore FormatStringProblem
-            ).ToArrayAsync();
+            ).ToArrayAsync(cancellationToken);
 
-        return await CreateResultAsync(matchedPersons.Select(r => r.person_id).Distinct().AsReadOnly());
+        return await CreateResultAsync(matchedPersons.Select(r => r.person_id).Distinct().AsReadOnly(), cancellationToken);
     }
 
 #pragma warning disable IDE1006 // Naming Styles

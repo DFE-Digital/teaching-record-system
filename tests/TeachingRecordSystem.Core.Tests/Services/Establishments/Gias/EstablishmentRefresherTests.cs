@@ -63,7 +63,7 @@ public class EstablishmentRefresherTests(ServiceFixture fixture) : ServiceTestBa
 
             var establishments = new List<Establishment> { establishment1, establishment2 };
             Mock.Get(establishmentMasterDataService)
-                .Setup(s => s.GetEstablishmentsAsync())
+                .Setup(s => s.GetEstablishmentsAsync(It.IsAny<CancellationToken>()))
                 .Returns(establishments.ToAsyncEnumerable());
 
             var establishmentRefresher = new EstablishmentRefresher(
@@ -189,7 +189,7 @@ public class EstablishmentRefresherTests(ServiceFixture fixture) : ServiceTestBa
 
             var establishments = new List<Establishment> { updatedEstablishment };
             Mock.Get(establishmentMasterDataService)
-                .Setup(s => s.GetEstablishmentsAsync())
+                .Setup(s => s.GetEstablishmentsAsync(It.IsAny<CancellationToken>()))
                 .Returns(establishments.ToAsyncEnumerable());
 
             var establishmentRefresher = new EstablishmentRefresher(

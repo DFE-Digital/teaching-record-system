@@ -525,33 +525,33 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
     {
         public HashSet<Guid> DeletedFileIds { get; } = [];
 
-        public Task<bool> DeleteFileAsync(Guid fileId)
+        public Task<bool> DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             DeletedFileIds.Add(fileId);
             return Task.FromResult(true);
         }
 
-        public Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+        public Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter, CancellationToken cancellationToken = default)
         {
             return Task.FromResult($"https://fake-storage.example.com/{fileId}");
         }
 
-        public Task<string?> TryGetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+        public Task<string?> TryGetFileUrlAsync(Guid fileId, TimeSpan expiresAfter, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<string?>($"https://fake-storage.example.com/{fileId}");
         }
 
-        public Task<Stream> OpenReadStreamAsync(Guid fileId)
+        public Task<Stream> OpenReadStreamAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<Stream>(new MemoryStream());
         }
 
-        public Task<Guid> UploadFileAsync(Stream stream, string? contentType, Guid? fileIdOverride = null)
+        public Task<Guid> UploadFileAsync(Stream stream, string? contentType, Guid? fileIdOverride = null, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(fileIdOverride ?? Guid.NewGuid());
         }
 
-        public Task<bool> UploadFileAsync(string fileName, Stream stream, string? contentType)
+        public Task<bool> UploadFileAsync(string fileName, Stream stream, string? contentType, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
         }
@@ -561,23 +561,23 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
     {
         public HashSet<Guid> DeletedFileIds { get; } = [];
 
-        public Task<bool> DeleteFileAsync(Guid fileId)
+        public Task<bool> DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             DeletedFileIds.Add(fileId);
             return Task.FromResult(true);
         }
 
-        public Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
+        public Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter, CancellationToken cancellationToken = default)
         {
             return Task.FromResult($"https://fake-safe-storage.example.com/{fileId}");
         }
 
-        public Task<Stream> OpenReadStreamAsync(Guid fileId)
+        public Task<Stream> OpenReadStreamAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<Stream>(new MemoryStream());
         }
 
-        public Task<bool> TrySafeUploadAsync(Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride = null)
+        public Task<bool> TrySafeUploadAsync(Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride = null, CancellationToken cancellationToken = default)
         {
             fileId = fileIdOverride ?? Guid.NewGuid();
             return Task.FromResult(true);

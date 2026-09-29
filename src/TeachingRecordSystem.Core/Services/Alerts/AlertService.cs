@@ -8,7 +8,7 @@ public class AlertService(
     TimeProvider timeProvider,
     IEventPublisher eventPublisher)
 {
-    public async Task<Alert> CreateAlertAsync(CreateAlertOptions options, ProcessContext processContext)
+    public async Task<Alert> CreateAlertAsync(CreateAlertOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -29,7 +29,7 @@ public class AlertService(
         };
 
         dbContext.Add(alert);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new AlertCreatedEvent
@@ -37,14 +37,15 @@ public class AlertService(
                 EventId = Guid.NewGuid(),
                 PersonId = options.PersonId,
                 Alert = EventModels.Alert.FromModel(alert)
-            });
+            },
+            cancellationToken);
 
         return alert;
     }
 
-    public async Task DeleteAlertAsync(DeleteAlertOptions options, ProcessContext processContext)
+    public async Task DeleteAlertAsync(DeleteAlertOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId);
+        var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId, cancellationToken);
 
         if (alert.DeletedOn is not null)
         {
@@ -57,7 +58,7 @@ public class AlertService(
         alert.DeletedOn = now;
         alert.UpdatedOn = now;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new AlertDeletedEvent
@@ -65,12 +66,13 @@ public class AlertService(
                 EventId = Guid.NewGuid(),
                 PersonId = alert.PersonId,
                 Alert = EventModels.Alert.FromModel(alert)
-            });
+            },
+            cancellationToken);
     }
 
-    public async Task UpdateAlertAsync(UpdateAlertOptions options, ProcessContext processContext)
+    public async Task UpdateAlertAsync(UpdateAlertOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId);
+        var alert = await dbContext.Alerts.FindOrThrowAsync(options.AlertId, cancellationToken);
 
         if (alert.DeletedOn is not null)
         {
@@ -100,7 +102,7 @@ public class AlertService(
         var now = timeProvider.UtcNow;
         alert.UpdatedOn = now;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new AlertUpdatedEvent
@@ -110,6 +112,7 @@ public class AlertService(
                 Alert = EventModels.Alert.FromModel(alert),
                 OldAlert = oldAlert,
                 Changes = changes
-            });
+            },
+            cancellationToken);
     }
 }

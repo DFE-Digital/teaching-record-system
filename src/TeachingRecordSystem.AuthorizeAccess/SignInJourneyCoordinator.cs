@@ -52,7 +52,7 @@ public class SignInJourneyCoordinator(
         return SquashPathAndAdvanceTo(Links.DebugIdentity());
     }
 
-    public async Task<IResult> OnOneLoginCallbackAsync(AuthenticationTicket ticket)
+    public async Task<IResult> OnOneLoginCallbackAsync(AuthenticationTicket ticket, CancellationToken cancellationToken = default)
     {
         if (!ticket.Properties.TryGetVectorsOfTrust(out var vtr))
         {
@@ -61,29 +61,29 @@ public class SignInJourneyCoordinator(
 
         if (vtr.SequenceEqual([Vtrs.AuthenticationOnly]))
         {
-            await OnUserAuthenticatedAsync(ticket);
+            await OnUserAuthenticatedAsync(ticket, cancellationToken);
         }
         else
         {
             Debug.Assert(vtr.SequenceEqual([Vtrs.AuthenticationAndIdentityVerification]));
             Debug.Assert(State.OneLoginAuthenticationTicket is not null);
-            await OnUserVerifiedAsync(ticket);
+            await OnUserVerifiedAsync(ticket, cancellationToken);
         }
 
         return GetNextPage();
     }
 
-    public async Task OnUserAuthenticatedAsync(AuthenticationTicket ticket)
+    public async Task OnUserAuthenticatedAsync(AuthenticationTicket ticket, CancellationToken cancellationToken = default)
     {
         var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow, cancellationToken);
 
-        var oneLoginUser = await oneLoginService.OnSignInAsync(sub, email, processContext);
+        var oneLoginUser = await oneLoginService.OnSignInAsync(sub, email, processContext, cancellationToken);
         var trn = oneLoginUser.Person?.Trn;
 
-        var pendingSupportTaskReference = await oneLoginService.GetPendingSupportTaskReferenceByUserAsync(oneLoginUser.Subject);
+        var pendingSupportTaskReference = await oneLoginService.GetPendingSupportTaskReferenceByUserAsync(oneLoginUser.Subject, cancellationToken);
 
         string? existingTrnRequestId = null;
 
@@ -92,7 +92,7 @@ public class SignInJourneyCoordinator(
             var existingTrnRequest = await dbContext.TrnRequestMetadata
                 .Where(tr => tr.OneLoginUserSubject == sub && tr.IdentityVerified == true)
                 .OrderByDescending(tr => tr.CreatedOn)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (existingTrnRequest is not null)
             {
@@ -101,7 +101,7 @@ public class SignInJourneyCoordinator(
             }
         }
 
-        var hasClosedIdVerificationSupportTask = await oneLoginService.HasClosedIdVerificationSupportTaskAsync(sub);
+        var hasClosedIdVerificationSupportTask = await oneLoginService.HasClosedIdVerificationSupportTaskAsync(sub, cancellationToken);
 
         await UpdateStateAsync(async state =>
         {
@@ -130,12 +130,12 @@ public class SignInJourneyCoordinator(
                 hasClosedIdVerificationSupportTask &&
                 state.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
             {
-                await CompleteWithDeferredMatchingAsync(state, processContext);
+                await CompleteWithDeferredMatchingAsync(state, processContext, cancellationToken);
             }
         });
     }
 
-    public Task OnUserVerifiedAsync(AuthenticationTicket ticket)
+    public Task OnUserVerifiedAsync(AuthenticationTicket ticket, CancellationToken cancellationToken = default)
     {
         var verifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
         var verifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
@@ -145,19 +145,21 @@ public class SignInJourneyCoordinator(
             verifiedNames,
             verifiedDatesOfBirth,
             coreIdentityClaimVc,
-            state => state.OneLoginAuthenticationTicket = ticket);
+            state => state.OneLoginAuthenticationTicket = ticket,
+            cancellationToken);
     }
 
     public async Task OnUserVerifiedCoreAsync(
         string[][] verifiedNames,
         DateOnly[] verifiedDatesOfBirth,
         string? coreIdentityClaimVc,
-        Action<SignInJourneyState>? updateState = null)
+        Action<SignInJourneyState>? updateState = null,
+        CancellationToken cancellationToken = default)
     {
         var sub = State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow, cancellationToken);
 
         await oneLoginService.SetUserVerifiedAsync(
             new SetUserVerifiedOptions
@@ -168,12 +170,13 @@ public class SignInJourneyCoordinator(
                 VerifiedNames = verifiedNames,
                 CoreIdentityClaimVc = coreIdentityClaimVc
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         string? trn = null;
         string? trnTokenTrn = null;
 
-        if (await oneLoginService.FindPersonByTrnTokenAsync(verifiedNames, verifiedDatesOfBirth, State.TrnToken, email) is { MatchedAttributes: not null } result)
+        if (await oneLoginService.FindPersonByTrnTokenAsync(verifiedNames, verifiedDatesOfBirth, State.TrnToken, email, cancellationToken) is { MatchedAttributes: not null } result)
         {
             await oneLoginService.SetUserMatchedAsync(
                 new SetUserMatchedOptions
@@ -183,7 +186,8 @@ public class SignInJourneyCoordinator(
                     MatchRoute = OneLoginUserMatchRoute.TrnToken,
                     MatchedAttributes = result.MatchedAttributes
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             trn = result.Trn;
         }
@@ -267,7 +271,7 @@ public class SignInJourneyCoordinator(
         return base.StepIsValid(step) || step.NormalizedUrl.StartsWith("/oauth2/authorize");
     }
 
-    public async Task<IActionResult?> TryMatchToTeachingRecordAsync()
+    public async Task<IActionResult?> TryMatchToTeachingRecordAsync(CancellationToken cancellationToken = default)
     {
         if (State.OneLoginAuthenticationTicket is null)
         {
@@ -275,7 +279,7 @@ public class SignInJourneyCoordinator(
         }
 
         // Matching again would overwrite a match made in another journey since this one captured its state
-        if (await TryAdvanceIfVerifiedOrConnectedAsync() is { } nextPage)
+        if (await TryAdvanceIfVerifiedOrConnectedAsync(cancellationToken) is { } nextPage)
         {
             return nextPage.ToActionResult();
         }
@@ -294,13 +298,14 @@ public class SignInJourneyCoordinator(
         var trnTokenTrn = State.TrnTokenTrn;
 
         var matchResult = await oneLoginService.MatchPersonAsync(
-            new(names!, datesOfBirth!, email, nationalInsuranceNumber, trn, trnTokenTrn));
+            new(names!, datesOfBirth!, email, nationalInsuranceNumber, trn, trnTokenTrn),
+            cancellationToken);
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
             var subject = State.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
-            var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow);
+            var processContext = await ProcessContext.FromDbAsync(dbContext, State.SigningInProcessId, timeProvider.UtcNow, cancellationToken);
 
             await oneLoginService.SetUserMatchedAsync(
                 new SetUserMatchedOptions
@@ -310,7 +315,8 @@ public class SignInJourneyCoordinator(
                     MatchRoute = OneLoginUserMatchRoute.Interactive,
                     MatchedAttributes = matchedAttributes
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             UpdateState(state => Complete(state, matchedTrn));
 
@@ -324,7 +330,7 @@ public class SignInJourneyCoordinator(
     // A journey instance outlives the state it captured when the user signed in; they may have been verified
     // or connected to a teaching record in another journey since. Refreshes the state from the One Login user
     // and returns the page to continue at if that's happened, otherwise null.
-    public async Task<IResult?> TryAdvanceIfVerifiedOrConnectedAsync()
+    public async Task<IResult?> TryAdvanceIfVerifiedOrConnectedAsync(CancellationToken cancellationToken = default)
     {
         if (State.OneLoginAuthenticationTicket is null)
         {
@@ -335,7 +341,7 @@ public class SignInJourneyCoordinator(
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(u => u.Person)
-            .SingleAsync(u => u.Subject == subject);
+            .SingleAsync(u => u.Subject == subject, cancellationToken);
 
         var newlyVerified = oneLoginUser.VerificationRoute is not null && !State.IdentityVerified;
         var connectedTrn = oneLoginUser.Person?.Trn;
@@ -402,7 +408,7 @@ public class SignInJourneyCoordinator(
         CreateAuthenticationTicket(state, specificClaims);
     }
 
-    public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state, ProcessContext? processContext = null)
+    public async Task<string> CompleteWithDeferredMatchingAsync(SignInJourneyState state, ProcessContext? processContext = null, CancellationToken cancellationToken = default)
     {
         if (state.OneLoginAuthenticationTicket is null)
         {
@@ -424,7 +430,7 @@ public class SignInJourneyCoordinator(
 
         var requestId = Guid.NewGuid().ToString();
 
-        processContext ??= await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
+        processContext ??= await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow, cancellationToken);
 
         // Create a dormant TRN request
         var trnRequestInfo = await trnRequestService.CreateTrnRequestAsync(
@@ -442,7 +448,8 @@ public class SignInJourneyCoordinator(
                 NationalInsuranceNumber = state.NationalInsuranceNumber,
                 Gender = null
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var specificClaims = new[] { new Claim(AuthorizeAccessClaimTypes.TrnRequestId, trnRequestInfo.TrnRequest.RequestId) };
         CreateAuthenticationTicket(state, specificClaims);

@@ -26,9 +26,9 @@ public class IndexModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var email = Email!;
         if (!email.Contains('@'))
@@ -36,7 +36,7 @@ public class IndexModel(
             email += "@education.gov.uk";
         }
 
-        var user = await userService.GetUserByEmailAsync(email);
+        var user = await userService.GetUserByEmailAsync(email, cancellationToken);
 
         if (user is null)
         {
@@ -44,7 +44,7 @@ public class IndexModel(
             return this.PageWithErrors();
         }
 
-        var existingUser = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == user.UserId);
+        var existingUser = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == user.UserId, cancellationToken);
         if (existingUser is not null)
         {
             return Redirect(linkGenerator.Users.EditUser.Index(existingUser.UserId));

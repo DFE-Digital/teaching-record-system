@@ -28,7 +28,7 @@ public class NoMatches(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -48,7 +48,8 @@ public class NoMatches(
                 {
                     SupportTask = _supportTask!
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             emailSent = true;
         }
@@ -61,14 +62,15 @@ public class NoMatches(
                 {
                     SupportTask = _supportTask!
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             emailSent = resolveResult.EmailSent;
         }
 
         journey.DeleteInstance();
 
-        var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
+        var appContent = await supportTaskService.GetAppContentAsync(_supportTask, cancellationToken);
 
         var emailSentMessage = appContent?.OneLoginNoMatchesEmailSentFlashMessage is not null
             ? string.Format(appContent.OneLoginNoMatchesEmailSentFlashMessage, Name)
@@ -84,6 +86,8 @@ public class NoMatches(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
@@ -94,7 +98,7 @@ public class NoMatches(
         var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
         Name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
 
-        var appContent = await supportTaskService.GetAppContentAsync(_supportTask);
+        var appContent = await supportTaskService.GetAppContentAsync(_supportTask, cancellationToken);
         NoMatchesPageContent = appContent?.OneLoginNoMatchesPageContentHtml;
 
         await base.OnPageHandlerExecutionAsync(context, next);

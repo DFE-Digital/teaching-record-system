@@ -10,7 +10,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
     FindPersonsHandlerBase(dbContext, referenceDataCache),
     ICommandHandler<FindPersonsByTrnAndDateOfBirthCommand, FindPersonsResult>
 {
-    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonsByTrnAndDateOfBirthCommand command)
+    public async Task<ApiResult<FindPersonsResult>> ExecuteAsync(FindPersonsByTrnAndDateOfBirthCommand command, CancellationToken cancellationToken)
     {
         var trns = command.Persons
             .Where(t => !string.IsNullOrEmpty(t.Trn))
@@ -20,7 +20,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
         var persons = await DbContext.Persons
             .Where(p => trns.Contains(p.Trn) && p.DateOfBirth != null)
             .Select(p => new { p.PersonId, p.DateOfBirth, p.Trn })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         // Remove any results where the request DOB doesn't match the contact's DOB
         // (we can't easily do this in the query itself).
@@ -29,6 +29,6 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
             .Select(t => t.PersonId)
             .ToArray();
 
-        return await CreateResultAsync(matched);
+        return await CreateResultAsync(matched, cancellationToken);
     }
 }

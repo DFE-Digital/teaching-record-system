@@ -10,7 +10,8 @@ public class MandatoryQualificationService(
 {
     public async Task<MandatoryQualification> CreateMandatoryQualificationAsync(
         CreateMandatoryQualificationOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -30,7 +31,7 @@ public class MandatoryQualificationService(
         };
 
         dbContext.MandatoryQualifications.Add(qualification);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new MandatoryQualificationCreatedEvent
@@ -40,16 +41,18 @@ public class MandatoryQualificationService(
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(
                     qualification,
                     providerNameHint: MandatoryQualificationProvider.GetById(options.ProviderId).Name)
-            });
+            },
+            cancellationToken);
 
         return qualification;
     }
 
     public async Task<MandatoryQualificationUpdatedEventChanges> UpdateMandatoryQualificationAsync(
         UpdateMandatoryQualificationOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var qualification = await dbContext.MandatoryQualifications.FindOrThrowAsync(options.QualificationId);
+        var qualification = await dbContext.MandatoryQualifications.FindOrThrowAsync(options.QualificationId, cancellationToken);
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -76,7 +79,7 @@ public class MandatoryQualificationService(
         }
 
         qualification.UpdatedOn = timeProvider.UtcNow;
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new MandatoryQualificationUpdatedEvent
@@ -88,16 +91,18 @@ public class MandatoryQualificationService(
                     providerNameHint: qualification.ProviderId is Guid newProviderId ? MandatoryQualificationProvider.GetById(newProviderId).Name : null),
                 OldMandatoryQualification = oldMandatoryQualification,
                 Changes = changes
-            });
+            },
+            cancellationToken);
 
         return changes;
     }
 
     public async Task DeleteMandatoryQualificationAsync(
         DeleteMandatoryQualificationOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var qualification = await dbContext.MandatoryQualifications.FindOrThrowAsync(options.QualificationId);
+        var qualification = await dbContext.MandatoryQualifications.FindOrThrowAsync(options.QualificationId, cancellationToken);
 
         if (qualification.DeletedOn is not null)
         {
@@ -110,7 +115,7 @@ public class MandatoryQualificationService(
         qualification.DeletedOn = now;
         qualification.UpdatedOn = now;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new MandatoryQualificationDeletedEvent
@@ -120,6 +125,7 @@ public class MandatoryQualificationService(
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(
                     qualification,
                     providerNameHint: qualification.ProviderId is Guid providerId ? MandatoryQualificationProvider.GetById(providerId).Name : null)
-            });
+            },
+            cancellationToken);
     }
 }

@@ -16,12 +16,12 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
 
     public ConnectedPersonInfo? ConnectedPerson { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(u => u.Person)
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleAsync(u => u.Subject == OneLoginUserSubject);
+            .SingleAsync(u => u.Subject == OneLoginUserSubject, cancellationToken);
 
         OneLoginUser = GetOneLoginUserInfo(oneLoginUser);
 

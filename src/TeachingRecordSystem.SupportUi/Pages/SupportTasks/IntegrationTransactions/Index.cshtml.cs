@@ -23,13 +23,13 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Descending;
         var sortBy = SortBy ??= IntegrationTransactionSortByOption.CreatedOn;
 
         var query = dbContext.IntegrationTransactions.AsQueryable();
-        var totalIntegrationTransactionCount = await query.CountAsync();
+        var totalIntegrationTransactionCount = await query.CountAsync(cancellationToken);
 
         if (sortBy == IntegrationTransactionSortByOption.CreatedOn)
         {
@@ -81,7 +81,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 x.FailureCount,
                 x.DuplicateCount
             ))
-            .GetPageAsync(PageNumber, IntegrationTransactionsPerPage, totalIntegrationTransactionCount);
+            .GetPageAsync(PageNumber, IntegrationTransactionsPerPage, totalIntegrationTransactionCount, cancellationToken);
 
         Pagination = PaginationViewModel.Create(
             Results,

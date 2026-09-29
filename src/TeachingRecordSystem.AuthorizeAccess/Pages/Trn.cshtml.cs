@@ -38,9 +38,9 @@ public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
         Trn = coordinator.State.Trn;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         coordinator.UpdateState(state => state.SetTrn(HaveTrn!.Value, Trn));
 
@@ -53,7 +53,7 @@ public partial class TrnModel(SignInJourneyCoordinator coordinator) : PageModel
                     : coordinator.AdvanceTo(links => links.ProofOfIdentity());
         }
 
-        return await coordinator.TryMatchToTeachingRecordAsync() ??
+        return await coordinator.TryMatchToTeachingRecordAsync(cancellationToken) ??
             (coordinator.State.IdentityVerified
                 ? coordinator.AdvanceTo(links => links.NotFound())
                 : coordinator.AdvanceTo(links => links.ProofOfIdentity()));

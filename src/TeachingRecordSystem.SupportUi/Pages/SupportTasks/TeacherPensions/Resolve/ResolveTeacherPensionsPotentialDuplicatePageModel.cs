@@ -49,7 +49,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(
         };
     }
 
-    protected async Task<TeacherPensionsPotentialDuplicateAttributes> GetPersonAttributesAsync(Guid personId)
+    protected async Task<TeacherPensionsPotentialDuplicateAttributes> GetPersonAttributesAsync(Guid personId, CancellationToken cancellationToken = default)
     {
         var personAttributes = await DbContext.Persons
             .Where(p => p.PersonId == personId)
@@ -64,7 +64,7 @@ public abstract class ResolveTeacherPensionsPotentialDuplicatePageModel(
                 p.Gender,
                 p.Trn
             })
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         return new TeacherPensionsPotentialDuplicateAttributes()
         {

@@ -18,6 +18,8 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         if (context.RouteData.Values["qualificationId"] is not string qualificationIdParam ||
             !Guid.TryParse(qualificationIdParam, out Guid qualificationId))
         {
@@ -36,7 +38,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
         // we need to return a BadRequest instead of a NotFound result
         var currentMqWithPotentiallyDeactivatedPerson = await query
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (currentMqWithPotentiallyDeactivatedPerson is not null &&
             currentMqWithPotentiallyDeactivatedPerson.Person!.Status == PersonStatus.Deactivated)
@@ -47,7 +49,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
 
         // Query again with query filters to make sure deleted Qualifications are ignored
         var currentMq = await query
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (currentMq is null)
         {

@@ -17,17 +17,17 @@ public class EventsModel(TrsDbContext dbContext) : PageModel
 
     public IReadOnlyCollection<IEventEntry>? EventPayloads { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var legacyEvents = await dbContext.Events
             .Where(e => e.PersonId == PersonId)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var processes = await dbContext.Processes
             .Where(p => p.PersonIds.Contains(PersonId))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         EventPayloads = legacyEvents
             .Select(e => (IEventEntry)new LegacyEventPayload(e.EventName, e.Payload, e.Created))

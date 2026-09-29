@@ -42,14 +42,14 @@ public class AgeRangeSpecialismModel(
         };
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state =>
         {
@@ -63,6 +63,8 @@ public class AgeRangeSpecialismModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         AgeRangeSpecialismRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.AgeRangeSpecialism);
 
 

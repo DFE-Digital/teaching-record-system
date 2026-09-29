@@ -32,9 +32,9 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, UserS
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.ApiKeyCreating, timeProvider.UtcNow, User.GetUserId());
 
@@ -46,7 +46,8 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, UserS
                     ApplicationUserId = ApplicationUserId,
                     Key = Key!
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation(ApiKey.KeyUniqueIndexName))
         {
@@ -60,7 +61,9 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, UserS
 
     public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var user = await dbContext.ApplicationUsers.SingleOrDefaultAsync(a => a.UserId == ApplicationUserId);
+        var cancellationToken = context.HttpContext.RequestAborted;
+
+        var user = await dbContext.ApplicationUsers.SingleOrDefaultAsync(a => a.UserId == ApplicationUserId, cancellationToken);
 
         if (user is null)
         {

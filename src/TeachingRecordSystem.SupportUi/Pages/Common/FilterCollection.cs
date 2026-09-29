@@ -35,7 +35,7 @@ public class FilterCollection<T> : IReadOnlyCollection<Filter<T>>
         return filteredQuery;
     }
 
-    public async Task<int> CalculateFilterCountsAsync(IQueryable<T> query)
+    public async Task<int> CalculateFilterCountsAsync(IQueryable<T> query, CancellationToken cancellationToken = default)
     {
         // Groups entities by a string array of filter values:
         // First element in the array is a value of the first multi-value filter, second element is a value of the second multi-value filter etc.
@@ -44,7 +44,7 @@ public class FilterCollection<T> : IReadOnlyCollection<Filter<T>>
         var counts = await query
             .GroupBy(_groupByExpressionForFilterValueCounts)
             .Select(g => new { g.Key, Count = g.Count() })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         // The total count of all entities is the sum of all the partitioned counts.
         // Null/empty values are also captured by the group by expression so the total count includes these values

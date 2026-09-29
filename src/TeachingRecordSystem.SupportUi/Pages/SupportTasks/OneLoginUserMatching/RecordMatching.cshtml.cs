@@ -31,7 +31,7 @@ public class RecordMatching(SupportTaskSearchService searchService, SupportUiLin
 
     public ResultPage<OneLoginUserRecordMatchingSupportTasksSearchResultItem>? Results { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
         var sortBy = SortBy ?? OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn;
@@ -39,7 +39,7 @@ public class RecordMatching(SupportTaskSearchService searchService, SupportUiLin
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
         var result = await searchService.SearchOneLoginUserRecordMatchingSupportTasksAsync(
-            searchOptions, paginationOptions);
+            searchOptions, paginationOptions, cancellationToken);
 
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;

@@ -17,13 +17,13 @@ public class Events(TrsDbContext dbContext) : PageModel
 
     public IReadOnlyCollection<ProcessEventPayload>? Processes { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var processesAndEvents = await dbContext.Processes
             .Where(p => p.OneLoginUserSubjects.Contains(OneLoginUserSubject))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         Processes = processesAndEvents
             .Select(p => new ProcessEventPayload(

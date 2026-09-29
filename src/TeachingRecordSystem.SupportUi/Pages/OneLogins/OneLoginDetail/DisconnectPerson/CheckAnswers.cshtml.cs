@@ -38,16 +38,16 @@ public class CheckAnswers(
 
     public DisconnectPersonStayVerified? StayVerified { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
-        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
+        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId, cancellationToken);
         PersonName = $"{person.FirstName} {person.LastName}";
         Reason = journey.State.DisconnectReason;
         Detail = journey.State.DisconnectReason == DisconnectPersonReason.AnotherReason ? journey.State.Detail : null;
         StayVerified = journey.State.StayVerified;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -65,14 +65,14 @@ public class CheckAnswers(
             AdditionalInformation = null
         };
         var processContext = new ProcessContext(ProcessType.OneLoginUserPersonDisconnecting, timeProvider.UtcNow, User.GetUserId(), changeReason: changeReason);
-        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId);
+        var person = await dbContext.Persons.SingleAsync(x => x.PersonId == PersonId, cancellationToken);
         if (journey.State.StayVerified == DisconnectPersonStayVerified.Yes)
         {
-            await oneLoginService.SetUserUnmatchedAsync(OneLoginUserSubject, processContext);
+            await oneLoginService.SetUserUnmatchedAsync(OneLoginUserSubject, processContext, cancellationToken);
         }
         else
         {
-            await oneLoginService.SetUserUnverifiedAndUnmatchedAsync(OneLoginUserSubject, processContext);
+            await oneLoginService.SetUserUnverifiedAndUnmatchedAsync(OneLoginUserSubject, processContext, cancellationToken);
 
         }
 

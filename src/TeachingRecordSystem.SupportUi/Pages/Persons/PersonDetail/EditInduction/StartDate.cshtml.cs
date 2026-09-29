@@ -30,11 +30,11 @@ public class StartDateModel(EditInductionJourneyCoordinator journey, TimeProvide
         StartDate = journey.State.StartDate;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (StartDate > timeProvider.Today)
@@ -47,7 +47,7 @@ public class StartDateModel(EditInductionJourneyCoordinator journey, TimeProvide
             ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(WebConstants.DateDisplayFormat)}");
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state => state.StartDate = StartDate);
 

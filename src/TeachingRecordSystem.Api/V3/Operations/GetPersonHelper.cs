@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.Api.V3.Operations;
 
 public class GetPersonHelper(TrsDbContext dbContext)
 {
-    public async Task<OneOf<ApiError, (Guid PersonId, string Trn)>> GetPersonByTrnAsync(string trn)
+    public async Task<OneOf<ApiError, (Guid PersonId, string Trn)>> GetPersonByTrnAsync(string trn, CancellationToken cancellationToken = default)
     {
         var result = await dbContext.Database
             .SqlQuery<Result>($"select * from fn_resolve_record_by_trn({trn})")
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (result is null)
         {

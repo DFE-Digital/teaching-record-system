@@ -20,6 +20,8 @@ public class CheckPersonExistsFilter(TrsDbContext dbContext) : IAsyncResourceFil
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var personIdParam = context.RouteData.Values["personId"] as string ?? context.HttpContext.Request.Query["personId"];
         if (personIdParam is null || !Guid.TryParse(personIdParam, out Guid personId))
         {
@@ -46,7 +48,7 @@ public class CheckPersonExistsFilter(TrsDbContext dbContext) : IAsyncResourceFil
         Task<Person?> GetPersonAsync() => dbContext.Persons
             .FromSql($"select * from persons where person_id = {personId} for update")  // https://github.com/dotnet/efcore/issues/26042
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }
 

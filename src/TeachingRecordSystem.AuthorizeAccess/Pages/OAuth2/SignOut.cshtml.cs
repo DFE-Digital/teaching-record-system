@@ -50,6 +50,8 @@ public class SignOutModel(TrsDbContext dbContext) : PageModel
 
     public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         // Although the spec allows for logout requests without an id_token_hint, we require one so we can
         // a) extract the One Login ID token and;
         // b) know which authentication scheme to sign out with.
@@ -66,7 +68,7 @@ public class SignOutModel(TrsDbContext dbContext) : PageModel
         _authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
         string clientId = _authenticateResult.Principal!.GetAudiences().Single();
-        _client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId);
+        _client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId, cancellationToken);
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

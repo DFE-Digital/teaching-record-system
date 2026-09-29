@@ -33,20 +33,22 @@ public class CountryModel(AddRouteJourneyCoordinator journey, ReferenceDataCache
         TrainingCountryId = journey.State.TrainingCountryId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return await journey.AnswerAndAdvanceAsync(AddRoutePage.Country, state => state.TrainingCountryId = TrainingCountryId);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         CountryRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.Country);
         TrainingCountries = (await referenceDataCache.GetTrainingCountriesAsync())
             .Select(r => new CountryDisplayInfo()

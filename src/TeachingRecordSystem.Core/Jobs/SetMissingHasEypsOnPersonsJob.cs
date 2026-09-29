@@ -56,7 +56,8 @@ public class SetMissingHasEypsOnPersonsJob(
                     OldPersonAttributes = oldPersonAttributes,
                     Changes = PersonProfessionalStatusAttributesUpdatedEventChanges.HasEyps
                 },
-                processContext);
+                processContext,
+                cancellationToken);
 
             updatedPersons.Add(person.PersonId);
         }
@@ -79,6 +80,6 @@ public class SetMissingHasEypsOnPersonsJob(
         await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
 
-        await fileService.UploadFileAsync($"setmissinghaseyps{timeProvider.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv");
+        await fileService.UploadFileAsync($"setmissinghaseyps{timeProvider.UtcNow:yyyyMMddHHmmss}.csv", stream, "text/csv", cancellationToken);
     }
 }

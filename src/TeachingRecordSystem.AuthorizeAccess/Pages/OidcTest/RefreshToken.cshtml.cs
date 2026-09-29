@@ -45,7 +45,7 @@ public class RefreshTokenModel(IHttpContextAccessor httpContextAccessor) : PageM
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         OldAccessToken = CurrentAccessToken;
         OldRefreshToken = CurrentRefreshToken;
@@ -71,8 +71,8 @@ public class RefreshTokenModel(IHttpContextAccessor httpContextAccessor) : PageM
 
             request.Content = new FormUrlEncodedContent(formData);
 
-            var response = await _httpClient.SendAsync(request);
-            var responseContent = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {

@@ -47,14 +47,14 @@ public class Completed(
 
     public string? OrderDirectionLabel { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Descending;
         var sortBy = SortBy ?? CompletedTasksSortByOption.CompletedOn;
         var searchOptions = new CompletedTasksSearchOptions(Search, Type, CompletedByUserId, sortBy, sortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var result = await searchService.SearchCompletedTasksAsync(searchOptions, paginationOptions);
+        var result = await searchService.SearchCompletedTasksAsync(searchOptions, paginationOptions, cancellationToken);
 
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
@@ -63,7 +63,7 @@ public class Completed(
             Results,
             pageNumber => linkGenerator.SupportTasks.Completed(Search, Type, CompletedByUserId, sortBy, sortDirection, pageNumber));
 
-        CompletedByOptions = await supportTaskService.GetCompletedByUsersAsync();
+        CompletedByOptions = await supportTaskService.GetCompletedByUsersAsync(cancellationToken);
 
         OrderedByLabel = sortBy switch
         {

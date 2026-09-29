@@ -27,7 +27,7 @@ public class OAuth2Controller(
     [HttpPost("~/oauth2/authorize")]
     [IgnoreAntiforgeryToken]
     [Journey(SignInJourneyCoordinator.JourneyName, Optional = true)]
-    public async Task<IActionResult> AuthorizeAsync()
+    public async Task<IActionResult> AuthorizeAsync(CancellationToken cancellationToken)
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
@@ -45,7 +45,7 @@ public class OAuth2Controller(
         }
 
         var clientId = request.ClientId!;
-        var client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId);
+        var client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId, cancellationToken);
 
         if (HttpContext.GetWebRequestEvent() is Dfe.Analytics.Events.Event webRequestEvent)
         {
@@ -80,7 +80,8 @@ public class OAuth2Controller(
                             ClientId = clientId,
                             JourneyInstanceId = ctx.InstanceId.ToString()
                         },
-                        processContext);
+                        processContext,
+                        cancellationToken);
 
                     redirectToSelf += $"&{JourneyInstanceId.KeyRouteValueName}={Uri.EscapeDataString(ctx.InstanceId.Key)}";
 
@@ -116,7 +117,8 @@ public class OAuth2Controller(
             client: client.UserId.ToString(),
             status: Statuses.Valid,
             type: AuthorizationTypes.Permanent,
-            scopes: request.GetScopes()).ToListAsync();
+            scopes: request.GetScopes(),
+            cancellationToken: cancellationToken).ToListAsync(cancellationToken);
 
         var identity = new ClaimsIdentity(
             claims: user.Claims,
@@ -125,7 +127,7 @@ public class OAuth2Controller(
             roleType: null);
 
         identity.SetScopes(request.GetScopes());
-        identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+        identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes(), cancellationToken).ToListAsync(cancellationToken));
 
         var authorization = authorizations.LastOrDefault();
         authorization ??= await authorizationManager.CreateAsync(
@@ -133,16 +135,18 @@ public class OAuth2Controller(
             subject: subject,
             client: client.UserId.ToString(),
             type: AuthorizationTypes.Permanent,
-            scopes: identity.GetScopes());
+            scopes: identity.GetScopes(),
+            cancellationToken: cancellationToken);
 
-        identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
+        identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization, cancellationToken));
         identity.SetDestinations(GetDestinations);
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, ((SignInJourneyState)coordinator!.State).SigningInProcessId, timeProvider.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, ((SignInJourneyState)coordinator!.State).SigningInProcessId, timeProvider.UtcNow, cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new AuthorizeAccessRequestCompletedEvent { EventId = Guid.NewGuid() },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
@@ -177,7 +181,7 @@ public class OAuth2Controller(
     [HttpGet("~/oauth2/userinfo")]
     [HttpPost("~/oauth2/userinfo")]
     [Produces("application/json")]
-    public async Task<IActionResult> UserInfoAsync()
+    public async Task<IActionResult> UserInfoAsync(CancellationToken cancellationToken)
     {
         var subject = User.GetClaim(AuthorizeAccessClaimTypes.Subject)!;
 
@@ -188,7 +192,7 @@ public class OAuth2Controller(
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(o => o.Person)
-            .SingleAsync(u => u.Subject == subject);
+            .SingleAsync(u => u.Subject == subject, cancellationToken);
 
         if (oneLoginUser.Person is Person p)
         {

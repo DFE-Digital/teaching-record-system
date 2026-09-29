@@ -11,9 +11,9 @@ public class AadUserService : IAadUserService
         _graphServiceClient = graphServiceClient;
     }
 
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var user = await _graphServiceClient.Users[userId].GetAsync();
+        var user = await _graphServiceClient.Users[userId].GetAsync(cancellationToken: cancellationToken);
 
         if (user is null)
         {
@@ -28,13 +28,13 @@ public class AadUserService : IAadUserService
         };
     }
 
-    public async Task<User?> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         var result = await _graphServiceClient.Users.GetAsync(req =>
         {
             req.QueryParameters.Filter = $"mail eq '{email}'";
             req.Headers.Add("ConsistencyLevel", "eventual");
-        });
+        }, cancellationToken);
 
         var user = result?.Value?.SingleOrDefault();
 

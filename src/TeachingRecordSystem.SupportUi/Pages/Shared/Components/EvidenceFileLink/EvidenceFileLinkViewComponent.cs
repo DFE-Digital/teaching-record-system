@@ -10,9 +10,11 @@ public class EvidenceFileLinkViewComponent(
 {
     public async Task<IViewComponentResult> InvokeAsync(UploadedEvidenceFile? evidenceFile)
     {
+        var cancellationToken = HttpContext.RequestAborted;
+
         if (evidenceFile is UploadedEvidenceFile file)
         {
-            var fileUrl = await fileService.TryGetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
+            var fileUrl = await fileService.TryGetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry, cancellationToken);
             if (fileUrl is not null)
             {
                 file.PreviewUrl = linkGenerator.Files.File(file.FileName, fileUrl);

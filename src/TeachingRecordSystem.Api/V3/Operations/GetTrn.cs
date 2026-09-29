@@ -6,9 +6,9 @@ public record GetTrnResult;
 
 public class GetTrnHandler(GetPersonHelper getPersonHelper) : ICommandHandler<GetTrnCommand, GetTrnResult>
 {
-    public async Task<ApiResult<GetTrnResult>> ExecuteAsync(GetTrnCommand command)
+    public async Task<ApiResult<GetTrnResult>> ExecuteAsync(GetTrnCommand command, CancellationToken cancellationToken)
     {
-        var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn);
+        var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn, cancellationToken);
 
         return getPersonResult.Match<ApiResult<GetTrnResult>>(
             error => error,

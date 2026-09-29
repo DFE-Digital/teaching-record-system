@@ -33,7 +33,7 @@ public class DetailModel(TrsDbContext context) : PageModel
     public bool HasFailures { get; set; }
 
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var sortBy = SortBy ??= IntegrationTransactionRecordSortByOption.Status;
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Descending;
@@ -42,7 +42,7 @@ public class DetailModel(TrsDbContext context) : PageModel
             .Include(x => x.IntegrationTransactionRecords!)
                 .ThenInclude(r => r.Person)
                 .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId);
+            .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId, cancellationToken);
 
         if (integrationTransaction is null)
         {
@@ -94,7 +94,7 @@ public class DetailModel(TrsDbContext context) : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnGetDownloadFailuresAsync()
+    public async Task<IActionResult> OnGetDownloadFailuresAsync(CancellationToken cancellationToken)
     {
         using var writer = new StringWriter();
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
@@ -102,7 +102,7 @@ public class DetailModel(TrsDbContext context) : PageModel
         var integrationTransaction = await context.IntegrationTransactions
             .Include(x => x.IntegrationTransactionRecords!)
                 .ThenInclude(r => r.Person)
-            .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId);
+            .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId, cancellationToken);
 
         if (integrationTransaction?.IntegrationTransactionRecords == null)
         {

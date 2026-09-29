@@ -32,9 +32,9 @@ public class Name(SignInJourneyCoordinator coordinator) : PageModel
         LastName = coordinator.State.LastName;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         coordinator.UpdateState(state => state.SetName(FirstName!, LastName!));
 

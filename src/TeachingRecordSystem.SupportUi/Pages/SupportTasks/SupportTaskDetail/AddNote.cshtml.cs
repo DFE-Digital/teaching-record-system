@@ -36,9 +36,9 @@ public class AddNote(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.SupportTaskNoteCreating, timeProvider.UtcNow, User.GetUserId());
 
@@ -49,7 +49,8 @@ public class AddNote(
                 Content = Content!,
                 CreatedByUserId = User.GetUserId()
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner("Note added");
 

@@ -22,9 +22,10 @@ public class TrnsController(ICommandDispatcher commandDispatcher) : ControllerBa
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey)]
     public async Task<IActionResult> GetTrnAsync(
-        [FromRoute] string trn)
+        [FromRoute] string trn,
+        CancellationToken cancellationToken)
     {
-        var result = await commandDispatcher.DispatchAsync(new GetTrnCommand(trn));
+        var result = await commandDispatcher.DispatchAsync(new GetTrnCommand(trn), cancellationToken);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)

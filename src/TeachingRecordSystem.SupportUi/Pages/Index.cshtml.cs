@@ -14,13 +14,13 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
     public int UnassignedCount { get; set; }
     public int InProgressCount { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         SupportTaskCounts = (await dbContext.SupportTasks
                 .Where(t => t.IsOutstanding)
                 .GroupBy(t => t.SupportTaskType)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
-                .ToArrayAsync())
+                .ToArrayAsync(cancellationToken))
             .ToDictionary(t => t.Status, t => t.Count);
 
         var canViewSupportTasks = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.SupportTasksEdit)).Succeeded;
@@ -31,15 +31,15 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
             MyTasksCount = await dbContext.SupportTasks
                 .Where(t => t.AssignedToUserId == userId && t.IsOutstanding)
-                .CountAsync();
+                .CountAsync(cancellationToken);
 
             UnassignedCount = await dbContext.SupportTasks
                 .Where(t => t.AssignedToUserId == null && t.IsOutstanding)
-                .CountAsync();
+                .CountAsync(cancellationToken);
 
             InProgressCount = await dbContext.SupportTasks
                 .Where(t => t.Status == SupportTaskStatus.InProgress)
-                .CountAsync();
+                .CountAsync(cancellationToken);
         }
     }
 }

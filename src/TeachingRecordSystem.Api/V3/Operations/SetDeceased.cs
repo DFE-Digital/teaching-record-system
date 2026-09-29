@@ -15,9 +15,9 @@ public class SetDeceasedHandler(
     TimeProvider timeProvider) :
     ICommandHandler<SetDeceasedCommand, SetDeceasedResult>
 {
-    public async Task<ApiResult<SetDeceasedResult>> ExecuteAsync(SetDeceasedCommand command)
+    public async Task<ApiResult<SetDeceasedResult>> ExecuteAsync(SetDeceasedCommand command, CancellationToken cancellationToken)
     {
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn, cancellationToken);
 
         if (person is null)
         {
@@ -30,7 +30,8 @@ public class SetDeceasedHandler(
 
         await personService.DeactivatePersonAsync(
             new DeactivatePersonOptions(person.PersonId, command.DateOfDeath),
-            processContext);
+            processContext,
+            cancellationToken);
 
         return new SetDeceasedResult();
     }

@@ -22,12 +22,13 @@ public class ResolveTeacherPensionsPotentialDuplicateJourneyCoordinator(
     public static async Task<ResolveTeacherPensionsPotentialDuplicateState> CreateStateAsync(
         TrnRequestService trnRequestService,
         SupportTask supportTask,
-        string completionUrl)
+        string completionUrl,
+        CancellationToken cancellationToken = default)
     {
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.TeacherPensionsPotentialDuplicate);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var matchResult = await trnRequestService.MatchPersonsAsync(requestData, excludePersonIds: supportTask.PersonId!.Value);
+        var matchResult = await trnRequestService.MatchPersonsAsync(requestData, excludePersonIds: [supportTask.PersonId!.Value], cancellationToken);
         var matchedPersons = matchResult.Outcome switch
         {
             MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],

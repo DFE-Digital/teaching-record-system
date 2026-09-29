@@ -43,14 +43,15 @@ public static class QueryableExtensions
         this IQueryable<T> source,
         int? currentPage,
         int pageSize,
-        int totalItemCount)
+        int totalItemCount,
+        CancellationToken cancellationToken = default)
     {
         var page = ResultPage.ResolveCurrentPage(currentPage, pageSize, totalItemCount);
 
         var items = await source
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         return new ResultPage<T>(items.AsReadOnly(), page, pageSize, totalItemCount);
     }

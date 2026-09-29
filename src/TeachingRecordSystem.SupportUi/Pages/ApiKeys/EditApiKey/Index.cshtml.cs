@@ -30,7 +30,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     {
     }
 
-    public async Task<IActionResult> OnPostExpireAsync()
+    public async Task<IActionResult> OnPostExpireAsync(CancellationToken cancellationToken)
     {
         if (Expires.HasValue)
         {
@@ -45,7 +45,8 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 ApiKeyId = ApiKeyId,
                 Expires = Option.Some<DateTime?>(timeProvider.UtcNow)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner("API key expired");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));
@@ -53,9 +54,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _apiKey = await dbContext.ApiKeys
             .Include(k => k.ApplicationUser)
-            .SingleOrDefaultAsync(k => k.ApiKeyId == ApiKeyId);
+            .SingleOrDefaultAsync(k => k.ApiKeyId == ApiKeyId, cancellationToken);
 
         if (_apiKey is null)
         {

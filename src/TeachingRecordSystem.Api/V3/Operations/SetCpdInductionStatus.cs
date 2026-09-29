@@ -21,7 +21,7 @@ public class SetCpdInductionStatusHandler(
     InductionService inductionService) :
     ICommandHandler<SetCpdInductionStatusCommand, SetCpdInductionStatusResult>
 {
-    public async Task<ApiResult<SetCpdInductionStatusResult>> ExecuteAsync(SetCpdInductionStatusCommand command)
+    public async Task<ApiResult<SetCpdInductionStatusResult>> ExecuteAsync(SetCpdInductionStatusCommand command, CancellationToken cancellationToken)
     {
         if (command.Status is not InductionStatus.RequiredToComplete and not InductionStatus.InProgress
             and not InductionStatus.Passed and not InductionStatus.Failed)
@@ -49,7 +49,7 @@ public class SetCpdInductionStatusHandler(
             return ApiError.InductionCompletedDateIsNotPermitted(command.Status);
         }
 
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn, cancellationToken);
 
         if (person is null)
         {
@@ -78,7 +78,8 @@ public class SetCpdInductionStatusHandler(
                 CompletedDate = command.CompletedDate,
                 CpdModifiedOn = command.CpdModifiedOn
             },
-            new ProcessContext(ProcessType.PersonCpdInductionUpdating, timeProvider.UtcNow, currentUserId));
+            new ProcessContext(ProcessType.PersonCpdInductionUpdating, timeProvider.UtcNow, currentUserId),
+            cancellationToken);
 
         return new SetCpdInductionStatusResult();
     }

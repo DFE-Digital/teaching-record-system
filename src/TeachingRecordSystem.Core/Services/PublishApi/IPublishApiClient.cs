@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.Services.PublishApi;
 
 public interface IPublishApiClient
 {
-    Task<IReadOnlyCollection<ProviderResource>> GetAccreditedProvidersAsync();
+    Task<IReadOnlyCollection<ProviderResource>> GetAccreditedProvidersAsync(CancellationToken cancellationToken = default);
 }
 
 public record ProviderListResponse

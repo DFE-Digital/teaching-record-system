@@ -25,11 +25,11 @@ public class ConfirmKeepRecordSeparateReasonModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
             Journey.DeleteInstance();
 
             return Redirect(Journey.State.CompletionUrl);
@@ -55,7 +55,8 @@ public class ConfirmKeepRecordSeparateReasonModel(
                 SupportTaskReference = SupportTaskReference,
                 Comments = Reason
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner(
             "Teachers’ Pensions duplicate task completed",

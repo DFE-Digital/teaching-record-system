@@ -32,11 +32,11 @@ public class CheckYourAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         await routesToProfessionalStatusService.UpdateRouteToProfessionalStatusAsync(
@@ -67,7 +67,8 @@ public class CheckYourAnswersModel(
                     Details = ChangeReasonDetail.ChangeReasonDetail,
                     EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
                     AdditionalInformation = ChangeReasonDetail.AdditionalInformation
-                }));
+                }),
+            cancellationToken);
 
         journey.DeleteInstance();
 
@@ -78,6 +79,8 @@ public class CheckYourAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var checkAnswersUrl = linkGenerator.RoutesToProfessionalStatus.EditRoute.CheckAnswers(journey.InstanceId);
 
         // The detail page lets the user come straight here, so this is what asks for the reason for the

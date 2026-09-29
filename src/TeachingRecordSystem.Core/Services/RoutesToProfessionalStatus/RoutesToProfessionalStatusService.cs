@@ -12,13 +12,14 @@ public class RoutesToProfessionalStatusService(
 {
     public async Task<RouteToProfessionalStatus> CreateRouteToProfessionalStatusAsync(
         CreateRouteToProfessionalStatusOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)
-            .SingleOrDefaultAsync(p => p.PersonId == options.PersonId)
+            .SingleOrDefaultAsync(p => p.PersonId == options.PersonId, cancellationToken)
             ?? throw new NotFoundException(options.PersonId, nameof(Person));
 
         Debug.Assert(person.Qualifications is not null);
@@ -71,7 +72,7 @@ public class RoutesToProfessionalStatusService(
         }
 
         dbContext.RouteToProfessionalStatuses.Add(route);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new RouteToProfessionalStatusCreatedEvent
@@ -79,18 +80,20 @@ public class RoutesToProfessionalStatusService(
                 EventId = Guid.NewGuid(),
                 PersonId = person.PersonId,
                 RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route)
-            });
+            },
+            cancellationToken);
 
-        await PublishPersonChangesAsync(eventScope, person, oldPersonAttributes, newInduction, oldInduction);
+        await PublishPersonChangesAsync(eventScope, person, oldPersonAttributes, newInduction, oldInduction, cancellationToken);
 
         return route;
     }
 
     public async Task<RouteToProfessionalStatusUpdatedEventChanges> UpdateRouteToProfessionalStatusAsync(
         UpdateRouteToProfessionalStatusOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var route = await GetRouteAsync(options.QualificationId);
+        var route = await GetRouteAsync(options.QualificationId, cancellationToken);
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -174,7 +177,7 @@ public class RoutesToProfessionalStatusService(
         }
 
         route.UpdatedOn = now;
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         if (changes != RouteToProfessionalStatusUpdatedEventChanges.None)
         {
@@ -186,19 +189,21 @@ public class RoutesToProfessionalStatusService(
                     RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
                     OldRouteToProfessionalStatus = oldEventModel,
                     Changes = changes
-                });
+                },
+                cancellationToken);
         }
 
-        await PublishPersonChangesAsync(eventScope, person, oldPersonAttributes, newInduction, oldInduction);
+        await PublishPersonChangesAsync(eventScope, person, oldPersonAttributes, newInduction, oldInduction, cancellationToken);
 
         return changes;
     }
 
     public async Task DeleteRouteToProfessionalStatusAsync(
         DeleteRouteToProfessionalStatusOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var route = await GetRouteAsync(options.QualificationId);
+        var route = await GetRouteAsync(options.QualificationId, cancellationToken);
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -240,7 +245,7 @@ public class RoutesToProfessionalStatusService(
             person.RefreshQtlsStatus();
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new RouteToProfessionalStatusDeletedEvent
@@ -248,9 +253,10 @@ public class RoutesToProfessionalStatusService(
                 EventId = Guid.NewGuid(),
                 PersonId = route.PersonId,
                 RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route)
-            });
+            },
+            cancellationToken);
 
-        await PublishPersonChangesAsync(eventScope, person, oldPersonAttributes, newInduction, oldInduction);
+        await PublishPersonChangesAsync(eventScope, person, oldPersonAttributes, newInduction, oldInduction, cancellationToken);
     }
 
     // The person's professional status attributes and their induction are changes to the person, not to the route,
@@ -260,7 +266,8 @@ public class RoutesToProfessionalStatusService(
         Person person,
         EventModels.ProfessionalStatusPersonAttributes oldPersonAttributes,
         EventModels.Induction newInduction,
-        EventModels.Induction oldInduction)
+        EventModels.Induction oldInduction,
+        CancellationToken cancellationToken)
     {
         var personAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person);
         var personAttributesChanges = GetPersonAttributesChanges(personAttributes, oldPersonAttributes);
@@ -275,7 +282,8 @@ public class RoutesToProfessionalStatusService(
                     PersonAttributes = personAttributes,
                     OldPersonAttributes = oldPersonAttributes,
                     Changes = personAttributesChanges
-                });
+                },
+                cancellationToken);
         }
 
         var inductionChanges = PersonInductionUpdatedEvent.GetChanges(newInduction, oldInduction);
@@ -290,7 +298,8 @@ public class RoutesToProfessionalStatusService(
                     Induction = newInduction,
                     OldInduction = oldInduction,
                     Changes = inductionChanges
-                });
+                },
+                cancellationToken);
         }
     }
 
@@ -315,10 +324,10 @@ public class RoutesToProfessionalStatusService(
         route.ExemptFromInductionDueToQtsDate = route.HoldsFrom < new DateOnly(2000, 5, 7);
     }
 
-    private async Task<RouteToProfessionalStatus> GetRouteAsync(Guid qualificationId) =>
+    private async Task<RouteToProfessionalStatus> GetRouteAsync(Guid qualificationId, CancellationToken cancellationToken) =>
         await dbContext.RouteToProfessionalStatuses
             .Include(r => r.Person)
             .ThenInclude(p => p!.Qualifications)
-            .SingleOrDefaultAsync(r => r.QualificationId == qualificationId)
+            .SingleOrDefaultAsync(r => r.QualificationId == qualificationId, cancellationToken)
         ?? throw new NotFoundException(qualificationId, nameof(RouteToProfessionalStatus));
 }

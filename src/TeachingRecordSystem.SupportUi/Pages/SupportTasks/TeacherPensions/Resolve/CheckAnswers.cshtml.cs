@@ -65,6 +65,8 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var supportTask = GetSupportTask();
         var requestData = supportTask.TrnRequestMetadata!;
         var state = Journey.State;
@@ -86,7 +88,7 @@ public class CheckAnswersModel(
                 p.Gender,
                 p.Trn
             })
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         // Mirrors GetResolvedPersonAttributes: only a TrnRequest source changes the record.
         FirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? requestData.FirstName : selectedPerson.FirstName;
@@ -118,11 +120,11 @@ public class CheckAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+            await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
             Journey.DeleteInstance();
 
             return Redirect(Journey.State.CompletionUrl);
@@ -140,7 +142,8 @@ public class CheckAnswersModel(
                 AttributeSources = GetPersonAttributeSources(),
                 Comments = MergeComments
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner(
             "Teachers’ Pensions duplicate task completed",

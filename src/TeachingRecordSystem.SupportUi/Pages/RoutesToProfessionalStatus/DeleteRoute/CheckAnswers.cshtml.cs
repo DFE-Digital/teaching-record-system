@@ -41,11 +41,11 @@ public class CheckAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
@@ -63,7 +63,8 @@ public class CheckAnswersModel(
                     Details = ChangeReasonDetail.ChangeReasonDetail,
                     EvidenceFile = ChangeReasonDetail.Evidence.UploadedEvidenceFile?.ToEventModel(),
                     AdditionalInformation = ChangeReasonDetail.AdditionalInformation
-                }));
+                }),
+            cancellationToken);
 
         journey.DeleteInstance();
 
@@ -74,6 +75,8 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         ReturnUrl = linkGenerator.RoutesToProfessionalStatus.DeleteRoute.CheckAnswers(journey.InstanceId);
         BackLink = journey.GetBackLink();
 

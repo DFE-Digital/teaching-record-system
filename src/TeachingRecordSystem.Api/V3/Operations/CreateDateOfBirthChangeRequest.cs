@@ -33,11 +33,11 @@ public class CreateDateOfBirthChangeRequestHandler(
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<ApiResult<CreateDateOfBirthChangeRequestResult>> ExecuteAsync(CreateDateOfBirthChangeRequestCommand command)
+    public async Task<ApiResult<CreateDateOfBirthChangeRequestResult>> ExecuteAsync(CreateDateOfBirthChangeRequestCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (person is null)
         {
@@ -47,7 +47,7 @@ public class CreateDateOfBirthChangeRequestHandler(
         var existingOpenRequest = await dbContext.SupportTasks
             .AnyAsync(t => t.PersonId == person.PersonId
                 && t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest
-                && t.IsOutstanding);
+                && t.IsOutstanding, cancellationToken);
 
         if (existingOpenRequest)
         {
@@ -56,7 +56,8 @@ public class CreateDateOfBirthChangeRequestHandler(
 
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(
             command.EvidenceFileUrl,
-            HttpCompletionOption.ResponseHeadersRead);
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
 
         if (!evidenceFileResponse.IsSuccessStatusCode)
         {
@@ -69,8 +70,8 @@ public class CreateDateOfBirthChangeRequestHandler(
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync();
-        var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType);
+        await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync(cancellationToken);
+        var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType, cancellationToken: cancellationToken);
 
         var userId = currentUserProvider.GetCurrentApplicationUserId();
 
@@ -86,7 +87,8 @@ public class CreateDateOfBirthChangeRequestHandler(
                 EmailAddress = command.EmailAddress,
                 SourceApplicationUserId = userId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var emailAddress = !string.IsNullOrEmpty(command.EmailAddress) ? command.EmailAddress : person.EmailAddress;
 
@@ -102,7 +104,7 @@ public class CreateDateOfBirthChangeRequestHandler(
 
             dbContext.Emails.Add(email);
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
         }

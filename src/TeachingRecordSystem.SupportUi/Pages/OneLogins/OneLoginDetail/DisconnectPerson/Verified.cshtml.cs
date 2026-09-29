@@ -35,7 +35,7 @@ public class Verified(
         StayVerified = journey.State.StayVerified;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -43,7 +43,7 @@ public class Verified(
             return Redirect(linkGenerator.OneLogins.OneLoginDetail.Index(OneLoginUserSubject));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.OneLogins.OneLoginDetail.DisconnectPerson.CheckAnswers(journey.InstanceId),

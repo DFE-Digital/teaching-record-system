@@ -6,5 +6,5 @@ public interface ICurrentUserProvider
 {
     Guid GetCurrentApplicationUserId();
     bool TryGetTrnRequestId([NotNullWhen(true)] out string? trnRequestId);
-    Task<string?> GetTrnAsync();
+    Task<string?> GetTrnAsync(CancellationToken cancellationToken = default);
 }

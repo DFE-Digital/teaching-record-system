@@ -21,7 +21,7 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
 
     public PaginationViewModel? Pagination { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         PageNumber ??= 1;
 
@@ -33,7 +33,8 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
         var items = await changeHistoryService.GetChangeHistoryByPersonAsync(
             PersonId,
             User,
-            new PaginationOptions(PageNumber, PageSize));
+            new PaginationOptions(PageNumber, PageSize),
+            cancellationToken);
         TimelineItems = items;
 
         // If an 'out of bounds' page was requested, redirect to the first page

@@ -14,6 +14,8 @@ public partial class RedirectWithPersonIdFilter(TrsDbContext dbContext) : IAsync
 
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var matched = _personWithTrnPathRegex().Match(context.HttpContext.Request.Path);
 
         if (matched.Success)
@@ -23,7 +25,7 @@ public partial class RedirectWithPersonIdFilter(TrsDbContext dbContext) : IAsync
             var person = await dbContext.Persons
                 .Where(p => p.Trn == trn)
                 .Select(p => new { p.PersonId })
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             if (person is not null)
             {

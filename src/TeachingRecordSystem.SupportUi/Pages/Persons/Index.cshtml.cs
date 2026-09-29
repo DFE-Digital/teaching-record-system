@@ -41,7 +41,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public IReadOnlyDictionary<string, IReadOnlyDictionary<object, int>>? Facets { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         Search = Search?.Trim() ?? string.Empty;
 
@@ -59,7 +59,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         {
             var oneLoginUser = await dbContext.OneLoginUsers
                 .Where(o => o.EmailAddress == Search && o.PersonId != null)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (oneLoginUser is null)
             {
@@ -116,11 +116,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             .Select(p => p.Status)
             .GroupBy(p => p)
             .Select(g => new { Status = g.Key, Count = g.Count() })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var hasOneLoginUserCount = await query
             .Where(p => p.OneLoginUsers != null && p.OneLoginUsers.Any())
-            .CountAsync();
+            .CountAsync(cancellationToken);
 
         Facets = new Dictionary<string, IReadOnlyDictionary<object, int>>
         {
@@ -156,7 +156,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             query = query.Where(p => p.OneLoginUsers != null && p.OneLoginUsers.Any());
         }
 
-        var totalPersonCount = await query.CountAsync();
+        var totalPersonCount = await query.CountAsync(cancellationToken);
 
         // Apply sorting
         IOrderedQueryable<Person> orderedQuery = sortBy switch
@@ -197,7 +197,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                     ? p.OneLoginUsers.Select(o => o.EmailAddress!).Where(e => e != null).ToArray()!
                     : Array.Empty<string>()
             })
-            .GetPageAsync(PageNumber, PageSize, totalPersonCount);
+            .GetPageAsync(PageNumber, PageSize, totalPersonCount, cancellationToken);
 
         Pagination = PaginationViewModel.Create(
             SearchResults!,
