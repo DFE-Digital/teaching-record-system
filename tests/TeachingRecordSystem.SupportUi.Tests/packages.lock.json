@@ -1053,7 +1053,7 @@
       "teachingrecordsystem.supportui": {
         "type": "Project",
         "dependencies": {
-          "AspNetCore.SassCompiler": "[1.103.0, )",
+          "AspNetCore.SassCompiler": "[1.103.1, )",
           "GovUk.Frontend.AspNetCore": "[5.0.0, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",
@@ -1148,9 +1148,9 @@
       },
       "AspNetCore.SassCompiler": {
         "type": "CentralTransitive",
-        "requested": "[1.103.0, )",
-        "resolved": "1.103.0",
-        "contentHash": "c9KytDdq1ZG2sMJRrveuPgUQX4o+KXzlNjTHLSbNFP2qbBbZLyyqUzpCFwRfywgRbum34N9VRMw+c/Rjbzuntg=="
+        "requested": "[1.103.1, )",
+        "resolved": "1.103.1",
+        "contentHash": "D8cONnRjT0oPWCqI71lWCN4u1ZrFMyHq2ZS9XTjkXW6Vv5/2PMvc2LMyQseHQxJtNoTY7eqeMxHBB5HbWVZa8g=="
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
