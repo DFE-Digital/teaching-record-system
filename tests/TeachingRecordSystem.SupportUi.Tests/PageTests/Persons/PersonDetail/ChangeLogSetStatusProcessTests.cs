@@ -71,8 +71,7 @@ public class ChangeLogSetStatusProcessTests : TestBase
             user.Name,
             process.CreatedOn);
 
-        doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
-        doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile.Name} (opens in new tab)", v.TrimmedText()));
     }
@@ -123,8 +122,7 @@ public class ChangeLogSetStatusProcessTests : TestBase
             user.Name,
             process.CreatedOn);
 
-        doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
-        doc.AssertSummaryListRowValue("change-reason", "Reason details", v => Assert.Equal(reasonDetail, v.TrimmedText()));
+        doc.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reasonDetail, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Additional information", v => Assert.Equal(additionalInformation, v.TrimmedText()));
         doc.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile.Name} (opens in new tab)", v.TrimmedText()));
     }

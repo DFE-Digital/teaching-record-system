@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 
@@ -38,33 +39,24 @@ public class PersonCreatingTests(HostFixture hostFixture) : ChangeHistoryEntryTe
                 gender: person.Gender));
 
         // Assert
-        AssertTitle(entry, "Record created");
+        AssertTitle(entry, "Record created manually");
 
-        entry.AssertSummaryListRowValue("details", "Name", v =>
-            Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
-        entry.AssertSummaryListRowValue("details", "Date of birth", v =>
-            Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
-        entry.AssertSummaryListRowValue("details", "Email address", v =>
-            Assert.Equal(person.EmailAddress, v.TrimmedText()));
-        // The record created view has always shown the National Insurance number in its display form.
-        var expectedNino = NationalInsuranceNumber.Parse(person.NationalInsuranceNumber!).ToDisplayString();
-        entry.AssertSummaryListRowValue("details", "National Insurance number", v =>
-            Assert.Equal(expectedNino, v.TrimmedText()));
-        entry.AssertSummaryListRowValue("details", "Gender", v =>
-            Assert.Equal(person.Gender?.GetDisplayName(), v.TrimmedText()));
+        var name = entry.GetElementByTestId("name");
+        Assert.NotNull(name);
+        Assert.Equal($"Record created for {person.FirstName} {person.MiddleName} {person.LastName}", name!.TrimmedText());
 
         entry.AssertSummaryListRowValue("create-reason", "Reason", v =>
-            Assert.Equal(changeReason.Reason, v.TrimmedText()));
-        entry.AssertSummaryListRowValue("create-reason", "Reason details", v =>
             Assert.Equal(changeReason.Details, v.TrimmedText()));
         entry.AssertSummaryListRowValue("create-reason", "Additional information", v =>
             Assert.Equal(changeReason.AdditionalInformation, v.TrimmedText()));
         entry.AssertSummaryListRowValue("create-reason", "Evidence", v =>
             Assert.Equal($"{evidenceFile.Name} (opens in new tab)", v.TrimmedText()));
+
+        Assert.Null(entry.GetElementByTestId("email-sent-message"));
     }
 
     [Fact]
-    public async Task ProcessWithoutOptionalDetailsOrChangeReason_RendersWithoutThem()
+    public async Task ProcessWithoutChangeReason_RendersWithoutReasonSection()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -85,16 +77,88 @@ public class PersonCreatingTests(HostFixture hostFixture) : ChangeHistoryEntryTe
                 gender: null));
 
         // Assert
+        AssertTitle(entry, "Record created manually");
+
+        Assert.Null(entry.GetElementByTestId("create-reason"));
+    }
+
+    [Fact]
+    public async Task ProcessCreatedBySystemUser_RendersRecordCreatedTitle()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        // Act
+        var entry = await PublishPersonCreatedEventAsync(
+            person.PersonId,
+            SystemUser.SystemUserId,
+            changeReason: null,
+            CreatePersonDetails(
+                firstName: person.FirstName,
+                middleName: person.MiddleName,
+                lastName: person.LastName,
+                dateOfBirth: person.DateOfBirth,
+                emailAddress: null,
+                nationalInsuranceNumber: null,
+                gender: null));
+
+        // Assert
+        AssertTitle(entry, "Record created");
+    }
+
+    [Fact]
+    public async Task ProcessWithEmailSentEvent_RendersEmailSentMessage()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var details = CreatePersonDetails(
+            firstName: person.FirstName,
+            middleName: person.MiddleName,
+            lastName: person.LastName,
+            dateOfBirth: person.DateOfBirth,
+            emailAddress: null,
+            nationalInsuranceNumber: null,
+            gender: null);
+
+        var email = new EventModels.Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = "template-123",
+            EmailAddress = Faker.Internet.Email(),
+            Personalization = new Dictionary<string, string>(),
+            Metadata = new Dictionary<string, object>(),
+            SentOn = TimeProvider.UtcNow,
+            EmailReplyToId = null
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.PersonCreating,
+            SystemUser.SystemUserId,
+            changeReason: null,
+            new PersonCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Details = details,
+                TrnRequestMetadata = null
+            },
+            new EmailSentEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Email = email
+            });
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
         AssertTitle(entry, "Record created");
 
-        var details = entry.GetElementByTestId("details");
-        Assert.NotNull(details);
-        Assert.DoesNotContain("Email address", details.TrimmedText());
-        Assert.DoesNotContain("National Insurance number", details.TrimmedText());
-        Assert.DoesNotContain("Gender", details.TrimmedText());
-
-        // A record created before change reasons were captured still shows the section, with nothing in it.
-        entry.AssertSummaryListRowValue("create-reason", "Reason", v => Assert.Equal("Not provided", v.TrimmedText()));
+        var emailSentMessage = entry.GetElementByTestId("email-sent-message");
+        Assert.NotNull(emailSentMessage);
+        Assert.Equal("We\u2019ve sent them an email confirming their TRN.", emailSentMessage!.TrimmedText());
     }
 
     private async Task<IHtmlElement> PublishPersonCreatedEventAsync(

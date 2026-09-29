@@ -21,7 +21,6 @@ public class ChangeHistoryService(
         var eventTypes = new[]
         {
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
-            nameof(LegacyEvents.PersonDetailsUpdatedEvent),
             nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
             nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
             nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
@@ -91,6 +90,8 @@ public class ChangeHistoryService(
             ProcessType.PersonUnmerging,
             ProcessType.PersonDeactivating,
             ProcessType.PersonReactivating,
+            ProcessType.PersonDeceased,
+            ProcessType.PersonDetailsUpdating,
             ProcessType.AlertCreating,
             ProcessType.AlertUpdating,
             ProcessType.AlertDeleting,

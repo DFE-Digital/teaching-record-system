@@ -43,16 +43,13 @@ public class ChangeLogPersonCreatingProcessTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Record created", createdByUser.Name, process.CreatedOn);
+        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Record created manually", createdByUser.Name, process.CreatedOn);
 
-        doc.AssertSummaryListRowValue("details", "Name", v =>
-            Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("details", "Date of birth", v =>
-            Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+        var name = doc.GetElementByTestId("name");
+        Assert.NotNull(name);
+        Assert.Equal($"Record created for {person.FirstName} {person.MiddleName} {person.LastName}", name!.TrimmedText());
 
         doc.AssertSummaryListRowValue("create-reason", "Reason", v =>
-            Assert.Equal(changeReason.Reason, v.TrimmedText()));
-        doc.AssertSummaryListRowValue("create-reason", "Reason details", v =>
             Assert.Equal(changeReason.Details, v.TrimmedText()));
         doc.AssertSummaryListRowValue("create-reason", "Additional information", v =>
             Assert.Equal(changeReason.AdditionalInformation, v.TrimmedText()));
@@ -76,14 +73,9 @@ public class ChangeLogPersonCreatingProcessTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Record created", createdByUser.Name, process.CreatedOn);
+        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Record created manually", createdByUser.Name, process.CreatedOn);
 
-        doc.AssertSummaryListRowDoesNotExist("details", "Email address");
-        doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
-        doc.AssertSummaryListRowDoesNotExist("details", "Gender");
-
-        doc.AssertSummaryListRowValue("create-reason", "Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListRowValue("create-reason", "Evidence", v => Assert.Equal("Not provided", v.TrimmedText()));
+        Assert.Null(doc.GetElementByTestId("create-reason"));
     }
 
     [Fact]
