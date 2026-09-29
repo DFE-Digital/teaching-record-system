@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using FluentValidation;
@@ -34,6 +35,20 @@ public static class Extensions
         return services;
     }
 
+    private static void ConfigureJsonSerializerOptions(JsonSerializerOptions options)
+    {
+        options.Converters.Add(new JsonStringEnumConverter());
+        options.Converters.Add(new OneOfJsonConverterFactory());
+
+        options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        {
+            Modifiers =
+            {
+                Modifiers.OptionProperties
+            }
+        };
+    }
+
     public static IHostApplicationBuilder AddApiServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddApiServices(builder.Configuration, builder.Environment);
@@ -63,19 +78,10 @@ public static class Extensions
             {
                 options.SuppressInferBindingSourcesForParameters = true;
             })
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new OneOfJsonConverterFactory());
+            .AddJsonOptions(options => ConfigureJsonSerializerOptions(options.JsonSerializerOptions));
 
-                options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-                {
-                    Modifiers =
-                    {
-                        Modifiers.OptionProperties
-                    }
-                };
-            });
+        // OpenAPI documents are generated from these rather than the MVC options above
+        services.ConfigureHttpJsonOptions(options => ConfigureJsonSerializerOptions(options.SerializerOptions));
         services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)

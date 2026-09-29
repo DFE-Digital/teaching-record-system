@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240412.Requests;
@@ -13,10 +12,9 @@ namespace TeachingRecordSystem.Api.V3.V20240412.Controllers;
 public class TeacherController(ICommandDispatcher commandDispatcher) : ControllerBase
 {
     [HttpPost("name-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateNameChange",
-        Summary = "Create name change request",
-        Description = "Creates a name change request for the authenticated teacher.")]
+    [OperationId("CreateNameChange"),
+        EndpointSummary("Create name change request"),
+        EndpointDescription("Creates a name change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
@@ -39,10 +37,9 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
     }
 
     [HttpPost("date-of-birth-changes")]
-    [SwaggerOperation(
-        OperationId = "CreateDobChange",
-        Summary = "Create DOB change request",
-        Description = "Creates a date of birth change request for the authenticated teacher.")]
+    [OperationId("CreateDobChange"),
+        EndpointSummary("Create DOB change request"),
+        EndpointDescription("Creates a date of birth change request for the authenticated teacher.")]
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
