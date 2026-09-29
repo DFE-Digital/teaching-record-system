@@ -155,11 +155,10 @@ public class Index(
         BackLink = this.GetReturnUrlOrDefault(
             IsOutstanding ? linkGenerator.SupportTasks.Active() : linkGenerator.SupportTasks.Completed());
 
-        var changeHistoryContext = ChangeHistoryContext.ForSupportTask(SupportTaskReference);
         ChangeHistory = (await changeHistoryService.GetChangeHistoryBySupportTaskAsync(SupportTaskReference))
             .Select(e => new ChangeHistoryEntryViewModel
             {
-                Context = changeHistoryContext,
+                Context = e.Context,
                 Timestamp = e.Process.CreatedOn,
                 UserName = e.RaisedByUser.Name,
                 ProcessId = e.Process.ProcessId,
@@ -172,7 +171,11 @@ public class Index(
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
-    public static string GetZendeskTicketDisplayText(string url) => new Uri(url).LocalPath;
+    public static string GetZendeskTicketDisplayText(string url)
+    {
+        var uri = new Uri(url);
+        return uri.PathAndQuery + uri.Fragment;
+    }
 
     public record Note(string Content, DateTime CreatedOn, string CreatedBy);
 }

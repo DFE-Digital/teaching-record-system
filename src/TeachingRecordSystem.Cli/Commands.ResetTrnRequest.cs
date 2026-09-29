@@ -2,7 +2,11 @@ using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
+using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Cli;
@@ -40,10 +44,18 @@ public partial class Commands
 
                 var services = new ServiceCollection()
                     .AddTimeProvider()
+                    .AddLogging()
                     .AddDatabase(connectionString)
                     .AddMemoryCache()
                     .AddWebhookMessageFactory()
                     .AddEventPublisher()
+                    .AddPersonService()
+                    .AddOneLoginService()
+                    .AddSupportTaskServices()
+                    .AddTrnRequestService(configuration)
+                    // TrnRequestService's dependencies pull in a job scheduler that resetting never uses;
+                    // this one fails loudly rather than letting the command queue any work.
+                    .AddSingleton<IBackgroundJobScheduler, UnavailableBackgroundJobScheduler>()
                     .BuildServiceProvider();
 
                 using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -90,51 +102,56 @@ public partial class Commands
 
                 var processContext = new ProcessContext(ProcessType.TrnRequestResetting, now, SystemUser.SystemUserId);
 
-                await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+                SupportTask supportTask;
 
-                var oldTrnRequest = EventModels.TrnRequestMetadata.FromModel(request);
-                request.ResolvedPersonId = null;
-                request.Status = TrnRequestStatus.Pending;
-
-                var changes = (oldTrnRequest.Status != request.Status ? TrnRequestUpdatedChanges.Status : 0) |
-                    (oldTrnRequest.ResolvedPersonId != request.ResolvedPersonId ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
-
-                var subject = SupportTask.Subject.FromTrnRequest(request);
-                var supportTask = new SupportTask
+                // The event scope runs its handlers when it's disposed, so it has to close before the transaction
+                // is completed - nothing can touch the database once that's done.
+                await using (var eventScope = eventPublisher.GetOrCreateEventScope(processContext))
                 {
-                    CreatedOn = now,
-                    UpdatedOn = now,
-                    SupportTaskType = SupportTaskType.TrnRequest,
-                    OneLoginUserSubject = request.OneLoginUserSubject,
-                    TrnRequestApplicationUserId = request.ApplicationUserId,
-                    TrnRequestId = request.RequestId,
-                    SubjectName = subject.Name,
-                    SubjectEmailAddress = subject.EmailAddress,
-                    SourceApplicationUserId = request.ApplicationUserId,
-                    Data = new TrnRequestData()
-                };
+                    var oldTrnRequest = EventModels.TrnRequestMetadata.FromModel(request);
+                    request.ResolvedPersonId = null;
+                    request.Status = TrnRequestStatus.Pending;
 
-                dbContext.SupportTasks.Add(supportTask);
-                await dbContext.SaveChangesAsync();
+                    var changes = (oldTrnRequest.Status != request.Status ? TrnRequestUpdatedChanges.Status : 0) |
+                        (oldTrnRequest.ResolvedPersonId != request.ResolvedPersonId ? TrnRequestUpdatedChanges.ResolvedPersonId : 0);
 
-                await eventScope.PublishEventAsync(
-                    new SupportTaskCreatedEvent
+                    var subject = SupportTask.Subject.FromTrnRequest(request);
+                    supportTask = new SupportTask
                     {
-                        EventId = Guid.NewGuid(),
-                        SupportTask = EventModels.SupportTask.FromModel(supportTask)
-                    });
+                        CreatedOn = now,
+                        UpdatedOn = now,
+                        SupportTaskType = SupportTaskType.TrnRequest,
+                        OneLoginUserSubject = request.OneLoginUserSubject,
+                        TrnRequestApplicationUserId = request.ApplicationUserId,
+                        TrnRequestId = request.RequestId,
+                        SubjectName = subject.Name,
+                        SubjectEmailAddress = subject.EmailAddress,
+                        SourceApplicationUserId = request.ApplicationUserId,
+                        Data = new TrnRequestData()
+                    };
 
-                await eventScope.PublishEventAsync(
-                    new TrnRequestUpdatedEvent
-                    {
-                        EventId = Guid.NewGuid(),
-                        SourceApplicationUserId = sourceApplicationUserId,
-                        RequestId = trnRequestId,
-                        Changes = changes,
-                        TrnRequest = EventModels.TrnRequestMetadata.FromModel(request),
-                        OldTrnRequest = oldTrnRequest,
-                        ReasonDetails = reason
-                    });
+                    dbContext.SupportTasks.Add(supportTask);
+                    await dbContext.SaveChangesAsync();
+
+                    await eventScope.PublishEventAsync(
+                        new SupportTaskCreatedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            SupportTask = EventModels.SupportTask.FromModel(supportTask)
+                        });
+
+                    await eventScope.PublishEventAsync(
+                        new TrnRequestUpdatedEvent
+                        {
+                            EventId = Guid.NewGuid(),
+                            SourceApplicationUserId = sourceApplicationUserId,
+                            RequestId = trnRequestId,
+                            Changes = changes,
+                            TrnRequest = EventModels.TrnRequestMetadata.FromModel(request),
+                            OldTrnRequest = oldTrnRequest,
+                            ReasonDetails = reason
+                        });
+                }
 
                 transaction.Complete();
 

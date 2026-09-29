@@ -12,7 +12,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
         if (includeDeactivatedPersons)
         {
-            persons = persons.IgnoreQueryFilters();
+            persons = persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]);
         }
 
         return persons.SingleOrDefaultAsync(p => p.PersonId == personId);
@@ -70,7 +70,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
     public async Task UpdatePersonDetailsAsync(UpdatePersonDetailsOptions options, ProcessContext processContext)
     {
-        var person = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
+        var person = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
         if (person is null)
         {
@@ -139,7 +139,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
     public async Task DeactivatePersonAsync(DeactivatePersonOptions options, ProcessContext processContext)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.PersonId);
 
         if (deactivatingPerson is null)
         {
@@ -173,7 +173,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
     public async Task ReactivatePersonAsync(Guid personId, ProcessContext processContext)
     {
-        var reactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == personId);
+        var reactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == personId);
 
         if (reactivatingPerson is null)
         {
@@ -212,7 +212,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
     public async Task DeactivatePersonViaMergeAsync(DeactivatePersonViaMergeOptions options, ProcessContext processContext)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
 
         if (deactivatingPerson is null)
         {
@@ -226,7 +226,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
 
         if (retainedPerson is null)
         {
@@ -276,7 +276,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
 
     public async Task MergePersonsAsync(MergePersonsOptions options, ProcessContext processContext)
     {
-        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
+        var deactivatingPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.DeactivatingPersonId);
 
         if (deactivatingPerson is null)
         {
@@ -288,7 +288,7 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
         }
 
-        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
+        var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId);
 
         if (retainedPerson is null)
         {

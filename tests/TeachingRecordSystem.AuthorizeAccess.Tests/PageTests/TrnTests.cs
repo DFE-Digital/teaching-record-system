@@ -389,6 +389,47 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
     }
 
+    [Fact]
+    public async Task Post_UserConnectedInAnotherJourney_DoesNotRematchAndCompletesSignIn()
+    {
+        // Arrange
+        var clientApplicationUser = await TestData.CreateApplicationUserAsync();
+        var connectedPerson = await TestData.CreatePersonAsync();
+
+        await WithJourneyCoordinatorAsync(
+            (instanceId, processId) => CreateSignInJourneyState(instanceId, processId, "/", clientApplicationUser.UserId),
+            async coordinator =>
+            {
+                // The person the typed TRN would match, had this journey's state still been current
+                var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());
+                var oneLoginUser = await TestData.CreateOneLoginUserAsync(
+                    personId: null,
+                    verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth!.Value));
+
+                await SetupInstanceForVerifiedUserStateAsync(coordinator, oneLoginUser);
+
+                await SetOneLoginUserConnectedAsync(oneLoginUser.Subject, connectedPerson.PersonId);
+
+                var redirectUri = coordinator.State.RedirectUri;
+                var request = new HttpRequestMessage(HttpMethod.Post, JourneyUrls.Trn(coordinator.InstanceId))
+                {
+                    Content = new FormUrlEncodedContentBuilder { { "HaveTrn", bool.TrueString }, { "Trn", person.Trn } }
+                };
+
+                // Act
+                var response = await HttpClient.SendAsync(request);
+
+                // Assert
+                Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+                Assert.Equal(redirectUri, response.Headers.Location?.OriginalString);
+
+                Assert.NotNull(coordinator.State.AuthenticationTicket);
+
+                oneLoginUser = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
+                Assert.Equal(connectedPerson.PersonId, oneLoginUser.PersonId);
+            });
+    }
+
     private async Task SetupInstanceForVerifiedUserStateAsync(
         SignInJourneyCoordinator coordinator,
         OneLoginUser oneLoginUser,

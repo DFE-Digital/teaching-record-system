@@ -14,11 +14,11 @@ public class PersonInfoCache(IDbContextFactory<TrsDbContext> dbContextFactory, I
             await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
             return await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .Where(p => p.PersonId == personId)
-                .Select(p => new PersonInfo(p.PersonId, p.Trn, p.FirstName, p.LastName))
+                .Select(p => new PersonInfo(p.PersonId, p.Trn))
                 .SingleOrDefaultAsync();
         });
 }
 
-public record PersonInfo(Guid PersonId, string Trn, string FirstName, string LastName);
+public record PersonInfo(Guid PersonId, string Trn);

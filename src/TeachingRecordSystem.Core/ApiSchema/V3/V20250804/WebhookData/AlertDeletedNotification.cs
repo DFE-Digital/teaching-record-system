@@ -13,7 +13,7 @@ public record AlertDeletedNotification : IWebhookMessageData
 public class AlertDeletedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
     IEventMapper<Events.AlertDeletedEvent, AlertDeletedNotification>
 {
-    public async Task<AlertDeletedNotification?> MapEventAsync(Events.AlertDeletedEvent @event)
+    public async Task<AlertDeletedNotification?> MapEventAsync(Events.AlertDeletedEvent @event, EventMapperContext context)
     {
         if (@event.Alert.AlertTypeId is not Guid alertTypeId)
         {

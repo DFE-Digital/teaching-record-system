@@ -28,9 +28,9 @@
             @foreach (var (match, i) in Model.PotentialDuplicates!.Select((match, i) => (match, i)))
             {
                 <govuk-summary-card data-testid="person-@match.Identifier.ToString().ToLower()" class="trs-potential-duplicates__item">
-                    <title>
+                    <card-title>
                         TRN @match.Trn
-                    </title>
+                    </card-title>
                     <card-actions>
                         <action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
                             View record (opens in a new tab)
@@ -99,14 +99,14 @@
             @if (Model.CannotMergeReason is null)
             {
                 <govuk-radios for="PrimaryPersonId" data-testid="primary-person-options">
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                    <legend class="govuk-fieldset__legend--m">
                         Which is the primary record?
-                    </govuk-radios-fieldset-legend>
+                    </legend>
                     @foreach (var match in Model.PotentialDuplicates!)
                     {
-                        <govuk-radios-item value="@match.PersonId">
+                        <radios-item value="@match.PersonId">
                             TRN @match.Trn
-                        </govuk-radios-item>
+                        </radios-item>
                     }
                 </govuk-radios>
             }

@@ -80,13 +80,6 @@ public static class Extensions
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
-            .AddJwtBearer(AuthenticationSchemeNames.IdAccessToken, options =>
-            {
-                options.Authority = configuration["GetAnIdentity:BaseAddress"];
-                options.MapInboundClaims = false;
-                options.TokenValidationParameters.ValidateAudience = false;
-                options.TokenValidationParameters.RequireExpirationTime = false;
-            })
             .AddJwtBearer(AuthenticationSchemeNames.AuthorizeAccessAccessToken, options =>
             {
                 options.Authority = configuration.GetRequiredValue("AuthorizeAccessIssuer");
@@ -105,14 +98,12 @@ public static class Extensions
             options.AddPolicy(
                 AuthorizationPolicies.TeacherAuthAccessToken,
                 policy => policy
-                    .AddAuthenticationSchemes(AuthenticationSchemeNames.IdAccessToken, AuthenticationSchemeNames.AuthorizeAccessAccessToken)
+                    .AddAuthenticationSchemes(AuthenticationSchemeNames.AuthorizeAccessAccessToken)
                     .RequireAssertion(ctx =>
                     {
                         var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
                         var hasRequiredClaim = ctx.User.HasClaim(c => c.Type is "trn" or AuthorizeAccessClaimTypes.TrnRequestId);
-                        var isIdUser = scopes.Contains("dqt:read") && hasRequiredClaim;
-                        var isAuthorizeAccessUser = scopes.Contains("teaching_record") && hasRequiredClaim;
-                        return isIdUser || isAuthorizeAccessUser;
+                        return scopes.Contains("teaching_record") && hasRequiredClaim;
                     }));
         });
 

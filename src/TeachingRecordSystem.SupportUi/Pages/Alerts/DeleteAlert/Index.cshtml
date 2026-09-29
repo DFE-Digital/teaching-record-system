@@ -19,34 +19,34 @@
             <p class="govuk-body"><strong>Alert type:</strong> @Model.AlertTypeName</p>
 
             <govuk-radios for="DeleteReason">
-                <govuk-radios-item value="@DeleteAlertReasonOption.AddedInError">
+                <radios-item value="@DeleteAlertReasonOption.AddedInError">
                     @DeleteAlertReasonOption.AddedInError.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@DeleteAlertReasonOption.AnotherReason">
+                </radios-item>
+                <radios-item value="@DeleteAlertReasonOption.AnotherReason">
                     @DeleteAlertReasonOption.AnotherReason.GetDisplayName()
-                    <govuk-radios-item-conditional data-testid="delete-reason-detail">
+                    <conditional data-testid="delete-reason-detail">
                         <govuk-input data-testid="reason-detail" for="DeleteReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
-                            <govuk-input-label>Enter a reason</govuk-input-label>
+                            <label>Enter a reason</label>
                         </govuk-input>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
+                    </conditional>
+                </radios-item>
             </govuk-radios>
 
             <govuk-radios for="ProvideAdditionalInformation">
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend--m">
                     Do you want to provide more information?
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@true">
+                </legend>
+                <radios-item value="@true">
                     Yes
-                    <govuk-radios-item-conditional>
+                    <conditional>
                         <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            <label>Enter details</label>
                         </govuk-character-count>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@false">
+                    </conditional>
+                </radios-item>
+                <radios-item value="@false">
                     No
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

@@ -6,6 +6,14 @@
     {
       "library": "@govuk-one-login/service-header@6.0.0",
       "destination": "lib/govuk-one-login/service-header/"
+    },
+    {
+      "library": "accessible-autocomplete@3.0.2",
+      "destination": "wwwroot/lib/accessible-autocomplete/",
+      "files": [
+        "dist/accessible-autocomplete.min.css",
+        "dist/accessible-autocomplete.min.js"
+      ]
     }
   ]
 }

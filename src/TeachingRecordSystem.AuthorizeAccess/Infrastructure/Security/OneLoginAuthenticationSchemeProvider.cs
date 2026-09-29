@@ -156,7 +156,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
                     var instanceId = JourneyInstanceId.Parse(serializedInstanceId);
 
-                    var queryParams = context.HttpContext.Request.Query.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    var queryParams = context.HttpContext.Request.Query.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
                     queryParams[JourneyInstanceId.KeyRouteValueName] = instanceId.Key;
                     context.HttpContext.Request.Query = new QueryCollection(queryParams);
                 }

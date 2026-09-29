@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -33,7 +34,8 @@ public partial class Commands
             CreateDeleteCommand(),
             CreateGetCommand(),
             CreateListCommand(),
-            CreateUpdateCommand()
+            CreateUpdateCommand(),
+            CreatePingCommand()
         };
 
         static string ParseApiVersionArgument(ArgumentResult result)
@@ -373,6 +375,49 @@ public partial class Commands
 
                     var output = JsonSerializer.Serialize(printableEndpoint, jsonSerializerOptions);
                     Console.WriteLine(output);
+                });
+
+            return command;
+        }
+
+        Command CreatePingCommand()
+        {
+            var webhookEndpointIdOption = new Option<Guid>("--webhook-endpoint-id", "--id") { Required = true };
+            var connectionStringOption = new Option<string>("--connection-string") { Required = true };
+
+            var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
+            if (configuredConnectionString is not null)
+            {
+                connectionStringOption.DefaultValueFactory = _ => configuredConnectionString;
+            }
+
+            var command = new Command(
+                "ping",
+                "Queues a ping message to be sent to a webhook endpoint, allowing integrators to test their signature verification without triggering a 'real' event. The message is delivered by the webhook delivery background service.")
+            {
+                webhookEndpointIdOption,
+                connectionStringOption
+            };
+
+            command.SetAction(
+                async parseResult =>
+                {
+                    var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
+                    var connectionString = parseResult.GetRequiredValue(connectionStringOption);
+
+                    await using var services = new ServiceCollection()
+                        .AddTimeProvider()
+                        .AddDatabase(connectionString)
+                        .AddMemoryCache()
+                        .AddWebhookMessageFactory()
+                        .BuildServiceProvider();
+
+                    using var scope = services.CreateScope();
+                    var webhookMessageFactory = scope.ServiceProvider.GetRequiredService<WebhookMessageFactory>();
+
+                    var message = await webhookMessageFactory.CreatePingMessageAsync(webhookEndpointId);
+
+                    Console.WriteLine($"Ping message '{message.WebhookMessageId}' was queued for delivery to endpoint '{webhookEndpointId}'.");
                 });
 
             return command;

@@ -26,7 +26,7 @@ public class GetPersonTests : TestBase
     public async Task Get_PersonForTrnDoesNotExist_ReturnsForbidden()
     {
         // Arrange
-        var httpClient = GetHttpClientWithIdentityAccessToken("1234567");
+        var httpClient = GetHttpClientWithAuthorizeAccessToken("1234567", Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
 
         // Act
@@ -44,7 +44,7 @@ public class GetPersonTests : TestBase
             .WithNationalInsuranceNumber()
             .WithEmailAddress(Faker.Internet.Email()));
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
 
         // Act
@@ -81,7 +81,7 @@ public class GetPersonTests : TestBase
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)));
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");
 
         // Act
@@ -110,7 +110,7 @@ public class GetPersonTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");
 
         // Act
@@ -138,7 +138,7 @@ public class GetPersonTests : TestBase
 
         var validMq = person.Qualifications!.OfType<MandatoryQualification>().Last();
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=MandatoryQualifications");
 
         // Act
@@ -172,7 +172,7 @@ public class GetPersonTests : TestBase
 
         var alert = person.Alerts!.Single();
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Sanctions");
 
         // Act
@@ -206,7 +206,7 @@ public class GetPersonTests : TestBase
 
         var alert = person.Alerts!.Single();
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Alerts");
 
         // Act
@@ -241,7 +241,7 @@ public class GetPersonTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithPreviousNames((firstName, middleName, lastName, new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc))));
 
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=PreviousNames");
 
         // Act

@@ -5,6 +5,10 @@
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 
+## 20260915
+
+- A `ping` webhook message has been added to aid in testing webhook message verification.
+
 ## 20260612
 
 - A webhook message has been added that fires when a person has been deactivated - `person.completed`.

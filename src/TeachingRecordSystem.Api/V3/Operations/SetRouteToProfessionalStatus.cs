@@ -33,6 +33,7 @@ public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
     ReferenceDataCache referenceDataCache,
+    TimeProvider timeProvider,
     RoutesToProfessionalStatusService routesToProfessionalStatusService) :
     ICommandHandler<SetRouteToProfessionalStatusCommand, SetRouteToProfessionalStatusResult>
 {
@@ -193,7 +194,6 @@ public class SetRouteToProfessionalStatusHandler(
                 new UpdateRouteToProfessionalStatusOptions
                 {
                     QualificationId = route.QualificationId,
-                    UpdatedBy = currentUserId,
                     RouteToProfessionalStatusTypeId = Option.Some(command.RouteToProfessionalStatusTypeId),
                     Status = Option.Some(command.Status),
                     HoldsFrom = Option.Some(command.HoldsFrom),
@@ -206,7 +206,8 @@ public class SetRouteToProfessionalStatusHandler(
                     TrainingProviderId = Option.Some(trainingProviderId),
                     DegreeTypeId = Option.Some(degreeTypeId),
                     ExemptFromInduction = Option.Some(command.IsExemptFromInduction)
-                });
+                },
+                new ProcessContext(ProcessType.RouteToProfessionalStatusUpdating, timeProvider.UtcNow, currentUserId));
         }
         else
         {
@@ -216,7 +217,6 @@ public class SetRouteToProfessionalStatusHandler(
                     PersonId = person.PersonId,
                     RouteToProfessionalStatusTypeId = command.RouteToProfessionalStatusTypeId,
                     Status = command.Status,
-                    CreatedBy = currentUserId,
                     SourceApplicationUserId = currentUserId,
                     SourceApplicationReference = command.SourceApplicationReference,
                     HoldsFrom = command.HoldsFrom,
@@ -230,7 +230,8 @@ public class SetRouteToProfessionalStatusHandler(
                     TrainingProviderId = trainingProviderId,
                     DegreeTypeId = degreeTypeId,
                     IsExemptFromInduction = command.IsExemptFromInduction
-                });
+                },
+                new ProcessContext(ProcessType.RouteToProfessionalStatusCreating, timeProvider.UtcNow, currentUserId));
         }
 
         return new SetRouteToProfessionalStatusResult();

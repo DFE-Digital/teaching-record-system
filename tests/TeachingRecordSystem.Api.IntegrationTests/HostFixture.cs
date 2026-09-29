@@ -36,8 +36,6 @@ public class HostFixture : IAsyncLifetime
 
     public static Guid DefaultApplicationUserId { get; } = new("c0c8c511-e8e4-4b8e-96e3-55085dafc05d");
 
-    public static Guid GetAnIdentityApplicationUserId { get; } = new("873f0cb0-7174-4256-921a-e8a8aaa06361");
-
     public SigningCredentials JwtSigningCredentials { get; }
 
     // Resolves through the running test's scope when there is one, so scoped services aren't cached in the
@@ -60,13 +58,6 @@ public class HostFixture : IAsyncLifetime
             UserId = DefaultApplicationUserId,
             Name = "Tests",
             ApiRoles = ApiRoles.All.ToArray()
-        });
-
-        AddOrUpdateUser(new Core.DataStore.Postgres.Models.ApplicationUser
-        {
-            UserId = GetAnIdentityApplicationUserId,
-            Name = "Get an identity",
-            ApiRoles = [ApiRoles.UpdatePerson]
         });
 
         dbContext.SaveChanges();
@@ -107,11 +98,7 @@ public class HostFixture : IAsyncLifetime
 
             // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
             // i.e. Program.cs and that has a dependency on IConfiguration
-            var configuration = TestConfiguration.GetConfiguration()
-                .AddInMemoryCollection([
-                    KeyValuePair.Create("GetAnIdentityApplicationUserId", (string?)GetAnIdentityApplicationUserId.ToString())
-                ])
-                .Build();
+            var configuration = TestConfiguration.GetConfiguration();
             builder.UseConfiguration(configuration);
 
             builder.ConfigureServices((context, services) =>
@@ -120,11 +107,9 @@ public class HostFixture : IAsyncLifetime
                 services.Configure<AuthenticationOptions>(options =>
                 {
                     options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestApiKeyAuthenticationHandler);
-                    options.SchemeMap["IdAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                     options.SchemeMap["AuthorizeAccessAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                 });
 
-                services.Configure<SimpleJwtBearerAuthenticationOptions>("IdAccessToken", o => o.IssuerSigningKey = hostFixture.JwtSigningCredentials.Key);
                 services.Configure<SimpleJwtBearerAuthenticationOptions>("AuthorizeAccessAccessToken", o => o.IssuerSigningKey = hostFixture.JwtSigningCredentials.Key);
 
                 // Add controllers defined in this test assembly

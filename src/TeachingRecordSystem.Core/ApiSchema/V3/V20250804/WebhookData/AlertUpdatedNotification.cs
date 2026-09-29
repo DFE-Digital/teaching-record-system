@@ -13,7 +13,7 @@ public record AlertUpdatedNotification : IWebhookMessageData
 public class AlertUpdatedNotificationMapper(PersonInfoCache personInfoCache, ReferenceDataCache referenceDataCache) :
     IEventMapper<Events.AlertUpdatedEvent, AlertUpdatedNotification>
 {
-    public async Task<AlertUpdatedNotification?> MapEventAsync(Events.AlertUpdatedEvent @event)
+    public async Task<AlertUpdatedNotification?> MapEventAsync(Events.AlertUpdatedEvent @event, EventMapperContext context)
     {
         if ((@event.Changes & (Events.AlertUpdatedEventChanges.DqtSpent | Events.AlertUpdatedEventChanges.DqtSanctionCode)) != 0)
         {

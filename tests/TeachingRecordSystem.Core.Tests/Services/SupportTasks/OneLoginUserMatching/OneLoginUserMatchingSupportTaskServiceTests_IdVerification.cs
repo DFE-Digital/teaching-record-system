@@ -20,6 +20,9 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         var trnTokenTrn = "0000000";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "evidence.jpg";
+        var trainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var subject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).First();
+        var yearQtsReceived = TimeProvider.UtcNow.Year.ToString();
 
         var options = new CreateOneLoginUserIdVerificationSupportTaskOptions
         {
@@ -33,7 +36,12 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
             StatedLastName = statedLastName,
             StatedDateOfBirth = statedDateOfBirth,
             EvidenceFileId = evidenceFileId,
-            EvidenceFileName = evidenceFileName
+            EvidenceFileName = evidenceFileName,
+            YearQtsReceived = yearQtsReceived,
+            TrainingProviderId = trainingProvider.TrainingProviderId,
+            TrainingProviderName = trainingProvider.Name,
+            SubjectId = subject.TrainingSubjectId,
+            SubjectName = subject.Name
         };
 
         var processContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -59,6 +67,11 @@ public partial class OneLoginUserMatchingSupportTaskServiceTests(ServiceFixture 
         Assert.Equal(trnTokenTrn, data.TrnTokenTrn);
         Assert.Equal(evidenceFileId, data.EvidenceFileId);
         Assert.Equal(evidenceFileName, data.EvidenceFileName);
+        Assert.Equal(yearQtsReceived, data.YearQtsReceived);
+        Assert.Equal(trainingProvider.TrainingProviderId, data.TrainingProviderId);
+        Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
+        Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
+        Assert.Equal(subject.Name, data.SubjectName);
 
         Events.AssertEventsPublished(e => Assert.IsType<SupportTaskCreatedEvent>(e));
     }

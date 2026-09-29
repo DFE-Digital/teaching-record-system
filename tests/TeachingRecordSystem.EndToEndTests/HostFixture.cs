@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,7 @@ using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.EndToEndTests;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.EndToEndTests.Infrastructure.Webhooks;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -54,7 +56,7 @@ public sealed class HostFixture : IAsyncLifetime
     {
         _apiWebApplicationFactory = new(this);
         _authorizeAccessWebApplicationFactory = new(this);
-        _supportUiWebApplicationFactory = new();
+        _supportUiWebApplicationFactory = new(this);
 
         _webhookReceiver = new();
 
@@ -84,6 +86,7 @@ public sealed class HostFixture : IAsyncLifetime
     public TimeProvider TimeProvider { get; }
     public TestData TestData { get; private set; } = null!;
     public WebhookMessageRecorder WebhookMessageRecorder { get; }
+    public Guid WebhookEndpointId { get; private set; }
 
     public async ValueTask InitializeAsync()
     {
@@ -95,9 +98,12 @@ public sealed class HostFixture : IAsyncLifetime
         DbContextFactory = PooledTestDatabaseExtensions.CreateDbContextFactory(_databaseLease);
         TestData = new(DbContextFactory, new ReferenceDataCache(DbContextFactory), TimeProvider);
 
+        await AddTestAppToApplicationUsers();
+        await AddWebhookReceiverEndpoint();
+
         _apiWebApplicationFactory.StartServer();
         _authorizeAccessWebApplicationFactory.StartServer();
-        //_supportUiWebApplicationFactory.StartServer();
+        _supportUiWebApplicationFactory.StartServer();
 
         _playwright = await Playwright.CreateAsync();
 
@@ -115,13 +121,13 @@ public sealed class HostFixture : IAsyncLifetime
 
         var browserType = OperatingSystem.IsMacOS() ? _playwright.Webkit : _playwright.Chromium;
         _browser = await browserType.LaunchAsync(browserOptions);
-
-        await AddTestAppToApplicationUsers();
-        await AddWebhookReceiverEndpoint();
     }
 
     public async ValueTask DisposeAsync()
     {
+        await _browser.DisposeAsync();
+        _playwright.Dispose();
+
         await _apiWebApplicationFactory.DisposeAsync();
         await _authorizeAccessWebApplicationFactory.DisposeAsync();
         await _supportUiWebApplicationFactory.DisposeAsync();
@@ -136,10 +142,21 @@ public sealed class HostFixture : IAsyncLifetime
         await TestDatabases.DisposeAsync();
     }
 
-    public Task<IBrowserContext> CreateBrowserContext() =>
+    public Task<IBrowserContext> CreateBrowserContext(bool javascriptEnabled = true) =>
         _browser.NewContextAsync(new()
         {
+            JavaScriptEnabled = javascriptEnabled,
             ViewportSize = ViewportSize.NoViewport
+        });
+
+    public Task<IBrowserContext> CreateSupportUiBrowserContext() =>
+        _browser.NewContextAsync(new()
+        {
+            BaseURL = SupportUiBaseUrl,
+            // Pinned rather than left to the window size of whichever machine is running the tests.
+            // The pages aren't all width independent - the sortable column headers overlap each other
+            // below about 1000px, so a click on one lands on its neighbour.
+            ViewportSize = new ViewportSize { Width = 1280, Height = 800 }
         });
 
     public HttpClient GetHttpClientWithAuthorizeAccessTokenForTrnRequest(
@@ -219,9 +236,11 @@ public sealed class HostFixture : IAsyncLifetime
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
+        WebhookEndpointId = Guid.NewGuid();
+
         dbContext.WebhookEndpoints.Add(new Core.DataStore.Postgres.Models.WebhookEndpoint
         {
-            WebhookEndpointId = Guid.NewGuid(),
+            WebhookEndpointId = WebhookEndpointId,
             ApplicationUserId = DeferredRecordMatchingPolicyApplicationUserId,
             Address = _webhookReceiver.FullyQualifiedEndpoint,
             ApiVersion = VersionRegistry.V3MinorVersions.V20260416,
@@ -256,6 +275,10 @@ public sealed class HostFixture : IAsyncLifetime
         });
 
         WebhookSender.Register(services);
+
+        // Register WebhookDeliveryService as a plain singleton (not as an IHostedService) so tests can resolve
+        // it and invoke SendMessagesAsync() directly on demand, rather than waiting for its background timer.
+        services.AddSingleton<WebhookDeliveryService>();
 
         // Replace CreateWebhookMessages with SendWebhookMessagesEventHandler;
         // we want to dispatch webhook messages immediately instead of queueing them
@@ -292,11 +315,9 @@ public sealed class HostFixture : IAsyncLifetime
                 services.Configure<AuthenticationOptions>(options =>
                 {
                     //options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestApiKeyAuthenticationHandler);
-                    options.SchemeMap["IdAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                     options.SchemeMap["AuthorizeAccessAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
                 });
 
-                services.Configure<SimpleJwtBearerAuthenticationOptions>("IdAccessToken", o => o.IssuerSigningKey = _hostFixture.JwtSigningCredentials.Key);
                 services.Configure<SimpleJwtBearerAuthenticationOptions>("AuthorizeAccessAccessToken", o => o.IssuerSigningKey = _hostFixture.JwtSigningCredentials.Key);
 
                 _hostFixture.ConfigureServices(services);
@@ -418,14 +439,86 @@ public sealed class HostFixture : IAsyncLifetime
 
     private class SupportUiWebApplicationFactory : WebApplicationFactory<SupportUi.Program>
     {
-        public SupportUiWebApplicationFactory()
+        private readonly HostFixture _hostFixture;
+
+        public SupportUiWebApplicationFactory(HostFixture hostFixture)
         {
+            _hostFixture = hostFixture;
+
             UseKestrel(SupportUiPort);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("EndToEndTests");
 
+            builder.UseStaticWebAssets();
+
+            var configuration = TestConfiguration.GetConfiguration();
+            configuration.AddInMemoryCollection([
+                KeyValuePair.Create(
+                    $"ConnectionStrings:{TrsDbContext.ConnectionName}",
+                    (string?)_hostFixture._databaseLease!.ConnectionString)
+            ]);
+            builder.UseConfiguration(configuration);
+
+            builder.ConfigureServices(services =>
+            {
+                services.Configure<GovUkFrontendOptions>(options => options.DefaultFileUploadJavaScriptEnhancements = false);
+
+                services.AddAuthentication()
+                    .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
+
+                services
+                    .AddSingleton<CurrentUserProvider>()
+                    .AddStartupTask<TestUsers.CreateUsersStartupTask>()
+                    .AddSingleton<TestData>()
+                    .AddSingleton(GetMockFileService())
+                    .AddSingleton(GetMockSafeFileService())
+                    .AddSingleton(GetMockAdUserService())
+                    .AddStartupTask<SeedLookupData>()
+                    .AddSingleton<IBackgroundJobScheduler, ExecuteOnCommitBackgroundJobScheduler>();
+
+                IFileService GetMockFileService()
+                {
+                    var fileService = new Mock<IFileService>();
+                    fileService
+                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+                        .ReturnsAsync(Guid.NewGuid());
+                    fileService
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+                    return fileService.Object;
+                }
+
+                ISafeFileService GetMockSafeFileService()
+                {
+                    var safeFileService = new Mock<ISafeFileService>();
+                    safeFileService
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+
+                    return safeFileService.Object;
+                }
+
+                IAadUserService GetMockAdUserService()
+                {
+                    var userService = new Mock<IAadUserService>();
+                    userService
+                        .Setup(s => s.GetUserByEmailAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.Email))
+                        .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
+                    userService
+                        .Setup(s => s.GetUserByEmailAsync(TestUsers.TestAzureActiveDirectoryUser.Email))
+                        .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
+                    userService
+                        .Setup(s => s.GetUserByIdAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.UserId))
+                        .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
+                    userService
+                        .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId))
+                        .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
+                    return userService.Object;
+                }
+            });
         }
     }
 }

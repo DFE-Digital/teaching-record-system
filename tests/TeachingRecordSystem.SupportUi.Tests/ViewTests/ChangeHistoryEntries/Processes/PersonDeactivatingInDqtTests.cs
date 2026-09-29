@@ -24,10 +24,15 @@ public class PersonDeactivatingInDqtTests(HostFixture hostFixture) : ChangeHisto
             });
 
         // Act
-        var entry = await GetEntryHtmlAsync(process.ProcessId);
+        var entry = await GetEntryHtmlAsync(process.ProcessId, person.PersonId);
 
         // Assert
-        AssertTitle(entry, "Record deactivated");
+        AssertTitle(entry, "Record deactivated in DQT");
+
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Record deactivated for", bodyText);
+        Assert.Contains($"{person.FirstName} {person.LastName}", bodyText);
+
         Assert.Empty(entry.QuerySelectorAll(".govuk-summary-list"));
     }
 }

@@ -33,7 +33,6 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
             return BadRequest();
         }
 
-        var changeHistoryContext = ChangeHistoryContext.ForOneLoginUser(OneLoginUserSubject);
         var items = await changeHistoryService.GetChangeHistoryByOneLoginUserAsync(
             OneLoginUserSubject,
             new PaginationOptions(PageNumber, PageSize));
@@ -41,7 +40,7 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
         ChangeHistory = items
             .Select(e => new ChangeHistoryEntryViewModel
             {
-                Context = changeHistoryContext,
+                Context = e.Context,
                 Timestamp = e.Process.CreatedOn,
                 UserName = e.RaisedByUser.Name,
                 ProcessId = e.Process.ProcessId,

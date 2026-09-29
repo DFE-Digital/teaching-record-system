@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema;
 using TeachingRecordSystem.Core.ApiSchema.V3;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20260915.WebhookData;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Infrastructure.Json;
@@ -73,33 +74,40 @@ public class WebhookMessageFactory(
                 continue;
             }
 
-            var payload = await MapEventAsync(mapperType, dataType!);
-            if (payload is null)
+            var mapper = CreateMapper(mapperType, dataType!);
+
+            foreach (var applicationUserEndpoints in endpointCloudEventTypeVersions[(version, cloudEventType)].GroupBy(e => e.ApplicationUserId))
             {
-                continue;
-            }
+                var context = new EventMapperContext { ApplicationUserId = applicationUserEndpoints.Key };
 
-            var serializedPayload = JsonSerializer.SerializeToElement(payload, _serializerOptions);
-
-            messages.AddRange(endpointCloudEventTypeVersions[(version, cloudEventType)].Select(ep =>
-            {
-                var id = Guid.NewGuid();
-
-                return new WebhookMessage
+                var payload = await mapper.MapEventAsync(@event, context);
+                if (payload is null)
                 {
-                    WebhookMessageId = id,
-                    WebhookEndpointId = ep.WebhookEndpointId,
-                    CloudEventId = id.ToString(),
-                    CloudEventType = cloudEventType,
-                    Timestamp = timeProvider.UtcNow,
-                    ApiVersion = version,
-                    Data = serializedPayload,
-                    NextDeliveryAttempt = timeProvider.UtcNow,
-                    Delivered = null,
-                    DeliveryAttempts = [],
-                    DeliveryErrors = []
-                };
-            }));
+                    continue;
+                }
+
+                var serializedPayload = JsonSerializer.SerializeToElement(payload, _serializerOptions);
+
+                messages.AddRange(applicationUserEndpoints.Select(ep =>
+                {
+                    var id = Guid.NewGuid();
+
+                    return new WebhookMessage
+                    {
+                        WebhookMessageId = id,
+                        WebhookEndpointId = ep.WebhookEndpointId,
+                        CloudEventId = id.ToString(),
+                        CloudEventType = cloudEventType,
+                        Timestamp = timeProvider.UtcNow,
+                        ApiVersion = version,
+                        Data = serializedPayload,
+                        NextDeliveryAttempt = timeProvider.UtcNow,
+                        Delivered = null,
+                        DeliveryAttempts = [],
+                        DeliveryErrors = []
+                    };
+                }));
+            }
         }
 
         dbContext.WebhookMessages.AddRange(messages);
@@ -113,31 +121,63 @@ public class WebhookMessageFactory(
 
         return messages;
 
-        Task<object?> MapEventAsync(Type mapperType, Type dataType)
+        IEventMapper CreateMapper(Type mapperType, Type dataType)
         {
             var mapper = ActivatorUtilities.CreateInstance(serviceProvider, mapperType);
 
             var eventType = @event.GetType();
 
-            var wrappedMapper = (IEventMapper)ActivatorUtilities.CreateInstance(
+            return (IEventMapper)ActivatorUtilities.CreateInstance(
                 serviceProvider,
                 typeof(WrappedMapper<,>).MakeGenericType(eventType, dataType),
                 mapper);
-
-            return wrappedMapper.MapEventAsync(@event);
         }
+    }
+
+    public async Task<WebhookMessage> CreatePingMessageAsync(Guid webhookEndpointId)
+    {
+        var endpoint = await dbContext.WebhookEndpoints
+            .SingleAsync(e => e.WebhookEndpointId == webhookEndpointId);
+
+        var data = new PingNotification { PingId = Guid.NewGuid() };
+        var serializedPayload = JsonSerializer.SerializeToElement(data, _serializerOptions);
+
+        var id = Guid.NewGuid();
+
+        var message = new WebhookMessage
+        {
+            WebhookMessageId = id,
+            WebhookEndpointId = endpoint.WebhookEndpointId,
+            CloudEventId = id.ToString(),
+            CloudEventType = PingNotification.CloudEventType,
+            Timestamp = timeProvider.UtcNow,
+            ApiVersion = endpoint.ApiVersion,
+            Data = serializedPayload,
+            NextDeliveryAttempt = timeProvider.UtcNow,
+            Delivered = null,
+            DeliveryAttempts = [],
+            DeliveryErrors = []
+        };
+
+        dbContext.WebhookMessages.Add(message);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.Entry(message).State = EntityState.Detached;
+        message.WebhookEndpoint = endpoint;
+
+        return message;
     }
 
     private interface IEventMapper
     {
-        Task<object?> MapEventAsync(IEvent @event);
+        Task<object?> MapEventAsync(IEvent @event, EventMapperContext context);
     }
 
     private class WrappedMapper<TEvent, TData>(IEventMapper<TEvent, TData> innerMapper) : IEventMapper
         where TEvent : IEvent
         where TData : IWebhookMessageData
     {
-        public async Task<object?> MapEventAsync(IEvent @event) =>
-            await innerMapper.MapEventAsync((TEvent)@event);
+        public async Task<object?> MapEventAsync(IEvent @event, EventMapperContext context) =>
+            await innerMapper.MapEventAsync((TEvent)@event, context);
     }
 }

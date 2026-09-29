@@ -28,6 +28,11 @@ public partial class TestData
         private Option<string> _evidenceFileName;
         private Option<string?> _trnTokenTrn;
         private Option<Guid> _clientApplicationUserId;
+        private Option<string?> _yearQtsReceived;
+        private Option<Guid?> _trainingProviderId;
+        private Option<string?> _trainingProviderName;
+        private Option<Guid?> _subjectId;
+        private Option<string?> _subjectName;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private Option<string> _trnRequestId;
@@ -93,6 +98,36 @@ public partial class TestData
             return this;
         }
 
+        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithYearQtsReceived(string? yearQtsReceived)
+        {
+            _yearQtsReceived = Option.Some(yearQtsReceived);
+            return this;
+        }
+
+        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithTrainingProviderId(Guid? trainingProviderId)
+        {
+            _trainingProviderId = Option.Some(trainingProviderId);
+            return this;
+        }
+
+        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithTrainingProviderName(string? trainingProviderName)
+        {
+            _trainingProviderName = Option.Some(trainingProviderName);
+            return this;
+        }
+
+        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithSubjectId(Guid? subjectId)
+        {
+            _subjectId = Option.Some(subjectId);
+            return this;
+        }
+
+        public CreateOneLoginUserIdVerificationSupportTaskBuilder WithSubjectName(string? subjectName)
+        {
+            _subjectName = Option.Some(subjectName);
+            return this;
+        }
+
         public CreateOneLoginUserIdVerificationSupportTaskBuilder WithStatus(SupportTaskStatus status)
         {
             _status = Option.Some(status);
@@ -130,6 +165,11 @@ public partial class TestData
                 var evidenceFileId = _evidenceFileId.ValueOr(Guid.NewGuid());
                 var evidenceFileName = _evidenceFileName.ValueOr("evidence.pdf");
                 var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
+                var yearQtsReceived = _yearQtsReceived.ValueOrDefault();
+                var trainingProviderId = _trainingProviderId.ValueOrDefault();
+                var trainingProviderName = _trainingProviderName.ValueOrDefault();
+                var subjectId = _subjectId.ValueOrDefault();
+                var subjectName = _subjectName.ValueOrDefault();
                 var status = _status.ValueOr(SupportTaskStatus.Open);
                 var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
                 var zendeskTickets = _zendeskTickets.ValueOr([]);
@@ -217,7 +257,12 @@ public partial class TestData
                         EvidenceFileId = evidenceFileId,
                         EvidenceFileName = evidenceFileName,
                         TrnTokenTrn = trnTokenTrn,
-                        ClientApplicationUserId = clientApplicationUserId
+                        ClientApplicationUserId = clientApplicationUserId,
+                        YearQtsReceived = yearQtsReceived,
+                        TrainingProviderId = trainingProviderId,
+                        TrainingProviderName = trainingProviderName,
+                        SubjectId = subjectId,
+                        SubjectName = subjectName
                     },
                     OneLoginUserSubject = oneLoginUserSubject,
                     SubjectName = subject.Name,

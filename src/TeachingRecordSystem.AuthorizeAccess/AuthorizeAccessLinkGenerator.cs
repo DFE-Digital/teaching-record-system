@@ -22,6 +22,12 @@ public abstract class AuthorizeAccessLinkGenerator
     public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/CheckAnswers", journeyInstanceId: journeyInstanceId);
 
+    public string QtsStatus(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/QtsStatus", journeyInstanceId: journeyInstanceId);
+
+    public string QtsDetails(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/QtsDetails", journeyInstanceId: journeyInstanceId);
+
     public string SupportRequestSubmitted(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportRequestSubmitted", journeyInstanceId: journeyInstanceId);
 

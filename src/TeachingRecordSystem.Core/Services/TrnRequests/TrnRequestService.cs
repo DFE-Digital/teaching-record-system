@@ -24,7 +24,7 @@ public class TrnRequestService(
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor,
     IOptions<TrnRequestOptions> trnRequestOptionsAccessor)
 {
-    /// The set of SupportTaskTypes that can resolve the attached TRN request
+    // The set of SupportTaskTypes that can resolve the attached TRN request
     private static readonly HashSet<SupportTaskType> _trnRequestResolvingSupportTaskTypes =
     [
         SupportTaskType.TrnRequest,
@@ -341,8 +341,8 @@ public class TrnRequestService(
             });
     }
 
-    /// Resolves the request to the record in <paramref name="options"/> (or a new one) and closes its support task,
-    /// returning the ID of the record it resolved to.
+    // Resolves the request to the record in <paramref name="options"/> (or a new one) and closes its support task,
+    // returning the ID of the record it resolved to.
     public async Task<Guid> ResolveTrnRequestAsync(ResolveTrnRequestOptions options, ProcessContext processContext)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
@@ -421,8 +421,8 @@ public class TrnRequestService(
             Gender = trnRequest.Gender
         };
 
-    /// The attributes the record ends up with: only a TrnRequest source changes a value, so anything else
-    /// keeps the existing one.
+    // The attributes the record ends up with: only a TrnRequest source changes a value, so anything else
+    // keeps the existing one.
     private static TrnRequestDataPersonAttributes GetResolvedAttributes(
         PersonAttributeSources sources,
         TrnRequestDataPersonAttributes existingAttributes,
@@ -684,7 +684,8 @@ public class TrnRequestService(
     {
         request.PotentialDuplicate = false;
 
-        // If a One Login ID is provided then ignore other matching rules and match only on that if it's associated with a teaching record
+        // If a One Login ID is provided and we already know about *and* it's matched to a Person,
+        // then that matched Person is the result.
         if (!string.IsNullOrEmpty(request.OneLoginUserSubject))
         {
             var oneLoginUser = await dbContext.OneLoginUsers
@@ -942,6 +943,7 @@ public class TrnRequestService(
         return new TrnRequestInfo(trnRequest, trn);
     }
 
+    [UsedImplicitly]
     private record TrnRequestMatchQueryResult(
         Guid PersonId,
         string Trn,

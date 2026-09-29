@@ -448,6 +448,74 @@ public partial class OneLoginServiceTests
         Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.LastName);
     }
 
+    [Theory]
+    [InlineData("À", "A")]
+    [InlineData("Á", "A")]
+    [InlineData("Â", "A")]
+    [InlineData("Ã", "A")]
+    [InlineData("Ä", "A")]
+    [InlineData("Å", "A")]
+    [InlineData("Æ", "AE")]
+    public async Task GetSuggestedPersonMatchesAsync_UsesUnaccentedNames(string searchFirstName, string personFirstName)
+    {
+        // Arrange
+        var lastName = "Testson";
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithFirstName(personFirstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+
+        string[][] names = [[searchFirstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetSuggestedPersonMatchesAsync(new(names, datesOfBirth, EmailAddress: null, NationalInsuranceNumber: null, Trn: null, TrnTokenTrnHint: null)));
+
+        // Assert
+        Assert.Collection(
+            result,
+            r =>
+            {
+                Assert.Equal(person.PersonId, r.PersonId);
+                Assert.Contains(r.MatchedAttributes, kvp => kvp.Key == PersonMatchedAttribute.FirstName && kvp.Value == personFirstName);
+                Assert.Contains(r.MatchedAttributes, kvp => kvp.Key == PersonMatchedAttribute.LastName && kvp.Value == lastName);
+            });
+    }
+
+    [Theory]
+    [InlineData("À", "A")]
+    [InlineData("Á", "A")]
+    [InlineData("Â", "A")]
+    [InlineData("Ã", "A")]
+    [InlineData("Ä", "A")]
+    [InlineData("Å", "A")]
+    [InlineData("Æ", "AE")]
+    public async Task GetMatchedAttributesAsync_UsesUnaccentedNames(string searchFirstName, string personFirstName)
+    {
+        // Arrange
+        var lastName = "Testson";
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+        var person = await TestData.CreatePersonAsync(p => p.WithFirstName(personFirstName).WithLastName(lastName));
+
+        string[][] names = [[searchFirstName, lastName]];
+        DateOnly[] datesOfBirth = [dateOfBirth];
+
+        // Act
+        var result = await WithServiceAsync(
+            s => s.GetMatchedAttributesAsync(new GetMatchedAttributesOptions
+            {
+                PersonId = person.PersonId,
+                Names = names,
+                DatesOfBirth = datesOfBirth,
+                EmailAddress = null
+            }));
+
+        // Assert
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.FirstName && kvp.Value == personFirstName);
+        Assert.Contains(result, kvp => kvp.Key == PersonMatchedAttribute.LastName && kvp.Value == lastName);
+    }
+
     private static readonly PersonMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
     [
         PersonMatchedAttribute.FirstName,

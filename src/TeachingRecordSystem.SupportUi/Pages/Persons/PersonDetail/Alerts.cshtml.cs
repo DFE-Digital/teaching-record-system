@@ -30,7 +30,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
             .ToArrayAsync();
 
         var personIsActive = await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => p.PersonId == PersonId)
             .Select(p => p.Status == PersonStatus.Active)
             .SingleAsync();

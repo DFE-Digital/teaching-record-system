@@ -1,11 +1,11 @@
 @using TeachingRecordSystem.Core.Events.ChangeReasons
-@inject PersonInfoCache PersonInfoCache
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model ChangeHistoryEntryViewModel
 @{
     var updatedEvent = Model.GetEvent<OneLoginUserUpdatedEvent>();
     var oneLoginUser = updatedEvent.OneLoginUser;
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
-    var personInfo = oneLoginUser.PersonId is not null ? await PersonInfoCache.GetPersonInfoAsync(oneLoginUser.PersonId.Value) : null;
+    var personInfo = oneLoginUser.PersonId is Guid personId ? Model.Context.GetPersonInfo(personId) : null;
     var personLinkText = personInfo is not null ? $"{personInfo.FirstName} {personInfo.LastName}" : "record";
 }
 
@@ -29,8 +29,8 @@
     @if (changeReason is not null)
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Reason for change</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
                         <key>Reason details</key>
@@ -46,7 +46,7 @@
                         </value>
                     </row>
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
 </timeline-entry>

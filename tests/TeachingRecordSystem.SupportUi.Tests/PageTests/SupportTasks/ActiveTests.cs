@@ -1100,7 +1100,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
     private static IElement[] GetResultRows(IHtmlDocument document) =>
         document
             .GetElementByTestId("results")?
-            .GetElementsByClassName("govuk-table__row")
+            .QuerySelectorAll("tbody > tr")
             .ToArray() ?? [];
 
     private static string[] GetResultTaskReferences(IHtmlDocument document) =>

@@ -1,4 +1,3 @@
-using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
@@ -129,9 +128,7 @@ public class SetCpdInductionStatusTests : TestBase
                 startDate,
                 completedDate: null,
                 cpdModifiedOn: TimeProvider.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: TimeProvider.UtcNow,
-                out _);
+                now: TimeProvider.UtcNow);
 
             await dbContext.SaveChangesAsync();
         });

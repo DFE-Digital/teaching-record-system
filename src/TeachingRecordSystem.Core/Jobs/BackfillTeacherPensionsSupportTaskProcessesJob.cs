@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using LegacySupportTaskCreatedEvent = TeachingRecordSystem.Core.Events.Legacy.SupportTaskCreatedEvent;
 using Process = TeachingRecordSystem.Core.DataStore.Postgres.Models.Process;
 
@@ -16,6 +17,12 @@ namespace TeachingRecordSystem.Core.Jobs;
 /// back-filled event is attached to that same process. Every task is expected to have one; the job throws if
 /// no matching process is found.
 /// </summary>
+/// <remarks>
+/// The import built the legacy event from a <see cref="SupportTask"/> it hadn't saved yet, so once references
+/// moved onto a database sequence (#2861, January 2026) the payload's <c>SupportTaskReference</c> was null.
+/// The task is recovered from the person the event names and the reference stamped onto the back-filled event,
+/// which is what the support task's change history is keyed on.
+/// </remarks>
 public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbContext)
 {
     // This matches the EventName value stored in the events table for the legacy event.
@@ -28,12 +35,13 @@ public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbConte
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Only migrate events that haven't already been back-filled so the job is idempotent.
+        // The task type is read from the payload rather than from a join to support_tasks: the reference the join
+        // would need is missing from most of these events.
         var legacyEvents = await dbContext.Events
             .FromSql($"""
                 select e.* from events e
-                join support_tasks st on st.support_task_reference = (e.payload -> 'SupportTask' ->> 'SupportTaskReference')
                 where e.event_name = {_legacyEventName}
-                and st.support_task_type = {(int)SupportTaskType.TeacherPensionsPotentialDuplicate}
+                and (e.payload -> 'SupportTask' ->> 'SupportTaskType')::int = {(int)SupportTaskType.TeacherPensionsPotentialDuplicate}
                 and not exists (select 1 from process_events pe where pe.process_event_id = e.event_id)
                 order by e.created
                 """)
@@ -43,10 +51,12 @@ public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbConte
         {
             var legacyEventData = (LegacySupportTaskCreatedEvent)legacyEvent.ToEventBase();
 
+            var supportTask = await FindSupportTaskAsync(legacyEventData, cancellationToken);
+
             IEvent newEvent = new SupportTaskCreatedEvent
             {
                 EventId = legacyEventData.EventId,
-                SupportTask = legacyEventData.SupportTask
+                SupportTask = legacyEventData.SupportTask with { SupportTaskReference = supportTask.SupportTaskReference }
             };
 
             var process =
@@ -68,6 +78,45 @@ public class BackfillTeacherPensionsSupportTaskProcessesJob(TrsDbContext dbConte
         {
             await transaction.CommitAsync(cancellationToken);
         }
+    }
+
+    private async Task<SupportTask> FindSupportTaskAsync(
+        LegacySupportTaskCreatedEvent legacyEventData,
+        CancellationToken cancellationToken)
+    {
+        var reference = legacyEventData.SupportTask.SupportTaskReference;
+
+        if (!string.IsNullOrEmpty(reference))
+        {
+            return await dbContext.SupportTasks
+                .IgnoreQueryFilters([QueryFilterNames.Deleted])
+                .SingleOrDefaultAsync(t => t.SupportTaskReference == reference, cancellationToken) ??
+                throw new InvalidOperationException($"Support task '{reference}' does not exist.");
+        }
+
+        if (legacyEventData.SupportTask.PersonId is not { } personId)
+        {
+            throw new InvalidOperationException(
+                $"Legacy {nameof(SupportTaskCreatedEvent)} '{legacyEventData.EventId}' has neither a support task " +
+                $"reference nor a person id.");
+        }
+
+        var candidates = await dbContext.SupportTasks
+            .IgnoreQueryFilters([QueryFilterNames.Deleted])
+            .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.PersonId == personId)
+            .ToListAsync(cancellationToken);
+
+        // The import raises the task against the person it has just created, so a person has one of these tasks.
+        // Should a record somehow have several, the import the event came from picks out the right one.
+        var supportTask = candidates.Count <= 1
+            ? candidates.SingleOrDefault()
+            : candidates.SingleOrDefault(t =>
+                t.GetData<TeacherPensionsPotentialDuplicateData>().IntegrationTransactionId ==
+                (legacyEventData.SupportTask.Data as TeacherPensionsPotentialDuplicateData)?.IntegrationTransactionId);
+
+        return supportTask ??
+            throw new InvalidOperationException(
+                $"No {SupportTaskType.TeacherPensionsPotentialDuplicate} support task found for person '{personId}'.");
     }
 
     private async Task<Process?> FindImportProcessAsync(

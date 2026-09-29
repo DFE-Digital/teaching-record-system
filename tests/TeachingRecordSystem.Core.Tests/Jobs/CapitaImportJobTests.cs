@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -108,7 +109,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             CreatedByTps = true
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -164,7 +165,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             CreatedByTps = true
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -245,7 +246,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             CreatedByTps = true
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -290,7 +291,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -347,7 +348,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             CreatedByTps = true
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -486,6 +487,8 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             FailureMessage = ""
         }, record);
         Assert.NotNull(record.PersonId);
+
+        await AssertPersonDeactivatingProcessAsync(record.PersonId!.Value, dateOfDeath);
     }
 
     [Fact]
@@ -508,10 +511,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         // Assert
         await AssertNoPersonAsync(existingPerson.Trn);
 
-        var evt = await AssertSingleEventAsync<LegacyEvents.PersonStatusUpdatedEvent>(existingPerson.PersonId);
-        Assert.Equal("Date of death received from capita import", evt.Reason);
-        Assert.Equal(PersonStatus.Active, evt.OldStatus);
-        Assert.Equal(PersonStatus.Deactivated, evt.Status);
+        await AssertPersonDeactivatingProcessAsync(existingPerson.PersonId, dateOfDeath);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -944,7 +944,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             FirstName = existingPerson.FirstName
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1043,7 +1043,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             FirstName = existingPerson.FirstName
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1189,7 +1189,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             FirstName = newFirstName
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1248,7 +1248,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
             FirstName = newFirstName
         }, newPerson);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1305,7 +1305,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         Assert.Equal(newLastName, newPerson.LastName);
         Assert.Equal(newFirstName, newPerson.FirstName);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1361,7 +1361,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         Assert.Equal(newLastName, newPerson.LastName);
         Assert.Equal(newFirstName, newPerson.FirstName);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1415,7 +1415,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         Assert.Equal(existingPerson.LastName, newPerson.LastName);
         Assert.Equal(newFirstName, newPerson.FirstName);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1459,7 +1459,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1539,7 +1539,7 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         // Assert
         var newPerson = await AssertSinglePersonAsync(newTrn);
 
-        await AssertSingleEventAsync<LegacyEvents.PersonCreatedEvent>(newPerson.PersonId);
+        await AssertSinglePersonCreatedProcessEventAsync(newPerson.PersonId);
 
         var transaction = await AssertSingleIntegrationTransactionAsync(integrationTransactionId);
         AssertHasProperties(new
@@ -1737,8 +1737,27 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
         await WithDbContextAsync(async dbContext =>
         {
             var selectedPerson = dbContext.Persons.Single(x => x.Trn == trn);
-            selectedPerson.SetStatus(PersonStatus.Deactivated, "de-activate", "de-activated", "", null, SystemUser.SystemUserId, TimeProvider.UtcNow, out var _);
+            selectedPerson.Status = PersonStatus.Deactivated;
+            selectedPerson.UpdatedOn = TimeProvider.UtcNow;
             await dbContext.SaveChangesAsync();
+        });
+    }
+
+    private async Task AssertPersonDeactivatingProcessAsync(Guid personId, DateOnly expectedDateOfDeath)
+    {
+        await WithDbContextAsync(async dbContext =>
+        {
+            var process = await dbContext.Processes
+                .Include(p => p.Events)
+                .SingleOrDefaultAsync(p => p.ProcessType == ProcessType.PersonDeactivating && p.PersonIds.Contains(personId));
+            Assert.NotNull(process);
+
+            var changeReason = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(process.ChangeReason);
+            Assert.Equal("Date of death received from capita import", changeReason.Reason);
+
+            var deactivatedEvent = Assert.IsType<PersonDeactivatedEvent>(Assert.Single(process.Events!).Payload);
+            Assert.Equal(personId, deactivatedEvent.PersonId);
+            Assert.Equal(expectedDateOfDeath, deactivatedEvent.DateOfDeath);
         });
     }
 
@@ -1805,6 +1824,17 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
 
         return metadata;
     }
+
+    private Task AssertSinglePersonCreatedProcessEventAsync(Guid personId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var processEvent = await dbContext.ProcessEvents.SingleOrDefaultAsync(pe =>
+                pe.EventName == nameof(PersonCreatedEvent) && pe.PersonIds.Contains(personId));
+            Assert.NotNull(processEvent);
+
+            var process = await dbContext.Processes.SingleAsync(p => p.ProcessId == processEvent.ProcessId);
+            Assert.Equal(ProcessType.TeacherPensionsRecordImporting, process.ProcessType);
+        });
 
     private async Task<TEvent> AssertSingleEventAsync<TEvent>(Guid personId)
     {

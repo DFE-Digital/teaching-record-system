@@ -258,29 +258,23 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
             Assert.Equal(gender, createdPersonRecord.Gender);
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<LegacyEvents.PersonCreatedEvent>(e);
-
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(personId, actualEvent.PersonId);
-            Assert.Equal(firstName, actualEvent.PersonAttributes.FirstName);
-            Assert.Equal(middleName, actualEvent.PersonAttributes.MiddleName);
-            Assert.Equal(lastName, actualEvent.PersonAttributes.LastName);
-            Assert.Equal(dateOfBirth, actualEvent.PersonAttributes.DateOfBirth);
-            Assert.Equal(emailAddress, actualEvent.PersonAttributes.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber, actualEvent.PersonAttributes.NationalInsuranceNumber);
-            Assert.Equal(gender, actualEvent.PersonAttributes.Gender);
-            Assert.Equal("Another reason", actualEvent.CreateReason);
-            Assert.Equal(ChangeReasonDetails, actualEvent.CreateReasonDetail);
-            Assert.Equal(otherEvidenceFileId, actualEvent.EvidenceFile!.FileId);
-            Assert.Equal("other-evidence.png", actualEvent.EvidenceFile.Name);
-        });
+        EventObserver.AssertNoEventsSaved();
 
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.PersonCreating, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<PersonCreatedEvent>();
+
+            p.AssertProcessHasEvents<PersonCreatedEvent>(createdEvent =>
+            {
+                Assert.Equal(personId, createdEvent.PersonId);
+                Assert.Equal(firstName, createdEvent.Details.FirstName);
+                Assert.Equal(middleName, createdEvent.Details.MiddleName);
+                Assert.Equal(lastName, createdEvent.Details.LastName);
+                Assert.Equal(dateOfBirth, createdEvent.Details.DateOfBirth);
+                Assert.Equal(emailAddress, createdEvent.Details.EmailAddress);
+                Assert.Equal(nationalInsuranceNumber, createdEvent.Details.NationalInsuranceNumber);
+                Assert.Equal(gender, createdEvent.Details.Gender);
+            });
 
             var changeReasonInfo = Assert.IsType<ChangeReasonWithDetailsAndEvidence>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal("Another reason", changeReasonInfo.Reason);

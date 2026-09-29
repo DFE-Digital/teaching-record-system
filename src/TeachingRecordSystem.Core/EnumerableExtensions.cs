@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.Core;
 public static class EnumerableExtensions
 {
     public static IReadOnlyCollection<T> AsReadOnly<T>(this IEnumerable<T> enumerable) =>
-        enumerable as IReadOnlyCollection<T> ?? enumerable.ToArray();
+        enumerable as IReadOnlyCollection<T> ?? Array.AsReadOnly(enumerable.ToArray());
 
     public static T First<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) where T : notnull =>
         source.FirstOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);

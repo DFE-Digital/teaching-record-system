@@ -10,5 +10,5 @@ public class NotFoundModel(SignInJourneyCoordinator coordinator) : PageModel
     {
     }
 
-    public IActionResult OnPost() => coordinator.AdvanceTo(links => links.CheckAnswers());
+    public IActionResult OnPost() => coordinator.AdvanceTo(links => links.QtsStatus());
 }

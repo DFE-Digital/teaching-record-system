@@ -161,6 +161,13 @@ public partial class EwcWalesImportJobTests
             Assert.Equal(InductionStatus.Exempt, contact.InductionStatus);
             Assert.Contains(InductionExemptionReason.PassedInWalesId, contact.InductionExemptionReasonIds);
         });
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.PersonWelshInductionUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<PersonInductionUpdatedEvent>(updatedEvent =>
+                Assert.Equal(person.PersonId, updatedEvent.PersonId));
+        });
     }
 
     [Fact]

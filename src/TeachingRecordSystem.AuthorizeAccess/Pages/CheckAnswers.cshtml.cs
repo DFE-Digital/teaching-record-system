@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 [Journey(SignInJourneyCoordinator.JourneyName)]
 public class CheckAnswersModel(
     SignInJourneyCoordinator coordinator,
+    ReferenceDataCache referenceDataCache,
     OneLoginUserMatchingSupportTaskService oneLoginUserMatchingSupportTaskService,
     TrsDbContext dbContext,
     TimeProvider timeProvider) : PageModel
@@ -29,12 +30,27 @@ public class CheckAnswersModel(
 
     public string? ProofOfIdentityFileName => coordinator.State.ProofOfIdentityFileName;
 
+    public string? YearQtsReceived => coordinator.State.YearQtsReceived;
+
+    public string? QtsTrainingProviderName { get; private set; }
+
+    public string? QtsSubjectName { get; private set; }
+
+    public bool HasQtsDetails => coordinator.State.HaveQts == true;
+
     public void OnGet()
     {
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // The user may have been verified or connected to a teaching record in another journey while this
+        // page was open, which makes a support request redundant
+        if (await coordinator.TryAdvanceIfVerifiedOrConnectedAsync() is { } nextPage)
+        {
+            return nextPage.ToActionResult();
+        }
+
         var state = coordinator.State;
 
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
@@ -67,6 +83,11 @@ public class CheckAnswersModel(
                     StatedTrn = state.Trn,
                     ClientApplicationUserId = state.ClientApplicationUserId,
                     TrnTokenTrn = state.TrnTokenTrn,
+                    YearQtsReceived = state.YearQtsReceived,
+                    TrainingProviderId = state.QtsTrainingProviderId,
+                    TrainingProviderName = QtsTrainingProviderName,
+                    SubjectId = state.QtsSubjectId,
+                    SubjectName = QtsSubjectName,
                     TrnRequestId = trnRequestId
                 },
                 processContext);
@@ -86,7 +107,12 @@ public class CheckAnswersModel(
                     StatedLastName = state.LastName!,
                     StatedDateOfBirth = state.DateOfBirth!.Value,
                     EvidenceFileId = state.ProofOfIdentityFileId!.Value,
-                    EvidenceFileName = state.ProofOfIdentityFileName!
+                    EvidenceFileName = state.ProofOfIdentityFileName!,
+                    YearQtsReceived = state.YearQtsReceived,
+                    TrainingProviderId = state.QtsTrainingProviderId,
+                    TrainingProviderName = QtsTrainingProviderName,
+                    SubjectId = state.QtsSubjectId,
+                    SubjectName = QtsSubjectName
                 },
                 processContext);
         }
@@ -98,7 +124,7 @@ public class CheckAnswersModel(
             new PushStepOptions { SetAsFirstStep = true });  // Prevents the user from going back to any page before 'SupportRequestSubmitted'
     }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var state = coordinator.State;
 
@@ -114,5 +140,20 @@ public class CheckAnswersModel(
             Name = $"{state.FirstName} {state.LastName}";
             DateOfBirth = state.DateOfBirth!.Value;
         }
+
+        if (state.HaveQts == true)
+        {
+            if (state.QtsTrainingProviderId is { } trainingProviderId)
+            {
+                QtsTrainingProviderName = (await referenceDataCache.GetTrainingProviderByIdAsync(trainingProviderId)).Name;
+            }
+
+            if (state.QtsSubjectId is { } subjectId)
+            {
+                QtsSubjectName = (await referenceDataCache.GetTrainingSubjectByIdAsync(subjectId)).Name;
+            }
+        }
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

@@ -1,0 +1,43 @@
+@model EventModels.PersonDetails
+@{
+    var name = string.JoinNonEmpty(' ', Model.FirstName, Model.MiddleName, Model.LastName);
+    var email = EmailAddress.TryParse(Model.EmailAddress, out var parsedEmail)
+        ? parsedEmail.ToDisplayString()
+        : Model.EmailAddress;
+    var nino = NationalInsuranceNumber.TryParse(Model.NationalInsuranceNumber, out var parsedNino)
+        ? parsedNino.ToDisplayString()
+        : Model.NationalInsuranceNumber;
+}
+<div data-testid="details">
+    <govuk-summary-list>
+        <row>
+            <key>Name</key>
+            <value use-empty-fallback>@name</value>
+        </row>
+        <row>
+            <key>Date of birth</key>
+            <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
+        </row>
+        @if (email is not null)
+        {
+            <row>
+                <key>Email address</key>
+                <value use-empty-fallback>@email</value>
+            </row>
+        }
+        @if (nino is not null)
+        {
+            <row>
+                <key>National Insurance number</key>
+                <value use-empty-fallback>@nino</value>
+            </row>
+        }
+        @if (Model.Gender is not null)
+        {
+            <row>
+                <key>Gender</key>
+                <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
+            </row>
+        }
+    </govuk-summary-list>
+</div>

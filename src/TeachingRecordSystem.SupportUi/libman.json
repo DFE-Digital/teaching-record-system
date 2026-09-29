@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/libman.json",
+  "version": "1.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "accessible-autocomplete@3.0.2",
+      "destination": "wwwroot/lib/accessible-autocomplete/",
+      "files": [
+        "dist/accessible-autocomplete.min.css",
+        "dist/accessible-autocomplete.min.js"
+      ]
+    }
+  ]
+}

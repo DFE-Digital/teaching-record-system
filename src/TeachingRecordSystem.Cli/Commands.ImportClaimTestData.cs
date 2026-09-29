@@ -6,6 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.Inductions;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
@@ -59,13 +61,15 @@ public static partial class Commands
                 .AddBackgroundJobScheduler(environment)
                 .AddHangfire(environment)
                 .AddSingleton<ReferenceDataCache>()
-                .AddRoutesToProfessionalStatusService();
+                .AddRoutesToProfessionalStatusService()
+                .AddInductionService();
 
             var serviceProvider = services.BuildServiceProvider();
 
             using var scope = serviceProvider.CreateScope();
             var personService = scope.ServiceProvider.GetRequiredService<PersonService>();
             var routesToProfessionalStatusService = scope.ServiceProvider.GetRequiredService<RoutesToProfessionalStatusService>();
+            var inductionService = scope.ServiceProvider.GetRequiredService<InductionService>();
             var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
             var processContext = new ProcessContext(processType: ProcessType.PersonCreating, now: DateTime.UtcNow,
                 SystemUser.SystemUserId);
@@ -144,14 +148,17 @@ public static partial class Commands
                         PersonId = person.PersonId,
                         RouteToProfessionalStatusTypeId = routeId,
                         Status = routeStatus,
-                        CreatedBy = SystemUser.SystemUserId,
                         SourceApplicationUserId = SystemUser.SystemUserId,
                         SourceApplicationReference = nameof(CreateImportClaimTestDataCommand),
                         HoldsFrom = qtsDate,
                         TrainingStartDate = startDate,
                         TrainingSubjectIds = subjectIds,
                         IsExemptFromInduction = false
-                    });
+                    },
+                    new ProcessContext(
+                        ProcessType.RouteToProfessionalStatusCreating,
+                        DateTime.UtcNow,
+                        SystemUser.SystemUserId));
 
                 if (!string.IsNullOrWhiteSpace(inductionStatusStr))
                 {
@@ -170,13 +177,26 @@ public static partial class Commands
                         };
                     }
 
-                    person.SetInductionStatus(parsedInduction, startDate, null, exemptionReasonIds: [],
-                        changeReason: "Imported", changeReasonDetail: null, evidenceFile: null,
-                        updatedBy: SystemUser.SystemUserId, now: DateTime.UtcNow, additionalInformation: null, out var inductionEvent);
-                    if (inductionEvent is not null)
-                    {
-                        dbContext.AddEventWithoutBroadcast(inductionEvent);
-                    }
+                    await inductionService.SetInductionStatusAsync(
+                        new SetInductionStatusOptions
+                        {
+                            PersonId = person.PersonId,
+                            Status = parsedInduction,
+                            StartDate = startDate,
+                            CompletedDate = null,
+                            ExemptionReasonIds = []
+                        },
+                        new ProcessContext(
+                            ProcessType.PersonInductionUpdating,
+                            DateTime.UtcNow,
+                            SystemUser.SystemUserId,
+                            new ChangeReasonWithDetailsAndEvidence
+                            {
+                                Reason = "Imported",
+                                Details = null,
+                                EvidenceFile = null,
+                                AdditionalInformation = null
+                            }));
                 }
                 await dbContext.SaveChangesAsync();
 

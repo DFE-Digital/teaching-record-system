@@ -3,7 +3,6 @@ using System.Transactions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -45,9 +44,24 @@ public class BatchSendProfessionalStatusEmailsJob(
 
         var end = timeProvider.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
 
-        var eventNames = EventBase.GetEventNamesForBaseType(typeof(IEventWithRouteToProfessionalStatus))
-            .Except([nameof(RouteToProfessionalStatusMigratedEvent)])
-            .ToArray();
+        // Whether the person gained QTS/EYTS or lost QTLS is on their attributes event, not on the route's, so
+        // that's what these read; the raised-by user lives on the process. Migrating from DQT isn't a real award,
+        // so those processes are left out.
+        var attributesEventName = nameof(PersonProfessionalStatusAttributesUpdatedEvent);
+
+        var routeProcessTypes = new[]
+        {
+            (int)ProcessType.RouteToProfessionalStatusCreating,
+            (int)ProcessType.RouteToProfessionalStatusUpdating,
+            (int)ProcessType.RouteToProfessionalStatusDeleting
+        };
+
+        var routeEventNames = new[]
+        {
+            nameof(RouteToProfessionalStatusCreatedEvent),
+            nameof(RouteToProfessionalStatusUpdatedEvent),
+            nameof(RouteToProfessionalStatusDeletedEvent)
+        };
 
         await ProcessQtsAwardeesAsync();
         await ProcessEytsAwardeesAsync();
@@ -63,15 +77,20 @@ public class BatchSendProfessionalStatusEmailsJob(
             var qtsAwardees = await dbContext.Database.SqlQuery<QtsAwardeeQueryResult>(
                     $"""
                      select
-                         person_ids[1] as person_id,
-                         (payload->'RouteToProfessionalStatus'->>'RouteToProfessionalStatusTypeId')::uuid route_to_professional_status_type_id
-                     from events
-                     where event_name = any({eventNames})
-                     and created >= {start}
-                     and created < {end}
-                     and (payload->>'RaisedBy')::uuid = any({jobOptionsAccessor.Value.RaisedByUserIds})
-                     and payload->'PersonAttributes'->>'QtsDate' is not null
-                     and payload->'OldPersonAttributes'->>'QtsDate' is null
+                         pe.person_ids[1] as person_id,
+                         (route.payload->'RouteToProfessionalStatus'->>'RouteToProfessionalStatusTypeId')::uuid route_to_professional_status_type_id
+                     from process_events pe
+                     join processes p on p.process_id = pe.process_id
+                     -- The template depends on which route was awarded, which is on the route's own event.
+                     join process_events route on route.process_id = pe.process_id
+                         and route.event_name = any({routeEventNames})
+                     where pe.event_name = {attributesEventName}
+                     and p.process_type = any({routeProcessTypes})
+                     and pe.created_on >= {start}
+                     and pe.created_on < {end}
+                     and p.user_id = any({jobOptionsAccessor.Value.RaisedByUserIds})
+                     and pe.payload->'PersonAttributes'->>'QtsDate' is not null
+                     and pe.payload->'OldPersonAttributes'->>'QtsDate' is null
                      """)
                 .Join(
                     dbContext.Persons,
@@ -104,7 +123,11 @@ public class BatchSendProfessionalStatusEmailsJob(
                     ["last name"] = qtsAwardee.LastName
                 };
 
-                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = qtsAwardee.Trn };
+                var metadata = new Dictionary<string, object>
+                {
+                    [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = qtsAwardee.Trn,
+                    [SendAytqInviteEmailJob.JobMetadataKeys.PersonId] = qtsAwardee.PersonId
+                };
 
                 var email = new Email
                 {
@@ -127,13 +150,15 @@ public class BatchSendProfessionalStatusEmailsJob(
         {
             var eytsAwardees = await dbContext.Database.SqlQuery<EytsAwardeeQueryResult>(
                     $"""
-                     select person_ids[1] as person_id from events
-                     where event_name = any({eventNames})
-                     and created >= {start}
-                     and created < {end}
-                     and (payload->>'RaisedBy')::uuid = any({jobOptionsAccessor.Value.RaisedByUserIds})
-                     and payload->'PersonAttributes'->>'EytsDate' is not null
-                     and payload->'OldPersonAttributes'->>'EytsDate' is null
+                     select pe.person_ids[1] as person_id from process_events pe
+                     join processes p on p.process_id = pe.process_id
+                     where pe.event_name = {attributesEventName}
+                     and p.process_type = any({routeProcessTypes})
+                     and pe.created_on >= {start}
+                     and pe.created_on < {end}
+                     and p.user_id = any({jobOptionsAccessor.Value.RaisedByUserIds})
+                     and pe.payload->'PersonAttributes'->>'EytsDate' is not null
+                     and pe.payload->'OldPersonAttributes'->>'EytsDate' is null
                      """)
                 .Join(
                     dbContext.Persons,
@@ -159,7 +184,11 @@ public class BatchSendProfessionalStatusEmailsJob(
                     ["last name"] = eytsAwardee.LastName
                 };
 
-                var metadata = new Dictionary<string, object> { [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = eytsAwardee.Trn };
+                var metadata = new Dictionary<string, object>
+                {
+                    [SendAytqInviteEmailJob.JobMetadataKeys.Trn] = eytsAwardee.Trn,
+                    [SendAytqInviteEmailJob.JobMetadataKeys.PersonId] = eytsAwardee.PersonId
+                };
 
                 var email = new Email
                 {
@@ -182,13 +211,15 @@ public class BatchSendProfessionalStatusEmailsJob(
         {
             var qtlsLosers = await dbContext.Database.SqlQuery<QtlsLoserQueryResult>(
                     $"""
-                     select person_ids[1] as person_id from events
-                     where event_name = any({eventNames})
-                     and created >= {start}
-                     and created < {end}
-                     and (payload->>'RaisedBy')::uuid = any({jobOptionsAccessor.Value.RaisedByUserIds})
-                     and payload->'PersonAttributes'->>'QtlsStatus' = '1' --Expired
-                     and payload->'OldPersonAttributes'->>'QtlsStatus' = '2' --Active
+                     select pe.person_ids[1] as person_id from process_events pe
+                     join processes p on p.process_id = pe.process_id
+                     where pe.event_name = {attributesEventName}
+                     and p.process_type = any({routeProcessTypes})
+                     and pe.created_on >= {start}
+                     and pe.created_on < {end}
+                     and p.user_id = any({jobOptionsAccessor.Value.RaisedByUserIds})
+                     and pe.payload->'PersonAttributes'->>'QtlsStatus' = '1' --Expired
+                     and pe.payload->'OldPersonAttributes'->>'QtlsStatus' = '2' --Active
                      """)
                 .Join(
                     dbContext.Persons,
@@ -213,12 +244,16 @@ public class BatchSendProfessionalStatusEmailsJob(
                     EmailId = Guid.NewGuid(),
                     TemplateId = EmailTemplateIds.QtlsLapsed,
                     EmailAddress = qtlsLoser.EmailAddress!,
-                    Personalization = new Dictionary<string, string>()
+                    Personalization = new Dictionary<string, string>(),
+                    Metadata = new Dictionary<string, object>
+                    {
+                        [SendQtlsLapsedEmailJob.JobMetadataKeys.PersonId] = qtlsLoser.PersonId
+                    }
                 };
 
                 dbContext.Emails.Add(email);
 
-                await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId));
+                await backgroundJobScheduler.EnqueueAsync<SendQtlsLapsedEmailJob>(j => j.ExecuteAsync(email.EmailId));
             }
 
             await dbContext.SaveChangesAsync(cancellationToken);

@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 using CoreTrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
@@ -47,7 +48,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
 
             // Assert
             Assert.NotNull(notification);
@@ -98,7 +99,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
 
             // Assert
             Assert.NotNull(notification);
@@ -138,7 +139,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
 
             // Assert
             Assert.Null(notification);
@@ -184,7 +185,37 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
+
+            // Assert
+            Assert.Null(notification);
+        });
+
+    [Fact]
+    public Task MapEventAsync_ContextIsForDifferentApplicationUser_ReturnsNull() =>
+        WithServiceAsync<TrnRequestCompletedNotificationMapper>(async mapper =>
+        {
+            // Arrange
+            var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+            var otherApplicationUser = await TestData.CreateApplicationUserAsync();
+
+            var (_, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+            var trnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequestMetadata) with { Status = CoreTrnRequestStatus.Completed };
+
+            var @event = new TrnRequestUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SourceApplicationUserId = applicationUser.UserId,
+                RequestId = trnRequest.RequestId,
+                Changes = TrnRequestUpdatedChanges.Status,
+                TrnRequest = trnRequest,
+                OldTrnRequest = trnRequest with { Status = CoreTrnRequestStatus.Pending },
+                ReasonDetails = null
+            };
+
+            // Act
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = otherApplicationUser.UserId });
 
             // Assert
             Assert.Null(notification);

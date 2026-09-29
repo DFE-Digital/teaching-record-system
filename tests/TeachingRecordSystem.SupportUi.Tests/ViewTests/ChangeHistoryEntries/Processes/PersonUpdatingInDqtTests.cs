@@ -1,4 +1,3 @@
-using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -57,9 +56,31 @@ public class PersonUpdatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
         var entry = await PublishPersonUpdatedInDqtEventAsync(PersonUpdatedInDqtEventChanges.All, details, oldDetails);
 
         // Assert
-        AssertTitle(entry, "Record updated");
+        AssertTitle(entry, "Record updated in DQT");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Record updated for", bodyText);
+        Assert.Contains($"{details.FirstName} {details.MiddleName} {details.LastName}", bodyText);
+
+        var recordDetails = entry.QuerySelector("details");
+        Assert.NotNull(recordDetails);
+        var recordDetailsSummary = recordDetails.GetElementsByTagName("summary").SingleOrDefault();
+        Assert.Equal("Record details", recordDetailsSummary?.TrimmedText());
+
+        entry.AssertSummaryListHasRows(
+            ("Previous TRN", oldDetails.Trn),
+            ("Previous name", $"{oldDetails.FirstName} {oldDetails.MiddleName} {oldDetails.LastName}"),
+            ("Previous date of birth", oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)),
+            ("Previous email address", oldDetails.EmailAddress),
+            ("Previous National Insurance number", oldDetails.NationalInsuranceNumber),
+            ("Previous gender", oldDetails.Gender?.GetDisplayName()),
+            ("Previous date of death", oldDetails.DateOfDeath?.ToString(WebConstants.DateDisplayFormat)),
+            ("Previous QTS held since", oldDetails.QtsDate?.ToString(WebConstants.DateDisplayFormat)),
+            ("Previous EYTS held since", oldDetails.EytsDate?.ToString(WebConstants.DateDisplayFormat)),
+            ("Previous QTLS held since", oldDetails.QtlsDate?.ToString(WebConstants.DateDisplayFormat)),
+            ("Previous qualified teacher learning and skills status (QTLS)", oldDetails.QtlsStatus.GetDisplayName()),
+            ("Previous induction status", oldDetails.InductionStatus?.GetDisplayName()),
+            ("Previous DQT induction status", oldDetails.DqtInductionStatus),
             ("TRN", details.Trn),
             ("Name", $"{details.FirstName} {details.MiddleName} {details.LastName}"),
             ("Date of birth", details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)),
@@ -73,23 +94,6 @@ public class PersonUpdatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
             ("Qualified teacher learning and skills status (QTLS)", details.QtlsStatus.GetDisplayName()),
             ("Induction status", details.InductionStatus?.GetDisplayName()),
             ("DQT induction status", details.DqtInductionStatus));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("TRN", oldDetails.Trn),
-            ("Name", $"{oldDetails.FirstName} {oldDetails.MiddleName} {oldDetails.LastName}"),
-            ("Date of birth", oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)),
-            ("Email address", oldDetails.EmailAddress),
-            ("National Insurance number", oldDetails.NationalInsuranceNumber),
-            ("Gender", oldDetails.Gender?.GetDisplayName()),
-            ("Date of death", oldDetails.DateOfDeath?.ToString(WebConstants.DateDisplayFormat)),
-            ("QTS held since", oldDetails.QtsDate?.ToString(WebConstants.DateDisplayFormat)),
-            ("EYTS held since", oldDetails.EytsDate?.ToString(WebConstants.DateDisplayFormat)),
-            ("QTLS held since", oldDetails.QtlsDate?.ToString(WebConstants.DateDisplayFormat)),
-            ("Qualified teacher learning and skills status (QTLS)", oldDetails.QtlsStatus.GetDisplayName()),
-            ("Induction status", oldDetails.InductionStatus?.GetDisplayName()),
-            ("DQT induction status", oldDetails.DqtInductionStatus));
     }
 
     [Fact]
@@ -103,15 +107,15 @@ public class PersonUpdatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
         var entry = await PublishPersonUpdatedInDqtEventAsync(PersonUpdatedInDqtEventChanges.FirstName, details, oldDetails);
 
         // Assert
-        AssertTitle(entry, "Record updated");
+        AssertTitle(entry, "Record updated in DQT");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
+        var bodyText = entry.GetElementsByClassName("govuk-body").SingleOrDefault()?.TrimmedText();
+        Assert.Contains("Record updated for", bodyText);
+        Assert.Contains($"{details.FirstName} {details.MiddleName} {details.LastName}", bodyText);
+
+        entry.AssertSummaryListHasRows(
+            ("Previous name", $"{oldDetails.FirstName} {oldDetails.MiddleName} {oldDetails.LastName}"),
             ("Name", $"{details.FirstName} {details.MiddleName} {details.LastName}"));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("Name", $"{oldDetails.FirstName} {oldDetails.MiddleName} {oldDetails.LastName}"));
     }
 
     [Fact]
@@ -125,19 +129,12 @@ public class PersonUpdatingInDqtTests(HostFixture hostFixture) : ChangeHistoryEn
         var entry = await PublishPersonUpdatedInDqtEventAsync(PersonUpdatedInDqtEventChanges.EmailAddress, details, oldDetails);
 
         // Assert
-        AssertTitle(entry, "Record updated");
+        AssertTitle(entry, "Record updated in DQT");
 
-        GetMainSummaryList(entry).AssertSummaryListHasRows(
+        entry.AssertSummaryListHasRows(
+            ("Previous email address", oldDetails.EmailAddress),
             ("Email address", details.EmailAddress));
-
-        var previousData = entry.GetElementByTestId("previous-data");
-        Assert.NotNull(previousData);
-        previousData.AssertSummaryListHasRows(
-            ("Email address", oldDetails.EmailAddress));
     }
-
-    private static IElement GetMainSummaryList(IHtmlElement entry) =>
-        entry.QuerySelectorAll(".govuk-summary-list").First(sl => sl.Closest(".govuk-details") is null);
 
     private async Task<IHtmlElement> PublishPersonUpdatedInDqtEventAsync(
         PersonUpdatedInDqtEventChanges changes,

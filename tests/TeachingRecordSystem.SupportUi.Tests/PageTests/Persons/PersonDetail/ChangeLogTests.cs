@@ -140,38 +140,26 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             for (int i = 0; i < eventCount; i++)
             {
-                var @event = new LegacyEvents.PersonDetailsUpdatedEvent
+                var @event = new LegacyEvents.MandatoryQualificationDqtReactivatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     CreatedUtc = TimeProvider.UtcNow.AddMinutes(-i),
                     RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
                     PersonId = person.PersonId,
-                    PersonAttributes = new EventModels.PersonDetails
+                    Key = null,
+                    MandatoryQualification = new EventModels.MandatoryQualification
                     {
-                        FirstName = person.FirstName,
-                        MiddleName = person.MiddleName,
-                        LastName = person.LastName,
-                        DateOfBirth = person.DateOfBirth,
-                        EmailAddress = person.EmailAddress,
-                        NationalInsuranceNumber = person.NationalInsuranceNumber,
-                        Gender = person.Gender
-                    },
-                    OldPersonAttributes = new EventModels.PersonDetails
-                    {
-                        FirstName = person.FirstName,
-                        MiddleName = person.MiddleName,
-                        LastName = person.LastName,
-                        DateOfBirth = person.DateOfBirth,
-                        EmailAddress = person.EmailAddress,
-                        NationalInsuranceNumber = person.NationalInsuranceNumber,
-                        Gender = person.Gender
-                    },
-                    Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress,
-                    NameChangeReason = null,
-                    NameChangeEvidenceFile = null,
-                    DetailsChangeReason = null,
-                    DetailsChangeReasonDetail = null,
-                    DetailsChangeEvidenceFile = null
+                        QualificationId = Guid.NewGuid(),
+                        Provider = new EventModels.MandatoryQualificationProvider
+                        {
+                            MandatoryQualificationProviderId = Guid.NewGuid(),
+                            Name = $"Provider {i}"
+                        },
+                        Specialism = MandatoryQualificationSpecialism.Hearing,
+                        Status = MandatoryQualificationStatus.Passed,
+                        StartDate = new DateOnly(2020, 1, 1),
+                        EndDate = new DateOnly(2021, 1, 1)
+                    }
                 };
 
                 dbContext.AddEventWithoutBroadcast(@event);

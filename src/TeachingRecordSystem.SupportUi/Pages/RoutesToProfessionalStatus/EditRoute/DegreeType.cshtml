@@ -40,14 +40,14 @@
         <form method="post">
             <span class="govuk-caption-l">@Model.PageCaption</span>
             <govuk-select for="DegreeTypeId" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true">
+                <label is-page-heading="true">
                     @ViewBag.Title
-                </govuk-select-label>
-                <govuk-select-hint>Start typing the name of the degree type</govuk-select-hint>
-                <govuk-select-item value=""></govuk-select-item>
+                </label>
+                <hint>Start typing the name of the degree type</hint>
+                <select-item value=""></select-item>
                 @foreach (var degreeType in Model.DegreeTypes)
                 {
-                    <govuk-select-item value="@degreeType.DegreeTypeId" selected="@Model.DegreeTypeId==degreeType.DegreeTypeId">@degreeType.Name</govuk-select-item>
+                    <select-item value="@degreeType.DegreeTypeId" selected="@Model.DegreeTypeId==degreeType.DegreeTypeId">@degreeType.Name</select-item>
                 }
             </govuk-select>
             <div class="govuk-button-group">

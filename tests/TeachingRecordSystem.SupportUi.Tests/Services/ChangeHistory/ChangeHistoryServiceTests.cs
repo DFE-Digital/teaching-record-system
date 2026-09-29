@@ -31,7 +31,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var user = await TestData.CreateUserAsync();
         var createdUtc = TimeProvider.UtcNow;
 
-        await CreateNameChangeEventAsync(person.PersonId, "Smith", createdUtc, user.UserId);
+        await CreateMandatoryQualificationDqtReactivatedEventAsync(person.PersonId, "Smith Training", createdUtc, user.UserId);
 
         // Act
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
@@ -42,9 +42,9 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(person.PersonId, item.PersonId);
         Assert.Equal(createdUtc, item.Timestamp);
 
-        var entry = Assert.IsType<LegacyEventChangeHistoryEntry<LegacyEvents.PersonDetailsUpdatedEvent>>(item.ItemModel);
+        var entry = Assert.IsType<LegacyEventChangeHistoryEntry<LegacyEvents.MandatoryQualificationDqtReactivatedEvent>>(item.ItemModel);
         Assert.Equal(user.Name, entry.RaisedByUser.Name);
-        Assert.Equal("Smith", entry.Event.PersonAttributes.LastName);
+        Assert.Equal("Smith Training", entry.Event.MandatoryQualification.Provider?.Name);
     }
 
     [Fact]
@@ -55,20 +55,14 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         await WithDbContextAsync(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(new LegacyEvents.PersonDetailsUpdatedEvent
+            dbContext.AddEventWithoutBroadcast(new LegacyEvents.MandatoryQualificationDqtReactivatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = TimeProvider.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(Guid.NewGuid(), "Some DQT User"),
                 PersonId = person.PersonId,
-                PersonAttributes = CreatePersonDetails("Smith"),
-                OldPersonAttributes = CreatePersonDetails("Jones"),
-                NameChangeReason = null,
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
+                Key = null,
+                MandatoryQualification = CreateMandatoryQualification("Smith Training")
             });
             await dbContext.SaveChangesAsync();
         });
@@ -78,7 +72,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        var entry = Assert.IsType<LegacyEventChangeHistoryEntry<LegacyEvents.PersonDetailsUpdatedEvent>>(item.ItemModel);
+        var entry = Assert.IsType<LegacyEventChangeHistoryEntry<LegacyEvents.MandatoryQualificationDqtReactivatedEvent>>(item.ItemModel);
         Assert.Equal("Some DQT User", entry.RaisedByUser.Name);
     }
 
@@ -89,7 +83,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var person = await TestData.CreatePersonAsync();
         var otherPerson = await TestData.CreatePersonAsync();
 
-        await CreateNameChangeEventAsync(otherPerson.PersonId, "Smith", TimeProvider.UtcNow);
+        await CreateMandatoryQualificationDqtReactivatedEventAsync(otherPerson.PersonId, "Smith Training", TimeProvider.UtcNow);
 
         // Act
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
@@ -133,15 +127,15 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var person = await TestData.CreatePersonAsync();
         var baseTime = TimeProvider.UtcNow;
 
-        await CreateNameChangeEventAsync(person.PersonId, "Oldest", baseTime.AddMinutes(-10));
-        await CreateNameChangeEventAsync(person.PersonId, "Newest", baseTime);
-        await CreateNameChangeEventAsync(person.PersonId, "Middle", baseTime.AddMinutes(-5));
+        await CreateMandatoryQualificationDqtReactivatedEventAsync(person.PersonId, "Oldest Provider", baseTime.AddMinutes(-10));
+        await CreateMandatoryQualificationDqtReactivatedEventAsync(person.PersonId, "Newest Provider", baseTime);
+        await CreateMandatoryQualificationDqtReactivatedEventAsync(person.PersonId, "Middle Provider", baseTime.AddMinutes(-5));
 
         // Act
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        Assert.Equal(["Newest", "Middle", "Oldest"], GetLastNames(result));
+        Assert.Equal(["Newest Provider", "Middle Provider", "Oldest Provider"], GetProviderNames(result));
     }
 
     [Fact]
@@ -152,7 +146,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var user = await TestData.CreateUserAsync();
         var baseTime = TimeProvider.UtcNow;
 
-        await CreateNameChangeEventAsync(person.PersonId, "Smith", baseTime.AddMinutes(-10));
+        await CreateMandatoryQualificationDqtReactivatedEventAsync(person.PersonId, "Smith Training", baseTime.AddMinutes(-10));
         // The process is created 'now', so it is newer than the legacy event
         var process = await CreateReactivatingProcessAsync(person.PersonId, user.UserId);
 
@@ -193,12 +187,118 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(user.Name, entry.RaisedByUser.Name);
     }
 
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesNotifyingTrnRecipientProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var email = new EventModels.Email
+        {
+            EmailId = Guid.NewGuid(),
+            TemplateId = "template-123",
+            EmailAddress = "test@example.com",
+            Personalization = new Dictionary<string, string>(),
+            Metadata = new Dictionary<string, object>(),
+            SentOn = TimeProvider.UtcNow,
+            EmailReplyToId = null
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.NotifyingTrnRecipient,
+            changeReason: null,
+            events: new EmailSentEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Email = email
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.NotifyingTrnRecipient, entry.Process.ProcessType);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesPersonDeceasedProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.PersonDeceased,
+            user.UserId,
+            changeReason: null,
+            new PersonDeactivatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Changes = PersonDeactivatedEventChanges.PersonStatus,
+                MergedWithPersonId = null,
+                DateOfDeath = TimeProvider.Today
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.PersonDeceased, entry.Process.ProcessType);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesPersonDetailsUpdatingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.PersonDetailsUpdating,
+            user.UserId,
+            changeReason: null,
+            new PersonDetailsUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                PersonDetails = CreatePersonDetails("Smith"),
+                OldPersonDetails = CreatePersonDetails("Jones"),
+                Changes = PersonDetailsUpdatedEventChanges.LastName
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.PersonDetailsUpdating, entry.Process.ProcessType);
+    }
+
     [Theory]
-    [InlineData(1, new[] { "Name0", "Name1" })]
-    [InlineData(2, new[] { "Name2", "Name3" })]
-    [InlineData(3, new[] { "Name4" })]
+    [InlineData(1, new[] { "Provider0", "Provider1" })]
+    [InlineData(2, new[] { "Provider2", "Provider3" })]
+    [InlineData(3, new[] { "Provider4" })]
     [InlineData(4, new string[0])]
-    public async Task GetChangeHistoryByPersonAsync_Pagination(int pageNumber, string[] expectedLastNames)
+    public async Task GetChangeHistoryByPersonAsync_Pagination(int pageNumber, string[] expectedProviderNames)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -206,7 +306,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         for (var i = 0; i < 5; i++)
         {
-            await CreateNameChangeEventAsync(person.PersonId, $"Name{i}", baseTime.AddMinutes(-i));
+            await CreateMandatoryQualificationDqtReactivatedEventAsync(person.PersonId, $"Provider{i}", baseTime.AddMinutes(-i));
         }
 
         // Act
@@ -218,8 +318,30 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         // Assert
         Assert.Equal(5, result.TotalItemCount);
         Assert.Equal(pageNumber, result.CurrentPage);
-        Assert.Equal(expectedLastNames, GetLastNames(result));
+        Assert.Equal(expectedProviderNames, GetProviderNames(result));
     }
+
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesNoteCreatingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var process = await CreateNoteCreatingProcessAsync(person.PersonId, user.UserId);
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.NoteCreating, entry.Process.ProcessType);
+    }
+
 
     [Theory]
     [InlineData(false, UserRoles.Viewer, true)]
@@ -431,23 +553,17 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         return new ClaimsPrincipal(new ClaimsIdentity(user.CreateClaims(), authenticationType: "Test"));
     }
 
-    private Task CreateNameChangeEventAsync(Guid personId, string lastName, DateTime createdUtc, Guid? raisedByUserId = null) =>
+    private Task CreateMandatoryQualificationDqtReactivatedEventAsync(Guid personId, string providerName, DateTime createdUtc, Guid? raisedByUserId = null) =>
         WithDbContextAsync(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(new LegacyEvents.PersonDetailsUpdatedEvent
+            dbContext.AddEventWithoutBroadcast(new LegacyEvents.MandatoryQualificationDqtReactivatedEvent
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = createdUtc,
                 RaisedBy = raisedByUserId ?? SystemUser.SystemUserId,
                 PersonId = personId,
-                PersonAttributes = CreatePersonDetails(lastName),
-                OldPersonAttributes = CreatePersonDetails("Previous"),
-                NameChangeReason = null,
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
+                Key = null,
+                MandatoryQualification = CreateMandatoryQualification(providerName)
             });
             await dbContext.SaveChangesAsync();
         });
@@ -576,6 +692,25 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
                 Changes = PersonReactivatedEventChanges.PersonStatus
             });
 
+    private Task<Process> CreateNoteCreatingProcessAsync(Guid personId, Guid userId) =>
+        TestData.CreateProcessAsync(
+            ProcessType.NoteCreating,
+            userId,
+            changeReason: null,
+            new NoteCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = personId,
+                Note = new EventModels.Note
+                {
+                    NoteId = Guid.NewGuid(),
+                    PersonId = personId,
+                    Content = "Test note content",
+                    File = null
+                }
+            });
+
+
     private static EventModels.PersonDetails CreatePersonDetails(string lastName) =>
         new()
         {
@@ -588,15 +723,30 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
             Gender = null
         };
 
+    private static EventModels.MandatoryQualification CreateMandatoryQualification(string providerName) =>
+        new()
+        {
+            QualificationId = Guid.NewGuid(),
+            Provider = new EventModels.MandatoryQualificationProvider
+            {
+                MandatoryQualificationProviderId = Guid.NewGuid(),
+                Name = providerName
+            },
+            Specialism = MandatoryQualificationSpecialism.Hearing,
+            Status = MandatoryQualificationStatus.Passed,
+            StartDate = new DateOnly(2020, 1, 1),
+            EndDate = new DateOnly(2021, 1, 1)
+        };
+
     private static string[] GetNoteContents(IReadOnlyCollection<ProcessChangeHistoryEntry> entries) =>
         entries
             .Select(e => e.GetEvent<SupportTaskNoteCreatedEvent>().SupportTaskNote.Content)
             .ToArray();
 
-    private static string[] GetLastNames(ResultPage<TimelineItem> page) =>
+    private static string[] GetProviderNames(ResultPage<TimelineItem> page) =>
         page
             .Select(i => ((LegacyEventChangeHistoryEntry)i.ItemModel).Event)
-            .Cast<LegacyEvents.PersonDetailsUpdatedEvent>()
-            .Select(e => e.PersonAttributes.LastName)
+            .Cast<LegacyEvents.MandatoryQualificationDqtReactivatedEvent>()
+            .Select(e => e.MandatoryQualification.Provider!.Name!)
             .ToArray();
 }

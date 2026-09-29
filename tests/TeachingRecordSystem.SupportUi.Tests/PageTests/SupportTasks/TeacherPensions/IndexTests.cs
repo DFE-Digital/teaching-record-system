@@ -166,10 +166,62 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
+    [Fact]
+    public async Task Get_MoreTasksThanFitOnOnePage_ShowsPaginationWithLinkToNextPage()
+    {
+        // Arrange
+        var pageSize = 20;
+
+        await Enumerable.Range(1, pageSize + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync())
+            .ToArrayAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/teacher-pensions");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var nextPageLink = GetNextPageLink(doc);
+        Assert.NotNull(nextPageLink);
+        Assert.Contains("pageNumber=2", nextPageLink);
+    }
+
+    [Fact]
+    public async Task Get_WithSearchAndMoreMatchesThanFitOnOnePage_NextPageLinkRetainsSearch()
+    {
+        // Arrange
+        var pageSize = 20;
+        var lastName = TestData.GenerateLastName();
+
+        await Enumerable.Range(1, pageSize + 1)
+            .ToAsyncEnumerable()
+            .Select(async (int _, CancellationToken _) => await TestData.CreateTeacherPensionsPotentialDuplicateTaskAsync(
+                configurePerson: p => p.WithLastName(lastName)))
+            .ToArrayAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/teacher-pensions?Search={Uri.EscapeDataString(lastName)}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var nextPageLink = GetNextPageLink(doc);
+        Assert.NotNull(nextPageLink);
+        Assert.Contains($"search={Uri.EscapeDataString(lastName)}", nextPageLink);
+        Assert.Contains("pageNumber=2", nextPageLink);
+    }
+
+    private static string? GetNextPageLink(IHtmlDocument document) =>
+        document.QuerySelector(".govuk-pagination__next a")?.GetAttribute("href");
+
     private static IElement[] GetResultRows(IHtmlDocument document) =>
         document
             .GetElementByTestId("results")!
-            .GetElementsByClassName("govuk-table__row")
+            .QuerySelectorAll("tbody > tr")
             .ToArray();
 
     private static string[] GetResultTaskReferences(IHtmlDocument document) =>

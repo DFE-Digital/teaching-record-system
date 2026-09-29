@@ -37,7 +37,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
+        var response = await GetHttpClientWithAuthorizeAccessToken(person.Trn, Version).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -83,7 +83,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(trn).SendAsync(request);
+        var response = await GetHttpClientWithAuthorizeAccessToken(trn, Version).SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsErrorAsync(response, 10001, StatusCodes.Status400BadRequest);
@@ -110,7 +110,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
+        var response = await GetHttpClientWithAuthorizeAccessToken(person.Trn, Version).SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
@@ -157,7 +157,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         };
 
         // Act
-        var response = await GetHttpClientWithIdentityAccessToken(person.Trn).SendAsync(request);
+        var response = await GetHttpClientWithAuthorizeAccessToken(person.Trn, Version).SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);

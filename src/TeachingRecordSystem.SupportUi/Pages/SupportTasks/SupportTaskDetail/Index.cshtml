@@ -77,22 +77,22 @@
 
                 <div class="trs-support-task__overview-actions">
                     <govuk-select for="AssignedToUserId">
-                        <govuk-select-label>Assigned to</govuk-select-label>
-                        <govuk-select-item value="@Model.UnassignedUserId">Unassigned</govuk-select-item>
+                        <label>Assigned to</label>
+                        <select-item value="@Model.UnassignedUserId">Unassigned</select-item>
                         @if (Model.ShowMyselfOption)
                         {
-                            <govuk-select-item value="@Model.CurrentUserId">Myself</govuk-select-item>
+                            <select-item value="@Model.CurrentUserId">Myself</select-item>
                         }
                         @foreach (var option in Model.AssignToOptions!)
                         {
-                            <govuk-select-item value="@option.UserId">@option.UserName</govuk-select-item>
+                            <select-item value="@option.UserId">@option.UserName</select-item>
                         }
                     </govuk-select>
 
                     <govuk-select for="Status">
-                        <govuk-select-label>Status</govuk-select-label>
-                        <govuk-select-item value="@SupportTaskStatus.Open">Not started</govuk-select-item>
-                        <govuk-select-item value="@SupportTaskStatus.InProgress">In progress</govuk-select-item>
+                        <label>Status</label>
+                        <select-item value="@SupportTaskStatus.Open">Not started</select-item>
+                        <select-item value="@SupportTaskStatus.InProgress">In progress</select-item>
                     </govuk-select>
                 </div>
 
@@ -115,17 +115,17 @@
             else
             {
                 <govuk-details open="@Model.ExpandNotes" data-testid="notes">
-                    <govuk-details-summary>View notes</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>View notes</summary>
+                    <text>
                         <div class="moj-timeline">
                             @foreach (var note in Model.Notes!)
                             {
-                                <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
+                                <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn">
                                     @note.Content
                                 </timeline-entry>
                             }
                         </div>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             }
 
@@ -147,46 +147,42 @@
             else
             {
                 <govuk-details open="@Model.ExpandZendeskTickets" data-testid="zendesk-tickets">
-                    <govuk-details-summary>View tickets</govuk-details-summary>
-                    <govuk-details-text>
-                        <table class="govuk-table">
-                            <thead class="govuk-table__head">
-                            <tr class="govuk-table__row">
-                                <th scope="col" class="govuk-table__header govuk-!-width-one-half">
-                                    Link to ticket
-                                </th>
-                                <th scope="col" class="govuk-table__header">
-                                    Action
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                            @foreach (var ticketUrl in Model.ZendeskTickets)
-                            {
-                                <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell">@Index.GetZendeskTicketDisplayText(ticketUrl)</td>
-                                    <td class="govuk-table__cell">
-                                        <div class="govuk-button-group govuk-!-margin-bottom-0">
-                                            <govuk-button type="button"
-                                                          class="govuk-button--secondary trs-requires-js govuk-!-margin-bottom-0"
-                                                          data-clipboard-text="@ticketUrl">
-                                                Copy to clipboard
-                                            </govuk-button>
+                    <summary>View tickets</summary>
+                    <text>
+                        <govuk-table>
+                        <table-head>
+                            <table-head-cell class="govuk-!-width-one-half">
+                                Link to ticket
+                            </table-head-cell>
+                            <table-head-cell>
+                                Action
+                            </table-head-cell>
+                        </table-head>
+                        @foreach (var ticketUrl in Model.ZendeskTickets)
+                        {
+                            <table-row>
+                                <table-cell>@Index.GetZendeskTicketDisplayText(ticketUrl)</table-cell>
+                                <table-cell>
+                                    <div class="govuk-button-group govuk-!-margin-bottom-0">
+                                        <govuk-button type="button"
+                                                      class="govuk-button--secondary trs-requires-js govuk-!-margin-bottom-0"
+                                                      data-clipboard-text="@ticketUrl">
+                                            Copy to clipboard
+                                        </govuk-button>
 
-                                            <a
-                                                href="@ticketUrl"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="govuk-link">
-                                                View ticket (opens in new tab)
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </govuk-details-text>
+                                        <a
+                                            href="@ticketUrl"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="govuk-link">
+                                            View ticket (opens in new tab)
+                                        </a>
+                                    </div>
+                                </table-cell>
+                            </table-row>
+                        }
+                        </govuk-table>
+                    </text>
                 </govuk-details>
             }
 
@@ -202,15 +198,15 @@
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-2">History</h2>
 
                 <govuk-details>
-                    <govuk-details-summary>View activity</govuk-details-summary>
-                    <govuk-details-text>
+                    <summary>View activity</summary>
+                    <text>
                         <div class="moj-timeline">
                             @foreach (var entry in Model.ChangeHistory!)
                             {
                                 <vc:change-history-entry model="@entry" />
                             }
                         </div>
-                    </govuk-details-text>
+                    </text>
                 </govuk-details>
             </div>
         }
@@ -285,7 +281,7 @@
                     <div class="moj-timeline">
                         @foreach (var note in Model.Notes!)
                         {
-                            <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn.ToGmt()">
+                            <timeline-entry title="Note added" by="@note.CreatedBy" timestamp="@note.CreatedOn">
                                 @note.Content
                             </timeline-entry>
                         }

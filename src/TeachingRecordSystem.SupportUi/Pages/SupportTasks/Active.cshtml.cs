@@ -79,7 +79,7 @@ public class Active(
 
     // The tasks shown on this page, sent up with a checkbox tick so the banner request can tell
     // whether they're now all selected without having to run the search again.
-    public string PageTaskReferences => string.Join(",", Results?.Select(r => r.SupportTaskReference) ?? []);
+    public string PageTaskReferences => string.Join(",", Results?.AsEnumerable().Select(r => r.SupportTaskReference) ?? []);
 
     public string RowCheckboxIncludeSelector => $"{SelectedTaskInputsSelector}, [name={PageTaskReferencesInputName}]";
 

@@ -33,7 +33,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
 
         var person = await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Include(p => p.Alerts).AsSplitQuery()
             .Include(p => p.OneLoginUsers).AsSplitQuery()

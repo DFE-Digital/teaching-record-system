@@ -24,9 +24,9 @@
 
             <div class="trs-potential-duplicates @(showDuplicatesSideBySide ? "trs-potential-duplicates--side-by-side" : "")">
                 <govuk-summary-card data-testid="request" class="trs-potential-duplicates__item">
-                    <title>
+                    <card-title>
                         Teachers&rsquo; Pensions record
-                    </title>
+                    </card-title>
                     <card-actions>
                         <action href="@LinkGenerator.Persons.PersonDetail.Index(Model.SupportTask!.PersonId!.Value)" target="_blank">
                             View record
@@ -78,9 +78,9 @@
                 @foreach (var (match, hasNameMismatch) in Model.PotentialDuplicatesWithNameMatchingInfo)
                 {
                     <govuk-summary-card data-testid="match" class="trs-potential-duplicates__item">
-                        <title>
+                        <card-title>
                             Record @match.Identifier
-                        </title>
+                        </card-title>
                         <card-actions>
                             <action href="@LinkGenerator.Persons.PersonDetail.Index(match.PersonId)" target="_blank">
                                 View record
@@ -136,22 +136,22 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <govuk-radios for="PersonId">
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend--m">
                     What do you want to do with the Teachers&rsquo; Pensions record?
-                </govuk-radios-fieldset-legend>
+                </legend>
 
                 @foreach (var match in Model.PotentialDuplicates)
                 {
-                    <govuk-radios-item value="@match.PersonId">
+                    <radios-item value="@match.PersonId">
                         Merge it with Record @match.Identifier
-                    </govuk-radios-item>
+                    </radios-item>
                 }
 
-                <govuk-radios-divider>or</govuk-radios-divider>
+                <divider>or</divider>
 
-                <govuk-radios-item value="@Guid.Empty">
+                <radios-item value="@Guid.Empty">
                     Keep it as a separate record
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">

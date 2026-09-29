@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
+using TeachingRecordSystem.Core.Services.Inductions;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
 
@@ -14,7 +15,7 @@ public class CheckAnswersModel(
     SupportUiLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     TimeProvider timeProvider,
-    TrsDbContext dbContext) : PageModel
+    InductionService inductionService) : PageModel
 {
     public JourneyInstanceId InstanceId => journey.InstanceId;
 
@@ -78,26 +79,26 @@ public class CheckAnswersModel(
             return Redirect(journey.CompletedDateUrl(returnUrl: ReturnUrl));
         }
 
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == journey.PersonId);
-
-        person.SetInductionStatus(
-            InductionStatus,
-            StartDate,
-            CompletedDate,
-            journey.State.ExemptionReasonIds,
-            ChangeReason.GetDisplayName(),
-            ChangeReasonDetail,
-            EvidenceFile?.ToEventModel(),
-            User.GetUserId(),
-            timeProvider.UtcNow,
-            additionalInformation: AdditionalInformation,
-            out var updatedEvent);
-
-        if (updatedEvent is not null)
-        {
-            dbContext.AddEventWithoutBroadcast(updatedEvent);
-            await dbContext.SaveChangesAsync();
-        }
+        await inductionService.SetInductionStatusAsync(
+            new SetInductionStatusOptions
+            {
+                PersonId = journey.PersonId,
+                Status = InductionStatus,
+                StartDate = StartDate,
+                CompletedDate = CompletedDate,
+                ExemptionReasonIds = journey.State.ExemptionReasonIds
+            },
+            new ProcessContext(
+                ProcessType.PersonInductionUpdating,
+                timeProvider.UtcNow,
+                User.GetUserId(),
+                new ChangeReasonWithDetailsAndEvidence
+                {
+                    Reason = ChangeReason.GetDisplayName(),
+                    Details = ChangeReasonDetail,
+                    EvidenceFile = EvidenceFile?.ToEventModel(),
+                    AdditionalInformation = AdditionalInformation
+                }));
 
         journey.DeleteInstance();
 

@@ -21,8 +21,8 @@ resource "azurerm_storage_account" "safe_storage" {
 
 resource "azurerm_security_center_storage_defender" "safe_storage" {
   storage_account_id                          = azurerm_storage_account.safe_storage.id
-  malware_scanning_on_upload_enabled          = true
-  malware_scanning_on_upload_cap_gb_per_month = 100
+  malware_scanning_on_upload_enabled          = var.safe_storage_malware_scan_enabled
+  malware_scanning_on_upload_cap_gb_per_month = var.safe_storage_malware_scan_cap_gb_per_month
   override_subscription_settings_enabled      = true
 }
 

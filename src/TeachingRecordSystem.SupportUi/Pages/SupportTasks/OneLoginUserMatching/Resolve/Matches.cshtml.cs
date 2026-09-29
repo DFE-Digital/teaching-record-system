@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,6 +17,7 @@ public class Matches(
     SupportTaskService supportTaskService,
     TimeProvider timeProvider,
     SupportUiLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
     IFeatureProvider featureProvider) :
     PageModel
 {
@@ -46,6 +48,9 @@ public class Matches(
     public DateOnly DateOfBirth { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public string? Trn { get; set; }
+    public string? QtsYearReceived { get; set; }
+    public string? QtsProvider { get; set; }
+    public string? QtsSubject { get; set; }
 
     public IReadOnlyCollection<SuggestedMatchViewModel>? SuggestedMatches { get; set; }
 
@@ -114,7 +119,9 @@ public class Matches(
         return Redirect(journey.State.CompletionUrl);
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutionAsync(
+        PageHandlerExecutingContext context,
+        PageHandlerExecutionDelegate next)
     {
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
@@ -131,9 +138,21 @@ public class Matches(
         Trn = TrnHelper.NormalizeTrn(data.StatedTrn);
         EmailAddress = oneLoginUser.EmailAddress;
 
-        var matchedPersonIds = journey.State.MatchedPersons.Select(m => m.PersonId).ToArray();
-        SuggestedMatches = (await dbContext.Persons
-            .Include(p => p.PreviousNames)
+        QtsYearReceived = data.YearQtsReceived;
+        QtsProvider = data.TrainingProviderId is Guid trainingProviderId
+            ? (await referenceDataCache.GetTrainingProviderByIdAsync(trainingProviderId)).Name
+            : data.TrainingProviderName;
+        QtsSubject = data.SubjectId is Guid subjectId
+            ? (await referenceDataCache.GetTrainingSubjectByIdAsync(subjectId)).Name
+            : data.SubjectName;
+
+        var matchedPersonIds = journey.State.MatchedPersons
+            .Select(m => m.PersonId)
+            .ToArray();
+
+        var matches = (await dbContext.Persons
+            .Include(p => p.PreviousNames).AsSplitQuery()
+            .Include(p => p.Qualifications).AsSplitQuery()
             .Where(p => matchedPersonIds.Contains(p.PersonId))
             .Select(p => new
             {
@@ -145,11 +164,14 @@ public class Matches(
                 p.LastName,
                 p.DateOfBirth,
                 p.NationalInsuranceNumber,
-                p.PreviousNames
+                p.PreviousNames,
+                p.Qualifications
             })
             .ToArrayAsync())
-            .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId))  // Ensure we maintain the order of matches
-            .Select((match, idx) => new SuggestedMatchViewModel
+            .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId));
+
+        SuggestedMatches = await Task.WhenAll(
+            matches.Select(async (match, idx) => new SuggestedMatchViewModel
             {
                 Identifier = (char)('A' + idx),
                 PersonId = match.PersonId,
@@ -164,13 +186,118 @@ public class Matches(
                     .OrderBy(n => n.CreatedOn)
                     .Select(n => $"{n.FirstName} {n.MiddleName} {n.LastName}")
                     .ToArray(),
-                MatchedAttributeTypes = journey.State.MatchedPersons.Single(m => m.PersonId == match.PersonId)
+                QtlsDetails = await GetQtlsDetailsAsync(
+                    match.Qualifications!
+                        .OfType<RouteToProfessionalStatus>()
+                        .Where(route =>
+                            route.RouteToProfessionalStatusTypeId ==
+                                RouteToProfessionalStatusType.QtlsAndSetMembershipId &&
+                            route.Status == RouteToProfessionalStatusStatus.Holds)
+                        .OrderByDescending(route => route.HoldsFrom)
+                        .ThenByDescending(route => route.CreatedOn)
+                        .FirstOrDefault(),
+                    QtsYearReceived,
+                    QtsSubject),
+                QtsDetails = await GetQtsDetailsAsync(
+                    match.Qualifications!
+                        .OfType<RouteToProfessionalStatus>(),
+                    QtsYearReceived,
+                    QtsProvider,
+                    QtsSubject),
+                MatchedAttributeTypes = journey.State.MatchedPersons
+                    .Single(m => m.PersonId == match.PersonId)
                     .MatchedAttributes
                     .Select(kvp => kvp.Key)
                     .ToArray()
-            })
-            .ToArray();
+            }));
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
+
+    private async Task<SuggestedMatchProfessionalStatusDetailsViewModel?> GetQtlsDetailsAsync(
+        RouteToProfessionalStatus? route,
+        string? requestYearReceived,
+        string? requestSubject)
+    {
+        if (route is null)
+        {
+            return null;
+        }
+
+        return await BuildProfessionalStatusDetailsAsync(
+            route,
+            heading: "QTS - QTLS and SET Membership",
+            requestYearReceived,
+            requestProvider: null,
+            requestSubject,
+            showProvider: false,
+            referenceDataCache);
+    }
+
+    private async Task<IReadOnlyCollection<SuggestedMatchProfessionalStatusDetailsViewModel>> GetQtsDetailsAsync(
+        IEnumerable<RouteToProfessionalStatus> routes,
+        string? requestYearReceived,
+        string? requestProvider,
+        string? requestSubject)
+    {
+        var qtsRoutes = routes
+            .Where(x => x.Status == RouteToProfessionalStatusStatus.Holds)
+            .OrderByDescending(route => route.HoldsFrom)
+            .ThenByDescending(route => route.CreatedOn);
+
+        var qtsDetails = new List<SuggestedMatchProfessionalStatusDetailsViewModel>();
+
+        foreach (var route in qtsRoutes)
+        {
+            var routeType = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(route.RouteToProfessionalStatusTypeId);
+
+            if (routeType.ProfessionalStatusType is not ProfessionalStatusType.QualifiedTeacherStatus ||
+                route.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId)
+            {
+                continue;
+            }
+
+            var details = await BuildProfessionalStatusDetailsAsync(
+                route,
+                heading: $"QTS - {routeType.Name}",
+                requestYearReceived,
+                requestProvider,
+                requestSubject,
+                showProvider: true,
+                referenceDataCache);
+
+            qtsDetails.Add(details);
+        }
+
+        return qtsDetails;
+    }
+
+    private static async Task<SuggestedMatchProfessionalStatusDetailsViewModel> BuildProfessionalStatusDetailsAsync(
+        RouteToProfessionalStatus route,
+        string heading,
+        string? requestYearReceived,
+        string? requestProvider,
+        string? requestSubject,
+        bool showProvider,
+        ReferenceDataCache referenceDataCache)
+    {
+        var yearReceived = route.HoldsFrom?.Year.ToString(CultureInfo.InvariantCulture);
+        var provider = showProvider && route.TrainingProviderId is Guid trainingProviderId ?
+            (await referenceDataCache.GetTrainingProviderByIdAsync(trainingProviderId)).Name :
+            null;
+        var subjects = route.TrainingSubjectIds is { Length: > 0 } ?
+            await Task.WhenAll(route.TrainingSubjectIds.Select(async subjectId => (await referenceDataCache.GetTrainingSubjectByIdAsync(subjectId)).Name)) :
+            [];
+
+        return new SuggestedMatchProfessionalStatusDetailsViewModel
+        {
+            Heading = heading,
+            YearReceived = yearReceived,
+            Provider = provider,
+            Subjects = subjects,
+        };
+    }
+
+    private static string? NormalizeComparisonValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

@@ -23,7 +23,8 @@ public static class HttpContextExtensions
                 person.LastName,
                 person.EmailAddress,
                 person.DateOfBirth,
-                person.NationalInsuranceNumber));
+                person.NationalInsuranceNumber,
+                person.MergedWithPersonId));
 
     public static CurrentOneLoginUserFeature GetCurrentOneLoginUserFeature(this HttpContext context) =>
         context.Features.GetRequiredFeature<CurrentOneLoginUserFeature>();
@@ -76,7 +77,8 @@ public record CurrentPersonFeature(
     string LastName,
     string? EmailAddress,
     DateOnly? DateOfBirth,
-    string? NationalInsuranceNumber)
+    string? NationalInsuranceNumber,
+    Guid? MergedWithPersonId)
 {
     public string Name => (FirstName + " " + MiddleName).Trim() + " " + LastName;
 }

@@ -24,7 +24,7 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
         CanViewNotes = (await authorizationService.AuthorizeAsync(User, PersonId, AuthorizationPolicies.NotesView)) is { Succeeded: true };
 
         var personIsActive = await dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => p.PersonId == PersonId)
             .Select(p => p.Status == PersonStatus.Active)
             .SingleAsync();

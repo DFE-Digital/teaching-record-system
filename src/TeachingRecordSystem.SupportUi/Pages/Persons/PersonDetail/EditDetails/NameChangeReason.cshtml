@@ -16,18 +16,18 @@
             <span class="govuk-caption-l" data-testid="edit-details-caption">Change name - @Model.PersonName</span>
 
             <govuk-radios for="Reason" data-testid="change-reason-options">
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
+                <legend class="govuk-fieldset__legend--l" is-page-heading="true" data-testid="change-reason-options-legend">
                     Why are you changing the name on this record?
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@PersonNameChangeReason.MarriageOrCivilPartnership">
+                </legend>
+                <radios-item value="@PersonNameChangeReason.MarriageOrCivilPartnership">
                     @PersonNameChangeReason.MarriageOrCivilPartnership.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@PersonNameChangeReason.DeedPollOrOtherLegalProcess">
+                </radios-item>
+                <radios-item value="@PersonNameChangeReason.DeedPollOrOtherLegalProcess">
                     @PersonNameChangeReason.DeedPollOrOtherLegalProcess.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@PersonNameChangeReason.CorrectingAnError">
+                </radios-item>
+                <radios-item value="@PersonNameChangeReason.CorrectingAnError">
                     @PersonNameChangeReason.CorrectingAnError.GetDisplayName()
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

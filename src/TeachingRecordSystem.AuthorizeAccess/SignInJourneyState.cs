@@ -73,6 +73,18 @@ public class SignInJourneyState(
     public string? Trn { get; private set; }
 
     [JsonInclude]
+    public bool? HaveQts { get; private set; }
+
+    [JsonInclude]
+    public string? YearQtsReceived { get; private set; }
+
+    [JsonInclude]
+    public Guid? QtsTrainingProviderId { get; private set; }
+
+    [JsonInclude]
+    public Guid? QtsSubjectId { get; private set; }
+
+    [JsonInclude]
     public string? FirstName { get; private set; }
 
     [JsonInclude]
@@ -142,6 +154,18 @@ public class SignInJourneyState(
 
         HaveTrn = haveTrn;
         Trn = haveTrn ? trn! : null;
+    }
+
+    public void SetQts(bool haveQts)
+    {
+        HaveQts = haveQts;
+    }
+
+    public void SetQtsDetails(string? yearQtsReceived, Guid? qtsTrainingProviderId, Guid? qtsSubjectId)
+    {
+        YearQtsReceived = yearQtsReceived;
+        QtsTrainingProviderId = qtsTrainingProviderId;
+        QtsSubjectId = qtsSubjectId;
     }
 
     public void SetProofOfIdentityFile(Guid fileId, string fileName)

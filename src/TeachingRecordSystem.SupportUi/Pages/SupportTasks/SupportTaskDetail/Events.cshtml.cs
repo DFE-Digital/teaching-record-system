@@ -28,9 +28,10 @@ public class Events(TrsDbContext dbContext) : PageModel
         Processes = processesAndEvents
             .Select(p => new ProcessEventPayload(
                 p.ProcessType.ToString(),
-                p.Events!.Select(e => new ProcessEventPayloadEvent(e.EventName, e.Payload)).ToArray(),
+                p.Events!.OrderBy(e => e.CreatedOn).Select(e => new ProcessEventPayloadEvent(e.EventName, e.Payload)).ToArray(),
                 p.ChangeReason,
                 p.CreatedOn))
+            .OrderByDescending(p => p.Timestamp)
             .ToArray();
     }
 

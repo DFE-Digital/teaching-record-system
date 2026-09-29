@@ -276,6 +276,78 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
     }
 
     [Fact]
+    public async Task ProcessNewEmploymentHistory_WhenCalledWithNewEmploymentHistory_CreatesTpsEmploymentCreatingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var tpsCsvExtractId = Guid.NewGuid();
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "225", establishmentNumber: "2236");
+        var startDate = new DateOnly(2023, 02, 03);
+        var endDate = new DateOnly(2024, 03, 30);
+        var extractDate = new DateOnly(2024, 04, 25);
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            DbContextFactory,
+            TimeProvider);
+        await processor.ProcessNewEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
+
+        // Assert
+        using var dbContext = DbContextFactory.CreateDbContext();
+        var personEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.PersonId == person.PersonId);
+        var process = await dbContext.Processes
+            .Include(p => p.Events)
+            .SingleAsync(p => p.ProcessType == ProcessType.TpsEmploymentCreating && p.PersonIds.Contains(person.PersonId));
+        Assert.Equal(SystemUser.SystemUserId, process.UserId);
+        Assert.Null(process.ChangeReason);
+
+        var processEvent = Assert.Single(process.Events!);
+        Assert.Equal(nameof(TpsEmploymentCreatedEvent), processEvent.EventName);
+        Assert.Equal(person.PersonId, Assert.Single(processEvent.PersonIds));
+        var createdEvent = Assert.IsType<TpsEmploymentCreatedEvent>(processEvent.Payload);
+        Assert.Equal(person.PersonId, createdEvent.PersonId);
+        Assert.Equal(personEmployment.TpsEmploymentId, createdEvent.TpsEmployment.PersonEmploymentId);
+        Assert.Equal(establishment.EstablishmentId, createdEvent.TpsEmployment.EstablishmentId);
+    }
+
+    [Fact]
+    public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithUpdatedEmploymentHistory_CreatesTpsEmploymentUpdatingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var tpsCsvExtractId = Guid.NewGuid();
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "226", establishmentNumber: "2237");
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode, personEmailAddress: "original@email.com");
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person.Trn, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, new DateOnly(2023, 02, 02), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25), memberEmailAddress: "updated@email.com"));
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            DbContextFactory,
+            TimeProvider);
+        await processor.ProcessUpdatedEmploymentHistoryAsync(tpsCsvExtractId, CancellationToken.None);
+
+        // Assert
+        using var dbContext = DbContextFactory.CreateDbContext();
+        var process = await dbContext.Processes
+            .Include(p => p.Events)
+            .SingleAsync(p => p.ProcessType == ProcessType.TpsEmploymentUpdating && p.PersonIds.Contains(person.PersonId));
+        Assert.Equal(SystemUser.SystemUserId, process.UserId);
+        Assert.Null(process.ChangeReason);
+
+        var processEvent = Assert.Single(process.Events!);
+        Assert.Equal(nameof(TpsEmploymentUpdatedEvent), processEvent.EventName);
+        var updatedEvent = Assert.IsType<TpsEmploymentUpdatedEvent>(processEvent.Payload);
+        Assert.Equal(person.PersonId, updatedEvent.PersonId);
+        Assert.Equal(existingPersonEmployment.TpsEmploymentId, updatedEvent.TpsEmployment.PersonEmploymentId);
+        Assert.Equal("updated@email.com", updatedEvent.TpsEmployment.PersonEmailAddress);
+        Assert.Equal("original@email.com", updatedEvent.OldTpsEmployment.PersonEmailAddress);
+        Assert.True(updatedEvent.Changes.HasFlag(TpsEmploymentUpdatedEventChanges.PersonEmailAddress));
+    }
+
+    [Fact]
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithEndDateInTheFuture_SetsLastKnownEmployedDateToExtractDate()
     {
         // Arrange
@@ -437,6 +509,81 @@ public class TpsCsvExtractProcessorTests(ServiceFixture fixture) : ServiceTestBa
         using var dbContext = DbContextFactory.CreateDbContext();
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
         Assert.Equal(establishment2.EstablishmentId, updatedPersonEmployment.EstablishmentId);
+    }
+
+    [Fact]
+    public async Task UpdateLatestEstablishmentVersions_WithMoreEstablishmentChangesThanFitInASinglePage_UpdatesAllPersonEmploymentRecords()
+    {
+        // Arrange
+        // The la code and establishment number are randomised so that the records created by this test are the only ones
+        // in their (la code, establishment number) group; records left behind by previous runs stay pointed at their own
+        // group's latest establishment and so aren't picked up again.
+        var localAuthorityCode = Guid.NewGuid().ToString("N")[..3];
+        var establishmentNumber = Guid.NewGuid().ToString("N")[..4];
+        var person = await TestData.CreatePersonAsync();
+        var closedEstablishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: localAuthorityCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 2);
+        var openEstablishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: localAuthorityCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 1);
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var firstStartDate = new DateOnly(2020, 01, 01);
+        var employmentCount = 1001;  // The processor pages through the changes 1000 at a time
+
+        var tpsEmploymentIds = await WithDbContextAsync(async dbContext =>
+        {
+            var tpsEmployments = Enumerable.Range(0, employmentCount)
+                .Select(i =>
+                {
+                    var startDate = firstStartDate.AddDays(i);
+
+                    return new TpsEmployment
+                    {
+                        TpsEmploymentId = Guid.NewGuid(),
+                        PersonId = person.PersonId,
+                        EstablishmentId = closedEstablishment.EstablishmentId,
+                        StartDate = startDate,
+                        EndDate = null,
+                        EmploymentType = EmploymentType.FullTime,
+                        WithdrawalConfirmed = false,
+                        LastKnownTpsEmployedDate = startDate.AddMonths(1),
+                        LastExtractDate = new DateOnly(2024, 03, 25),
+                        NationalInsuranceNumber = nationalInsuranceNumber,
+                        PersonPostcode = personPostcode,
+                        PersonEmailAddress = null,
+                        EmployerPostcode = null,
+                        EmployerEmailAddress = null,
+                        CreatedOn = TimeProvider.GetUtcNow().UtcDateTime,
+                        UpdatedOn = TimeProvider.GetUtcNow().UtcDateTime,
+                        Key = $"{person.Trn}.{localAuthorityCode}.{establishmentNumber}.{startDate:yyyyMMdd}"
+                    };
+                })
+                .ToArray();
+
+            dbContext.TpsEmployments.AddRange(tpsEmployments);
+            await dbContext.SaveChangesAsync();
+
+            return tpsEmployments.Select(e => e.TpsEmploymentId).ToArray();
+        });
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            DbContextFactory,
+            TimeProvider);
+        await processor.UpdateLatestEstablishmentVersionsAsync(CancellationToken.None);
+
+        // Assert
+        using var dbContext = DbContextFactory.CreateDbContext();
+        var updatedPersonEmployments = await dbContext.TpsEmployments.Where(e => tpsEmploymentIds.Contains(e.TpsEmploymentId)).ToListAsync();
+        Assert.Equal(employmentCount, updatedPersonEmployments.Count);
+        Assert.All(updatedPersonEmployments, e => Assert.Equal(openEstablishment.EstablishmentId, e.EstablishmentId));
+
+        var updatedEvents = await dbContext.ProcessEvents
+            .Where(e => e.EventName == nameof(TpsEmploymentUpdatedEvent) && e.PersonIds.Contains(person.PersonId))
+            .ToListAsync();
+        var tpsEmploymentIdsWithUpdatedEvent = updatedEvents
+            .Select(e => (TpsEmploymentUpdatedEvent)e.Payload)
+            .Select(e => e.TpsEmployment.PersonEmploymentId)
+            .ToHashSet();
+        Assert.All(tpsEmploymentIds, id => Assert.Contains(id, tpsEmploymentIdsWithUpdatedEvent));
     }
 
     [Fact]

@@ -14,6 +14,7 @@ public class VerifyModel(
     ResolveOneLoginUserMatchingJourneyCoordinator journey,
     ISafeFileService safeFileService,
     SupportUiLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
     SupportTaskService supportTaskService,
     TimeProvider timeProvider,
     IFeatureProvider featureProvider) : PageModel
@@ -46,6 +47,10 @@ public class VerifyModel(
     public string? NationalInsuranceNumber { get; set; }
     public string? Trn { get; set; }
     public EvidenceInfo? Evidence { get; set; }
+    public string? QtsYearReceived { get; set; }
+    public string? QtsProvider { get; set; }
+    public string? QtsSubject { get; set; }
+    public bool HasQtsDetails => !string.IsNullOrWhiteSpace(QtsYearReceived) || QtsProvider is not null || QtsSubject is not null;
 
     public void OnGet()
     {
@@ -147,6 +152,13 @@ public class VerifyModel(
         NationalInsuranceNumber = Core.NationalInsuranceNumber.Normalize(data.StatedNationalInsuranceNumber);
         Trn = TrnHelper.NormalizeTrn(data.StatedTrn);
         EmailAddress = oneLoginUser.EmailAddress;
+        QtsYearReceived = data.YearQtsReceived;
+        QtsProvider = data.TrainingProviderId is Guid trainingProviderId
+            ? (await referenceDataCache.GetTrainingProviderByIdAsync(trainingProviderId)).Name
+            : null;
+        QtsSubject = data.SubjectId is Guid subjectId
+            ? (await referenceDataCache.GetTrainingSubjectByIdAsync(subjectId)).Name
+            : null;
 
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
         if (!fileExtensionContentTypeProvider.TryGetContentType(data.EvidenceFileName, out var evidenceFileMimeType))

@@ -11,6 +11,7 @@ public record SetQtlsCommand(string Trn, DateOnly? QtsDate) : ICommand<QtlsResul
 public class SetQtlsHandler(
     TrsDbContext dbContext,
     ICurrentUserProvider currentUserProvider,
+    TimeProvider timeProvider,
     RoutesToProfessionalStatusService routesToProfessionalStatusService) :
     ICommandHandler<SetQtlsCommand, QtlsResult>
 {
@@ -54,10 +55,10 @@ public class SetQtlsHandler(
                         PersonId = person.PersonId,
                         RouteToProfessionalStatusTypeId = qtlsRouteId,
                         Status = RouteToProfessionalStatusStatus.Holds,
-                        CreatedBy = currentUserId,
                         HoldsFrom = adjustedQtsDate,
                         IsExemptFromInduction = true
-                    });
+                    },
+                    new ProcessContext(ProcessType.RouteToProfessionalStatusCreating, timeProvider.UtcNow, currentUserId));
             }
             else
             {
@@ -65,9 +66,9 @@ public class SetQtlsHandler(
                     new UpdateRouteToProfessionalStatusOptions
                     {
                         QualificationId = existingQualification.QualificationId,
-                        UpdatedBy = currentUserId,
                         HoldsFrom = Option.Some(adjustedQtsDate)
-                    });
+                    },
+                    new ProcessContext(ProcessType.RouteToProfessionalStatusUpdating, timeProvider.UtcNow, currentUserId));
             }
         }
         else if (existingQualification is not null)
@@ -75,9 +76,9 @@ public class SetQtlsHandler(
             await routesToProfessionalStatusService.DeleteRouteToProfessionalStatusAsync(
                 new DeleteRouteToProfessionalStatusOptions
                 {
-                    QualificationId = existingQualification.QualificationId,
-                    DeletedBy = currentUserId
-                });
+                    QualificationId = existingQualification.QualificationId
+                },
+                new ProcessContext(ProcessType.RouteToProfessionalStatusDeleting, timeProvider.UtcNow, currentUserId));
         }
 
         return new QtlsResult()

@@ -19,8 +19,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:PostgresExtension:btree_gin", ",,")
+                .HasAnnotation("Npgsql:PostgresExtension:pg_trgm", ",,")
+                .HasAnnotation("Npgsql:PostgresExtension:unaccent", ",,")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", b =>

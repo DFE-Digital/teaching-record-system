@@ -61,7 +61,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
 
         var request = new HttpRequestMessage(HttpMethod.Post, RequestPath)
         {
@@ -80,7 +80,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
 
         var request = new HttpRequestMessage(HttpMethod.Post, RequestPath)
         {
@@ -106,7 +106,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         var person = await TestData.CreatePersonAsync();
         var evidenceFileUrl = "https://place.com/evidence.jpg";
         ConfigureEvidenceFile(evidenceFileUrl);
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn);
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn, Version);
 
         var request = new HttpRequestMessage(HttpMethod.Post, RequestPath)
         {

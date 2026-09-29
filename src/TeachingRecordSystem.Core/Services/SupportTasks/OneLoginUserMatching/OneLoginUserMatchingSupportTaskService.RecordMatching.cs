@@ -28,7 +28,12 @@ public partial class OneLoginUserMatchingSupportTaskService
                     StatedNationalInsuranceNumber = options.StatedNationalInsuranceNumber,
                     StatedTrn = options.StatedTrn,
                     ClientApplicationUserId = options.ClientApplicationUserId,
-                    TrnTokenTrn = options.TrnTokenTrn
+                    TrnTokenTrn = options.TrnTokenTrn,
+                    YearQtsReceived = options.YearQtsReceived,
+                    TrainingProviderId = options.TrainingProviderId,
+                    TrainingProviderName = options.TrainingProviderName,
+                    SubjectId = options.SubjectId,
+                    SubjectName = options.SubjectName
                 },
                 PersonId = null,
                 OneLoginUserSubject = options.OneLoginUserSubject,

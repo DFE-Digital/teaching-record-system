@@ -38,16 +38,4 @@ public static class PersonDetailsUpdatedEventExtensions
         | (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress : 0)
         | (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0)
         | (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? LegacyEvents.PersonDetailsUpdatedEventChanges.Gender : 0);
-
-    public static LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges ToLegacyChangeNameRequestSupportTaskApprovedEventChanges(this PersonDetailsUpdatedEventChanges changes) =>
-        LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges.None
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges.FirstName : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges.MiddleName : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? LegacyEvents.ChangeNameRequestSupportTaskApprovedEventChanges.LastName : 0);
-
-    public static LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEventChanges ToLegacyChangeDateOfBirthRequestSupportTaskApprovedEventChanges(this PersonDetailsUpdatedEventChanges changes) =>
-        LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.None
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEventChanges.DateOfBirth : 0);
-
-
 }

@@ -1,4 +1,5 @@
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services;
 using TeachingRecordSystem.Core.Services.Persons;
@@ -569,7 +570,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .SingleAsync(p => p.PersonId == personToDeactivate.PersonId);
             Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(PersonStatus.Deactivated, updatedPersonRecord.Status);
@@ -605,7 +606,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .SingleAsync(p => p.PersonId == personToDeactivate.PersonId);
             Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(PersonStatus.Deactivated, updatedPersonRecord.Status);
@@ -673,7 +674,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .SingleAsync(p => p.PersonId == personToReactivate.PersonId);
             Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(PersonStatus.Active, updatedPersonRecord.Status);
@@ -714,7 +715,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         await WithDbContextAsync(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .SingleAsync(p => p.PersonId == personToReactivate.PersonId);
             Assert.Equal(TimeProvider.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(PersonStatus.Active, updatedPersonRecord.Status);
@@ -826,7 +827,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         await WithDbContextAsync(async dbContext =>
         {
             var deactivatedPerson = await dbContext.Persons
-                .IgnoreQueryFilters()
+                .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                 .SingleAsync(p => p.PersonId == personToDeactivate.PersonId);
             Assert.Equal(PersonStatus.Deactivated, deactivatedPerson.Status);
             Assert.Equal(personToRetain.PersonId, deactivatedPerson.MergedWithPersonId);
@@ -998,7 +999,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         // Assert
         var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personToRetain.PersonId));
         Assert.Equal(PersonStatus.Active, updatedPersonToRetain.Status);
@@ -1006,7 +1007,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         Assert.Equal(TimeProvider.UtcNow, updatedPersonToRetain.UpdatedOn);
 
         var updatedPersonToDeactivate = await WithDbContextAsync(dbContext => dbContext.Persons
-            .IgnoreQueryFilters()
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.MergedWithPerson)
             .SingleAsync(p => p.PersonId == personToDeactivate.PersonId));
         Assert.Equal(PersonStatus.Deactivated, updatedPersonToDeactivate.Status);

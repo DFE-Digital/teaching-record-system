@@ -29,6 +29,19 @@ Support UI *Add person*.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `PersonCreatedEvent` | Always | — |
+| `EmailSentEvent` | Sometimes | Back-filled only, onto the 45 overseas NPQ TRN allocations described below. *Add person* sends no email. |
+
+45 of these processes did not come from *Add person*. They are the person creations from the since-removed
+`AllocateTrnsToOverseasNpqApplicantsJob`, re-typed here from `TeacherPensionsRecordImporting` (28) by
+[`RepairOverseasNpqPersonCreationProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/RepairOverseasNpqPersonCreationProcessesJob.cs);
+that job's note explains why. They carry no `ChangeReason`, so the "Reason for creating record" block on their
+change history entry is empty.
+
+[`BackfillOverseasNpqTrnEmailSentEventsJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillOverseasNpqTrnEmailSentEventsJob.cs)
+attaches that run's 'TRN generated for NPQ' emails to them, since the allocation put the TRN on the record at
+the moment the record was created. The back-filled `EmailSentEvent` points at the `emails` row the send
+actually used — matched exactly on the TRN in the email's personalization, not on template and address — so it
+carries the real address, personalization and `SentOn`.
 
 ### `PersonDetailsUpdating` (25)
 API `SetPii`; Support UI *Edit details*.
@@ -38,7 +51,8 @@ API `SetPii`; Support UI *Edit details*.
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when at least one detail actually changes. |
 
 ### `PersonDeactivating` (26)
-Support UI *Set status → deactivate*.
+Support UI *Set status → deactivate*; [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs)
+when the imported Teachers' Pensions row carries a date of death.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
@@ -50,6 +64,34 @@ Support UI *Set status → reactivate*.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `PersonReactivatedEvent` | Always | — |
+
+Status changes from before these journeys moved onto `PersonService` were back-filled from the legacy
+`PersonStatusUpdatedEvent`s by
+[`BackfillPersonStatusProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonStatusProcessesJob.cs), which
+picks the process type from the status the legacy event recorded. Those processes carry the reason, reason details,
+additional information and evidence on the process `ChangeReason`. A back-filled `PersonReactivatedEvent` only ever
+flags `PersonStatus`, because the legacy event never recorded the date of death the reactivation cleared.
+
+### `PersonInductionUpdating` (98)
+Support UI *Edit induction*. The two systems that drive induction themselves get their own types below, so this one is a support user changing the record by hand.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
+### `PersonCpdInductionUpdating` (99)
+API `SetCpdInductionStatus`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
+
+### `PersonWelshInductionUpdating` (100)
+API `SetWelshInductionStatus`; the EWC Wales induction import. Both are EWC Wales telling us the outcome of an induction served in Wales, so they share a type. Back-filled events reach it through the import's integration transaction rather than the system user it runs as, which the DQT outbox handlers also wrote as; an induction change with no matching import row keeps `PersonInductionUpdating` (98).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonInductionUpdatedEvent` | Always | The operation returns early when nothing moves, and no process is created at all. |
 
 ### `PersonDeceased` (42)
 API `SetDeceased`.
@@ -67,6 +109,21 @@ Support UI *Merge person*.
 | `PersonDetailsUpdatedEvent` | Sometimes | The retained record's attributes are changed to values taken from the secondary record. |
 | `OneLoginUserUpdatedEvent` | Sometimes | The deactivated record had linked One Login users, which are re-pointed to the retained record. |
 
+Merges from before the journey moved onto `PersonService` were back-filled from the legacy `PersonsMergedEvent`s by
+[`BackfillPersonMergeProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonMergeProcessesJob.cs). Those
+processes carry the two person events but no `OneLoginUserUpdatedEvent`, which the legacy event never recorded.
+
+### `PersonUnmerging` (102)
+`trscli person unmerge`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonUnmergedEvent` | Always | — |
+
+The command only reverses the deactivation and the link back to the retained record. The details the merge copied onto
+the retained record and any One Login users it re-pointed are deliberately left alone, so no `PersonDetailsUpdatedEvent`
+or `OneLoginUserUpdatedEvent` is emitted.
+
 ### `TeacherPensionsRecordImporting` (28)
 [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs) (Teachers' Pensions import).
 
@@ -74,6 +131,37 @@ Support UI *Merge person*.
 | --- | --- | --- |
 | `PersonCreatedEvent` | Sometimes | The imported TPS record does not already exist in TRS, so a new person is created. |
 | `SupportTaskCreatedEvent` | Sometimes | The newly created person potentially matches an existing record (a `TeacherPensionsPotentialDuplicate` task). |
+
+45 processes of this type were not Teachers' Pensions imports at all. They were created by the since-removed
+`AllocateTrnsToOverseasNpqApplicantsJob` on 2025-11-06, which allocated TRNs to overseas NPQ applicants and
+recorded a legacy `PersonCreatedEvent` with no process; something later back-filled those events onto
+per-person processes and typed them `TeacherPensionsRecordImporting`, so the people involved showed a
+"Record imported from Teachers' Pensions" entry for a record that arrived by a different route.
+[`RepairOverseasNpqPersonCreationProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/RepairOverseasNpqPersonCreationProcessesJob.cs)
+re-types them to `PersonCreating` (24), keyed on a signature a real import cannot produce: raised by the
+system user rather than the Capita Teachers' Pensions user, holding a `PersonCreatedEvent` alone, for a
+person not stamped `created_by_tps`.
+
+### `TpsEmploymentCreating` (103)
+[`TpsCsvExtractProcessor`](../src/TeachingRecordSystem.Core/Services/WorkforceData/TpsCsvExtractProcessor.cs)
+(the monthly Teachers' Pensions workforce data extract), one process per employment record it creates.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TpsEmploymentCreatedEvent` | Always | — |
+
+### `TpsEmploymentUpdating` (104)
+[`TpsCsvExtractProcessor`](../src/TeachingRecordSystem.Core/Services/WorkforceData/TpsCsvExtractProcessor.cs),
+one process per employment record it changes — from the extract itself, from an establishment or end date being
+re-derived, or from the employer email address back-fill.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TpsEmploymentUpdatedEvent` | Always | — |
+
+Employment records changed before the extract processor moved onto processes were back-filled from the legacy
+`TpsEmploymentCreatedEvent`s and `TpsEmploymentUpdatedEvent`s by
+[`BackfillTpsEmploymentProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTpsEmploymentProcessesJob.cs).
 
 ---
 
@@ -88,6 +176,11 @@ API `CreateTrnRequest`.
 | `PersonCreatedEvent` | Sometimes | The request is auto-resolved and no existing record matches, so a new record is created. |
 | `SupportTaskCreatedEvent` | Sometimes | Auto-resolution finds potential duplicates (a `TrnRequest` task) or the matched record needs further checks (a `TrnRequestManualChecksNeeded` task). |
 | `OneLoginUserUpdatedEvent` | Sometimes | The request carries a verified One Login user that is connected to the resolved person. |
+
+The API wrote its support task creations straight to the legacy `events` table until December 2025.
+[`BackfillTrnRequestSupportTaskProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnRequestSupportTaskProcessesJob.cs)
+back-fills those as processes of this type, holding the `SupportTaskCreatedEvent` alone: TRN request creation
+itself never had a legacy event, so there is nothing else left to recover.
 
 ### `TrnRequestActivating` (43)
 API `ActivateTrnRequest`.
@@ -110,6 +203,11 @@ Support UI *Resolve TRN request*.
 | `PersonDetailsUpdatedEvent` | Sometimes | The support user merges into an existing record and updates its attributes. |
 | `SupportTaskCreatedEvent` | Sometimes | The matched record needs further checks (a `TrnRequestManualChecksNeeded` task). |
 | `OneLoginUserUpdatedEvent` | Sometimes | A verified One Login user on the request is connected to the resolved person. |
+
+Resolutions from before December 2025 recorded only the legacy `ApiTrnRequestSupportTaskUpdatedEvent`, which is
+still to be converted. Where one of them created a manual checks needed task,
+[`BackfillTrnRequestSupportTaskProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnRequestSupportTaskProcessesJob.cs)
+back-fills a process of this type holding that `SupportTaskCreatedEvent` alone.
 
 ### `TrnRequestManualChecksNeededTaskCompleting` (20)
 Support UI *TRN request manual checks needed → confirm*.
@@ -237,6 +335,75 @@ A single process spans the whole sign-in journey.
 | --- | --- | --- |
 | `EmailSentEvent` | Always | The TRN recipient email is sent. |
 
+The four award process types below all come from
+[`SendAytqInviteEmailJob`](../src/TeachingRecordSystem.Core/Jobs/SendAytqInviteEmailJob.cs), which picks between
+them on the template of the email
+[`BatchSendProfessionalStatusEmailsJob`](../src/TeachingRecordSystem.Core/Jobs/BatchSendProfessionalStatusEmailsJob.cs)
+queued. Older ones were back-filled by
+[`BackfillNotificationEmailProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNotificationEmailProcessesJob.cs) —
+see [what that job covers](#what-the-notification-back-fill-covers) below.
+
+### `NotifyingQtsAwardee` (92)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The QTS awarded email is sent. |
+
+### `NotifyingInternationalQtsAwardee` (93)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The international QTS awarded email is sent. |
+
+### `NotifyingEytsAwardee` (94)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The EYTS awarded email is sent. |
+
+### `NotifyingQtlsAwardee` (95)
+
+The QTLS post-launch email, which goes to people who gained QTS through the QTLS and SET membership route.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The QTLS post-launch email is sent. |
+
+### `NotifyingInductionCompletee` (96)
+[`SendInductionCompletedEmailJob`](../src/TeachingRecordSystem.Core/Jobs/SendInductionCompletedEmailJob.cs). Older
+ones were back-filled from the legacy `InductionCompletedEmailSentEvent` by
+[`BackfillNotificationEmailProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNotificationEmailProcessesJob.cs);
+this job always wrote that event, so it has no second era.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The induction completed email is sent. |
+
+### `NotifyingLapsedQtlsHolder` (97)
+[`SendQtlsLapsedEmailJob`](../src/TeachingRecordSystem.Core/Jobs/SendQtlsLapsedEmailJob.cs), for the emails
+[`BatchSendProfessionalStatusEmailsJob`](../src/TeachingRecordSystem.Core/Jobs/BatchSendProfessionalStatusEmailsJob.cs)
+queues when a person's QTLS expires.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `EmailSentEvent` | Always | The QTLS lapsed email is sent. |
+
+### What the notification back-fill covers
+
+[`BackfillNotificationEmailProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNotificationEmailProcessesJob.cs)
+creates the processes for the emails of all six types above that were sent before those types existed. It handles
+two eras, which left behind different things:
+
+| Era | Sender | Recorded | How the person is recovered |
+| --- | --- | --- | --- |
+| Up to the AYTQ rewire | the original per-status batch jobs | a typed legacy event (`QtsAwardedEmailSentEvent` and friends); no `emails` row | it's on the event; the `emails` row is recreated from the batch job item |
+| Rewire onwards | `SendEmailJob` | a real `emails` row and the generic legacy `EmailSentEvent`; no process | the TRN in the email's metadata |
+
+The QTLS lapsed email is the exception in the second era: it carries neither a TRN nor any personalization, so
+the person comes from the QTLS expiry that caused it — the `PersonProfessionalStatusAttributesUpdatedEvent` that
+moved their `QtlsStatus` from Active to Expired shortly before the send, narrowed by the address it went to.
+Anything that doesn't come back to exactly one person is skipped rather than guessed at.
+
 ---
 
 ## Change requests (created via the API)
@@ -268,8 +435,7 @@ Support UI *Change requests → accept* (name change).
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as approved. |
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when the approved name differs from the current record. |
-
-*The approval email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A confirmation email is sent when an email address is available. |
 
 ### `ChangeOfDateOfBirthRequestApproving` (31)
 Support UI *Change requests → accept* (date-of-birth change).
@@ -278,8 +444,7 @@ Support UI *Change requests → accept* (date-of-birth change).
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as approved. |
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when the approved date of birth differs from the current record. |
-
-*The approval email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A confirmation email is sent when an email address is available. |
 
 ### `ChangeOfNameRequestRejecting` (57)
 Support UI *Change requests → reject* (name change).
@@ -287,8 +452,7 @@ Support UI *Change requests → reject* (name change).
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as rejected. |
-
-*The rejection email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A rejection email is sent when an email address is available. |
 
 ### `ChangeOfDateOfBirthRequestRejecting` (58)
 Support UI *Change requests → reject* (date-of-birth change).
@@ -296,8 +460,7 @@ Support UI *Change requests → reject* (date-of-birth change).
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | The support task is closed as rejected. |
-
-*The rejection email is sent without a process context, so it produces no `EmailSentEvent`.*
+| `EmailSentEvent` | Sometimes | A rejection email is sent when an email address is available. |
 
 ### `ChangeOfNameRequestCancelling` (59)
 Support UI *Change requests → reject* with reason *Change no longer required* (name change).
@@ -483,12 +646,21 @@ CLI `webhook-endpoint delete`.
 
 ## NPQ TRN requests (legacy)
 
+The NPQ TRN request journey was removed from the Support UI, so nothing produces these process types any
+more. They cover the requests that were handled while it existed, plus the older ones back-filled from the
+legacy events:
+[`BackfillNpqTrnRequestProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillNpqTrnRequestProcessesJob.cs)
+from `NpqTrnRequestSupportTaskResolvedEvent` / `NpqTrnRequestSupportTaskRejectedEvent`, and
+[`BackfillTrnRequestSupportTaskProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnRequestSupportTaskProcessesJob.cs)
+from the `SupportTaskCreatedEvent`s the 'request a TRN' pages wrote before they moved onto the event pipeline.
+The tables below describe what those processes hold.
+
 ### `NpqTrnRequestTaskCreating` (15)
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `SupportTaskCreatedEvent` | Always | — |
-| `TrnRequestCreatedEvent` | Always | — |
+| `TrnRequestCreatedEvent` | Always | Only on a process the pages created — TRN request creation never had a legacy event, so the back-filled ones hold the `SupportTaskCreatedEvent` alone. |
 
 ### `NpqTrnRequestApproving` (18)
 
@@ -498,7 +670,7 @@ CLI `webhook-endpoint delete`.
 | `TrnRequestUpdatedEvent` | Always | — |
 | `PersonCreatedEvent` | Sometimes | The support user chooses to create a new record. |
 | `PersonDetailsUpdatedEvent` | Sometimes | The support user merges into an existing record and updates its attributes. |
-| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. |
+| `EmailSentEvent` | Sometimes | A 'TRN Generated for NPQ' email was sent to the person. Only ever on a process the journey created — the email was introduced after the journey was already running as a process, so the back-filled ones never have one. The same template was also sent by the bulk overseas NPQ TRN allocation; those sends belong to a person creation elsewhere, and are covered under `PersonCreating` (24). |
 
 ### `NpqTrnRequestRejecting` (19)
 
@@ -506,6 +678,20 @@ CLI `webhook-endpoint delete`.
 | --- | --- | --- |
 | `SupportTaskUpdatedEvent` | Always | — |
 | `TrnRequestUpdatedEvent` | Always | — |
+
+---
+
+## TRN allocation (historical)
+
+### `TrnAllocating` (91)
+
+Nothing produces this process type any more. It covers the TRNs handed out by the one-off jobs that allocated
+them to persons with EYPS and to overseas NPQ applicants, back-filled from the legacy `TrnAllocatedEvent`s by
+[`BackfillTrnAllocationProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTrnAllocationProcessesJob.cs).
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TrnAllocatedEvent` | Always | — |
 
 ---
 
@@ -612,6 +798,20 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | --- | --- | --- |
 | `DqtContactInductionStatusChangedEvent` | Always | — |
 
+### `PersonMigratingFromDqt` (1)
+The one-off migration of person records from DQT into TRS. Back-filled from the legacy `PersonMigratedEvent`; nothing writes this type any more. The events were written straight into the `events` table by `CreatePersonMigratedEventsJob` and carried no `RaisedBy`, so the back-filled processes are attributed to the system user.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonMigratedEvent` | Always | — |
+
+### `InductionMigratingFromDqt` (101)
+The one-off migration of induction from DQT onto the person record. Back-filled from the legacy `InductionMigratedEvent`; nothing writes this type any more.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `InductionMigratedEvent` | Always | — |
+
 ### `InitialTeacherTrainingCreatingInDqt` (80)
 
 | Event | Emitted | Scenario |
@@ -635,3 +835,55 @@ only used for display grouping (e.g. in [`ChangeHistoryService`](../src/Teaching
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `DqtQtsRegistrationUpdatedEvent` | Always | — |
+
+### `MandatoryQualificationDeactivatingInDqt` (84)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `MandatoryQualificationDqtDeactivatedEvent` | Always | — |
+
+### `MandatoryQualificationImportingIntoDqt` (85)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `MandatoryQualificationDqtImportedEvent` | Always | — |
+
+### `MandatoryQualificationMigratingFromDqt` (86)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `MandatoryQualificationMigratedEvent` | Always | — |
+
+### `RouteToProfessionalStatusCreating` (87)
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Add route*; the EWC Wales QTS import.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusCreatedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when adding the route moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when adding the route moves the person's induction. |
+
+### `RouteToProfessionalStatusUpdating` (88)
+API `SetRouteToProfessionalStatus` and `SetQtls`; Support UI *Edit route*; `SetMissingHasEypsOnPersonsJob`.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusUpdatedEvent` | Sometimes | Only when a field on the route itself actually changes. |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when the change moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when the change moves the person's induction. |
+
+### `RouteToProfessionalStatusDeleting` (89)
+API `SetQtls`; Support UI *Delete route*.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusDeletedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when deleting the route moves the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |
+| `PersonInductionUpdatedEvent` | Sometimes | Only when deleting the route moves the person's induction. |
+
+### `RouteToProfessionalStatusMigratingFromDqt` (90)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `RouteToProfessionalStatusMigratedEvent` | Always | — |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | Only when the migration moved the person's QTS/EYTS/PQTS date, their EYPS flag or their QTLS status. |

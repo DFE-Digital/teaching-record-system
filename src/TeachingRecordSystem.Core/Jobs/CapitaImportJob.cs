@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.SupportTasks.TeacherPensions;
 using TeachingRecordSystem.Core.Services.TrnRequests;
@@ -182,12 +183,7 @@ public class CapitaImportJob(
 
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            newPerson.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, "", null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
-                            if (@event is not null)
-                            {
-                                dbContext.AddEventWithoutBroadcast(@event);
-                                await dbContext.SaveChangesAsync();
-                            }
+                            await DeactivateForDateOfDeathAsync(newPerson.PersonId, dateOfDeath);
                         }
 
                         personId = newPerson.PersonId;
@@ -221,13 +217,7 @@ public class CapitaImportJob(
                         // Deactivate person if date of death is provided
                         if (!string.IsNullOrEmpty(row.DateOfDeath) && DateOnly.TryParseExact(row.DateOfDeath, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfDeath))
                         {
-                            person.DateOfDeath = dateOfDeath;
-                            person.SetStatus(PersonStatus.Deactivated, "Date of death received from capita import", null, "", null, SystemUser.Instance.UserId, timeProvider.UtcNow, out var @event);
-                            if (@event is not null)
-                            {
-                                dbContext.AddEventWithoutBroadcast(@event);
-                                await dbContext.SaveChangesAsync();
-                            }
+                            await DeactivateForDateOfDeathAsync(person.PersonId, dateOfDeath);
                         }
 
                         // update ni only if ni is not present && is valid.
@@ -302,6 +292,25 @@ public class CapitaImportJob(
         return integrationId;
     }
 
+    // The deactivation gets its own process rather than joining the import's; it's the same change the Support UI
+    // makes when a record is deactivated, and it's the reason the record shows as deactivated in the change history.
+    private Task DeactivateForDateOfDeathAsync(Guid personId, DateOnly dateOfDeath)
+    {
+        var processContext = new ProcessContext(
+            ProcessType.PersonDeactivating,
+            timeProvider.UtcNow,
+            SystemUser.Instance.UserId,
+            new ChangeReasonWithDetailsAndEvidence
+            {
+                Reason = "Date of death received from capita import",
+                Details = null,
+                EvidenceFile = null,
+                AdditionalInformation = null
+            });
+
+        return personService.DeactivatePersonAsync(new DeactivatePersonOptions(personId, dateOfDeath), processContext);
+    }
+
     public async Task<(List<string> Errors, List<string> Warnings, Person? person)> ValidateRowAsync(CapitaImportRecord record)
     {
         //hard errors
@@ -325,7 +334,7 @@ public class CapitaImportJob(
 
         // if a potential match is not found and the result of the import of this row would be to create a person
         // make sure that first name and last name are both present.
-        var person = await dbContext.Persons.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Trn == record.TRN);
+        var person = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).FirstOrDefaultAsync(x => x.Trn == record.TRN);
         if (person is null && string.IsNullOrEmpty(record.GetFirstName()))
         {
             errors.Add("Unable to create a new record without a firstname");

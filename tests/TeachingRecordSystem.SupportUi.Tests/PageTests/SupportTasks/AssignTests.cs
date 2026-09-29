@@ -369,8 +369,10 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_BackAndCancelLinks_KeepTheSelectedTasks()
     {
         // Arrange
-        var firstTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
-        var secondTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        // The clock is frozen, so pin distinct CreatedOn values - the default RequestedOn sort has no
+        // tiebreaker and tasks created at the same instant come back in an arbitrary order
+        var firstTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 20)));
+        var secondTask = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r.WithCreatedOn(new DateTime(2025, 1, 21)));
         var returnUrl = "/support-tasks/active?sortBy=Subject&pageNumber=2";
 
         var request = new HttpRequestMessage(

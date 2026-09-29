@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
@@ -19,27 +20,10 @@ public class ChangeHistoryService(
     {
         var eventTypes = new[]
         {
-            nameof(LegacyEvents.MandatoryQualificationDqtDeactivatedEvent),
             nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
-            nameof(LegacyEvents.MandatoryQualificationDqtImportedEvent),
-            nameof(LegacyEvents.MandatoryQualificationMigratedEvent),
-            nameof(LegacyEvents.InductionMigratedEvent),
-            nameof(LegacyEvents.PersonInductionUpdatedEvent),
-            nameof(LegacyEvents.PersonDetailsUpdatedEvent),
-            nameof(LegacyEvents.PersonCreatedEvent),
-            nameof(LegacyEvents.RouteToProfessionalStatusCreatedEvent),
-            nameof(LegacyEvents.RouteToProfessionalStatusUpdatedEvent),
-            nameof(LegacyEvents.RouteToProfessionalStatusDeletedEvent),
-            nameof(LegacyEvents.RouteToProfessionalStatusMigratedEvent),
             nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
-            nameof(LegacyEvents.NpqTrnRequestSupportTaskResolvedEvent),
-            nameof(LegacyEvents.PersonStatusUpdatedEvent),
-            nameof(LegacyEvents.PersonsMergedEvent),
-            nameof(LegacyEvents.TrnAllocatedEvent),
             nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
-            nameof(LegacyEvents.ChangeNameRequestSupportTaskApprovedEvent),
             nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
-            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskApprovedEvent),
             nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
             nameof(OneLoginUserUpdatedEvent)
         };
@@ -95,12 +79,19 @@ public class ChangeHistoryService(
 
         var processTypesToQuery = new[]
         {
+            ProcessType.PersonCreating,
             ProcessType.PersonCreatingInDqt,
             ProcessType.PersonImportingIntoDqt,
             ProcessType.PersonUpdatingInDqt,
             ProcessType.PersonDeactivatingInDqt,
             ProcessType.PersonReactivatingInDqt,
             ProcessType.PersonMergingInDqt,
+            ProcessType.PersonMerging,
+            ProcessType.PersonUnmerging,
+            ProcessType.PersonDeactivating,
+            ProcessType.PersonReactivating,
+            ProcessType.PersonDeceased,
+            ProcessType.PersonDetailsUpdating,
             ProcessType.AlertCreating,
             ProcessType.AlertUpdating,
             ProcessType.AlertDeleting,
@@ -118,15 +109,38 @@ public class ChangeHistoryService(
             ProcessType.InitialTeacherTrainingUpdatingInDqt,
             ProcessType.QtsRegistrationCreatingInDqt,
             ProcessType.QtsRegistrationUpdatingInDqt,
+            ProcessType.ChangeOfNameRequestCreating,
+            ProcessType.ChangeOfNameRequestApproving,
+            ProcessType.ChangeOfDateOfBirthRequestCreating,
+            ProcessType.ChangeOfDateOfBirthRequestApproving,
+            ProcessType.NpqTrnRequestApproving,
             ProcessType.MandatoryQualificationCreating,
             ProcessType.MandatoryQualificationUpdating,
             ProcessType.MandatoryQualificationDeleting,
+            ProcessType.MandatoryQualificationDeactivatingInDqt,
+            ProcessType.MandatoryQualificationImportingIntoDqt,
+            ProcessType.MandatoryQualificationMigratingFromDqt,
+            ProcessType.RouteToProfessionalStatusCreating,
+            ProcessType.RouteToProfessionalStatusUpdating,
+            ProcessType.RouteToProfessionalStatusDeleting,
+            ProcessType.RouteToProfessionalStatusMigratingFromDqt,
+            ProcessType.PersonInductionUpdating,
+            ProcessType.PersonCpdInductionUpdating,
+            ProcessType.PersonWelshInductionUpdating,
+            ProcessType.InductionMigratingFromDqt,
+            ProcessType.NoteCreating,
             ProcessType.PersonOneLoginUserDisconnecting,
             ProcessType.PersonOneLoginUserConnecting,
             ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,
             ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
             ProcessType.OneLoginUserPersonConnecting,
-            ProcessType.OneLoginUserPersonDisconnecting
+            ProcessType.OneLoginUserPersonDisconnecting,
+            ProcessType.NotifyingTrnRecipient,
+            ProcessType.TeacherPensionsRecordImporting,
+            ProcessType.TrnAllocating,
+            ProcessType.TrnRequestCreating,
+            ProcessType.TrnRequestResolving,
+            ProcessType.TrnRequestActivating
         };
 
         var processes = await dbContext.Processes
@@ -172,8 +186,11 @@ public class ChangeHistoryService(
                 || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
         }).ToList();
 
+        var contextData = await GetContextDataAsync(filteredProcesses);
+        var context = ChangeHistoryContext.ForPerson(personId, contextData.AllPersons, contextData.AllOneLoginUsers);
+
         var allResults = eventsWithUser.Select(e => MapLegacyEvent(e, personId))
-            .Concat(filteredProcesses.Select(p => MapProcess(p, personId)))
+            .Concat(filteredProcesses.Select(p => MapProcess(p, personId, context)))
             .ToArray();
 
         var pageNumber = paginationOptions.PageNumber ?? 1;
@@ -190,46 +207,49 @@ public class ChangeHistoryService(
     public async Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(
         string supportTaskReference)
     {
-        return await dbContext.Processes
+        var results = await dbContext.Processes
             .Where(p => p.SupportTaskReferences.Contains(supportTaskReference))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
             .OrderByDescending(p => p.CreatedOn)
             .Select(process =>
-                new ProcessChangeHistoryEntry(
+                new Result(
                     process,
-                    new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
+                    new RaisedByUserInfo
+                    {
+                        Name = process.User != null ? process.User.Name : process.DqtUserName!
+                    }))
             .ToArrayAsync();
+
+        var contextData = await GetContextDataAsync(results.Select(r => r.Process).AsReadOnly());
+        var context = ChangeHistoryContext.ForSupportTask(supportTaskReference, contextData.AllPersons, contextData.AllOneLoginUsers);
+
+        return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context)).AsReadOnly();
     }
 
     public async Task<ResultPage<ProcessChangeHistoryEntry>> GetChangeHistoryByOneLoginUserAsync(
         string oneLoginUserSubject,
         PaginationOptions paginationOptions)
     {
-        var processTypesToQuery = new[]
-        {
-            ProcessType.PersonOneLoginUserConnecting,
-            ProcessType.PersonOneLoginUserDisconnecting,
-            ProcessType.OneLoginUserRecordMatchingSupportTaskCompleting,
-            ProcessType.OneLoginUserIdVerificationSupportTaskCompleting,
-            ProcessType.OneLoginUserPersonConnecting,
-            ProcessType.OneLoginUserPersonDisconnecting
-        };
-
         var query = dbContext.Processes
-            .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject) && processTypesToQuery.Contains(p.ProcessType))
+            .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
             .OrderByDescending(p => p.CreatedOn);
 
         var totalCount = await query.CountAsync();
 
-        return await query
+        var results = await query
             .Select(process =>
-                new ProcessChangeHistoryEntry(
+                new Result(
                     process,
                     new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount);
+
+        var contextData = await GetContextDataAsync(results.Select(r => r.Process));
+        var context = ChangeHistoryContext.ForOneLoginUser(oneLoginUserSubject, contextData.AllPersons, contextData.AllOneLoginUsers);
+
+        return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context));
     }
 
     private TimelineItem MapLegacyEvent(EventWithUser eventWithUser, Guid personId)
@@ -253,13 +273,52 @@ public class ChangeHistoryService(
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.LegacyEvent, personId, timelineEvent.Event.CreatedUtc, timelineEvent)!;
     }
 
-    private TimelineItem MapProcess(Process process, Guid personId) =>
+    public async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults)
+    {
+        var allPersonIds = allResults
+            .SelectMany(r =>
+            {
+                var personIds = r.PersonIds.ToList();
+
+                // Support tasks that assign the PersonId to a OneLogin don't have PersonId set on the event itself;
+                // explicitly include it here.
+                r.Events!
+                    .Select(e => e.Payload)
+                    .OfType<SupportTaskUpdatedEvent>()
+                    .SelectMany(e => e.SupportTask.Data is IOneLoginUserMatchingData { PersonId: { } personId } ? [personId] : Array.Empty<Guid>())
+                    .ForEach(personIds.Add);
+
+                return personIds;
+            })
+            .Distinct()
+            .ToArray();
+
+        var allPersons = await dbContext.Persons
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
+            .Where(p => allPersonIds.Contains(p.PersonId))
+            .Select(p => new ChangeHistoryContext.PersonInfo(p.PersonId, p.Trn, p.FirstName, p.LastName))
+            .ToArrayAsync();
+
+        var allOneLoginUserSubjects = allResults.SelectMany(r => r.OneLoginUserSubjects).Distinct().ToArray();
+
+        var allOneLoginUsers = await dbContext.OneLoginUsers
+            .Where(u => allOneLoginUserSubjects.Contains(u.Subject))
+            .Select(u => new ChangeHistoryContext.OneLoginUserInfo(u.Subject, u.EmailAddress))
+            .ToArrayAsync();
+
+        return new(
+            allPersons.ToDictionary(p => p.PersonId, p => p),
+            allOneLoginUsers.ToDictionary(u => u.OneLoginUserSubject, u => u));
+    }
+
+    private TimelineItem MapProcess(Process process, Guid personId, ChangeHistoryContext context) =>
         new TimelineItem<ProcessChangeHistoryEntry>(
             TimelineItemType.Process,
             personId,
             process.CreatedOn,
-            new ProcessChangeHistoryEntry(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }));
+            new ProcessChangeHistoryEntry(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, context));
 
+    [UsedImplicitly]
     private record EventWithUser
     {
         public required string EventName { get; init; }
@@ -269,4 +328,10 @@ public class ChangeHistoryService(
         public required string? ApplicationUserName { get; init; }
         public required string? ApplicationUserShortName { get; init; }
     }
+
+    private record Result(Process Process, RaisedByUserInfo RaisedByUser);
+
+    public record ContextData(
+        IReadOnlyDictionary<Guid, ChangeHistoryContext.PersonInfo> AllPersons,
+        IReadOnlyDictionary<string, ChangeHistoryContext.OneLoginUserInfo> AllOneLoginUsers);
 }

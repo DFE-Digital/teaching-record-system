@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
@@ -250,22 +249,23 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : AddRouteTestBase(h
             Assert.Equal(state.DegreeTypeId, addedProfessionalStatusRecord.DegreeTypeId);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
-
-            Assert.Equal(TimeProvider.UtcNow, actualCreatedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, actualCreatedEvent.PersonId);
-            Assert.Equal(state.Status, actualCreatedEvent.RouteToProfessionalStatus.Status);
-            Assert.Equal(state.RouteToProfessionalStatusId, actualCreatedEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
-            Assert.Equal(state.TrainingStartDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingStartDate);
-            Assert.Equal(state.TrainingEndDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingEndDate);
-            Assert.Equal(state.HoldsFrom, actualCreatedEvent.RouteToProfessionalStatus.HoldsFrom);
-            Assert.Equal(state.TrainingAgeSpecialismType, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismType);
-            Assert.Equal(state.TrainingAgeSpecialismRangeFrom, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom);
-            Assert.Equal(state.TrainingAgeSpecialismRangeTo, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo);
-            Assert.Equal(state.TrainingSubjectIds, actualCreatedEvent.RouteToProfessionalStatus.TrainingSubjectIds);
-            Assert.Equal(state.IsExemptFromInduction, actualCreatedEvent.RouteToProfessionalStatus.ExemptFromInduction);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<RouteToProfessionalStatusCreatedEvent>(actualCreatedEvent =>
+            {
+                Assert.Equal(person.PersonId, actualCreatedEvent.PersonId);
+                Assert.Equal(state.Status, actualCreatedEvent.RouteToProfessionalStatus.Status);
+                Assert.Equal(state.RouteToProfessionalStatusId, actualCreatedEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
+                Assert.Equal(state.TrainingStartDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingStartDate);
+                Assert.Equal(state.TrainingEndDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingEndDate);
+                Assert.Equal(state.HoldsFrom, actualCreatedEvent.RouteToProfessionalStatus.HoldsFrom);
+                Assert.Equal(state.TrainingAgeSpecialismType, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismType);
+                Assert.Equal(state.TrainingAgeSpecialismRangeFrom, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom);
+                Assert.Equal(state.TrainingAgeSpecialismRangeTo, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo);
+                Assert.Equal(state.TrainingSubjectIds, actualCreatedEvent.RouteToProfessionalStatus.TrainingSubjectIds);
+                Assert.Equal(state.IsExemptFromInduction, actualCreatedEvent.RouteToProfessionalStatus.ExemptFromInduction);
+            });
         });
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
@@ -301,12 +301,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : AddRouteTestBase(h
         var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Equal(state.HoldsFrom, updatedPerson.QtsDate);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
-
-            Assert.Equal(state.HoldsFrom, actualCreatedEvent.PersonAttributes.QtsDate);
-            Assert.Null(actualCreatedEvent.OldPersonAttributes.QtsDate);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(state.HoldsFrom, attributesEvent.PersonAttributes.QtsDate);
+                Assert.Null(attributesEvent.OldPersonAttributes.QtsDate);
+            });
         });
     }
 
@@ -349,12 +351,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : AddRouteTestBase(h
         var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Equal(state.HoldsFrom, updatedPerson.EytsDate);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
-
-            Assert.Equal(state.HoldsFrom, actualCreatedEvent.PersonAttributes.EytsDate);
-            Assert.Null(actualCreatedEvent.OldPersonAttributes.EytsDate);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(state.HoldsFrom, attributesEvent.PersonAttributes.EytsDate);
+                Assert.Null(attributesEvent.OldPersonAttributes.EytsDate);
+            });
         });
     }
 
@@ -395,12 +399,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : AddRouteTestBase(h
         var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.True(updatedPerson.HasEyps);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
-
-            Assert.True(actualCreatedEvent.PersonAttributes.HasEyps);
-            Assert.False(actualCreatedEvent.OldPersonAttributes.HasEyps);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.True(attributesEvent.PersonAttributes.HasEyps);
+                Assert.False(attributesEvent.OldPersonAttributes.HasEyps);
+            });
         });
     }
 
@@ -438,12 +444,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : AddRouteTestBase(h
         var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Equal(state.HoldsFrom, updatedPerson.PqtsDate);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
-
-            Assert.Equal(state.HoldsFrom, actualCreatedEvent.PersonAttributes.PqtsDate);
-            Assert.Null(actualCreatedEvent.OldPersonAttributes.PqtsDate);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusCreating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(state.HoldsFrom, attributesEvent.PersonAttributes.PqtsDate);
+                Assert.Null(attributesEvent.OldPersonAttributes.PqtsDate);
+            });
         });
     }
 

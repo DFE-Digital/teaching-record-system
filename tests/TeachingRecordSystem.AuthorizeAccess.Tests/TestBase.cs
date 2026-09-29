@@ -237,12 +237,49 @@ public abstract class TestBase : IAsyncLifetime
         return trnToken;
     }
 
+    // Stands in for the user being verified in another journey while this one is open
+    protected Task SetOneLoginUserVerifiedAsync(string subject) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject);
+            SetVerified(oneLoginUser);
+            await dbContext.SaveChangesAsync();
+        });
+
+    // Stands in for the user being connected to a teaching record in another journey while this one is open
+    protected Task SetOneLoginUserConnectedAsync(string subject, Guid personId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject);
+            SetVerified(oneLoginUser);
+            oneLoginUser.SetMatched(TimeProvider.UtcNow, personId, OneLoginUserMatchRoute.Interactive, matchedAttributes: null);
+            await dbContext.SaveChangesAsync();
+        });
+
+    private void SetVerified(OneLoginUser oneLoginUser)
+    {
+        if (oneLoginUser.VerificationRoute is not null)
+        {
+            return;
+        }
+
+        oneLoginUser.SetVerified(
+            TimeProvider.UtcNow,
+            OneLoginUserVerificationRoute.OneLogin,
+            verifiedByApplicationUserId: null,
+            verifiedNames: [[TestData.GenerateFirstName(), TestData.GenerateLastName()]],
+            verifiedDatesOfBirth: [TestData.GenerateDateOfBirth()],
+            coreIdentityClaimVc: null);
+    }
+
     protected static class StepUrls
     {
         public const string NotVerified = "/not-verified";
         public const string Connect = "/connect";
         public const string NationalInsuranceNumber = "/national-insurance-number";
         public const string Trn = "/trn";
+        public const string QtsStatus = "/qts-status";
+        public const string QtsDetails = "/qts-details";
         public const string Found = "/found";
         public const string ContinueToApplication = "/continue-to-application";
         public const string NotFound = "/not-found";
@@ -269,6 +306,12 @@ public abstract class TestBase : IAsyncLifetime
 
         public static string Trn(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.Trn);
+
+        public static string QtsStatus(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.QtsStatus);
+
+        public static string QtsDetails(JourneyInstanceId instanceId) =>
+            instanceId.EnsureUrlHasKey(StepUrls.QtsDetails);
 
         public static string Found(JourneyInstanceId instanceId) =>
             instanceId.EnsureUrlHasKey(StepUrls.Found);

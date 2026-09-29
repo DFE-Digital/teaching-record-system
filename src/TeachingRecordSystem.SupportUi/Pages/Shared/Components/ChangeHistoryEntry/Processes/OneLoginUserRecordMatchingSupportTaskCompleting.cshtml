@@ -4,6 +4,7 @@
 @using TeachingRecordSystem.Core.Models
 @using TeachingRecordSystem.Core.Models.SupportTasks
 @using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @inject PersonInfoCache PersonInfoCache
 @inject SupportUiLinkGenerator LinkGenerator
 @inject TrsDbContext DbContext
@@ -20,7 +21,7 @@
     var hasTrnRequestUpdatedEvent = Model.TryGetEvent<TrnRequestUpdatedEvent>(out var trnRequestUpdatedEvent);
     var hasPersonCreatedEvent = Model.TryGetEvent<PersonCreatedEvent>(out var personCreatedEvent);
     var hasSupportTaskCreatedEvent = Model.TryGetEvent<SupportTaskCreatedEvent>(out var supportTaskCreatedEvent);
-    
+
     var oneLoginEmail = hasOneLoginUpdatedEvent
         ? oneLoginUpdatedEvent!.OneLoginUser.EmailAddress
         : supportTaskData!.OneLoginUserEmail;
@@ -89,8 +90,8 @@
     @if (hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OneLoginUser.PersonId is not null)
     {
         var matchedPersonId = oneLoginUpdatedEvent.OneLoginUser.PersonId!.Value;
-        var matchedPersonInfo = await PersonInfoCache.GetPersonInfoAsync(matchedPersonId);
-        var matchedPersonLinkText = $"{matchedPersonInfo?.FirstName} {matchedPersonInfo?.LastName}";
+        var matchedPersonInfo = Model.Context.GetPersonInfo(matchedPersonId);
+        var matchedPersonLinkText = $"{matchedPersonInfo.FirstName} {matchedPersonInfo.LastName}";
 
         <p class="govuk-body" data-testid="one-login-matched-message">
             @if (Model.Context.ContextType == ChangeHistoryContextType.SupportTask)
@@ -108,7 +109,7 @@
         </p>
     }
 
-    @if (hasTrnRequestUpdatedEvent 
+    @if (hasTrnRequestUpdatedEvent
         && trnRequestUpdatedEvent!.TrnRequest.ResolvedPersonId is not null
         && trnRequestUpdatedEvent.TrnRequest.Status == TrnRequestStatus.Completed)
     {

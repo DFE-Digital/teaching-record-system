@@ -300,11 +300,14 @@ public class SetRouteToProfessionalStatusTests(OperationTestFixture operationTes
                 PersonId = personId,
                 RouteToProfessionalStatusTypeId = routeTypeId,
                 Status = status,
-                CreatedBy = SystemUser.SystemUserId,
                 SourceApplicationUserId = currentUserId,
                 SourceApplicationReference = sourceRef,
                 HoldsFrom = holdsFrom,
                 TrainingSubjectIds = []
-            });
+            },
+            new ProcessContext(
+                ProcessType.RouteToProfessionalStatusCreating,
+                TimeProvider.UtcNow,
+                SystemUser.SystemUserId));
     }
 }

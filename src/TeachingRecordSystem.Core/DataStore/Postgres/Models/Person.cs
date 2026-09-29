@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -72,44 +71,12 @@ public class Person
     public bool DqtAllowTeacherIdentitySignInWithProhibitions { get; set; }
     public DateOnly? DateOfDeath { get; set; }
 
-    public void SetStatus(
-        PersonStatus targetStatus,
-        string? reason,
-        string? reasonDetail,
-        string? additionalInformation,
-        EventModels.File? evidenceFile,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        out PersonStatusUpdatedEvent @event)
-    {
-        var oldStatus = Status;
-        Status = targetStatus;
-        UpdatedOn = now;
-
-        @event = new()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Status = Status,
-            OldStatus = oldStatus,
-            Reason = reason,
-            ReasonDetail = reasonDetail,
-            EvidenceFile = evidenceFile,
-            DateOfDeath = null,
-            AdditionalInformation = additionalInformation
-        };
-    }
-
-    public void SetCpdInductionStatus(
+    public bool SetCpdInductionStatus(
         InductionStatus status,
         DateOnly? startDate,
         DateOnly? completedDate,
         DateTime cpdModifiedOn,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        out PersonInductionUpdatedEvent? @event)
+        DateTime now)
     {
         if (status is not (
             InductionStatus.RequiredToComplete
@@ -139,16 +106,9 @@ public class Person
         InductionStartDate = startDate;
         InductionCompletedDate = completedDate;
 
-        var changes = PersonInductionUpdatedEventChanges.None |
-            (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-            (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-            (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0);
-
-        if (changes == PersonInductionUpdatedEventChanges.None)
+        if (!InductionHasChanged(oldEventInduction))
         {
-            @event = null;
-            return;
+            return false;
         }
 
         InductionModifiedOn = now;
@@ -156,20 +116,7 @@ public class Person
         CpdInductionModifiedOn = now;
         CpdInductionCpdModifiedOn = cpdModifiedOn;
 
-        @event = new PersonInductionUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Induction = EventModels.Induction.FromModel(this),
-            OldInduction = oldEventInduction,
-            ChangeReason = null,
-            ChangeReasonDetail = null,
-            EvidenceFile = null,
-            Changes = changes,
-            AdditionalInformation = null
-        };
+        return true;
     }
 
     // This should be used for testing only
@@ -187,18 +134,12 @@ public class Person
         InductionExemptionReasonIds = exemptionReasonIds;
     }
 
-    public void SetInductionStatus(
+    public bool SetInductionStatus(
         InductionStatus status,
         DateOnly? startDate,
         DateOnly? completedDate,
         Guid[] exemptionReasonIds,
-        string? changeReason,
-        string? changeReasonDetail,
-        EventModels.File? evidenceFile,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        string? additionalInformation,
-        out PersonInductionUpdatedEvent? @event)
+        DateTime now)
     {
         // N.B. We allow missing data fields as some migrated data has missing fields
         // and we want to be able to test such scenarios.
@@ -233,53 +174,22 @@ public class Person
 
         InductionExemptWithoutReason = false;
 
-        var changes = PersonInductionUpdatedEventChanges.None |
-            (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
-            (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-            (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-            (!InductionExemptionReasonIds.ToHashSet().SetEquals(oldEventInduction.ExemptionReasonIds) ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0) |
-            (InductionExemptWithoutReason != oldEventInduction.InductionExemptWithoutReason ? PersonInductionUpdatedEventChanges.InductionExemptWithoutReason : 0);
-
-        if (changes == PersonInductionUpdatedEventChanges.None)
+        if (!InductionHasChanged(oldEventInduction))
         {
-            @event = null;
-            return;
+            return false;
         }
 
         InductionModifiedOn = now;
 
-        @event = new PersonInductionUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Induction = EventModels.Induction.FromModel(this),
-            OldInduction = oldEventInduction,
-            ChangeReason = changeReason,
-            ChangeReasonDetail = changeReasonDetail,
-            EvidenceFile = evidenceFile,
-            Changes = changes,
-            AdditionalInformation = additionalInformation
-        };
+        return true;
     }
 
-    public bool AddInductionExemptionReason(
-        Guid exemptionReasonId,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+    public bool AddInductionExemptionReason(Guid exemptionReasonId, DateTime now)
     {
         if (InductionExemptionReasonIds.Contains(exemptionReasonId))
         {
-            @event = null;
             return false;
         }
-
-        var oldEventInduction = EventModels.Induction.FromModel(this);
-
-        var changes = PersonInductionUpdatedEventChanges.InductionExemptionReasons;
 
         InductionExemptionReasonIds = InductionExemptionReasonIds.Concat([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
@@ -287,23 +197,7 @@ public class Person
         if (InductionStatus.Exempt.IsHigherPriorityThan(InductionStatus))
         {
             InductionStatus = InductionStatus.Exempt;
-            changes |= PersonInductionUpdatedEventChanges.InductionStatus;
         }
-
-        @event = new PersonInductionUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Induction = EventModels.Induction.FromModel(this),
-            OldInduction = oldEventInduction,
-            ChangeReason = null,
-            ChangeReasonDetail = null,
-            EvidenceFile = null,
-            Changes = changes,
-            AdditionalInformation = null
-        };
 
         return true;
     }
@@ -324,21 +218,12 @@ public class Person
         return true;
     }
 
-    public bool RemoveInductionExemptionReason(
-        Guid exemptionReasonId,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+    public bool RemoveInductionExemptionReason(Guid exemptionReasonId, DateTime now)
     {
         if (!InductionExemptionReasonIds.Contains(exemptionReasonId))
         {
-            @event = null;
             return false;
         }
-
-        var oldEventInduction = EventModels.Induction.FromModel(this);
-
-        var changes = PersonInductionUpdatedEventChanges.InductionExemptionReasons;
 
         InductionExemptionReasonIds = InductionExemptionReasonIds.Except([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
@@ -348,23 +233,7 @@ public class Person
         if (InductionStatus is InductionStatus.Exempt && (allExemptionReasonIds.Count == 0 && !InductionExemptWithoutReason))
         {
             InductionStatus = InductionStatusWithoutExemption;
-            changes |= PersonInductionUpdatedEventChanges.InductionStatus;
         }
-
-        @event = new PersonInductionUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Induction = EventModels.Induction.FromModel(this),
-            OldInduction = oldEventInduction,
-            ChangeReason = null,
-            ChangeReasonDetail = null,
-            EvidenceFile = null,
-            Changes = changes,
-            AdditionalInformation = null
-        };
 
         return true;
     }
@@ -373,20 +242,17 @@ public class Person
         bool passed,
         DateOnly? startDate,
         DateOnly? completedDate,
-        EventModels.RaisedByUserInfo updatedBy,
-        DateTime now,
-        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+        DateTime now)
     {
         if (passed)
         {
-            return AddInductionExemptionReason(InductionExemptionReason.PassedInWalesId, updatedBy, now, out @event);
+            return AddInductionExemptionReason(InductionExemptionReason.PassedInWalesId, now);
         }
 
         var newStatus = InductionStatus.FailedInWales;
 
         if (InductionStatus.IsHigherPriorityThan(newStatus))
         {
-            @event = null;
             return false;
         }
 
@@ -397,37 +263,23 @@ public class Person
         InductionStartDate = startDate;
         InductionCompletedDate = completedDate;
 
-        var changes = PersonInductionUpdatedEventChanges.None |
-            (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
-            (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
-            (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
-            (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0);
-
-        if (changes == PersonInductionUpdatedEventChanges.None)
+        if (!InductionHasChanged(oldEventInduction))
         {
-            @event = null;
             return false;
         }
 
         InductionModifiedOn = now;
 
-        @event = new PersonInductionUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = updatedBy,
-            PersonId = PersonId,
-            Induction = EventModels.Induction.FromModel(this),
-            OldInduction = oldEventInduction,
-            ChangeReason = null,
-            ChangeReasonDetail = null,
-            EvidenceFile = null,
-            Changes = changes,
-            AdditionalInformation = null
-        };
-
         return true;
     }
+
+    private bool InductionHasChanged(EventModels.Induction oldInduction) =>
+        InductionStatus != oldInduction.Status ||
+        InductionStatusWithoutExemption != oldInduction.StatusWithoutExemption ||
+        InductionStartDate != oldInduction.StartDate ||
+        InductionCompletedDate != oldInduction.CompletedDate ||
+        !InductionExemptionReasonIds.ToHashSet().SetEquals(oldInduction.ExemptionReasonIds) ||
+        InductionExemptWithoutReason != oldInduction.InductionExemptWithoutReason;
 
     public static bool ValidateInductionData(
         InductionStatus status,

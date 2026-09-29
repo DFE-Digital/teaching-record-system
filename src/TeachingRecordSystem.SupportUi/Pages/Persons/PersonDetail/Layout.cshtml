@@ -17,6 +17,17 @@
 
 <h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
 
+@if (person.Status == PersonStatus.Deactivated)
+{
+    <govuk-warning-text data-testid="deactivated-message">This record has been deactivated</govuk-warning-text>
+    @if (person.MergedWithPersonId is Guid mergedWithPersonId)
+    {
+        <p class="govuk-body">
+            <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(mergedWithPersonId)" target="_blank" rel="noopener noreferrer" data-testid="active-merged-record-link">View active merged record (opens in a new tab)</a>
+        </p>
+    }
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <nav class="moj-sub-navigation" aria-label="Sub navigation">

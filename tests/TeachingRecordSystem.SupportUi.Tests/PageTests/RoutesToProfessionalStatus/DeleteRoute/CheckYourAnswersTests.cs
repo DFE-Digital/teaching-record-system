@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.DeleteRoute;
@@ -235,16 +235,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
 
         await WithDbContextAsync(async dbContext => Assert.Null(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, p.ProcessContext.ProcessType);
+            var changeReason = p.ProcessContext.Process.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 
-            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, deletedEvent.PersonId);
-            Assert.Equal(deleteRouteState.ChangeReason!.GetDisplayName(), deletedEvent.DeletionReason);
-            Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, deletedEvent.DeletionReasonDetail);
-            Assert.Null(deletedEvent.EvidenceFile);
-            Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.None, deletedEvent.Changes);
+            p.AssertProcessHasEvents<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
+            {
+                Assert.Equal(person.PersonId, deletedEvent.PersonId);
+                Assert.Equal(deleteRouteState.ChangeReason!.GetDisplayName(), changeReason?.Reason);
+                Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, changeReason?.Details);
+                Assert.Null(changeReason?.EvidenceFile);
+            });
+
+            // Nothing about the person moved, so the route event is the only one on the process.
+            p.AssertProcessHasEvents<RouteToProfessionalStatusDeletedEvent>();
         });
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
@@ -288,15 +293,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
 
         var raisedByUserId = GetCurrentUserId();
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(raisedByUserId, deletedEvent.RaisedBy.UserId);
-            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, deletedEvent.PersonId);
-            Assert.Equal(qtsDate, deletedEvent.OldPersonAttributes.QtsDate);
-            Assert.Null(deletedEvent.PersonAttributes.QtsDate);
-            Assert.True(deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate));
+            Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
+            {
+                Assert.Equal(raisedByUserId, p.ProcessContext.UserId);
+                Assert.Equal(person.PersonId, deletedEvent.PersonId);
+            });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(qtsDate, attributesEvent.OldPersonAttributes.QtsDate);
+                Assert.Null(attributesEvent.PersonAttributes.QtsDate);
+                Assert.True(attributesEvent.Changes.HasFlag(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate));
+            });
         });
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
@@ -342,14 +353,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
         var updatedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
         Assert.Equal(holdsFromLatest, updatedPerson.QtsDate);
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(TimeProvider.UtcNow, deletedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, deletedEvent.PersonId);
-            Assert.Equal(holdsFromEarliest, deletedEvent.OldPersonAttributes.QtsDate);
-            Assert.Equal(holdsFromLatest, deletedEvent.PersonAttributes.QtsDate);
-            Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
+            Assert.Equal(ProcessType.RouteToProfessionalStatusDeleting, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvent<RouteToProfessionalStatusDeletedEvent>(deletedEvent =>
+            {
+                Assert.Equal(TimeProvider.UtcNow, p.ProcessContext.Now);
+                Assert.Equal(person.PersonId, deletedEvent.PersonId);
+            });
+
+            p.AssertProcessHasEvent<PersonProfessionalStatusAttributesUpdatedEvent>(attributesEvent =>
+            {
+                Assert.Equal(holdsFromEarliest, attributesEvent.OldPersonAttributes.QtsDate);
+                Assert.Equal(holdsFromLatest, attributesEvent.PersonAttributes.QtsDate);
+                Assert.Equal(PersonProfessionalStatusAttributesUpdatedEventChanges.QtsDate, attributesEvent.Changes);
+            });
         });
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));

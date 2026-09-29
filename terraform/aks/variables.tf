@@ -167,6 +167,18 @@ variable "skip_bq_policy_tags" {
   default = false
 }
 
+variable "safe_storage_malware_scan_enabled" {
+  type        = bool
+  default     = true
+  description = "Whether to enable malware scanning on the safe storage account"
+}
+
+variable "safe_storage_malware_scan_cap_gb_per_month" {
+  type        = number
+  default     = null
+  description = "The cap on the amount of data to scan for malware per month on the safe storage account"
+}
+
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
 

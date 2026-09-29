@@ -148,6 +148,10 @@ schema across both.
 - A message whose first mapper appears at a version *later* than the endpoint's is never delivered to that
   endpoint. Adding a new message type is therefore a schema change like any other: consumers have to move their
   endpoint's version forward to receive it.
+- Mappers run once per application user with endpoints subscribed to the message, and are passed an
+  [`EventMapperContext`](../src/TeachingRecordSystem.Core/ApiSchema/V3/EventMapperContext.cs) carrying that
+  application user's ID. Returning `null` sends nothing to that application's endpoints — this is how
+  `trn_request.completed` is only sent to the application that made the TRN request.
 - Delivered messages advertise their schema. `ce-dataschema` on the CloudEvent points at the OpenAPI document for
   the endpoint's version — `https://<host>/swagger/v3_<version>.json` — set by
   [`WebhookSender`](../src/TeachingRecordSystem.Core/Services/Webhooks/WebhookSender.cs).

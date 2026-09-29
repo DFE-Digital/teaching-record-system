@@ -25,6 +25,11 @@ public partial class TestData
         private Option<string> _statedTrn;
         private Option<string?> _trnTokenTrn;
         private Option<Guid> _clientApplicationUserId;
+        private Option<string?> _yearQtsReceived;
+        private Option<Guid?> _trainingProviderId;
+        private Option<string?> _trainingProviderName;
+        private Option<Guid?> _subjectId;
+        private Option<string?> _subjectName;
         private Option<SupportTaskStatus> _status;
         private Option<DateTime> _createdOn;
         private Option<string> _trnRequestId;
@@ -72,6 +77,36 @@ public partial class TestData
             return this;
         }
 
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithYearQtsReceived(string? yearQtsReceived)
+        {
+            _yearQtsReceived = Option.Some(yearQtsReceived);
+            return this;
+        }
+
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithTrainingProviderId(Guid? trainingProviderId)
+        {
+            _trainingProviderId = Option.Some(trainingProviderId);
+            return this;
+        }
+
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithTrainingProviderName(string? trainingProviderName)
+        {
+            _trainingProviderName = Option.Some(trainingProviderName);
+            return this;
+        }
+
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithSubjectId(Guid? subjectId)
+        {
+            _subjectId = Option.Some(subjectId);
+            return this;
+        }
+
+        public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithSubjectName(string? subjectName)
+        {
+            _subjectName = Option.Some(subjectName);
+            return this;
+        }
+
         public CreateOneLoginUserRecordMatchingSupportTaskBuilder WithStatus(SupportTaskStatus status)
         {
             _status = Option.Some(status);
@@ -106,6 +141,11 @@ public partial class TestData
                 var statedNationalInsuranceNumber = _statedNationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
                 var statedTrn = _statedTrn.ValueOr("9999999");
                 var trnTokenTrn = _trnTokenTrn.ValueOrDefault();
+                var yearQtsReceived = _yearQtsReceived.ValueOrDefault();
+                var trainingProviderId = _trainingProviderId.ValueOrDefault();
+                var trainingProviderName = _trainingProviderName.ValueOrDefault();
+                var subjectId = _subjectId.ValueOrDefault();
+                var subjectName = _subjectName.ValueOrDefault();
                 var status = _status.ValueOr(SupportTaskStatus.Open);
                 var createdOn = _createdOn.ValueOr(testData.TimeProvider.UtcNow);
                 var zendeskTickets = _zendeskTickets.ValueOr([]);
@@ -191,7 +231,12 @@ public partial class TestData
                         StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
                         StatedTrn = statedTrn,
                         ClientApplicationUserId = clientApplicationUserId,
-                        TrnTokenTrn = trnTokenTrn
+                        TrnTokenTrn = trnTokenTrn,
+                        YearQtsReceived = yearQtsReceived,
+                        TrainingProviderId = trainingProviderId,
+                        TrainingProviderName = trainingProviderName,
+                        SubjectId = subjectId,
+                        SubjectName = subjectName
                     },
                     OneLoginUserSubject = oneLoginUserSubject,
                     TrnRequestApplicationUserId = trnRequestId is not null ? clientApplicationUserId : null,

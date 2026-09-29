@@ -7,6 +7,4 @@ public abstract class TestBase(HostFixture hostFixture) : IntegrationTests.TestB
     public HttpClient GetHttpClient() => GetHttpClient(Version);
 
     public HttpClient GetHttpClientWithApiKey() => GetHttpClientWithApiKey(Version);
-
-    public HttpClient GetHttpClientWithIdentityAccessToken(string trn) => GetHttpClientWithIdentityAccessToken(trn, version: Version);
 }

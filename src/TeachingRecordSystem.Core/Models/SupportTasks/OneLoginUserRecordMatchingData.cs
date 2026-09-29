@@ -10,6 +10,11 @@ public record OneLoginUserRecordMatchingData : IOneLoginUserMatchingData
     public required string? StatedTrn { get; init; }
     public required string? TrnTokenTrn { get; init; }
     public required Guid ClientApplicationUserId { get; init; }
+    public required string? YearQtsReceived { get; init; }
+    public required Guid? TrainingProviderId { get; init; }
+    public required string? TrainingProviderName { get; init; }
+    public required Guid? SubjectId { get; init; }
+    public required string? SubjectName { get; init; }
     public Guid? PersonId { get; init; }
     public OneLoginUserRecordMatchingOutcome? Outcome { get; init; }
     public OneLoginUserNotConnectingReason? NotConnectingReason { get; init; }

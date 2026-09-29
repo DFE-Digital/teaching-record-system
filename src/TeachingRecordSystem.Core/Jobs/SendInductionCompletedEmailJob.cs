@@ -1,6 +1,7 @@
+using System.Transactions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -9,6 +10,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 public class SendInductionCompletedEmailJob(
     INotificationSender notificationSender,
     TrsDbContext dbContext,
+    IEventPublisher eventPublisher,
     IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions,
     TimeProvider timeProvider,
     TrnRequestService trnRequestService)
@@ -19,6 +21,11 @@ public class SendInductionCompletedEmailJob(
 
     public async Task ExecuteAsync(Guid inductionCompletedEmailsJobId, Guid personId)
     {
+        using var txn = new TransactionScope(
+            TransactionScopeOption.Required,
+            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
+            TransactionScopeAsyncFlowOption.Enabled);
+
         var item = await dbContext.InductionCompletedEmailsJobItems.SingleAsync(i => i.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && i.PersonId == personId);
 
         if (!item.Personalization.ContainsKey(LinkToAccessYourQualificationsServicePersonalisationKey))
@@ -33,16 +40,32 @@ public class SendInductionCompletedEmailJob(
         await notificationSender.SendEmailAsync(EmailTemplateIds.InductionCompletedEmailConfirmation, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
-        dbContext.AddEventWithoutBroadcast(new InductionCompletedEmailSentEvent
+        var sentOn = timeProvider.UtcNow;
+
+        var sentEmail = new Email
         {
-            EventId = Guid.NewGuid(),
-            InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
-            PersonId = personId,
+            EmailId = Guid.NewGuid(),
+            TemplateId = EmailTemplateIds.InductionCompletedEmailConfirmation,
             EmailAddress = item.EmailAddress,
-            CreatedUtc = timeProvider.UtcNow,
-            RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
-        });
+            Personalization = new Dictionary<string, string>(item.Personalization),
+            Metadata = new Dictionary<string, object> { { SendAytqInviteEmailJob.JobMetadataKeys.Trn, item.Trn } },
+            SentOn = sentOn
+        };
+
+        dbContext.Emails.Add(sentEmail);
 
         await dbContext.SaveChangesAsync();
+
+        var processContext = new ProcessContext(ProcessType.NotifyingInductionCompletee, sentOn, SystemUser.SystemUserId);
+
+        await eventPublisher.PublishSingleEventAsync(
+            new EmailSentEvent
+            {
+                PersonId = personId,
+                Email = EventModels.Email.FromModel(sentEmail)
+            },
+            processContext);
+
+        txn.Complete();
     }
 }

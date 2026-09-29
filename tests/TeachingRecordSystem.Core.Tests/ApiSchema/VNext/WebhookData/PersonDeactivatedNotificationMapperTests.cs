@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260612.WebhookData;
 using TeachingRecordSystem.Core.Tests.Services;
 
@@ -31,7 +32,7 @@ public class PersonDeactivatedNotificationMapperTests(ServiceFixture fixture) : 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
 
             // Assert
             Assert.NotNull(notification);
@@ -63,7 +64,7 @@ public class PersonDeactivatedNotificationMapperTests(ServiceFixture fixture) : 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event);
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
 
             // Assert
             Assert.NotNull(notification);

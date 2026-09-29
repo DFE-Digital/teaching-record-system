@@ -56,7 +56,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
             .MapErrorCode(
                 ApiError.ErrorCodes.RecordIsMerged,
                 e => RedirectPermanentPreserveMethod(
-                    Url.Action("Get", new { trn = (string)e.Data[ApiError.DataKeys.MergedWithTrn] })!))
+                    Url.Action("Get", new { trn = (string)e.Data[ApiError.DataKeys.MergedWithTrn] })! + Request.QueryString))
             .MapErrorCode(ApiError.ErrorCodes.ForbiddenForAppropriateBody, StatusCodes.Status403Forbidden);
     }
 }

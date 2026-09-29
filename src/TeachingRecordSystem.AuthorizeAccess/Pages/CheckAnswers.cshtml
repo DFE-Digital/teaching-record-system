@@ -4,6 +4,10 @@
 @model TeachingRecordSystem.AuthorizeAccess.Pages.CheckAnswersModel
 @{
     ViewBag.Title = "Check your details before sending support request";
+    var hasYearQtsReceived = !string.IsNullOrWhiteSpace(Model.YearQtsReceived);
+    var hasQtsTrainingProviderName = !string.IsNullOrWhiteSpace(Model.QtsTrainingProviderName);
+    var hasQtsSubjectName = !string.IsNullOrWhiteSpace(Model.QtsSubjectName);
+    var hasQtsDetails = hasYearQtsReceived || hasQtsTrainingProviderName || hasQtsSubjectName;
 }
 
 <div class="govuk-grid-row">
@@ -31,6 +35,7 @@
                 }
             </govuk-summary-list>
 
+
             <h2 class="govuk-heading-m">Additional details</h2>
 
             <govuk-summary-list>
@@ -41,7 +46,7 @@
                         <value>@Model.Name</value>
                         <row-actions>
                             <action href="@Links.Name(returnUrl: Request.GetEncodedPathAndQuery())"
-                                                           visually-hidden-text="name">
+                                visually-hidden-text="name">
                                 Change
                             </action>
                         </row-actions>
@@ -51,7 +56,7 @@
                         <value>@Model.DateOfBirth.ToString("d MMMM yyyy")</value>
                         <row-actions>
                             <action href="@Links.DateOfBirth(returnUrl: Request.GetEncodedPathAndQuery())"
-                                                           visually-hidden-text="date of birth">
+                                visually-hidden-text="date of birth">
                                 Change
                             </action>
                         </row-actions>
@@ -64,7 +69,7 @@
                     <value use-empty-fallback>@Model.NationalInsuranceNumber</value>
                     <row-actions>
                         <action href="@Links.NationalInsuranceNumber(returnUrl: Request.GetEncodedPathAndQuery())"
-                                                       visually-hidden-text="National Insurance number">
+                            visually-hidden-text="National Insurance number">
                             Change
                         </action>
                     </row-actions>
@@ -76,11 +81,13 @@
                     <value use-empty-fallback>@Model.Trn</value>
                     <row-actions>
                         <action href="@Links.Trn(returnUrl: Request.GetEncodedPathAndQuery())"
-                                                       visually-hidden-text="teacher reference number">
+                            visually-hidden-text="teacher reference number">
                             Change
                         </action>
                     </row-actions>
                 </row>
+
+
                 @if (!Model.IdentityVerified)
                 {
                     <row>
@@ -90,13 +97,61 @@
                         <value use-empty-fallback>@Model.ProofOfIdentityFileName</value>
                         <row-actions>
                             <action href="@Links.ProofOfIdentity(returnUrl: Request.GetEncodedPathAndQuery())"
-                                                           visually-hidden-text="proof of identity">
+                                visually-hidden-text="proof of identity">
                                 Change
                             </action>
                         </row-actions>
                     </row>
                 }
             </govuk-summary-list>
+
+            @if (hasQtsDetails)
+            {
+                <h2 class="govuk-heading-m">QTS Details</h2>
+
+                <govuk-summary-list>
+                    @if (hasYearQtsReceived)
+                    {
+                        <row>
+                            <key>Year received</key>
+                            <value>@Model.YearQtsReceived</value>
+                            <row-actions>
+                                <action href="@Links.QtsDetails()"
+                                    visually-hidden-text="year received">
+                                    Change
+                                </action>
+                            </row-actions>
+                        </row>
+                    }
+                    @if (hasQtsTrainingProviderName)
+                    {
+                        <row>
+                            <key>Provider</key>
+                            <value>@Model.QtsTrainingProviderName?.Replace("'", "’")</value>
+                            <row-actions>
+                                <action href="@Links.QtsDetails()"
+                                    visually-hidden-text="training provider">
+                                    Change
+                                </action>
+                            </row-actions>
+                        </row>
+                    }
+                    @if (hasQtsSubjectName)
+                    {
+                        <row>
+                            <key>Subject</key>
+                            <value>@Model.QtsSubjectName?.Replace("'", "’")</value>
+                            <row-actions>
+                                <action href="@Links.QtsDetails()"
+                                    visually-hidden-text="subject">
+                                    Change
+                                </action>
+                            </row-actions>
+                        </row>
+                    }
+                </govuk-summary-list>
+            }
+
 
             <govuk-button type="submit">Submit support request</govuk-button>
         </form>

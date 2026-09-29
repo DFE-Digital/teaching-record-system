@@ -13,7 +13,7 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
         var email = Faker.Internet.Email();
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email));
 
-        await using var context = await HostFixture.CreateBrowserContext();
+        await using var context = await HostFixture.CreateBrowserContext(javascriptEnabled: false);
         var page = await context.NewPageAsync();
 
         await page.GoToAuthorizeAccessTestStartPageAsync();
@@ -127,7 +127,7 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth!.Value);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
 
-        await using var context = await HostFixture.CreateBrowserContext();
+        await using var context = await HostFixture.CreateBrowserContext(false);
         var page = await context.NewPageAsync();
 
         await page.GoToAuthorizeAccessTestStartPageAsync();
@@ -146,7 +146,25 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickGovUkButtonAsync("Check your answers");
+        await page.ClickGovUkButtonAsync("Next");
+
+        var trainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
+            .First(x => !x.Name.Contains('\''));
+        var qtsSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync())
+            .First(x => !x.Name.Contains('\''));
+
+        await page.WaitForUrlPathAsync("/qts-status");
+        await page.CheckAsync("text=Yes");
+        await page.ClickGovUkButtonAsync("Continue");
+
+        await page.WaitForUrlPathAsync("/qts-details");
+        Assert.Equal(1, await page.Locator("select#TrainingProviderId").CountAsync());
+        Assert.Equal(1, await page.Locator("select#SubjectId").CountAsync());
+        Assert.Equal(0, await page.Locator(".autocomplete__input").CountAsync());
+        await page.FillAsync("input#YearQtsReceived", TimeProvider.UtcNow.Year.ToString());
+        await page.SelectOptionAsync("select#TrainingProviderId", [new SelectOptionValue { Value = trainingProvider.TrainingProviderId.ToString() }]);
+        await page.SelectOptionAsync("select#SubjectId", [new SelectOptionValue { Value = qtsSubject.TrainingSubjectId.ToString() }]);
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/check-answers");
         await page.ClickGovUkButtonAsync("Submit support request");

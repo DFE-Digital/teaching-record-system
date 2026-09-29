@@ -16,37 +16,37 @@
         <form method="post">
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
             <govuk-radios for="AddReason" data-testid="reason-options">
-                <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
+                <legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true">
                     @ViewBag.Title
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@AddMqReasonOption.NewInformationReceived">
+                </legend>
+                <radios-item value="@AddMqReasonOption.NewInformationReceived">
                     @AddMqReasonOption.NewInformationReceived.GetDisplayName()
-                </govuk-radios-item>
-                <govuk-radios-item value="@AddMqReasonOption.AnotherReason">
+                </radios-item>
+                <radios-item value="@AddMqReasonOption.AnotherReason">
                     @AddMqReasonOption.AnotherReason.GetDisplayName()
-                    <govuk-radios-item-conditional data-testid="add-reason-detail">
+                    <conditional data-testid="add-reason-detail">
                         <govuk-input data-testid="reason-detail" for="AddReasonDetail" input-class="govuk-input--width-20" spellcheck="false">
-                            <govuk-input-label>Enter a reason</govuk-input-label>
+                            <label>Enter a reason</label>
                         </govuk-input>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
+                    </conditional>
+                </radios-item>
             </govuk-radios>
 
             <govuk-radios for="ProvideAdditionalInformation" data-testid="has-additional-reason_detail-options">
-                <govuk-radios-fieldset-legend>
+                <legend>
                     <h2 class="govuk-fieldset__legend--m">Do you want to provide more information?</h2>
-                </govuk-radios-fieldset-legend>
-                <govuk-radios-item value="@true">
+                </legend>
+                <radios-item value="@true">
                     Yes
-                    <govuk-radios-item-conditional data-testid="additional-detail">
+                    <conditional data-testid="additional-detail">
                         <govuk-character-count for="AdditionalInformation" max-length="UiDefaults.ReasonDetailsMaxCharacterCount" rows="UiDefaults.ReasonDetailsRows">
-                            <govuk-character-count-label>Enter details</govuk-character-count-label>
+                            <label>Enter details</label>
                         </govuk-character-count>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@false">
+                    </conditional>
+                </radios-item>
+                <radios-item value="@false">
                     No
-                </govuk-radios-item>
+                </radios-item>
             </govuk-radios>
 
             @Html.EditorFor(m => m.Evidence)

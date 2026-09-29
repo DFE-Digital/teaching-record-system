@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "dotnet-ef": {
-      "version": "10.0.11",
+      "version": "10.0.12",
       "commands": [
         "dotnet-ef"
       ],
@@ -17,7 +17,7 @@
       "rollForward": false
     },
     "powershell": {
-      "version": "7.6.5",
+      "version": "7.6.6",
       "commands": [
         "pwsh"
       ],

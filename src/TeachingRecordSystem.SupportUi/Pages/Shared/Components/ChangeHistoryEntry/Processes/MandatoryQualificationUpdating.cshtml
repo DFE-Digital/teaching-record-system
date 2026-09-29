@@ -1,26 +1,75 @@
+@using Microsoft.AspNetCore.Html
+@using System.Text.Encodings.Web
 @using TeachingRecordSystem.Core.Events.ChangeReasons
 @model ChangeHistoryEntryViewModel
 @{
     var updatedEvent = Model.GetEvent<MandatoryQualificationUpdatedEvent>();
+    var mandatoryQualification = updatedEvent.MandatoryQualification;
     var oldMandatoryQualification = updatedEvent.OldMandatoryQualification;
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 }
 
-<timeline-entry title="Mandatory qualification changed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    @if (changeReason is not null)
+<timeline-entry title="Mandatory qualification updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
+    {
+        <p class="govuk-body">
+            Training provider changed from @ToDisplayValueOrFallback(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName) to @ToDisplayValueOrFallback(mandatoryQualification.Provider?.Name ?? mandatoryQualification.Provider?.DqtMqEstablishmentName)
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
+    {
+        <p class="govuk-body">
+            Specialism changed from @ToDisplayValueOrFallback(oldMandatoryQualification.Specialism?.GetTitle()) to @ToDisplayValueOrFallback(mandatoryQualification.Specialism?.GetTitle())
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.StartDate))
+    {
+        <p class="govuk-body">
+            Start date changed from @ToDisplayValueOrFallback(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(mandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat))
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Status))
+    {
+        <p class="govuk-body">
+            Status changed from @ToDisplayValueOrFallback(oldMandatoryQualification.Status?.GetTitle()) to @ToDisplayValueOrFallback(mandatoryQualification.Status?.GetTitle())
+        </p>
+    }
+    @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.EndDate))
+    {
+        <p class="govuk-body">
+            End date changed from @ToDisplayValueOrFallback(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(mandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat))
+        </p>
+    }
+
+    @functions {
+        private static IHtmlContent ToDisplayValueOrFallback(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return new HtmlString("<span class=\"trs-empty-fallback\">None</span>");
+            }
+
+            return new HtmlString(HtmlEncoder.Default.Encode(value));
+        }
+    }
+
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
+            <summary>Reason for change</summary>
+            <text>
                 <govuk-summary-list>
                     <row>
-                        <key>Reason</key>
-                        <value data-testid="change-reason">@(!string.IsNullOrEmpty(changeReason.Reason) ? changeReason.Reason : "None")</value>
-                    </row>
-                    <row>
-                        <key>More detail</key>
-                        <value data-testid="change-reason-detail" use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                        <key>Reason details</key>
+                        <value data-testid="change-reason" use-empty-fallback>
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
                         </value>
                     </row>
                     <row>
@@ -39,49 +88,7 @@
                         </row>
                     }
                 </govuk-summary-list>
-            </govuk-details-text>
+            </text>
         </govuk-details>
     }
-    <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
-        <govuk-details-summary>Previous data</govuk-details-summary>
-        <govuk-details-text>
-            <govuk-summary-list>
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Provider))
-                {
-                    <row>
-                        <key>Training provider</key>
-                        <value data-testid="provider">@(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
-                {
-                    <row>
-                        <key>Specialism</key>
-                        <value data-testid="specialism">@(oldMandatoryQualification.Specialism?.GetTitle() ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.StartDate))
-                {
-                    <row>
-                        <key>Start date</key>
-                        <value data-testid="start-date">@(oldMandatoryQualification.StartDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Status))
-                {
-                    <row>
-                        <key>Status</key>
-                        <value data-testid="status">@(oldMandatoryQualification.Status?.GetTitle() ?? "None")</value>
-                    </row>
-                }
-                @if (updatedEvent.Changes.HasFlag(MandatoryQualificationUpdatedEventChanges.EndDate))
-                {
-                    <row>
-                        <key>End date</key>
-                        <value data-testid="end-date">@(oldMandatoryQualification.EndDate?.ToString(WebConstants.DateDisplayFormat) ?? "None")</value>
-                    </row>
-                }
-            </govuk-summary-list>
-        </govuk-details-text>
-    </govuk-details>
 </timeline-entry>

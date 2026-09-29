@@ -69,6 +69,34 @@ public class GetPersonTests : TestBase
     }
 
     [Fact]
+    public async Task Get_PersonHasNoDirectNinoButHasEmploymentNino_ReturnsEmploymentNino()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "123");
+        var employmentNino = Faker.Identification.UkNationalInsuranceNumber()!;
+
+        await TestData.CreateTpsEmploymentAsync(
+            person,
+            establishment,
+            startDate: new DateOnly(2023, 1, 1),
+            lastKnownEmployedDate: new DateOnly(2023, 12, 31),
+            employmentType: EmploymentType.FullTime,
+            lastExtractDate: new DateOnly(2024, 1, 1),
+            nationalInsuranceNumber: employmentNino);
+
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn!, Version);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        Assert.Equal(employmentNino, jsonResponse.RootElement.GetProperty("nationalInsuranceNumber").GetString());
+    }
+
+    [Fact]
     public async Task Get_WithTrnRequestIdClaimAndResolvedRequest_ReturnsPersonDetails()
     {
         // Arrange

@@ -6,8 +6,8 @@
 
 <timeline-entry title="Alert deactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     <govuk-details class="govuk-!-margin-bottom-2">
-        <govuk-details-summary>Deactivated data</govuk-details-summary>
-        <govuk-details-text>
+        <summary>Deactivated data</summary>
+        <text>
             <govuk-summary-list>
                 <row>
                     <key>DQT sanction code</key>
@@ -47,6 +47,6 @@
                     <value use-empty-fallback>@alert.DqtSpent</value>
                 </row>
             </govuk-summary-list>
-        </govuk-details-text>
+        </text>
     </govuk-details>
 </timeline-entry>

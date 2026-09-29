@@ -127,6 +127,11 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 GetRecurringJobSchedule(CapitaExportNewJob.JobSchedule));
 
+            recurringJobManager.AddOrUpdate<CapitaExportMissingTrnJob>(
+                nameof(CapitaExportMissingTrnJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.AddOrUpdate<CapitaExportAmendJob>(
                 nameof(CapitaExportAmendJob),
                 job => job.ExecuteAsync(CancellationToken.None),
@@ -177,6 +182,11 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<PersonUnaccentNamesJob>(
+                nameof(PersonUnaccentNamesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("BackfillUsersInReportingDb");
 
             recurringJobManager.AddOrUpdate<BackfillUserProcessesJob>(
@@ -217,6 +227,31 @@ public static class Extensions
             recurringJobManager.AddOrUpdate<BackfillChangeRequestProcessesJob>(
                 nameof(BackfillChangeRequestProcessesJob),
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillChangeRequestApprovalProcessesJob>(
+                $"{nameof(BackfillChangeRequestApprovalProcessesJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillChangeRequestApprovalProcessesJob>(
+                nameof(BackfillChangeRequestApprovalProcessesJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillChangeRequestEmailSentEventsJob>(
+                $"{nameof(BackfillChangeRequestEmailSentEventsJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillChangeRequestEmailSentEventsJob>(
+                nameof(BackfillChangeRequestEmailSentEventsJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<RepairChangeRequestRejectionEmailsJob>(
+                nameof(RepairChangeRequestRejectionEmailsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
             recurringJobManager.AddOrUpdate<BackfillTeacherPensionsSupportTaskProcessesJob>(
@@ -279,6 +314,86 @@ public static class Extensions
                 job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
                 Cron.Never);
 
+            recurringJobManager.AddOrUpdate<BackfillMandatoryQualificationDqtProcessesJob>(
+                $"{nameof(BackfillMandatoryQualificationDqtProcessesJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillMandatoryQualificationDqtProcessesJob>(
+                nameof(BackfillMandatoryQualificationDqtProcessesJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillRouteToProfessionalStatusProcessesJob>(
+                $"{nameof(BackfillRouteToProfessionalStatusProcessesJob)} (dry-run)",
+                job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillRouteToProfessionalStatusProcessesJob>(
+                nameof(BackfillRouteToProfessionalStatusProcessesJob),
+                job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillNpqTrnRequestProcessesJob>(
+                nameof(BackfillNpqTrnRequestProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillPersonMergeProcessesJob>(
+                nameof(BackfillPersonMergeProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillTrnAllocationProcessesJob>(
+                nameof(BackfillTrnAllocationProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillNotificationEmailProcessesJob>(
+                nameof(BackfillNotificationEmailProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillOverseasNpqTrnEmailSentEventsJob>(
+                nameof(BackfillOverseasNpqTrnEmailSentEventsJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<RepairOverseasNpqPersonCreationProcessesJob>(
+                nameof(RepairOverseasNpqPersonCreationProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillPersonInductionProcessesJob>(
+                nameof(BackfillPersonInductionProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillTrnRequestSupportTaskProcessesJob>(
+                nameof(BackfillTrnRequestSupportTaskProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillInductionMigrationProcessesJob>(
+                nameof(BackfillInductionMigrationProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillPersonMigrationProcessesJob>(
+                nameof(BackfillPersonMigrationProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillPersonStatusProcessesJob>(
+                nameof(BackfillPersonStatusProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
+            recurringJobManager.AddOrUpdate<BackfillTpsEmploymentProcessesJob>(
+                nameof(BackfillTpsEmploymentProcessesJob),
+                job => job.ExecuteAsync(CancellationToken.None),
+                Cron.Never);
+
             recurringJobManager.RemoveIfExists("BackfillSupportTasksInReportingDb");
 
             recurringJobManager.RemoveIfExists("BackfillSupportTaskColumnsJob (dry-run)");
@@ -321,10 +436,7 @@ public static class Extensions
 
             recurringJobManager.RemoveIfExists("BackfillAlertsInReportingDb");
 
-            recurringJobManager.AddOrUpdate<BackfillAuthzRegistrationTokenJob>(
-                nameof(BackfillAuthzRegistrationTokenJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                GetRecurringJobSchedule(BackfillAuthzRegistrationTokenJob.JobSchedule));
+            recurringJobManager.RemoveIfExists("BackfillAuthzRegistrationTokenJob");
 
             var deleteOldEvidenceFilesJobOptions = sp.GetRequiredService<IOptions<DeleteOldEvidenceFilesJobOptions>>().Value;
             recurringJobManager.AddOrUpdate<DeleteOldEvidenceFilesJob>(
