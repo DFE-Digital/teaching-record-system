@@ -1,10 +1,16 @@
+@using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Events.ChangeReasons
 @model ChangeHistoryEntryViewModel
 @{
+    var deactivatedEvent = Model.GetEvent<PersonDeactivatedEvent>();
+    var personInfo = Model.Context.GetPersonInfo(deactivatedEvent.PersonId);
+    var name = string.JoinNonEmpty(' ', personInfo.FirstName, personInfo.LastName);
     var changeReason = Model.ChangeReason as ChangeReasonWithDetailsAndEvidence;
 }
 
-<timeline-entry title="Record reactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Record deactivated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="name">@name marked as deceased</p>
+
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
