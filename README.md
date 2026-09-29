@@ -137,7 +137,10 @@ To set up the initial TRS database schema run:
 > just cli add-trn-range --from 1000000 --to 9999999
 ```
 
-The trs_tests database will be created automatically when running the tests.
+The databases for the tests are created automatically when running them: a template per schema and a pool of
+databases cloned from it, all named `trs_tmpl_*` and `trs_test_*`, on the server the connection string above points
+at. The database named in it isn't used. Running several test projects at once against a local server needs more
+connections than Postgres' default of 100; the testcontainer is started with `max_connections=500`.
 
 #### Database migrations
 
@@ -160,7 +163,7 @@ In order for the local `trs` database to pick up the change, the migrate recipe 
 > just ef database update
 ```
 
-The trs_tests database for the tests should be migrated automatically when running the tests.
+The test databases are rebuilt automatically when the schema changes.
 
 #### Downgrading the local database
 To rollback a series of migrations, add an additional argument to the `ef database update` command to indicate the name of a migration to end on
@@ -170,16 +173,12 @@ To rollback a series of migrations, add an additional argument to the `ef databa
 > just ef database update <BeforeAddingUserRoleColumn>
 ```
 
-#### Regenerating the test cache
+#### Cleaning up test databases
 
-The trs_tests database for the tests should be migrated automatically, however sometimes it gets stuck and the tests may fail with the message:
-```
-Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving the entity changes. See the inner exception for details.
----- Npgsql.PostgresException : <some Postgres error, e.g. missing table or column>
-```
-If this happens, regenerating the test cache usually fixes this, there's a `just` recipe:
+The tests build a new template whenever the schema or seed data changes, and keep the database of any test that
+fails so it can be inspected. These build up over time; to drop them, skipping any a running test is using:
 ```shell
-> just remove-tests-schema-cache
+> just drop-test-databases
 ```
 
 

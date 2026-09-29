@@ -6,7 +6,6 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData(
     IDbContextFactory<TrsDbContext> dbContextFactory,
-    ReferenceDataCache referenceDataCache,
     TimeProvider timeProvider)
 {
     private static readonly Lock _gate = new();
@@ -30,11 +29,14 @@ public partial class TestData(
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
 
-    // TestData is registered as a singleton, so it would otherwise hold the process-wide cache for the
-    // lifetime of the run rather than the one belonging to the database the current test owns.
+    // TestData is registered as a singleton, so it can't take the cache from DI - that's scoped to the database
+    // the current test owns - and looks it up on each use instead. Outside a test (a fixture holding a lease for
+    // the whole run) there's only the one database, so a cache of its own will do.
+    private readonly Lazy<ReferenceDataCache> _runReferenceDataCache = new(() => new ReferenceDataCache(dbContextFactory));
+
     public ReferenceDataCache ReferenceDataCache => TestDatabaseScope.TryGetCurrent() is not null
         ? PooledReferenceDataCaches.ForCurrentDatabase(DbContextFactory)
-        : referenceDataCache;
+        : _runReferenceDataCache.Value;
 
     public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
     {

@@ -11,7 +11,6 @@
     <PackageReference Include="Faker.Net" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     <PackageReference Include="Moq" />
-    <PackageReference Include="Respawn" />
     <!-- SSH.NET is explicitly included so we upgrade from a version with vulnerabilities (pulled in from Testcontainers) -->
     <PackageReference Include="SSH.NET" />
     <PackageReference Include="System.Security.Cryptography.Xml" />

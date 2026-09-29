@@ -20,6 +20,7 @@ public sealed class PooledTestDatabase(string name, NpgsqlDataSource dataSource,
         await command.ExecuteNonQueryAsync();
 
         PooledReferenceDataCaches.Invalidate(Name);
+        PooledMemoryCaches.Invalidate(Name);
     }
 }
 
@@ -27,11 +28,16 @@ public sealed class PooledTestDatabase(string name, NpgsqlDataSource dataSource,
 //
 // Databases are created on demand rather than up front, so running a single test creates a single database.
 // That is what keeps the edit/run/fix loop as cheap as it is with no isolation at all.
-public sealed class TestDatabasePool(TestDatabaseServer server, TestDatabaseTemplate template, int maxSize) : IAsyncDisposable
+public sealed class TestDatabasePool(
+    TestDatabaseServer server,
+    TestDatabaseTemplate template,
+    NpgsqlConnection lockConnection,
+    int maxSize) : IAsyncDisposable
 {
     private readonly Channel<PooledTestDatabase> _available = Channel.CreateUnbounded<PooledTestDatabase>();
     private readonly List<PooledTestDatabase> _all = [];
     private readonly Lock _allGate = new();
+    private readonly SemaphoreSlim _claimGate = new(1, 1);
     private int _slots;
     private int _nameCounter;
 
@@ -81,10 +87,7 @@ public sealed class TestDatabasePool(TestDatabaseServer server, TestDatabaseTemp
 
     private async Task<PooledTestDatabase> CreateDatabaseAsync()
     {
-        // The state key is part of the name, so a database left behind by a previous run is only picked up
-        // while both its schema and the reset semantics still match. Truncating one of those is much cheaper
-        // than cloning the template again.
-        var name = $"trs_test_{template.StateKey}_{Interlocked.Increment(ref _nameCounter):D3}";
+        var name = await ClaimNameAsync();
 
         var exists = await server.ExecuteScalarAsync<int?>(
             "select 1 from pg_database where datname = @name",
@@ -112,6 +115,36 @@ public sealed class TestDatabasePool(TestDatabaseServer server, TestDatabaseTemp
         return database;
     }
 
+    // The state key is part of the name, so a database left behind by a previous run is only picked up while both
+    // its schema and the reset semantics still match. Truncating one of those is much cheaper than cloning the
+    // template again.
+    //
+    // Other processes - another test project, or another worktree sharing the server - build the same names from
+    // the same template, so each name is claimed with an advisory lock that is held until this process exits. That
+    // includes databases retained after a failure, which keeps a later claim from resetting them while this run is
+    // still reporting them.
+    private async Task<string> ClaimNameAsync()
+    {
+        await _claimGate.WaitAsync();
+
+        try
+        {
+            while (true)
+            {
+                var name = $"trs_test_{template.StateKey}_{++_nameCounter:D3}";
+
+                if (await TestDatabaseServer.TryLockAsync(lockConnection, name))
+                {
+                    return name;
+                }
+            }
+        }
+        finally
+        {
+            _claimGate.Release();
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         PooledTestDatabase[] all;
@@ -124,5 +157,8 @@ public sealed class TestDatabasePool(TestDatabaseServer server, TestDatabaseTemp
         {
             await database.DataSource.DisposeAsync();
         }
+
+        // Releases every lock this process holds, so the databases and template can be claimed or dropped.
+        await lockConnection.DisposeAsync();
     }
 }

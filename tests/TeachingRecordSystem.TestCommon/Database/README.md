@@ -8,7 +8,7 @@ Gives every test its own Postgres database, so tests can run concurrently and st
 
 ```
 Postgres (the existing testcontainer or configured server)
-  └── template database        migrated + reference data seeded, once per schema
+  └── template database        migrated + reference data seeded, once per schema and seed data
         └── pool of databases  cloned from the template, grown lazily
               └── one lease per test, reset on return
 ```
@@ -31,7 +31,8 @@ Postgres (the existing testcontainer or configured server)
    database per test makes both unnecessary.
 
 A failing test's database is kept, with its data, and named in the test output so it can be inspected with
-`psql`. It is dropped from the pool rather than reused.
+`psql`. It is dropped from the pool rather than reused. `just drop-test-databases` clears these out, along with
+templates and pools for schemas that no longer exist.
 
 ## What each project uses
 
@@ -43,11 +44,19 @@ A failing test's database is kept, with its data, and named in the test output s
 | `Api.UnitTests` | Database per test |
 | `AuthorizeAccess.Tests` | Database per test |
 | `Cli.Tests` | Database per test, connection string overlaid onto the command's configuration |
-| `SupportUi.EndToEndTests` | One database for the whole run (real Kestrel, so no ambient scope) |
-| `EndToEndTests` | One database for the whole run |
+| `EndToEndTests` | One database for the whole run (real Kestrel, so no ambient scope) |
 
-`DbHelper` still owns the testcontainer and the `trs` database; no project runs its tests against `trs` any
-more, but it remains the thing that starts the container.
+`TestDatabaseServer` starts the testcontainer when `UseTestContainers` is set. Starting it is serialised across
+processes by a lock file, so test projects started together share one container instead of racing to create it.
+
+## Sharing a server between processes
+
+Test projects with the same template seeds build the same template and the same pooled database names, and
+worktrees on the same code do too. So:
+
+- a template is built under an advisory lock named for it, and anyone else wanting it waits and then clones it;
+- every pooled database name is claimed with an advisory lock that is held until the process exits. A process
+  that finds a name taken moves on to the next one.
 
 ## Things worth knowing before migrating another project
 
@@ -60,10 +69,16 @@ more, but it remains the thing that starts the container.
   connection.
 - **Process-wide caches of database content break.** `ReferenceDataCache` is a singleton; once each test has
   its own database, a test that adds reference data publishes ids that don't exist anywhere else, and
-  concurrent tests fail on a foreign key. `PooledReferenceDataCaches` keeps one cache per database. Anything
-  else caching rows process-wide needs the same treatment.
-- **Reference tables that tests write to can't simply be preserved.** `training_providers` is truncated and
-  restored from a snapshot taken when the template was built; immutable ones are left alone.
-- **Cache keys must cover everything that determines the result.** The pooled database name includes a hash
-  of the schema *and* the reset statement, and the cached table list is keyed on the model assembly *and*
-  the table classifications. Both of these caused real bugs when they only covered the schema.
+  concurrent tests fail on a foreign key. `PooledReferenceDataCaches` keeps one cache per database, and
+  `PooledMemoryCaches` does the same for `IMemoryCache`, which caches webhook endpoints and person info.
+  Anything else caching rows process-wide needs the same treatment.
+- **Tables the template put rows in, other than reference data, are refilled on reset.** They're found when
+  the template is built rather than listed by hand, snapshotted, and recorded in a comment on the template;
+  a reset truncates them and copies the snapshot back. Only the immutable reference tables in
+  `TestDatabaseTemplate._referenceTables` are left alone.
+- **Cache keys must cover everything that determines the result.** The template name includes a hash of the
+  schema *and* of `TrsDbContext`'s seed data, since the seed data isn't in the create script. The pooled
+  database name includes the template and the reset statement, and the cached model is keyed on the model
+  assembly *and* the table classifications. Each of these caused real bugs when it covered less.
+- **Test-side seeds are versioned by hand.** Changing `TestDatabaseTemplate.SeedAsync` means bumping
+  `TemplateBuildVersion`; changing a seed registered with `AddTemplateSeed` means changing its key.

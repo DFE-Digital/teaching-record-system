@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
@@ -20,6 +21,10 @@ public static class PooledTestDatabaseExtensions
 
         services.AddScoped(sp => PooledReferenceDataCaches.ForCurrentDatabase(
             sp.GetRequiredService<IDbContextFactory<TrsDbContext>>()));
+
+        // AddMemoryCache only registers its own if there isn't one already, and the last registration wins otherwise,
+        // so this takes over whether it's called before or after.
+        services.AddSingleton<IMemoryCache, PooledMemoryCache>();
 
         return services;
     }

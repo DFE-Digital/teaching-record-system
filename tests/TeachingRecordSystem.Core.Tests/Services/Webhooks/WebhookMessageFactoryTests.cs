@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.WebhookData;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260915.WebhookData;
@@ -88,8 +87,6 @@ public class WebhookMessageFactoryTests(ServiceFixture fixture) : ServiceTestBas
             await dbContext.SaveChangesAsync();
             return (e, other);
         });
-
-        Services.GetRequiredService<IMemoryCache>().Remove(CacheKeys.EnabledWebhookEndpoints());
 
         // Act
         var messages = await WithServiceAsync<WebhookMessageFactory, IEnumerable<WebhookMessage>>(

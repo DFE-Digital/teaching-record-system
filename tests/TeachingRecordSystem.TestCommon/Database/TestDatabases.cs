@@ -45,8 +45,13 @@ public static class TestDatabases
             }
 
             var server = await TestDatabaseServer.EnsureStartedAsync();
-            var template = await TestDatabaseTemplate.EnsureAsync(server, _templateSeeds);
-            _pool = new TestDatabasePool(server, template, GetMaxPoolSize());
+
+            // Holds the advisory locks that tell other processes which template and databases this one is using,
+            // for as long as the pool lives.
+            var lockConnection = await server.OpenLockConnectionAsync();
+
+            var template = await TestDatabaseTemplate.EnsureAsync(server, lockConnection, _templateSeeds);
+            _pool = new TestDatabasePool(server, template, lockConnection, GetMaxPoolSize());
         }
         finally
         {

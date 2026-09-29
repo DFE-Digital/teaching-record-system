@@ -96,7 +96,7 @@ public sealed class HostFixture : IAsyncLifetime
         _databaseLease = await TestDatabases.AcquireForRunAsync();
 
         DbContextFactory = PooledTestDatabaseExtensions.CreateDbContextFactory(_databaseLease);
-        TestData = new(DbContextFactory, new ReferenceDataCache(DbContextFactory), TimeProvider);
+        TestData = new(DbContextFactory, TimeProvider);
 
         await AddTestAppToApplicationUsers();
         await AddWebhookReceiverEndpoint();

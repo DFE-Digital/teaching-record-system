@@ -27,10 +27,10 @@ The implementation lives in
 
 ### A database per run
 
-Used by `EndToEndTests` and `SupportUi.EndToEndTests`.
+Used by `EndToEndTests`.
 
-These drive real Kestrel servers over HTTP with Playwright, so requests arrive on threads that have no xUnit
-test context and the ambient lookup cannot work. Both projects are serialised anyway
+It drives real Kestrel servers over HTTP with Playwright, so requests arrive on threads that have no xUnit
+test context and the ambient lookup cannot work. The project is serialised anyway
 (`parallelizeTestCollections: false`), so the fixture takes a single lease for the whole run with
 `TestDatabases.AcquireForRunAsync()` and overlays its connection string onto the host's configuration. That
 still isolates the run from every other project, but not one test from the next.
@@ -41,8 +41,8 @@ connection string onto the configuration the command is handed.
 
 ### What this replaced
 
-Previously every test shared the `trs` database managed by
-[`DbHelper`](../tests/TeachingRecordSystem.TestCommon/DbHelper.cs), with nothing cleaned up between tests.
+Previously every test shared one `trs` database, managed by a `DbHelper` class that has since been removed,
+with nothing cleaned up between tests.
 Tests had to generate collision-free data and could not assert over whole tables. Tests needing a clean slate
 opted into `[ClearDbBeforeTest]`, which only works inside a `DisableParallelization` collection — trading
 concurrency for isolation. Those attributes are gone.
@@ -73,7 +73,7 @@ in the test output, so the exact state that broke can be opened with `psql`.
 1. **Fixture** — initialise the pool and point the host at it:
 
    ```csharp
-   await TestDatabases.InitializeAsync();   // instead of InitializeDbAsync()
+   await TestDatabases.InitializeAsync();
    services.AddPooledTestDatabase();        // last, so it wins
    ```
 
@@ -82,7 +82,8 @@ in the test output, so the exact state that broke can be opened with `psql`.
 2. **Startup seeding** — anything the host wrote to the database at start-up has to move into the template
    via `TestDatabases.AddTemplateSeed(key, seed)`. A startup task would otherwise only populate whichever
    database happened to be leased at the time. `SupportUi.Tests` seeds its admin user and its test route types
-   this way. Add the table to `_seededTables` in `TestDatabaseTemplate` so a reset restores those rows.
+   this way. Changing a seed means changing its key, so that a template built without the change isn't reused.
+   A reset restores the rows automatically: see the pitfall on tables holding both kinds of row.
 
 3. **Test base** — derive from `PooledDatabaseTestBase`, or lease a database in `InitializeAsync` and dispose
    it afterwards. Projects with a web host should also push a per-test DI scope (see below).
@@ -119,14 +120,20 @@ decorated it stay attached — and swaps only the connection.
 **Process-wide caches of database content stop being valid.** `ReferenceDataCache` is a singleton. Once each
 test has its own database, a test that adds reference data publishes ids that exist nowhere else, and a
 concurrent test referencing one fails on a foreign key. `PooledReferenceDataCaches` keeps one cache per
-database. Anything else caching rows process-wide needs the same treatment.
+database, and `PooledMemoryCaches` does the same for the `IMemoryCache` that caches webhook endpoints and person
+info. Anything else caching rows process-wide needs the same treatment.
 
-**Tables holding both seeded and test-created rows can be neither truncated nor preserved.** `users` and
-`training_providers` are truncated on reset and refilled from a template snapshot. Preserving them lets one
-test's writes leak into the next; truncating them loses the seed.
+**Tables holding both seeded and test-created rows can be neither truncated nor preserved.** Preserving them
+lets one test's writes leak into the next; truncating them loses the seed. So they are truncated on reset and
+refilled from a snapshot taken when the template was built. Which tables they are is found by looking, not
+listed by hand: every table other than the reference tables that the template put rows in. The hand-kept list
+this replaced had missed `establishments` and `oidc_applications`, so a database's first test saw their seeded
+rows and every later test on it saw none. The list is kept as a comment on the template database, since nothing
+can connect to a template to look.
 
-**Cache keys must cover everything that determines the result.** The pooled database name hashes the schema
-*and* the reset statement; the cached table list is keyed on the model assembly *and* the table
+**Cache keys must cover everything that determines the result.** The template name hashes the schema *and*
+`TrsDbContext`'s seed data, which the create script doesn't include; the pooled database name hashes the
+template *and* the reset statement; the cached table list is keyed on the model assembly *and* the table
 classifications. Both of these caused real bugs when they covered only the schema — in one case the reset
 silently did nothing while still reporting success.
 
@@ -173,16 +180,22 @@ consistently on the shared database and pass once each test gets a clean `traini
 `Cli.Tests` gains the most proportionally: it was one serialised collection paying for a shared-schema
 rebuild, and is now 35 independent tests.
 
-## Running tests in a worktree
+## Sharing a server
 
-Unchanged: set `UseTestContainers=true` and `TestContainersPostgresPort` to a free port.
+Several test processes can use one Postgres server at once: test projects run side by side, or worktrees
+pointed at the same server. Projects registering the same template seeds build the same template and the same
+pooled database names, so:
 
-`DbHelper` still owns the container and the `trs` database. Nothing runs its tests against `trs` any more, but
-it is still what starts the testcontainer, and `just remove-tests-schema-cache` still applies to it. The
-pooled templates and databases live on the same server.
+- **Starting the testcontainer** is serialised by a lock file keyed on the port, so processes started together
+  share one container instead of each creating one and all but the first failing to bind the port.
+- **Building a template** happens under a Postgres advisory lock named for it; anyone else waits, then clones it.
+- **Every pooled database name is claimed** with an advisory lock held until the process exits. A process that
+  finds a name taken tries the next one. Retained databases stay claimed too, so another run can't reset one
+  while this run is still reporting it.
 
-## AGENTS.md note
+Each process keeps a connection pool per database it has leased, which outgrows Postgres' default of 100
+connections once a few projects run together. The testcontainer is started with `max_connections=500`; a
+local server may need the same.
 
-The instructions in `AGENTS.md` about resetting the test database schema still apply to the shared `trs`
-database that `DbHelper` manages. Pooled templates key themselves on a hash of the EF model, so they rebuild
-on their own when the schema changes and need no manual cache clearing.
+Old templates and pools, and databases retained after failures, build up over time.
+`just drop-test-databases` drops them, skipping any that a running test process has claimed.
