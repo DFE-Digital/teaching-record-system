@@ -113,7 +113,8 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
                                 It.IsAny<Stream>(),
                                 It.IsAny<string?>(),
                                 out It.Ref<Guid>.IsAny,
-                                null))
+                                null,
+                                It.IsAny<CancellationToken>()))
                     .ReturnsAsync(false);
 
                 var person = await TestData.CreatePersonAsync(p => p.WithNationalInsuranceNumber());

@@ -29,11 +29,11 @@ public class CompletedDateModel(EditInductionJourneyCoordinator journey, TimePro
         CompletedDate = journey.State.CompletedDate;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (CompletedDate > timeProvider.Today)
@@ -46,7 +46,7 @@ public class CompletedDateModel(EditInductionJourneyCoordinator journey, TimePro
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be before the induction start date");
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state => state.CompletedDate = CompletedDate);
 

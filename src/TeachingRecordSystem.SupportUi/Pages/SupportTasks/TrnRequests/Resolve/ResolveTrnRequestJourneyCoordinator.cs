@@ -22,12 +22,13 @@ public class ResolveTrnRequestJourneyCoordinator(
     public static async Task<ResolveTrnRequestState> CreateStateAsync(
         TrnRequestService trnRequestService,
         SupportTask supportTask,
-        string completionUrl)
+        string completionUrl,
+        CancellationToken cancellationToken = default)
     {
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.TrnRequest);
         var requestData = supportTask.TrnRequestMetadata!;
 
-        var matchResult = await trnRequestService.MatchPersonsAsync(requestData);
+        var matchResult = await trnRequestService.MatchPersonsAsync(requestData, cancellationToken: cancellationToken);
         var matchedPersons = matchResult.Outcome switch
         {
             MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],

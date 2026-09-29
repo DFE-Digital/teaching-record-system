@@ -15,7 +15,8 @@ public class TeacherPensionsSupportTaskService(
 {
     public Task<SupportTask> CreatePotentialDuplicateAsync(
         CreateTeacherPensionsPotentialDuplicateOptions options,
-        ProcessContext processContext) =>
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default) =>
         supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
             {
@@ -31,22 +32,25 @@ public class TeacherPensionsSupportTaskService(
                 Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest),
                 SourceApplicationUserId = options.TrnRequest.ApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
     /// Merges the task's record into the record in <paramref name="options"/>, resolves the request to it and closes
     /// the task.
     public async Task ResolveWithMergeAsync(
         ResolveTeacherPensionsPotentialDuplicateWithMergeOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = await GetOpenSupportTaskAsync(options.SupportTaskReference);
+        var supportTask = await GetOpenSupportTaskAsync(options.SupportTaskReference, cancellationToken);
         var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(
-            supportTask.TrnRequestApplicationUserId!.Value,
-            supportTask.TrnRequestId!);
+            [supportTask.TrnRequestApplicationUserId!.Value,
+            supportTask.TrnRequestId!],
+            cancellationToken);
 
-        var existingPerson = await dbContext.Persons.FindOrThrowAsync(options.ExistingPersonId);
+        var existingPerson = await dbContext.Persons.FindOrThrowAsync(options.ExistingPersonId, cancellationToken);
 
         // Snapshot the surviving record before the merge, which updates it.
         var selectedPersonAttributes = GetPersonAttributes(existingPerson);
@@ -54,14 +58,16 @@ public class TeacherPensionsSupportTaskService(
 
         await personService.DeactivatePersonViaMergeAsync(
             new DeactivatePersonViaMergeOptions(supportTask.PersonId!.Value, options.ExistingPersonId),
-            processContext);
+            processContext,
+            cancellationToken);
 
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
             supportTask.TrnRequestApplicationUserId!.Value,
             supportTask.TrnRequestId!,
             options.ExistingPersonId,
             options.AttributeSources.GetAttributesToUpdate(),
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
 
         await supportTaskService.UpdateSupportTaskAsync<TeacherPensionsPotentialDuplicateData>(
             new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
@@ -76,7 +82,8 @@ public class TeacherPensionsSupportTaskService(
                 Outcome = SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithMerge,
                 Comments = options.Comments
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
     private static TeacherPensionsPotentialDuplicateAttributes GetPersonAttributes(Person person) =>
@@ -110,9 +117,9 @@ public class TeacherPensionsSupportTaskService(
 
     // Both resolutions update the person and the request before closing the task, so check up-front that the task can
     // be closed rather than leaving those behind when it can't
-    private async Task<SupportTask> GetOpenSupportTaskAsync(string supportTaskReference)
+    private async Task<SupportTask> GetOpenSupportTaskAsync(string supportTaskReference, CancellationToken cancellationToken)
     {
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference, cancellationToken);
 
         if (supportTask.Status is SupportTaskStatus.Closed)
         {
@@ -125,17 +132,19 @@ public class TeacherPensionsSupportTaskService(
     /// Keeps the task's record separate, resolving the request to it and closing the task.
     public async Task ResolveWithoutMergeAsync(
         ResolveTeacherPensionsPotentialDuplicateWithoutMergeOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = await GetOpenSupportTaskAsync(options.SupportTaskReference);
+        var supportTask = await GetOpenSupportTaskAsync(options.SupportTaskReference, cancellationToken);
 
         await trnRequestService.ResolveTrnRequestWithMatchedPersonAsync(
             supportTask.TrnRequestApplicationUserId!.Value,
             supportTask.TrnRequestId!,
             supportTask.PersonId!.Value,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
 
         await supportTaskService.UpdateSupportTaskAsync<TeacherPensionsPotentialDuplicateData>(
             new UpdateSupportTaskOptions<TeacherPensionsPotentialDuplicateData>
@@ -150,6 +159,7 @@ public class TeacherPensionsSupportTaskService(
                 Outcome = SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithoutMerge,
                 Comments = options.Comments
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 }

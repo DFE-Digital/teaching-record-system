@@ -49,11 +49,11 @@ public class ExemptionReasonsModel(
         ExemptionReasonIds = journey.State.ExemptionReasonIds;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (ExemptionReasonIds.Length == 0)
@@ -73,6 +73,8 @@ public class ExemptionReasonsModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         // Reachable as the journey's first step for a person whose status doesn't ask this question,
         // since a request can name the page directly. Once the journey is under way a status that
         // stops asking it truncates the path, so path validation is what turns the user away.

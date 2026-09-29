@@ -55,11 +55,11 @@ public class CheckAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (TargetStatus == PersonStatus.Deactivated)
@@ -76,7 +76,7 @@ public class CheckAnswersModel(
                     AdditionalInformation = DeactivateAdditionalInformation
                 });
 
-            await personService.DeactivatePersonAsync(new DeactivatePersonOptions(PersonId, DateOfDeath: null), processContext);
+            await personService.DeactivatePersonAsync(new DeactivatePersonOptions(PersonId, DateOfDeath: null), processContext, cancellationToken);
         }
         else
         {
@@ -92,7 +92,7 @@ public class CheckAnswersModel(
                     AdditionalInformation = ReactivateAdditionalInformation
                 });
 
-            await personService.ReactivatePersonAsync(PersonId, processContext);
+            await personService.ReactivatePersonAsync(PersonId, processContext, cancellationToken);
         }
 
         journey.DeleteInstance();
@@ -105,12 +105,14 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         Status = personInfo.Status;
 
-        var person = await journey.GetPersonAsync();
+        var person = await journey.GetPersonAsync(cancellationToken);
 
         if (person is null)
         {

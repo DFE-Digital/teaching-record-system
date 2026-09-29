@@ -50,7 +50,7 @@ public class IndexModel(
         return Task.CompletedTask;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         // Ensure submitted roles is valid
         if (!string.IsNullOrWhiteSpace(Role) && !UserRoles.All.Contains(Role))
@@ -64,7 +64,7 @@ public class IndexModel(
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.UserUpdating, timeProvider.UtcNow, User.GetUserId());
 
@@ -75,7 +75,8 @@ public class IndexModel(
                 Name = Name!,
                 Role = Role
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if ((changes & UserUpdatedEventChanges.Roles) != UserUpdatedEventChanges.None)
         {
@@ -93,7 +94,7 @@ public class IndexModel(
         return Redirect(linkGenerator.Users.Index());
     }
 
-    public async Task<IActionResult> OnPostActivateAsync()
+    public async Task<IActionResult> OnPostActivateAsync(CancellationToken cancellationToken)
     {
         if (_user!.Active)
         {
@@ -108,7 +109,7 @@ public class IndexModel(
 
         var processContext = new ProcessContext(ProcessType.UserActivating, timeProvider.UtcNow, User.GetUserId());
 
-        await userService.ActivateUserAsync(UserId, processContext);
+        await userService.ActivateUserAsync(UserId, processContext, cancellationToken);
 
         TempData.SetFlashNotificationBanner($"{_user.Name}\u2019s account has been reactivated");
 
@@ -117,7 +118,9 @@ public class IndexModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
+        var cancellationToken = context.HttpContext.RequestAborted;
+
+        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId, cancellationToken);
 
         if (_user is null)
         {

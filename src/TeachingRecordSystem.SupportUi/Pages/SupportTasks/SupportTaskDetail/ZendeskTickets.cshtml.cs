@@ -38,9 +38,9 @@ public class ZendeskTickets(
         TicketUrls = _supportTask!.ZendeskTickets.ToList();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var sanitizedTicketUrls = (TicketUrls ?? []).Where(url => !string.IsNullOrEmpty(url));
 
@@ -52,7 +52,8 @@ public class ZendeskTickets(
                 SupportTaskReference = SupportTaskReference,
                 ZendeskUrls = sanitizedTicketUrls
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (updated)
         {

@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching
 // journey; a journey's pages must all be steps within it and this is not a step the user navigates to.
 public class EvidenceModel(ISafeFileService safeFileService) : PageModel
 {
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
@@ -27,7 +27,7 @@ public class EvidenceModel(ISafeFileService safeFileService) : PageModel
             mimeType = "application/octet-stream";
         }
 
-        var stream = await safeFileService.OpenReadStreamAsync(data.EvidenceFileId);
+        var stream = await safeFileService.OpenReadStreamAsync(data.EvidenceFileId, cancellationToken);
         return File(stream, mimeType);
     }
 }

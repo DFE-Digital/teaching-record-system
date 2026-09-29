@@ -18,6 +18,8 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         if (context.RouteData.Values["qualificationId"] is not string qualificationIdParam ||
             !Guid.TryParse(qualificationIdParam, out Guid qualificationId))
         {
@@ -37,7 +39,7 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
         // we need to return a BadRequest instead of a NotFound result
         var currentRouteWithPotentiallyDeactivatedPerson = await query
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (currentRouteWithPotentiallyDeactivatedPerson is not null &&
             currentRouteWithPotentiallyDeactivatedPerson.Person!.Status == PersonStatus.Deactivated)
@@ -48,7 +50,7 @@ public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) 
 
         // Query again with query filters to make sure deleted Routes are ignored
         var currentRoute = await query
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (currentRoute is null)
         {

@@ -33,14 +33,14 @@ public class StatusModel(AddRouteJourneyCoordinator journey) : PageModel
         Status = journey.State.Status;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return await journey.AnswerAndAdvanceAsync(AddRoutePage.Status, state =>
         {
@@ -53,6 +53,8 @@ public class StatusModel(AddRouteJourneyCoordinator journey) : PageModel
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         RouteType = await journey.GetRouteTypeAsync();
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
 

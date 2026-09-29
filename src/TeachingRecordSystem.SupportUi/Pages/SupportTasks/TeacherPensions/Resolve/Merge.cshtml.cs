@@ -64,6 +64,8 @@ public class MergeModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var supportTask = GetSupportTask();
         var requestData = supportTask.TrnRequestMetadata!;
         var state = Journey.State;
@@ -72,7 +74,7 @@ public class MergeModel(
 
         BackLink = Journey.GetBackLink();
 
-        var personAttributes = await GetPersonAttributesAsync(personId);
+        var personAttributes = await GetPersonAttributesAsync(personId, cancellationToken);
         var attributeMatches = state.MatchedPersons
             .Single(m => m.PersonId == personId)
             .MatchedAttributes;
@@ -130,14 +132,14 @@ public class MergeModel(
         Evidence = Journey.State.Evidence;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
-        await evidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData);
+        await evidenceUploadManager.ValidateAndUploadAsync<MergeModel>(m => m.Evidence, ViewData, cancellationToken);
 
         if (DateOfBirth!.Different && DateOfBirthSource is null)
         {
@@ -164,7 +166,7 @@ public class MergeModel(
             ModelState.AddModelError(nameof(GenderSource), "Select a gender");
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return Journey.AdvanceTo(
             linkGenerator.SupportTasks.TeacherPensions.Resolve.CheckAnswers(Journey.InstanceId),
@@ -181,9 +183,9 @@ public class MergeModel(
             });
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         Journey.DeleteInstance();
 
         return Redirect(Journey.State.CompletionUrl);

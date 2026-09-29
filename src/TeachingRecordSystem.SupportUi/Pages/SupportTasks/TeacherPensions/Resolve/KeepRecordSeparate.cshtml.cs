@@ -34,16 +34,16 @@ public class KeepRecordSeparateModel(
         Reason = Journey.State.Reason;
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
         if (KeepSeparateReason == KeepingRecordSeparateReason.AnotherReason && string.IsNullOrEmpty(Reason))
@@ -66,7 +66,7 @@ public class KeepRecordSeparateModel(
             });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var supportTask = GetSupportTask();
 
@@ -83,7 +83,8 @@ public class KeepRecordSeparateModel(
                 SupportTaskReference = supportTask.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         Journey.DeleteInstance();
 
@@ -95,9 +96,9 @@ public class KeepRecordSeparateModel(
         return Redirect(Journey.State.CompletionUrl);
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         Journey.DeleteInstance();
 
         return Redirect(Journey.State.CompletionUrl);

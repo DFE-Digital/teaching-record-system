@@ -6,10 +6,10 @@ namespace TeachingRecordSystem.WebCommon.Validation;
 
 public static class PageModelValidationExtensions
 {
-    public static async Task ThrowIfInvalidAsync<T>(this T pageModel, IValidator<T>? validator = null)
+    public static async Task ThrowIfInvalidAsync<T>(this T pageModel, IValidator<T>? validator = null, CancellationToken cancellationToken = default)
         where T : PageModel
     {
-        var result = validator is not null ? await validator.ValidateAsync(pageModel) : new ValidationResult();
+        var result = validator is not null ? await validator.ValidateAsync(pageModel, cancellationToken) : new ValidationResult();
 
         // Errors already in ModelState (e.g. from model binding, or added by the page itself) should stop us too,
         // but they're not added to the exception; FluentValidationExceptionFilter copies the exception's errors

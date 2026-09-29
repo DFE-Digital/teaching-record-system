@@ -41,18 +41,18 @@ public class IndexModel(
         Trn = journey.State.PersonTrn;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
             return CancelJourney();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var person = await dbContext.Persons
             .Where(p => p.Trn == Trn)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (person is null)
         {

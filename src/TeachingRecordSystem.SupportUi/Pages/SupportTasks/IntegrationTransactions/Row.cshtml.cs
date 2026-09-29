@@ -19,12 +19,12 @@ public class RowModel(TrsDbContext context) : PageModel
 
     public string? PersonName => Person is not null ? string.JoinNonEmpty(' ', Person.FirstName, Person.MiddleName, Person.LastName) : null;
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var integrationTransaction = await context.IntegrationTransactions
             .Include(x => x.IntegrationTransactionRecords!)
                 .ThenInclude(r => r.Person)
-            .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId);
+            .SingleOrDefaultAsync(x => x.IntegrationTransactionId == IntegrationTransactionId, cancellationToken);
 
         var record = integrationTransaction?.IntegrationTransactionRecords?
             .FirstOrDefault(r => r.IntegrationTransactionRecordId == IntegrationTransactionRecordId);

@@ -20,7 +20,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
-    public async Task<IActionResult> CreateNameChangeAsync([FromBody] CreateNameChangeRequestRequest request)
+    public async Task<IActionResult> CreateNameChangeAsync([FromBody] CreateNameChangeRequestRequest request, CancellationToken cancellationToken)
     {
         var command = new CreateNameChangeRequestCommand()
         {
@@ -33,7 +33,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
             EmailAddress = request.Email
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(CreateNameChangeResponse.Create(r)));
     }
@@ -46,7 +46,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
-    public async Task<IActionResult> CreateDateOfBirthChangeAsync([FromBody] CreateDateOfBirthChangeRequestRequest request)
+    public async Task<IActionResult> CreateDateOfBirthChangeAsync([FromBody] CreateDateOfBirthChangeRequestRequest request, CancellationToken cancellationToken)
     {
         var command = new CreateDateOfBirthChangeRequestCommand()
         {
@@ -57,7 +57,7 @@ public class TeacherController(ICommandDispatcher commandDispatcher) : Controlle
             EmailAddress = request.Email
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(CreateDateOfBirthChangeResponse.Create(r)));
     }

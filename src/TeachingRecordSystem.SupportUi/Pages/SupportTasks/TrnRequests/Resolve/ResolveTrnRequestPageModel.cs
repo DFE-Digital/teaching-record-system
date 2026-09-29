@@ -42,7 +42,7 @@ public abstract class ResolveTrnRequestPageModel(
         };
     }
 
-    protected async Task<TrnRequestDataPersonAttributes> GetPersonAttributesAsync(Guid personId)
+    protected async Task<TrnRequestDataPersonAttributes> GetPersonAttributesAsync(Guid personId, CancellationToken cancellationToken = default)
     {
         var personAttributes = await dbContext.Persons
             .Where(p => p.PersonId == personId)
@@ -56,7 +56,7 @@ public abstract class ResolveTrnRequestPageModel(
                 p.EmailAddress,
                 p.Gender
             })
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         return new TrnRequestDataPersonAttributes()
         {

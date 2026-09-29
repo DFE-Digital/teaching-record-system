@@ -414,6 +414,6 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     private void ConfigureUserServiceMock(string userId, User? user) =>
         AzureActiveDirectoryUserServiceMock
-            .Setup(mock => mock.GetUserByIdAsync(userId))
+            .Setup(mock => mock.GetUserByIdAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 }

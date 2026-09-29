@@ -52,9 +52,9 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public void OnGet() { }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         if (ChecksCompleted == false)
         {
@@ -66,6 +66,8 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         PersonId = supportTask.TrnRequestMetadata!.ResolvedPersonId!.Value;
 
@@ -83,7 +85,7 @@ public class Index(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator)
                 HasQts = p.QtsDate != null,
                 HasEyts = p.EytsDate != null
             })
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         FirstName = person.FirstName;
         MiddleName = person.MiddleName;

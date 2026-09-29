@@ -30,7 +30,7 @@ public class IdVerification(SupportTaskSearchService searchService, SupportUiLin
 
     public ResultPage<OneLoginUserIdVerificationSupportTasksSearchResultItem>? Results { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
         var sortBy = SortBy ?? OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn;
@@ -38,7 +38,7 @@ public class IdVerification(SupportTaskSearchService searchService, SupportUiLin
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
         var result = await searchService.SearchOneLoginIdVerificationSupportTasksAsync(
-            searchOptions, paginationOptions);
+            searchOptions, paginationOptions, cancellationToken);
 
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;

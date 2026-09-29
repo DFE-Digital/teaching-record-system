@@ -11,16 +11,16 @@ public interface IEventPublisher
 {
     IEventScope GetOrCreateEventScope(ProcessContext processContext);
 
-    public async Task PublishSingleEventAsync(IEvent @event, ProcessContext processContext)
+    public async Task PublishSingleEventAsync(IEvent @event, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var scope = GetOrCreateEventScope(processContext);
-        await scope.PublishEventAsync(@event);
+        await scope.PublishEventAsync(@event, cancellationToken);
     }
 }
 
 public interface IEventScope : IAsyncDisposable
 {
-    Task PublishEventAsync(IEvent @event);
+    Task PublishEventAsync(IEvent @event, CancellationToken cancellationToken = default);
 }
 
 public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProvider) : IEventPublisher
@@ -48,7 +48,7 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
     {
         ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
-        public Task PublishEventAsync(IEvent @event) => rootScope.PublishEventAsync(@event);
+        public Task PublishEventAsync(IEvent @event, CancellationToken cancellationToken = default) => rootScope.PublishEventAsync(@event, cancellationToken);
     }
 
     private sealed class RootScope(
@@ -61,7 +61,7 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
 
         public ProcessContext ProcessContext => processContext;
 
-        public async Task PublishEventAsync(IEvent @event)
+        public async Task PublishEventAsync(IEvent @event, CancellationToken cancellationToken = default)
         {
             if (dbContext.Entry(processContext.Process).State == EntityState.Detached)
             {
@@ -87,7 +87,7 @@ public class EventPublisher(TrsDbContext dbContext, IServiceProvider serviceProv
             };
             dbContext.Set<ProcessEvent>().Add(processEvent);
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             processContext.AddEvent(@event);
             _events.Add(@event);
@@ -182,11 +182,11 @@ public class ProcessContext
         _events = process.Events?.Select(e => e.Payload).ToList() ?? throw new InvalidOperationException("Process must have its Events loaded.");
     }
 
-    public static async Task<ProcessContext> FromDbAsync(TrsDbContext dbContext, Guid processId, DateTime now)
+    public static async Task<ProcessContext> FromDbAsync(TrsDbContext dbContext, Guid processId, DateTime now, CancellationToken cancellationToken = default)
     {
         var process = await dbContext.Processes
             .Include(p => p.Events)
-            .SingleAsync(p => p.ProcessId == processId);
+            .SingleAsync(p => p.ProcessId == processId, cancellationToken);
 
         return new(process, now);
     }

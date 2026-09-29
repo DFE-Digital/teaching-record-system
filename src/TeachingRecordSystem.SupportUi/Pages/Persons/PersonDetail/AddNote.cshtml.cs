@@ -42,15 +42,15 @@ public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerat
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         Guid? fileId = null;
         if (File is not null)
         {
             await using var stream = File.OpenReadStream();
-            fileId = await fileService.UploadFileAsync(stream, File.ContentType);
+            fileId = await fileService.UploadFileAsync(stream, File.ContentType, cancellationToken: cancellationToken);
         }
 
         var processContext = new ProcessContext(ProcessType.NoteCreating, timeProvider.UtcNow, User.GetUserId());
@@ -64,7 +64,8 @@ public class AddNote(NoteService noteService, SupportUiLinkGenerator linkGenerat
                 FileId = fileId,
                 OriginalFileName = File?.FileName
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return Redirect(linkGenerator.Persons.PersonDetail.Notes(PersonId));
     }

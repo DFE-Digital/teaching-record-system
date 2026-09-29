@@ -30,9 +30,9 @@ public class MergePersonJourneyCoordinator(
     /// Discards the journey along with any evidence file uploaded during it and returns the URL to
     /// send the user back to.
     /// </summary>
-    public async Task<string> CancelAsync()
+    public async Task<string> CancelAsync(CancellationToken cancellationToken = default)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile, cancellationToken);
         DeleteInstance();
         return linkGenerator.Persons.PersonDetail.Index(PersonId);
     }
@@ -88,7 +88,7 @@ public class MergePersonJourneyCoordinator(
         }
     }
 
-    public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(params Guid[] personIds)
+    public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(Guid[] personIds, CancellationToken cancellationToken = default)
     {
         var potentialDuplicates = (await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
@@ -120,7 +120,7 @@ public class MergePersonJourneyCoordinator(
                     Gender = p.Gender
                 }
             })
-            .ToArrayAsync())
+            .ToArrayAsync(cancellationToken))
             .OrderBy(p => Array.IndexOf(personIds, p.PersonId))
             .ToArray();
 

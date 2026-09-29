@@ -25,9 +25,9 @@ public class TeachersController : ControllerBase
         Description = "Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request)
+    public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request, CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(request);
+        var response = await _mediator.Send(request, cancellationToken);
         return Ok(response);
     }
 
@@ -38,9 +38,9 @@ public class TeachersController : ControllerBase
         Description = "Gets an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> GetTeacherAsync([FromRoute] GetTeacherRequest request)
+    public async Task<IActionResult> GetTeacherAsync([FromRoute] GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(request);
+        var response = await _mediator.Send(request, cancellationToken);
         return response != null ? Ok(response) : NotFound();
     }
 }

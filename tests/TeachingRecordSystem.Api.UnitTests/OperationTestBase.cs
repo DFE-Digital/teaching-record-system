@@ -74,7 +74,7 @@ public abstract class OperationTestBase : IDisposable
         var serviceScopeFactory = Services.GetRequiredService<IServiceScopeFactory>();
         using var scope = serviceScopeFactory.CreateScope();
         var dispatcher = scope.ServiceProvider.GetRequiredService<ICommandDispatcher>();
-        var result = await dispatcher.DispatchAsync(command);
+        var result = await dispatcher.DispatchAsync(command, CancellationToken.None);
 
         await TestScopedServices.GetCurrent().BackgroundJobScheduler.ExecuteDeferredJobsAsync();
 

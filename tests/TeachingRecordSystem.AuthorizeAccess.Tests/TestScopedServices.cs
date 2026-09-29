@@ -21,8 +21,9 @@ public class TestScopedServices
                 It.IsAny<Stream>(),
                 It.IsAny<string?>(),
                 out It.Ref<Guid>.IsAny,
-                null))
-            .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride) =>
+                null,
+                It.IsAny<CancellationToken>()))
+            .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride, CancellationToken _) =>
             {
                 fileId = fileIdOverride ?? Guid.NewGuid();
             })

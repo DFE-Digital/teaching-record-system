@@ -58,7 +58,7 @@ public class VerifyModel(
         journey.State.ApplySavedModelStateValues(nameof(VerifyModel), ModelState);
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
@@ -69,10 +69,10 @@ public class VerifyModel(
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var resolveLinkGenerator = linkGenerator.SupportTasks.OneLoginUserMatching.Resolve;
 
@@ -109,7 +109,7 @@ public class VerifyModel(
         });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(VerifyModel),
@@ -127,7 +127,8 @@ public class VerifyModel(
                 SupportTaskReference = _supportTask!.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
 
@@ -141,6 +142,8 @@ public class VerifyModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
 
@@ -170,7 +173,7 @@ public class VerifyModel(
         {
             FileId = data.EvidenceFileId,
             FileName = data.EvidenceFileName,
-            FileUrl = await safeFileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry),
+            FileUrl = await safeFileService.GetFileUrlAsync(data.EvidenceFileId, WebConstants.FileUrlExpiry, cancellationToken),
             MimeType = evidenceFileMimeType
         };
 

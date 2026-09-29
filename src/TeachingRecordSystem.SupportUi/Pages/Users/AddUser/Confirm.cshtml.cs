@@ -48,7 +48,7 @@ public class ConfirmModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         // Ensure submitted role is valid
         if (!string.IsNullOrWhiteSpace(Role) && !UserRoles.All.Contains(Role))
@@ -62,7 +62,7 @@ public class ConfirmModel(
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.UserAdding, timeProvider.UtcNow, User.GetUserId());
 
@@ -74,7 +74,8 @@ public class ConfirmModel(
                 AzureAdUserId = AzureAdUserId,
                 Role = Role
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var roleText = UserRoles.GetDisplayNameForRole(Role!)
             .ToLowerInvariantFirstLetter()
@@ -86,7 +87,9 @@ public class ConfirmModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await aadUserService.GetUserByIdAsync(UserId!);
+        var cancellationToken = context.HttpContext.RequestAborted;
+
+        _user = await aadUserService.GetUserByIdAsync(UserId!, cancellationToken);
 
         if (_user is null)
         {

@@ -58,6 +58,8 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink();
 
         var state = journey.State;
@@ -65,7 +67,7 @@ public class CheckAnswersModel(
         var personBId = state.PersonBId!.Value;
         var primaryPersonId = state.PrimaryPersonId!.Value;
 
-        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync(personAId, personBId);
+        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync([personAId, personBId], cancellationToken);
 
         ResolvableAttributes = changedService.GetResolvableMergedAttributes(
              new List<ResolvedMergedAttribute>
@@ -103,11 +105,11 @@ public class CheckAnswersModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (_potentialDuplicates!.Any(p => p.IsInvalid))
@@ -144,7 +146,8 @@ public class CheckAnswersModel(
                 NationalInsuranceNumber = state.NationalInsuranceNumberSource is not PersonAttributeSource.PrimaryPerson ? Option.Some<NationalInsuranceNumber?>(NationalInsuranceNumber is { } nino ? Core.NationalInsuranceNumber.Parse(nino!) : null) : default,
                 Gender = state.GenderSource is not PersonAttributeSource.PrimaryPerson ? Option.Some(Gender) : default
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner(
             $"Records merged for {string.JoinNonEmpty(' ', FirstName, MiddleName, LastName)}",

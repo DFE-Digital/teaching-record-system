@@ -74,12 +74,12 @@ public class SetRouteToProfessionalStatusHandler(
         new("5D4C01C1-0841-4306-B49C-48AD6499FDC0")
     ];
 
-    public async Task<ApiResult<SetRouteToProfessionalStatusResult>> ExecuteAsync(SetRouteToProfessionalStatusCommand command)
+    public async Task<ApiResult<SetRouteToProfessionalStatusResult>> ExecuteAsync(SetRouteToProfessionalStatusCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)
             .Include(p => p.Qualifications).AsSplitQuery()
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (person is null)
         {
@@ -153,7 +153,7 @@ public class SetRouteToProfessionalStatusHandler(
         var route = await dbContext.RouteToProfessionalStatuses.SingleOrDefaultAsync(r =>
             r.PersonId == person.PersonId &&
             r.SourceApplicationReference == command.SourceApplicationReference &&
-            r.SourceApplicationUserId == currentUserId);
+            r.SourceApplicationUserId == currentUserId, cancellationToken);
 
         if (route is not null)
         {
@@ -207,7 +207,8 @@ public class SetRouteToProfessionalStatusHandler(
                     DegreeTypeId = Option.Some(degreeTypeId),
                     ExemptFromInduction = Option.Some(command.IsExemptFromInduction)
                 },
-                new ProcessContext(ProcessType.RouteToProfessionalStatusUpdating, timeProvider.UtcNow, currentUserId));
+                new ProcessContext(ProcessType.RouteToProfessionalStatusUpdating, timeProvider.UtcNow, currentUserId),
+                cancellationToken);
         }
         else
         {
@@ -231,7 +232,8 @@ public class SetRouteToProfessionalStatusHandler(
                     DegreeTypeId = degreeTypeId,
                     IsExemptFromInduction = command.IsExemptFromInduction
                 },
-                new ProcessContext(ProcessType.RouteToProfessionalStatusCreating, timeProvider.UtcNow, currentUserId));
+                new ProcessContext(ProcessType.RouteToProfessionalStatusCreating, timeProvider.UtcNow, currentUserId),
+                cancellationToken);
         }
 
         return new SetRouteToProfessionalStatusResult();

@@ -13,9 +13,9 @@ public class AddPersonJourneyCoordinator(
     /// Discards the journey along with any evidence file uploaded during it and returns the URL to
     /// send the user back to.
     /// </summary>
-    public async Task<string> CancelAsync()
+    public async Task<string> CancelAsync(CancellationToken cancellationToken = default)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile, cancellationToken);
         DeleteInstance();
         return linkGenerator.Persons.AddPerson.Index();
     }

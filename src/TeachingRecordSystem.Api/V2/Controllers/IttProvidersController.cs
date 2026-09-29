@@ -25,10 +25,10 @@ public class IttProvidersController : ControllerBase
         Summary = "Get ITT Providers",
         Description = "Gets the list of ITT providers")]
     [ProducesResponseType(typeof(GetIttProvidersResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetIttProvidersAsync()
+    public async Task<IActionResult> GetIttProvidersAsync(CancellationToken cancellationToken)
     {
         var request = new GetIttProvidersRequest();
-        var response = await _mediator.Send(request);
+        var response = await _mediator.Send(request, cancellationToken);
         return Ok(response);
     }
 }

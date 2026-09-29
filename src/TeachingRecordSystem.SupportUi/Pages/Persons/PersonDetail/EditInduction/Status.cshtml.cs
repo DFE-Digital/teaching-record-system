@@ -54,11 +54,11 @@ public class StatusModel(
         InductionStatus = journey.State.InductionStatus;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         if (!ModelState.IsValid)
@@ -91,10 +91,12 @@ public class StatusModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink() ?? journey.InductionUrl;
         CurrentInductionStatus = journey.State.CurrentInductionStatus;
 
-        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == journey.PersonId);
+        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == journey.PersonId, cancellationToken);
         _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(timeProvider.Today);
 
         await base.OnPageHandlerExecutionAsync(context, next);

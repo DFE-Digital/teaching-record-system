@@ -32,7 +32,7 @@ public class TrnRequestService(
         SupportTaskType.OneLoginUserIdVerification
     ];
 
-    public async Task<TrnRequestInfo> CreateTrnRequestAsync(CreateTrnRequestOptions options, ProcessContext processContext)
+    public async Task<TrnRequestInfo> CreateTrnRequestAsync(CreateTrnRequestOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -67,13 +67,13 @@ public class TrnRequestService(
 
         dbContext.TrnRequestMetadata.Add(trnRequest);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var result = new TrnRequestInfo(trnRequest, ResolvedPersonTrn: null);
 
         if (options.TryResolve)
         {
-            result = await TryResolveAsync(trnRequest, processContext);
+            result = await TryResolveAsync(trnRequest, processContext, cancellationToken);
         }
 
         await eventScope.PublishEventAsync(
@@ -81,7 +81,8 @@ public class TrnRequestService(
             {
                 EventId = Guid.NewGuid(),
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest)
-            });
+            },
+            cancellationToken);
 
         return result;
     }
@@ -90,17 +91,19 @@ public class TrnRequestService(
         Guid applicationUserId,
         string requestId,
         Guid personId,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
-        var person = await dbContext.Persons.FindOrThrowAsync(personId);
+        var person = await dbContext.Persons.FindOrThrowAsync(personId, cancellationToken);
 
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             person,
             publishTrnRequestUpdatedEvent: true,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
     }
 
     public async Task ResolveTrnRequestWithMatchedPersonAsync(
@@ -108,17 +111,19 @@ public class TrnRequestService(
         string requestId,
         Guid personId,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
-        var person = await dbContext.Persons.FindOrThrowAsync(personId);
+        var person = await dbContext.Persons.FindOrThrowAsync(personId, cancellationToken);
 
         await ResolveTrnRequestWithMatchedPersonAsync(
             trnRequest,
             person,
             publishTrnRequestUpdatedEvent: true,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
 
         if (attributesToUpdate.Count != 0)
         {
@@ -158,7 +163,8 @@ public class TrnRequestService(
                         ? Option.Some(trnRequest.Gender)
                         : default
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
     }
 
@@ -166,7 +172,8 @@ public class TrnRequestService(
         TrnRequestMetadata trnRequest,
         Person person,
         bool publishTrnRequestUpdatedEvent,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken)
     {
         if (trnRequest.Status is not (TrnRequestStatus.Pending or TrnRequestStatus.Dormant))
         {
@@ -177,16 +184,16 @@ public class TrnRequestService(
 
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
-        var furtherChecksNeeded = await RequiresFurtherChecksNeededSupportTaskAsync(person.PersonId, trnRequest.ApplicationUserId);
+        var furtherChecksNeeded = await RequiresFurtherChecksNeededSupportTaskAsync(person.PersonId, trnRequest.ApplicationUserId, cancellationToken);
 
         trnRequest.ResolvedPersonId = person.PersonId;
         trnRequest.Status = furtherChecksNeeded ? TrnRequestStatus.Pending : TrnRequestStatus.Completed;
 
-        await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
+        await TryEnsureTrnTokenAsync(trnRequest, person.Trn, cancellationToken);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        await EnsureOneLoginUserConnectedAsync(trnRequest, processContext);
+        await EnsureOneLoginUserConnectedAsync(trnRequest, processContext, cancellationToken);
 
         if (furtherChecksNeeded)
         {
@@ -196,7 +203,8 @@ public class TrnRequestService(
                     Person = person,
                     TrnRequest = trnRequest
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         if (publishTrnRequestUpdatedEvent)
@@ -211,24 +219,27 @@ public class TrnRequestService(
                     TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                     OldTrnRequest = oldTrnRequestEventModel,
                     ReasonDetails = null
-                });
+                },
+                cancellationToken);
         }
     }
 
     public async Task<string> ResolveTrnRequestWithNewRecordAsync(
         Guid applicationUserId,
         string requestId,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
-        return await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext);
+        return await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: true, processContext, cancellationToken);
     }
 
     private async Task<string> ResolveTrnRequestWithNewRecordAsync(
         TrnRequestMetadata trnRequest,
         bool publishTrnRequestUpdatedEvent,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken)
     {
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -249,16 +260,17 @@ public class TrnRequestService(
                 NationalInsuranceNumber = !string.IsNullOrEmpty(trnRequest.NationalInsuranceNumber) ? NationalInsuranceNumber.Parse(trnRequest.NationalInsuranceNumber) : null,
                 Gender = trnRequest.Gender
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         trnRequest.ResolvedPersonId = person.PersonId;
         trnRequest.Status = TrnRequestStatus.Completed;
 
-        await TryEnsureTrnTokenAsync(trnRequest, person.Trn);
+        await TryEnsureTrnTokenAsync(trnRequest, person.Trn, cancellationToken);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        await EnsureOneLoginUserConnectedAsync(trnRequest, processContext);
+        await EnsureOneLoginUserConnectedAsync(trnRequest, processContext, cancellationToken);
 
         if (publishTrnRequestUpdatedEvent)
         {
@@ -274,15 +286,16 @@ public class TrnRequestService(
                     TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                     OldTrnRequest = oldTrnRequestEventModel,
                     ReasonDetails = null
-                });
+                },
+                cancellationToken);
         }
 
         return person.Trn;
     }
 
-    public async Task RejectTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
+    public async Task RejectTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -305,12 +318,13 @@ public class TrnRequestService(
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                 OldTrnRequest = oldTrnRequestEventModel,
                 ReasonDetails = null
-            });
+            },
+            cancellationToken);
     }
 
-    public async Task CompleteResolvedTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
+    public async Task CompleteResolvedTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
         if (trnRequest.Status is not TrnRequestStatus.Pending)
         {
@@ -338,16 +352,17 @@ public class TrnRequestService(
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                 OldTrnRequest = oldTrnRequestEventModel,
                 ReasonDetails = null
-            });
+            },
+            cancellationToken);
     }
 
     // Resolves the request to the record in <paramref name="options"/> (or a new one) and closes its support task,
     // returning the ID of the record it resolved to.
-    public async Task<Guid> ResolveTrnRequestAsync(ResolveTrnRequestOptions options, ProcessContext processContext)
+    public async Task<Guid> ResolveTrnRequestAsync(ResolveTrnRequestOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(options.ApplicationUserId, options.RequestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([options.ApplicationUserId, options.RequestId], cancellationToken);
 
         TrnRequestDataPersonAttributes? selectedPersonAttributes = null;
         TrnRequestDataPersonAttributes resolvedAttributes;
@@ -358,7 +373,7 @@ public class TrnRequestService(
         {
             outcome = SupportTaskOutcome.TrnRequest_ResolvedWithExistingPerson;
 
-            var person = await dbContext.Persons.FindOrThrowAsync(personId);
+            var person = await dbContext.Persons.FindOrThrowAsync(personId, cancellationToken);
 
             // Snapshot the record before resolving, which updates it.
             selectedPersonAttributes = GetPersonAttributes(person);
@@ -369,7 +384,8 @@ public class TrnRequestService(
                 options.RequestId,
                 personId,
                 options.AttributeSources.GetAttributesToUpdate(),
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -378,7 +394,7 @@ public class TrnRequestService(
             // A new record takes every value from the request.
             resolvedAttributes = GetRequestAttributes(trnRequest);
 
-            await ResolveTrnRequestWithNewRecordAsync(options.ApplicationUserId, options.RequestId, processContext);
+            await ResolveTrnRequestWithNewRecordAsync(options.ApplicationUserId, options.RequestId, processContext, cancellationToken);
         }
 
         await ResolveTrnRequestSupportTaskAsync(
@@ -390,7 +406,8 @@ public class TrnRequestService(
                 SelectedPersonAttributes = selectedPersonAttributes,
                 Comments = options.Comments
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         // Resolving tracked the request's resolved record on the same entity.
         Debug.Assert(trnRequest.ResolvedPersonId is not null);
@@ -446,23 +463,26 @@ public class TrnRequestService(
         Guid applicationUserId,
         string requestId,
         string supportTaskReference,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        await CompleteResolvedTrnRequestAsync(applicationUserId, requestId, processContext);
+        await CompleteResolvedTrnRequestAsync(applicationUserId, requestId, processContext, cancellationToken);
 
         await CompleteManualChecksNeededSupportTaskAsync(
             new CompleteManualChecksNeededSupportTaskOptions
             {
                 SupportTaskReference = supportTaskReference
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
     public Task<SupportTask> CreateTrnRequestSupportTaskAsync(
         CreateTrnRequestSupportTaskOptions options,
-        ProcessContext processContext) =>
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default) =>
         supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
             {
@@ -474,11 +494,13 @@ public class TrnRequestService(
                 Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest),
                 SourceApplicationUserId = options.TrnRequest.ApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
     public Task<SupportTask> CreateManualChecksNeededSupportTaskAsync(
         CreateManualChecksNeededSupportTaskOptions options,
-        ProcessContext processContext) =>
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default) =>
         supportTaskService.CreateSupportTaskAsync(
             new CreateSupportTaskOptions
             {
@@ -490,11 +512,13 @@ public class TrnRequestService(
                 Subject = SupportTask.Subject.FromPerson(options.Person),
                 SourceApplicationUserId = options.TrnRequest.ApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
     internal Task ResolveTrnRequestSupportTaskAsync(
         ResolveTrnRequestSupportTaskOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         Debug.Assert(options.Outcome is SupportTaskOutcome.TrnRequest_ResolvedWithExistingPerson or SupportTaskOutcome.TrnRequest_ResolvedWithNewPerson);
 
@@ -512,12 +536,14 @@ public class TrnRequestService(
                 Outcome = options.Outcome,
                 Comments = options.Comments
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
     public Task CompleteManualChecksNeededSupportTaskAsync(
         CompleteManualChecksNeededSupportTaskOptions options,
-        ProcessContext processContext) =>
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default) =>
         supportTaskService.UpdateSupportTaskAsync<TrnRequestManualChecksNeededData>(
             new UpdateSupportTaskOptions<TrnRequestManualChecksNeededData>
             {
@@ -526,23 +552,24 @@ public class TrnRequestService(
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.TrnRequestManualChecksNeeded_Completed
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
-    public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId)
+    public async Task<TrnRequestInfo?> GetTrnRequestAsync(Guid applicationUserId, string requestId, CancellationToken cancellationToken = default)
     {
         var result = await dbContext.TrnRequestMetadata
             .Where(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId)
             .LeftJoin(dbContext.Persons, m => m.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequest = m, Trn = p!.Trn })
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (result is null)
         {
             return null;
         }
 
-        if (await TryEnsureTrnTokenAsync(result.TrnRequest, result.Trn))
+        if (await TryEnsureTrnTokenAsync(result.TrnRequest, result.Trn, cancellationToken))
         {
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         return new(result.TrnRequest, result.Trn);
@@ -551,7 +578,7 @@ public class TrnRequestService(
     public string GetAccessYourTeachingQualificationsLink(string trnToken) =>
         $"{aytqOptionsAccessor.Value.BaseAddress}{aytqOptionsAccessor.Value.StartUrlPath}?trn_token={Uri.EscapeDataString(trnToken)}";
 
-    public async Task<bool> RequiresFurtherChecksNeededSupportTaskAsync(Guid personId, Guid trnRequestApplicationUserId)
+    public async Task<bool> RequiresFurtherChecksNeededSupportTaskAsync(Guid personId, Guid trnRequestApplicationUserId, CancellationToken cancellationToken = default)
     {
         if (!trnRequestOptionsAccessor.Value.FlagFurtherChecksRequiredFromUserIds.Contains(trnRequestApplicationUserId))
         {
@@ -561,7 +588,7 @@ public class TrnRequestService(
         var personFlags = await dbContext.Persons
             .Where(p => p.PersonId == personId)
             .Select(p => new { HasQts = p.QtsDate != null, HasEyts = p.EytsDate != null, HasOpenAlert = p.Alerts!.Any(a => a.IsOpen) })
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         if (personFlags is { HasQts: false, HasEyts: false, HasOpenAlert: false })
         {
@@ -571,7 +598,7 @@ public class TrnRequestService(
         return true;
     }
 
-    public async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
+    public async Task<string> CreateTrnTokenAsync(string trn, string emailAddress, CancellationToken cancellationToken = default)
     {
         var trnToken = await GenerateTrnTokenAsync();
         dbContext.AuthzRegistrationTokens.Add(new AuthzRegistrationToken
@@ -592,13 +619,13 @@ public class TrnRequestService(
                 var buffer = new byte[8];
                 RandomNumberGenerator.Fill(buffer);
                 token = Convert.ToHexString(buffer).ToLower();
-            } while (await dbContext.AuthzRegistrationTokens.AnyAsync(t => t.Token == token));
+            } while (await dbContext.AuthzRegistrationTokens.AnyAsync(t => t.Token == token, cancellationToken));
 
             return token;
         }
     }
 
-    private async Task EnsureOneLoginUserConnectedAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    private async Task EnsureOneLoginUserConnectedAsync(TrnRequestMetadata trnRequest, ProcessContext processContext, CancellationToken cancellationToken)
     {
         Debug.Assert(trnRequest.ResolvedPersonId.HasValue);
 
@@ -609,7 +636,7 @@ public class TrnRequestService(
 
         var oneLoginUserSubject = trnRequest.OneLoginUserSubject;
 
-        if (await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject) is { PersonId: null } oneLoginUser)
+        if (await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject, cancellationToken) is { PersonId: null } oneLoginUser)
         {
             var personId = trnRequest.ResolvedPersonId.Value;
             var verifiedInfo = trnRequest.GetVerifiedInfo()!.Value;
@@ -622,7 +649,8 @@ public class TrnRequestService(
                     Names = verifiedInfo.Names,
                     DatesOfBirth = verifiedInfo.DatesOfBirth,
                     EmailAddress = trnRequest.EmailAddress
-                });
+                },
+                cancellationToken);
 
             if (oneLoginUser.VerificationRoute is null)
             {
@@ -643,7 +671,8 @@ public class TrnRequestService(
                         MatchRoute = matchRoute,
                         MatchedAttributes = matchedAttributes
                     },
-                    processContext);
+                    processContext,
+                    cancellationToken);
             }
             else
             {
@@ -655,7 +684,8 @@ public class TrnRequestService(
                         MatchRoute = matchRoute,
                         MatchedAttributes = matchedAttributes
                     },
-                    processContext);
+                    processContext,
+                    cancellationToken);
             }
         }
     }
@@ -663,7 +693,7 @@ public class TrnRequestService(
     // internal for testing.
     // Takes the entity rather than the request's keys as it's called mid-update by the Resolve* methods and relies on
     // them to save the token it assigns.
-    internal async Task<bool> TryEnsureTrnTokenAsync(TrnRequestMetadata trnRequest, string resolvedPersonTrn)
+    internal async Task<bool> TryEnsureTrnTokenAsync(TrnRequestMetadata trnRequest, string resolvedPersonTrn, CancellationToken cancellationToken = default)
     {
         if (trnRequest.Status is not TrnRequestStatus.Completed || trnRequest.TrnToken is not null || trnRequest.EmailAddress is null)
         {
@@ -676,11 +706,11 @@ public class TrnRequestService(
             return false;
         }
 
-        trnRequest.TrnToken = await CreateTrnTokenAsync(resolvedPersonTrn, trnRequest.EmailAddress);
+        trnRequest.TrnToken = await CreateTrnTokenAsync(resolvedPersonTrn, trnRequest.EmailAddress, cancellationToken);
         return true;
     }
 
-    public async Task<MatchPersonsResult> MatchPersonsAsync(TrnRequestMetadata request, params Guid[] excludePersonIds)
+    public async Task<MatchPersonsResult> MatchPersonsAsync(TrnRequestMetadata request, Guid[]? excludePersonIds = null, CancellationToken cancellationToken = default)
     {
         request.PotentialDuplicate = false;
 
@@ -690,18 +720,18 @@ public class TrnRequestService(
         {
             var oneLoginUser = await dbContext.OneLoginUsers
                 .Include(o => o.Person)
-                .SingleOrDefaultAsync(u => u.Subject == request.OneLoginUserSubject);
+                .SingleOrDefaultAsync(u => u.Subject == request.OneLoginUserSubject, cancellationToken);
 
             if (oneLoginUser?.Person is Person person)
             {
-                var match = (await GetMatchesFromTrnRequestAsync(request, person.PersonId))[0];
+                var match = (await GetMatchesFromTrnRequestAsync(request, person.PersonId, cancellationToken))[0];
                 var matchedAttributes = GetMatchedAttributes(match);
                 return MatchPersonsResult.DefiniteMatch(person.PersonId, person.Trn, matchedAttributes);
             }
         }
 
-        var results = (await GetMatchesFromTrnRequestAsync(request)).ToList();
-        results.RemoveAll(r => excludePersonIds.Contains(r.PersonId));
+        var results = (await GetMatchesFromTrnRequestAsync(request, personId: null, cancellationToken)).ToList();
+        results.RemoveAll(r => excludePersonIds is not null && excludePersonIds.Contains(r.PersonId));
 
         if (results.Count == 0)
         {
@@ -756,9 +786,9 @@ public class TrnRequestService(
                 .Select(r => r.potentialMatch));
     }
 
-    public async Task<TrnRequestInfo> ActivateTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
+    public async Task<TrnRequestInfo> ActivateTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
         if (trnRequest.Status is not TrnRequestStatus.Dormant)
         {
@@ -770,7 +800,7 @@ public class TrnRequestService(
         var oldTrnRequestEventModel = EventModels.TrnRequestMetadata.FromModel(trnRequest);
 
         trnRequest.Status = TrnRequestStatus.Pending;
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var changes = TrnRequestUpdatedChanges.Status;
 
@@ -781,13 +811,14 @@ public class TrnRequestService(
             t => t.TrnRequestApplicationUserId == trnRequest.ApplicationUserId &&
                 t.TrnRequestId == trnRequest.RequestId &&
                 t.IsOutstanding &&
-                _trnRequestResolvingSupportTaskTypes.Contains(t.SupportTaskType)))
+                _trnRequestResolvingSupportTaskTypes.Contains(t.SupportTaskType),
+            cancellationToken: cancellationToken))
         {
             result = new TrnRequestInfo(trnRequest, ResolvedPersonTrn: null);
         }
         else
         {
-            result = await TryResolveAsync(trnRequest, processContext);
+            result = await TryResolveAsync(trnRequest, processContext, cancellationToken);
 
             if (result.TrnRequest.ResolvedPersonId is not null)
             {
@@ -805,12 +836,13 @@ public class TrnRequestService(
                 TrnRequest = EventModels.TrnRequestMetadata.FromModel(trnRequest),
                 OldTrnRequest = oldTrnRequestEventModel,
                 ReasonDetails = null
-            });
+            },
+            cancellationToken);
 
         return result;
     }
 
-    private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request, Guid? personId = null)
+    private Task<TrnRequestMatchQueryResult[]> GetMatchesFromTrnRequestAsync(TrnRequestMetadata request, Guid? personId, CancellationToken cancellationToken)
     {
         // Find all Active records with a TRN that match on:
         // person ID (if provided) *OR*
@@ -879,7 +911,7 @@ public class TrnRequestService(
                     new NpgsqlParameter("person_id", NpgsqlDbType.Uuid) { Value = (object?)personId ?? DBNull.Value }
                 ]
                 // ReSharper restore FormatStringProblem
-            ).ToArrayAsync();
+            ).ToArrayAsync(cancellationToken);
 
         static NpgsqlParameter CreateArrayParameter(string name, IEnumerable<string?> values) =>
             new(name, NpgsqlDbType.Array | NpgsqlDbType.Varchar) { Value = values.ToArray() };
@@ -906,27 +938,27 @@ public class TrnRequestService(
         .Select(a => a!.Value)
         .ToArray();
 
-    public async Task<TrnRequestInfo> TryResolveAsync(Guid applicationUserId, string requestId, ProcessContext processContext)
+    public async Task<TrnRequestInfo> TryResolveAsync(Guid applicationUserId, string requestId, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync(applicationUserId, requestId);
+        var trnRequest = await dbContext.TrnRequestMetadata.FindOrThrowAsync([applicationUserId, requestId], cancellationToken);
 
-        return await TryResolveAsync(trnRequest, processContext);
+        return await TryResolveAsync(trnRequest, processContext, cancellationToken);
     }
 
-    private async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext)
+    private async Task<TrnRequestInfo> TryResolveAsync(TrnRequestMetadata trnRequest, ProcessContext processContext, CancellationToken cancellationToken)
     {
         string? trn = null;
-        var matchResult = await MatchPersonsAsync(trnRequest);
+        var matchResult = await MatchPersonsAsync(trnRequest, cancellationToken: cancellationToken);
 
         if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
         {
             trn = matchResult.Trn;
-            var person = (await dbContext.Persons.FindAsync(matchResult.PersonId))!;
-            await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, person, publishTrnRequestUpdatedEvent: false, processContext);
+            var person = (await dbContext.Persons.FindAsync(new object?[] { matchResult.PersonId }, cancellationToken))!;
+            await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, person, publishTrnRequestUpdatedEvent: false, processContext, cancellationToken);
         }
         else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
         {
-            trn = await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext);
+            trn = await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext, cancellationToken);
         }
         else
         {
@@ -937,7 +969,8 @@ public class TrnRequestService(
                 {
                     TrnRequest = trnRequest
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         return new TrnRequestInfo(trnRequest, trn);

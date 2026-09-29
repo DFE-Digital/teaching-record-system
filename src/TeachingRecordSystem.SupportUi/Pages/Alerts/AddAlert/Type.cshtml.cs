@@ -46,14 +46,14 @@ public class TypeModel(
         AlertTypeId = journey.State.AlertTypeId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var selectedType = AlertTypes!.Single(t => t.AlertTypeId == AlertTypeId);
 
@@ -66,15 +66,17 @@ public class TypeModel(
             });
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink();
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
@@ -86,7 +88,7 @@ public class TypeModel(
             .ToAsyncEnumerable()
             .Where(async (t, _) => (await authorizationService.AuthorizeAsync(User, t.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true })
             .Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var categories = await referenceDataCache.GetAlertCategoriesAsync();
         Categories = categories.Select(

@@ -106,11 +106,11 @@ public class IndexModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         // NotAvailable is not a value the user is allowed to select in the UI. We only allow it
@@ -120,7 +120,7 @@ public class IndexModel(
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceToNextQuestion(
             NameChanged
@@ -153,13 +153,15 @@ public class IndexModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
 
         BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Index(PersonId);
 
-        _person = await personService.GetPersonAsync(PersonId);
+        _person = await personService.GetPersonAsync(PersonId, cancellationToken: cancellationToken);
 
         if (_person is null)
         {

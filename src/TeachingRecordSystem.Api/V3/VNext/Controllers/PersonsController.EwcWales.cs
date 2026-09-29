@@ -21,7 +21,8 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetWelshInduction)]
     public async Task<IActionResult> SetWelshInductionStatusAsync(
         [FromRoute] string trn,
-        [FromBody] SetWelshInductionStatusRequest request)
+        [FromBody] SetWelshInductionStatusRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new SetWelshInductionStatusCommand(
             trn,
@@ -29,7 +30,7 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
             request.StartDate,
             request.CompletedDate);
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);

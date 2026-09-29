@@ -33,7 +33,7 @@ public class Verified(DisconnectOneLoginJourneyCoordinator journey, SupportUiLin
         StayVerified = journey.State.StayVerified;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -41,7 +41,7 @@ public class Verified(DisconnectOneLoginJourneyCoordinator journey, SupportUiLin
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.PersonDetail.DisconnectOneLogin.CheckAnswers(journey.InstanceId),

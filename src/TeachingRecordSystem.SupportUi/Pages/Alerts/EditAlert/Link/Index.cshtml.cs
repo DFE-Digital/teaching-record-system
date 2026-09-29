@@ -53,20 +53,20 @@ public class IndexModel(
         Link = journey.State.Link;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         // There was no link to begin with and the user doesn't want to add one, so there's nothing to
         // change; abandon the journey and return to the record.
         if (string.IsNullOrEmpty(PreviousLink) && AddLink == false)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
         return journey.AdvanceTo(
@@ -78,9 +78,9 @@ public class IndexModel(
             });
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceController.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }

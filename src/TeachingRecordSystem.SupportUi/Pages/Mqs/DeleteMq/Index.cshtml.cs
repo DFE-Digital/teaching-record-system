@@ -81,18 +81,18 @@ public class IndexModel(
         ProvideAdditionalInformation = journey.State.ProvideAdditionalInformation;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
         // Upload the evidence file before validating so that it's retained if the form is re-rendered
         // with errors.
-        await evidenceUploadManager.UploadAsync(Evidence);
+        await evidenceUploadManager.UploadAsync(Evidence, cancellationToken);
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Mqs.DeleteMq.CheckAnswers(journey.InstanceId),
@@ -106,9 +106,9 @@ public class IndexModel(
             });
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

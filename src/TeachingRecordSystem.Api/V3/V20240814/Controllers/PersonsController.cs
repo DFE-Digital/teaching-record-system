@@ -19,10 +19,10 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync([FromBody] FindPersonsRequest request)
+    public async Task<IActionResult> FindPersonsAsync([FromBody] FindPersonsRequest request, CancellationToken cancellationToken)
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
         return result.ToActionResult(r => Ok(FindPersonsResponse.Create(r)));
     }
 
@@ -34,10 +34,10 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request)
+    public async Task<IActionResult> FindPersonsAsync(FindPersonRequest request, CancellationToken cancellationToken)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r =>
             Ok(new FindPersonResponse()

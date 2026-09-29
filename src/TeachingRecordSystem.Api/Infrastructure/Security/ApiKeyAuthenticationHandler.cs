@@ -19,6 +19,8 @@ public class ApiKeyAuthenticationHandler(
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        var cancellationToken = Context.RequestAborted;
+
         string? authorizationHeader = Request.Headers.Authorization;
 
         if (string.IsNullOrEmpty(authorizationHeader))
@@ -37,7 +39,7 @@ public class ApiKeyAuthenticationHandler(
             .AsNoTracking()
             .Where(k => k.Key == key)
             .Include(k => k.ApplicationUser)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (apiKey is null)
         {

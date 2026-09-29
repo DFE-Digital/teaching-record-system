@@ -15,11 +15,11 @@ public class SetWelshInductionStatusHandler(
     InductionService inductionService) :
     ICommandHandler<SetWelshInductionStatusCommand, SetWelshInductionStatusResult>
 {
-    public async Task<ApiResult<SetWelshInductionStatusResult>> ExecuteAsync(SetWelshInductionStatusCommand command)
+    public async Task<ApiResult<SetWelshInductionStatusResult>> ExecuteAsync(SetWelshInductionStatusCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)
-            .SingleOrDefaultAsync(p => p.Trn == command.Trn);
+            .SingleOrDefaultAsync(p => p.Trn == command.Trn, cancellationToken);
 
         if (person is null)
         {
@@ -41,7 +41,8 @@ public class SetWelshInductionStatusHandler(
                 StartDate = !command.Passed ? command.StartDate : null,
                 CompletedDate = !command.Passed ? command.CompletedDate : null
             },
-            new ProcessContext(ProcessType.PersonWelshInductionUpdating, timeProvider.UtcNow, currentUserId));
+            new ProcessContext(ProcessType.PersonWelshInductionUpdating, timeProvider.UtcNow, currentUserId),
+            cancellationToken);
 
         return new SetWelshInductionStatusResult();
     }

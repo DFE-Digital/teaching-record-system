@@ -40,7 +40,7 @@ public class Index(SupportTaskSearchService supportTaskSearchService, TrsDbConte
 
     public bool ShowFilters { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         var searchOptions = new TrnRequestsSearchOptions(
             Search,
@@ -49,7 +49,7 @@ public class Index(SupportTaskSearchService supportTaskSearchService, TrsDbConte
             SortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var result = await supportTaskSearchService.SearchTrnRequestsAsync(searchOptions, paginationOptions);
+        var result = await supportTaskSearchService.SearchTrnRequestsAsync(searchOptions, paginationOptions, cancellationToken);
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
 
@@ -65,7 +65,7 @@ public class Index(SupportTaskSearchService supportTaskSearchService, TrsDbConte
                 (user, task) => user)
             .Select(u => new { u.UserId, u.Name, u.ShortName })
             .Distinct()
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         ResultsBySourceApplication = allTrnRequestingSourceApplications
             .LeftJoin(

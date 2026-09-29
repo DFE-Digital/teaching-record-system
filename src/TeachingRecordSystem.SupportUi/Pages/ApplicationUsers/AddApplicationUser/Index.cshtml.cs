@@ -30,9 +30,9 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, TimeProvider timeP
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.ApplicationUserCreating, timeProvider.UtcNow, User.GetUserId());
 
@@ -46,7 +46,8 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, TimeProvider timeP
                     Name = Name!,
                     ShortName = ShortName
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation(ApplicationUser.NameUniqueIndexName))
         {

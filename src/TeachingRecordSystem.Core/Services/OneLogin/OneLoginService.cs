@@ -20,7 +20,8 @@ public class OneLoginService(
         string personName,
         string reason,
         string? templateId,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var email = new Email
         {
@@ -31,7 +32,7 @@ public class OneLoginService(
         };
 
         dbContext.Emails.Add(email);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
@@ -40,7 +41,8 @@ public class OneLoginService(
         string personName,
         string? templateId,
         string? emailReplyToId,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var email = new Email
         {
@@ -52,7 +54,7 @@ public class OneLoginService(
         };
 
         dbContext.Emails.Add(email);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
@@ -61,7 +63,8 @@ public class OneLoginService(
         string personName,
         string? templateId,
         string? emailReplyToId,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var personalization = new Dictionary<string, string>
         {
@@ -78,7 +81,7 @@ public class OneLoginService(
         };
 
         dbContext.Emails.Add(email);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
@@ -87,7 +90,8 @@ public class OneLoginService(
         string personName,
         string reason,
         string? templateId,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var email = new Email
         {
@@ -98,14 +102,14 @@ public class OneLoginService(
         };
 
         dbContext.Emails.Add(email);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
     }
 
-    public async Task SetUserVerifiedAsync(SetUserVerifiedOptions options, ProcessContext processContext)
+    public async Task SetUserVerifiedAsync(SetUserVerifiedOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject, cancellationToken);
 
         if (user.VerifiedOn is not null)
         {
@@ -124,7 +128,7 @@ public class OneLoginService(
             options.VerifiedDatesOfBirth,
             options.CoreIdentityClaimVc);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         var updatedEvent = new OneLoginUserUpdatedEvent
@@ -135,18 +139,18 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventScope.PublishEventAsync(updatedEvent);
+        await eventScope.PublishEventAsync(updatedEvent, cancellationToken);
     }
 
-    public async Task SetUserUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
+    public async Task SetUserUnmatchedAsync(string oneLoginSubject, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject, cancellationToken);
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         user.SetUnmatched();
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var updatedEvent = new OneLoginUserUpdatedEvent
         {
@@ -156,12 +160,12 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventScope.PublishEventAsync(updatedEvent);
+        await eventScope.PublishEventAsync(updatedEvent, cancellationToken);
     }
 
-    public async Task SetUserMatchedAsync(SetUserMatchedOptions options, ProcessContext processContext)
+    public async Task SetUserMatchedAsync(SetUserMatchedOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject, cancellationToken);
 
         if (user.VerifiedOn is null)
         {
@@ -174,7 +178,7 @@ public class OneLoginService(
 
         user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         var updatedEvent = new OneLoginUserUpdatedEvent
@@ -185,12 +189,12 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventScope.PublishEventAsync(updatedEvent);
+        await eventScope.PublishEventAsync(updatedEvent, cancellationToken);
     }
 
-    public async Task SetUserVerifiedAndMatchedAsync(SetUserVerifiedAndMatchedOptions options, ProcessContext processContext)
+    public async Task SetUserVerifiedAndMatchedAsync(SetUserVerifiedAndMatchedOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject);
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == options.OneLoginUserSubject, cancellationToken);
 
         if (user.VerifiedOn is not null)
         {
@@ -211,7 +215,7 @@ public class OneLoginService(
 
         user.SetMatched(processContext.Now, options.MatchedPersonId, options.MatchRoute, options.MatchedAttributes);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         var updatedEvent = new OneLoginUserUpdatedEvent
@@ -222,12 +226,12 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventScope.PublishEventAsync(updatedEvent);
+        await eventScope.PublishEventAsync(updatedEvent, cancellationToken);
     }
 
-    public async Task SetUserUnverifiedAndUnmatchedAsync(string oneLoginSubject, ProcessContext processContext)
+    public async Task SetUserUnverifiedAndUnmatchedAsync(string oneLoginSubject, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject);
+        var user = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == oneLoginSubject, cancellationToken);
 
         var oldOneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
@@ -235,7 +239,7 @@ public class OneLoginService(
         user.SetUnverified();
         user.SetUnmatched();
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(user);
         var updatedEvent = new OneLoginUserUpdatedEvent
@@ -246,14 +250,15 @@ public class OneLoginService(
             Changes = OneLoginUserUpdatedEvent.GetChanges(oldOneLoginUserEventModel, oneLoginUserEventModel)
         };
 
-        await eventScope.PublishEventAsync(updatedEvent);
+        await eventScope.PublishEventAsync(updatedEvent, cancellationToken);
     }
 
     public async Task<FindPersonByTrnTokenResult?> FindPersonByTrnTokenAsync(
         IEnumerable<string[]> verifiedNames,
         IEnumerable<DateOnly> verifiedDatesOfBirth,
         string? trnToken,
-        string emailAddress)
+        string emailAddress,
+        CancellationToken cancellationToken = default)
     {
         Person? getAnIdentityPerson = null;
         OneLoginUserMatchRoute? matchRoute = null;
@@ -265,10 +270,11 @@ public class OneLoginService(
             var utcNow = timeProvider.UtcNow;
 
             trnTokenModel = await dbContext.AuthzRegistrationTokens.SingleOrDefaultAsync(
-                t => t.Token == trnToken && t.ExpiresUtc > utcNow && t.IsActive == true);
+                t => t.Token == trnToken && t.ExpiresUtc > utcNow && t.IsActive == true,
+                cancellationToken: cancellationToken);
             if (trnTokenModel is not null)
             {
-                getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn);
+                getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn, cancellationToken);
                 matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.TrnToken : null;
             }
         }
@@ -295,7 +301,7 @@ public class OneLoginService(
         {
             // Invalidate the token
             trnTokenModel.IsActive = false;
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn, matchedAttributes);
@@ -318,7 +324,7 @@ public class OneLoginService(
             ["reason"] = reason
         };
 
-    public virtual async Task<MatchPersonResult?> MatchPersonAsync(GetSuggestedPersonMatchesOptions matchOptions)
+    public virtual async Task<MatchPersonResult?> MatchPersonAsync(GetSuggestedPersonMatchesOptions matchOptions, CancellationToken cancellationToken = default)
     {
         var suggestedMatches = await GetSuggestedPersonMatchesAsync(
             new GetSuggestedPersonMatchesOptions(
@@ -327,7 +333,8 @@ public class OneLoginService(
                 matchOptions.EmailAddress,
                 matchOptions.NationalInsuranceNumber,
                 matchOptions.Trn,
-                matchOptions.TrnTokenTrnHint));
+                matchOptions.TrnTokenTrnHint),
+            cancellationToken);
 
         return MatchPerson(matchOptions, suggestedMatches);
     }
@@ -376,7 +383,7 @@ public class OneLoginService(
         return null;
     }
 
-    public async Task<IReadOnlyCollection<MatchPersonResult>> GetSuggestedPersonMatchesAsync(GetSuggestedPersonMatchesOptions options)
+    public async Task<IReadOnlyCollection<MatchPersonResult>> GetSuggestedPersonMatchesAsync(GetSuggestedPersonMatchesOptions options, CancellationToken cancellationToken = default)
     {
         // Return any record that matches on last name and DOB OR NINO OR TRN.
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
@@ -439,7 +446,7 @@ public class OneLoginService(
                     new NpgsqlParameter("trns", NpgsqlDbType.Varchar | NpgsqlDbType.Array) { Value = trns }
                 ]
                 // ReSharper restore FormatStringProblem
-            ).ToArrayAsync();
+            ).ToArrayAsync(cancellationToken);
 
         return results
             .Select(r =>
@@ -493,7 +500,7 @@ public class OneLoginService(
             .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>> GetMatchedAttributesAsync(GetMatchedAttributesOptions options)
+    public async Task<IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>> GetMatchedAttributesAsync(GetMatchedAttributesOptions options, CancellationToken cancellationToken = default)
     {
         // N.B. Keep this aligned with GetSuggestedPersonMatchesAsync()
 
@@ -535,7 +542,7 @@ public class OneLoginService(
                     new NpgsqlParameter("dates_of_birth", options.DatesOfBirth.ToArray())
                 ]
                 // ReSharper restore FormatStringProblem
-            ).ToArrayAsync();
+            ).ToArrayAsync(cancellationToken);
 
         return results
             .Select(r =>
@@ -560,14 +567,14 @@ public class OneLoginService(
             .Single();
     }
 
-    public Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject) =>
+    public Task<string?> GetPendingSupportTaskReferenceByUserAsync(string oneLoginUserSubject, CancellationToken cancellationToken = default) =>
         dbContext.SupportTasks
             .Where(t => t.OneLoginUserSubject == oneLoginUserSubject && t.IsOutstanding)
             .OrderBy(t => t.CreatedOn)
             .Select(t => t.SupportTaskReference)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<bool> HasClosedIdVerificationSupportTaskAsync(string oneLoginUserSubject)
+    public async Task<bool> HasClosedIdVerificationSupportTaskAsync(string oneLoginUserSubject, CancellationToken cancellationToken = default)
     {
         var closedIdVerificationTaskData = await dbContext.SupportTasks
             .Where(t =>
@@ -575,12 +582,12 @@ public class OneLoginService(
                 t.Status == SupportTaskStatus.Closed &&
                 t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification)
             .Select(t => t.Data)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         return closedIdVerificationTaskData.Any(t => ((OneLoginUserIdVerificationData)t).Outcome != OneLoginUserIdVerificationOutcome.NotVerified);
     }
 
-    public async Task<OneLoginUser> OnSignInAsync(string sub, string email, ProcessContext processContext)
+    public async Task<OneLoginUser> OnSignInAsync(string sub, string email, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
@@ -588,7 +595,7 @@ public class OneLoginService(
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(u => u.Person)
-            .SingleOrDefaultAsync(u => u.Subject == sub);
+            .SingleOrDefaultAsync(u => u.Subject == sub, cancellationToken);
 
         if (oneLoginUser is null)
         {
@@ -610,10 +617,10 @@ public class OneLoginService(
 
         if (oneLoginUser.PersonId is null)
         {
-            await TryMatchToTrnRequestAsync(oneLoginUser, processContext);
+            await TryMatchToTrnRequestAsync(oneLoginUser, processContext, cancellationToken);
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var oneLoginUserEventModel = EventModels.OneLoginUser.FromModel(oneLoginUser);
 
@@ -622,7 +629,8 @@ public class OneLoginService(
             {
                 EventId = Guid.NewGuid(),
                 OneLoginUser = oneLoginUserEventModel
-            });
+            },
+            cancellationToken);
 
         if (oldOneLoginUserEventModel is null)
         {
@@ -631,7 +639,8 @@ public class OneLoginService(
                 {
                     EventId = Guid.NewGuid(),
                     OneLoginUser = oneLoginUserEventModel
-                });
+                },
+                cancellationToken);
         }
         else
         {
@@ -646,14 +655,15 @@ public class OneLoginService(
                         OneLoginUser = oneLoginUserEventModel,
                         OldOneLoginUser = oldOneLoginUserEventModel,
                         Changes = changes
-                    });
+                    },
+                    cancellationToken);
             }
         }
 
         return oneLoginUser;
     }
 
-    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser, ProcessContext processContext)
+    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser, ProcessContext processContext, CancellationToken cancellationToken)
     {
         Debug.Assert(oneLoginUser.EmailAddress is not null);
 
@@ -661,7 +671,7 @@ public class OneLoginService(
             .Join(dbContext.Persons, r => r.ResolvedPersonId, p => p.PersonId, (m, p) => new { TrnRequestMetadata = m, ResolvedPerson = p })
             .Where(m => m.TrnRequestMetadata.OneLoginUserSubject == oneLoginUser.Subject)
             .Where(m => m.TrnRequestMetadata.IdentityVerified == true && m.TrnRequestMetadata.Status == TrnRequestStatus.Completed)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         if (requestAndResolvedPerson is not [{ TrnRequestMetadata: var trnRequestMetadata, ResolvedPerson: var resolvedPerson }])
         {

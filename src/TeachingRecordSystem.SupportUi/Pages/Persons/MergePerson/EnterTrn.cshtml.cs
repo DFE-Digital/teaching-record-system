@@ -51,21 +51,21 @@ public class EnterTrnModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        var potentialDuplicates = await journey.GetPotentialDuplicatesAsync(journey.State.PersonAId!.Value);
+        var potentialDuplicates = await journey.GetPotentialDuplicatesAsync([journey.State.PersonAId!.Value], cancellationToken);
 
         if (potentialDuplicates.Any(p => p.IsInvalid))
         {
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         if (OtherTrn == ThisTrn)
         {
@@ -74,7 +74,7 @@ public class EnterTrnModel(
 
         var otherPerson = await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleOrDefaultAsync(p => p.Trn == OtherTrn);
+            .SingleOrDefaultAsync(p => p.Trn == OtherTrn, cancellationToken);
 
         if (otherPerson is null)
         {

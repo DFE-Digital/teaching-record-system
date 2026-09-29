@@ -59,12 +59,12 @@ public class InductionModel(
 
     public bool CanWrite { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Include(p => p.Qualifications)
-            .SingleAsync(q => q.PersonId == PersonId);
+            .SingleAsync(q => q.PersonId == PersonId, cancellationToken);
 
         Status = person.InductionStatus;
         StartDate = person.InductionStartDate;

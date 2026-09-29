@@ -16,7 +16,7 @@ public class Confirm(TrnRequestService trnRequestService, TimeProvider timeProvi
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var trnRequest = supportTask.TrnRequestMetadata!;
@@ -27,7 +27,8 @@ public class Confirm(TrnRequestService trnRequestService, TimeProvider timeProvi
             trnRequest.ApplicationUserId,
             trnRequest.RequestId,
             SupportTaskReference!,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
 
         TempData.SetFlashNotificationBanner($"TRN request for {trnRequest.FirstName} {trnRequest.MiddleName} {trnRequest.LastName} completed");
 

@@ -46,6 +46,8 @@ public class MatchModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         BackLink = journey.GetBackLink();
 
         var personFeature = context.HttpContext.GetCurrentPersonFeature();
@@ -61,7 +63,7 @@ public class MatchModel(
         var oneLoginUser = await dbContext.OneLoginUsers
             .AsNoTracking()
             .Where(u => u.Subject == journey.State.Subject)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         OneLoginUserEmailAddress = oneLoginUser.EmailAddress;
         OneLoginUserVerifiedNames = oneLoginUser.VerifiedNames;

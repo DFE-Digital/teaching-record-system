@@ -21,10 +21,11 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> PutQtlsAsync(
         [FromRoute] string trn,
-        [FromBody] SetQtlsRequest request)
+        [FromBody] SetQtlsRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new SetQtlsCommand(trn, request.QtsDate);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(QtlsResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
@@ -38,10 +39,10 @@ public class PersonsController(ICommandDispatcher commandDispatcher) : Controlle
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
-    public async Task<IActionResult> GetQtlsAsync([FromRoute] string trn)
+    public async Task<IActionResult> GetQtlsAsync([FromRoute] string trn, CancellationToken cancellationToken)
     {
         var command = new GetQtlsCommand(trn);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
         return result.ToActionResult(r => Ok(QtlsResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }

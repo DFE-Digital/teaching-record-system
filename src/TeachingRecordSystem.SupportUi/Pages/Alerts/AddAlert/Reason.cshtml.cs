@@ -74,16 +74,16 @@ public class ReasonModel(
         AdditionalInformation = journey.State.AdditionalInformation;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
-        await evidenceUploadManager.UploadAsync(Evidence);
+        await evidenceUploadManager.UploadAsync(Evidence, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Alerts.AddAlert.CheckAnswers(journey.InstanceId),
@@ -97,9 +97,9 @@ public class ReasonModel(
             });
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }

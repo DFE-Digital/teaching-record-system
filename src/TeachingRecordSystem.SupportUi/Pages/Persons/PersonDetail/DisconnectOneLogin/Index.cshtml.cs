@@ -43,15 +43,15 @@ public class Index(DisconnectOneLoginJourneyCoordinator journey, SupportUiLinkGe
     [BindProperty]
     public bool Cancel { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
-        var oneLogin = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == OneLoginSubject);
+        var oneLogin = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == OneLoginSubject, cancellationToken);
         ReasonDetail = journey.State.Detail;
         Reason = journey.State.DisconnectReason;
         EmailAddress = oneLogin.EmailAddress;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -59,7 +59,7 @@ public class Index(DisconnectOneLoginJourneyCoordinator journey, SupportUiLinkGe
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.PersonDetail.DisconnectOneLogin.Verified(journey.InstanceId),

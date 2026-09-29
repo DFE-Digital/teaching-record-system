@@ -35,11 +35,11 @@ public class CreateNameChangeRequestHandler(
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<ApiResult<CreateNameChangeRequestResult>> ExecuteAsync(CreateNameChangeRequestCommand command)
+    public async Task<ApiResult<CreateNameChangeRequestResult>> ExecuteAsync(CreateNameChangeRequestCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .Where(p => p.Trn == command.Trn)
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (person is null)
         {
@@ -49,7 +49,7 @@ public class CreateNameChangeRequestHandler(
         var existingOpenRequest = await dbContext.SupportTasks
             .AnyAsync(t => t.PersonId == person.PersonId
                 && t.SupportTaskType == SupportTaskType.ChangeNameRequest
-                && t.IsOutstanding);
+                && t.IsOutstanding, cancellationToken);
 
         if (existingOpenRequest)
         {
@@ -58,7 +58,8 @@ public class CreateNameChangeRequestHandler(
 
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(
             command.EvidenceFileUrl,
-            HttpCompletionOption.ResponseHeadersRead);
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
 
         if (!evidenceFileResponse.IsSuccessStatusCode)
         {
@@ -71,8 +72,8 @@ public class CreateNameChangeRequestHandler(
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync();
-        var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType);
+        await using var stream = await evidenceFileResponse.Content.ReadAsStreamAsync(cancellationToken);
+        var evidenceFileId = await fileService.UploadFileAsync(stream, evidenceFileMimeType, cancellationToken: cancellationToken);
 
         var userId = currentUserProvider.GetCurrentApplicationUserId();
 
@@ -90,7 +91,8 @@ public class CreateNameChangeRequestHandler(
                 EmailAddress = command.EmailAddress,
                 SourceApplicationUserId = userId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var emailAddress = !string.IsNullOrEmpty(command.EmailAddress) ? command.EmailAddress : person.EmailAddress;
 
@@ -106,12 +108,12 @@ public class CreateNameChangeRequestHandler(
 
             dbContext.Emails.Add(email);
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await backgroundJobScheduler.EnqueueAsync<SendEmailJob>(j => j.ExecuteAsync(email.EmailId, processContext.ProcessId));
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new CreateNameChangeRequestResult(supportTask.SupportTaskReference);
     }

@@ -26,11 +26,11 @@ public class CreateTrnRequestHandler(
     TimeProvider timeProvider) :
     ICommandHandler<CreateTrnRequestCommand, TrnRequestInfo>
 {
-    public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(CreateTrnRequestCommand command)
+    public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(CreateTrnRequestCommand command, CancellationToken cancellationToken)
     {
         var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var existingRequest = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId);
+        var existingRequest = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId, cancellationToken);
         if (existingRequest is not null)
         {
             return ApiError.TrnRequestAlreadyCreated(command.RequestId);
@@ -56,7 +56,8 @@ public class CreateTrnRequestHandler(
                 NationalInsuranceNumber = normalizedNino,
                 Gender = command.Gender
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         var trnToken = trnRequest.TrnToken;
         var aytqLink = trnToken is not null ? trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) : null;

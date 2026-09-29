@@ -30,14 +30,14 @@ public class InductionExemptionModel(
         IsExemptFromInduction = journey.State.IsExemptFromInduction;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var detailUrl = linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 

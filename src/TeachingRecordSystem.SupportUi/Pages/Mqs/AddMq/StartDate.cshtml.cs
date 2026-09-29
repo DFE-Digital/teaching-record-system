@@ -42,23 +42,23 @@ public class StartDateModel(
         StartDate = journey.State.StartDate;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Mqs.AddMq.Status(journey.InstanceId),
             state => state.StartDate = StartDate);
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Qualifications(PersonId));
     }

@@ -10,7 +10,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
     public async Task<IReadOnlyCollection<AssignableUserInfo>> GetAssignableUsersAsync(
         bool includeAdministrators,
         bool includeCurrentAssignees,
-        Guid? includeUserId = null)
+        Guid? includeUserId = null,
+        CancellationToken cancellationToken = default)
     {
         return await dbContext.Users
             .Where(u =>
@@ -24,21 +25,21 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 (includeUserId != null && u.UserId == includeUserId))
             .OrderBy(u => u.Name)
             .Select(u => new AssignableUserInfo(u.UserId, u.Name))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<CompletedByUserInfo>> GetCompletedByUsersAsync()
+    public async Task<IReadOnlyCollection<CompletedByUserInfo>> GetCompletedByUsersAsync(CancellationToken cancellationToken = default)
     {
         return await dbContext.Users
             .Where(u => dbContext.SupportTasks.Any(t => t.CompletedByUserId == u.UserId))
             .OrderBy(u => u.Name)
             .Select(u => new CompletedByUserInfo(u.UserId, u.Name))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
     }
 
-    public async Task<SupportTaskNote> CreateNoteAsync(CreateSupportTaskNoteOptions options, ProcessContext processContext)
+    public async Task<SupportTaskNote> CreateNoteAsync(CreateSupportTaskNoteOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference, cancellationToken);
 
         var note = new SupportTaskNote
         {
@@ -50,7 +51,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         };
 
         dbContext.SupportTaskNotes.Add(note);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new SupportTaskNoteCreatedEvent
@@ -58,7 +59,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 EventId = Guid.NewGuid(),
                 SupportTaskNote = EventModels.SupportTaskNote.FromModel(note)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (supportTask.Status is SupportTaskStatus.Open)
         {
@@ -70,13 +72,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     Outcome = null
                 },
                 updateAction: null,
-                processContext);
+                processContext,
+                cancellationToken: cancellationToken);
         }
 
         return note;
     }
 
-    internal async Task<SupportTask> CreateSupportTaskAsync(CreateSupportTaskOptions options, ProcessContext processContext)
+    internal async Task<SupportTask> CreateSupportTaskAsync(CreateSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         if (options.SupportTaskType.GetDataType() != options.Data.GetType())
         {
@@ -103,27 +106,28 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
 
         dbContext.SupportTasks.Add(supportTask);
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new SupportTaskCreatedEvent
             {
                 EventId = Guid.NewGuid(),
                 SupportTask = EventModels.SupportTask.FromModel(supportTask)
-            });
+            },
+            cancellationToken);
 
         return supportTask;
     }
 
-    public async Task DeleteSupportTaskAsync(DeleteSupportTaskOptions options, ProcessContext processContext)
+    public async Task DeleteSupportTaskAsync(DeleteSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference, cancellationToken);
 
         supportTask.DeletedOn = processContext.Now;
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventScope.PublishEventAsync(
             new SupportTaskDeletedEvent
@@ -132,14 +136,15 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 SupportTaskReference = options.SupportTaskReference,
                 SupportTask = EventModels.SupportTask.FromModel(supportTask),
                 ReasonDetail = options.ReasonDetail
-            });
+            },
+            cancellationToken);
     }
 
-    public async Task<bool> AllocateSupportTaskAsync(AllocateSupportTaskOptions options, ProcessContext processContext)
+    public async Task<bool> AllocateSupportTaskAsync(AllocateSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference, cancellationToken);
 
         if (supportTask.Status is SupportTaskStatus.Closed)
         {
@@ -159,7 +164,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         {
             supportTask.UpdatedOn = processContext.Now;
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventScope.PublishEventAsync(
                 new SupportTaskUpdatedEvent
@@ -171,7 +176,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     SupportTask = EventModels.SupportTask.FromModel(supportTask),
                     Comments = null,
                     RejectionReason = null
-                });
+                },
+                cancellationToken);
 
             return true;
         }
@@ -179,13 +185,13 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         return false;
     }
 
-    public async Task AssignSupportTasksAsync(AssignSupportTasksOptions options, ProcessContext processContext)
+    public async Task AssignSupportTasksAsync(AssignSupportTasksOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
         foreach (var supportTaskReference in options.SupportTaskReferences)
         {
-            var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference);
+            var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(supportTaskReference, cancellationToken);
 
             if (supportTask.Status is SupportTaskStatus.Closed)
             {
@@ -202,7 +208,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             supportTask.AssignedToUserId = options.UserId;
             supportTask.UpdatedOn = processContext.Now;
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventScope.PublishEventAsync(
                 new SupportTaskUpdatedEvent
@@ -214,16 +220,17 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     SupportTask = EventModels.SupportTask.FromModel(supportTask),
                     Comments = null,
                     RejectionReason = null
-                });
+                },
+                cancellationToken);
         }
     }
 
-    internal Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext)
+    internal Task UpdateSupportTaskAsync(UpdateSupportTaskOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext);
+        return UpdateSupportTaskCoreAsync(options, updateAction: null, processContext, cancellationToken);
     }
 
-    internal Task UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext)
+    internal Task UpdateSupportTaskAsync<TData>(UpdateSupportTaskOptions<TData> options, ProcessContext processContext, CancellationToken cancellationToken = default)
         where TData : ISupportTaskData, IEquatable<TData>
     {
         return UpdateSupportTaskCoreAsync(
@@ -246,10 +253,11 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     (!supportTask.GetData<TData>().Equals(oldData) ? SupportTaskUpdatedEventChanges.Data : 0) |
                     (supportTask.Outcome != oldOutcome ? SupportTaskUpdatedEventChanges.Outcome : 0);
             },
-            processContext);
+            processContext,
+            cancellationToken);
     }
 
-    public Task SaveProgressAsync(SaveSupportTaskProgressOptions options, ProcessContext processContext)
+    public Task SaveProgressAsync(SaveSupportTaskProgressOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         return UpdateSupportTaskCoreAsync(
             new UpdateSupportTaskOptions
@@ -260,17 +268,19 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 SavedJourneyState = Option.Some(options.SavedJourneyState)!
             },
             updateAction: null,
-            processContext);
+            processContext,
+            cancellationToken: cancellationToken);
     }
 
     private async Task UpdateSupportTaskCoreAsync(
         UpdateSupportTaskOptions options,
         Func<SupportTask, SupportTaskUpdatedEventChanges, SupportTaskUpdatedEventChanges>? updateAction,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken)
     {
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
 
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference, cancellationToken);
 
         if (supportTask.Status is SupportTaskStatus.Closed)
         {
@@ -324,7 +334,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
         {
             supportTask.UpdatedOn = processContext.Now;
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             await eventScope.PublishEventAsync(
                 new SupportTaskUpdatedEvent
@@ -336,13 +346,14 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                     SupportTask = EventModels.SupportTask.FromModel(supportTask),
                     Comments = options.Comments,
                     RejectionReason = options.RejectionReason
-                });
+                },
+                cancellationToken);
         }
     }
 
-    public async Task<bool> UpdateZendeskUrlsAsync(UpdateZendeskUrlsOptions options, ProcessContext processContext)
+    public async Task<bool> UpdateZendeskUrlsAsync(UpdateZendeskUrlsOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
-        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference);
+        var supportTask = await dbContext.SupportTasks.FindOrThrowAsync(options.SupportTaskReference, cancellationToken);
 
         var zendeskUrls = options.ZendeskUrls.ToArray();
 
@@ -366,7 +377,7 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
             changes |= SupportTaskUpdatedEventChanges.Status;
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         await eventPublisher.PublishSingleEventAsync(
             new SupportTaskUpdatedEvent
@@ -379,7 +390,8 @@ public class SupportTaskService(TrsDbContext dbContext, IEventPublisher eventPub
                 Comments = null,
                 RejectionReason = null
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return true;
     }

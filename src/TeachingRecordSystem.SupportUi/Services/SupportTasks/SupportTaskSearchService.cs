@@ -13,7 +13,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
 
     public static Guid UnassignedUserId => Guid.Empty;
 
-    public async Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions options, PaginationOptions paginationOptions)
+    public async Task<TrnRequestsSearchResult> SearchTrnRequestsAsync(TrnRequestsSearchOptions options, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = options.Search?.Trim() ?? string.Empty;
         var sortBy = options.SortBy ?? TrnRequestsSortByOption.RequestedOn;
@@ -32,7 +32,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 u => u.UserId,
                 (t, user) => new { t.Task, t.TrnRequest, ApplicationUser = user });
 
-        var totalTaskCount = await tasks.CountAsync();
+        var totalTaskCount = await tasks.CountAsync(cancellationToken);
 
         if (SearchTextIsDate(search, out var minDate, out var maxDate))
         {
@@ -58,14 +58,14 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var resultsBySourceApplication = await tasks
             .GroupBy(t => t.TrnRequest.ApplicationUserId)
             .Select(t => new TrnRequestsSearchResultBySourceApplication(t.Key, t.Count()))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         if (options.SourceApplicationUserIds.Count is not 0)
         {
             tasks = tasks.Where(t => options.SourceApplicationUserIds.Contains(t.TrnRequest.ApplicationUserId));
         }
 
-        var totalFilteredTaskCount = await tasks.CountAsync();
+        var totalFilteredTaskCount = await tasks.CountAsync(cancellationToken);
 
         tasks = sortBy switch
         {
@@ -90,7 +90,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequest.EmailAddress,
                 t.Task.CreatedOn,
                 t.ApplicationUser.ShortName ?? t.ApplicationUser.Name))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount, cancellationToken);
 
         return new()
         {
@@ -100,7 +100,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<ChangeRequestsSearchResult> SearchChangeRequestsAsync(ChangeRequestsSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<ChangeRequestsSearchResult> SearchChangeRequestsAsync(ChangeRequestsSearchOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? ChangeRequestsSortByOption.RequestedOn;
@@ -120,8 +120,8 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Where(t => (t.SupportTaskType == SupportTaskType.ChangeNameRequest || t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest)
                         && t.IsOutstanding);
 
-        var nameChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeNameRequest);
-        var dateOfBirthChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest);
+        var nameChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeNameRequest, cancellationToken);
+        var dateOfBirthChangeRequestCount = await tasks.CountAsync(t => t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest, cancellationToken);
 
         tasks = tasks.Where(t => changeRequestTypes.Contains(t.SupportTaskType));
 
@@ -136,7 +136,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 nameParts.All(n => EF.Property<string[]>(t.Person!, "names").Contains(n)));
         }
 
-        var totalFilteredTaskCount = await tasks.CountAsync();
+        var totalFilteredTaskCount = await tasks.CountAsync(cancellationToken);
 
         tasks = sortBy switch
         {
@@ -159,7 +159,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 string.JoinNonEmpty(' ', t.Person.FirstName, t.Person.MiddleName, t.Person.LastName),
                 t.CreatedOn,
                 t.SupportTaskType))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount, cancellationToken);
 
         return new()
         {
@@ -170,7 +170,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<TrnRequestManualChecksSearchResult> SearchTrnRequestManualChecksAsync(TrnRequestManualChecksSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<TrnRequestManualChecksSearchResult> SearchTrnRequestManualChecksAsync(TrnRequestManualChecksSearchOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? TrnRequestManualChecksSortByOption.DateCreated;
@@ -185,7 +185,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Join(dbContext.ApplicationUsers, t => t.TrnRequestMetadata!.ApplicationUserId, u => u.UserId, (t, u) => new { Task = t, User = u })
             .GroupBy(m => new { UserName = m.User.Name, m.User.UserId })
             .Select(g => new { g.Key.UserId, Count = g.Count(), g.Key.UserName })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var totalTaskCount = groupedBySource.Sum(g => g.Count);
 
@@ -211,7 +211,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 nameParts.All(n => t.Task.TrnRequestMetadata!.Name.Select(m => EF.Functions.Collate(m, Collations.CaseInsensitive)).Contains(n)));
         }
 
-        var totalFilteredTaskCount = await tasks.CountAsync();
+        var totalFilteredTaskCount = await tasks.CountAsync(cancellationToken);
 
         tasks = sortBy switch
         {
@@ -237,7 +237,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.TrnRequestMetadata!.DateOfBirth,
                 t.CreatedOn,
                 t.TrnRequestMetadata.ApplicationUser!.ShortName ?? t.TrnRequestMetadata.ApplicationUser!.Name))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount, cancellationToken);
 
         return new()
         {
@@ -248,7 +248,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<TeachersPensionsPotentialDuplicatesSearchResult> SearchTeachersPensionsPotentialDuplicatesAsync(TeachersPensionsPotentialDuplicatesSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<TeachersPensionsPotentialDuplicatesSearchResult> SearchTeachersPensionsPotentialDuplicatesAsync(TeachersPensionsPotentialDuplicatesSearchOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? TeachersPensionsPotentialDuplicatesSortByOption.CreatedOn;
@@ -259,7 +259,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
             .Where(t => t.SupportTaskType == SupportTaskType.TeacherPensionsPotentialDuplicate && t.IsOutstanding)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var unorderedResults = tasks.Select(t =>
         {
@@ -311,7 +311,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<OneLoginUserIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(OneLoginUserIdVerificationSupportTasksOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<OneLoginUserIdVerificationSupportTasksSearchResult> SearchOneLoginIdVerificationSupportTasksAsync(OneLoginUserIdVerificationSupportTasksOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? OneLoginUserIdVerificationSupportTasksSortByOption.RequestedOn;
@@ -320,7 +320,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var tasks = await dbContext.SupportTasks
             .Include(t => t.OneLoginUser)
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserIdVerification && t.IsOutstanding)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var taskCount = tasks.Count;
 
@@ -336,7 +336,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 u.UserId,
                 ShortName = (u.ShortName ?? u.Name)!
             })
-            .ToDictionaryAsync(u => u.UserId, u => u.ShortName);
+            .ToDictionaryAsync(u => u.UserId, u => u.ShortName, cancellationToken);
 
         var results = tasks
             .Select(r =>
@@ -395,7 +395,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<OneLoginUserRecordMatchingSupportTasksSearchResult> SearchOneLoginUserRecordMatchingSupportTasksAsync(OneLoginUserRecordMatchingSupportTasksOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<OneLoginUserRecordMatchingSupportTasksSearchResult> SearchOneLoginUserRecordMatchingSupportTasksAsync(OneLoginUserRecordMatchingSupportTasksOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? OneLoginUserRecordMatchingSupportTasksSortByOption.RequestedOn;
@@ -404,7 +404,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         var tasks = await dbContext.SupportTasks
             .Include(t => t.OneLoginUser)
             .Where(t => t.SupportTaskType == SupportTaskType.OneLoginUserRecordMatching && t.IsOutstanding)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var clientUserIds = tasks
             .Select(t => ((OneLoginUserRecordMatchingData)t.Data!).ClientApplicationUserId)
@@ -418,7 +418,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 u.UserId,
                 ShortName = (u.ShortName ?? u.Name)!
             })
-            .ToDictionaryAsync(u => u.UserId, u => u.ShortName);
+            .ToDictionaryAsync(u => u.UserId, u => u.ShortName, cancellationToken);
 
         var taskCount = tasks.Count;
 
@@ -481,7 +481,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         };
     }
 
-    public async Task<SupportTasksSearchResult> SearchSupportTasksAsync(SupportTasksSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<SupportTasksSearchResult> SearchSupportTasksAsync(SupportTasksSearchOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var sortBy = searchOptions.SortBy ?? SupportTasksSortByOption.RequestedOn;
         var sortDirection = searchOptions.SortDirection ?? SortDirection.Ascending;
@@ -505,7 +505,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             tasks = tasks.Where(t => statuses.Contains(t.Status));
         }
 
-        var totalFilteredTaskCount = await tasks.CountAsync();
+        var totalFilteredTaskCount = await tasks.CountAsync(cancellationToken);
 
         tasks = tasks.OrderBySupportTasksSortOption(sortBy, sortDirection);
 
@@ -519,7 +519,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.AssignedTo != null ? t.AssignedTo.Name : null,
                 t.CreatedOn,
                 t.SourceApplicationUser != null ? (t.SourceApplicationUser.ShortName ?? t.SourceApplicationUser.Name) : null))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount, cancellationToken);
 
         return new()
         {
@@ -552,7 +552,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         return nameParts.Length > 0;
     }
 
-    public async Task<CompletedTasksSearchResult> SearchCompletedTasksAsync(CompletedTasksSearchOptions searchOptions, PaginationOptions paginationOptions)
+    public async Task<CompletedTasksSearchResult> SearchCompletedTasksAsync(CompletedTasksSearchOptions searchOptions, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = searchOptions.Search?.Trim() ?? string.Empty;
         var sortBy = searchOptions.SortBy ?? CompletedTasksSortByOption.CompletedOn;
@@ -615,7 +615,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
             tasks = tasks.Where(t => t.CompletedByUserId == completedByUserId);
         }
 
-        var totalFilteredTaskCount = await tasks.CountAsync();
+        var totalFilteredTaskCount = await tasks.CountAsync(cancellationToken);
 
         tasks = sortBy switch
         {
@@ -645,7 +645,7 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
                 t.CompletedByUserId,
                 t.CompletedBy != null ? t.CompletedBy.Name : null,
                 t.SourceApplicationUser != null ? (t.SourceApplicationUser.ShortName ?? t.SourceApplicationUser.Name) : null))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalFilteredTaskCount, cancellationToken);
 
         return new()
         {

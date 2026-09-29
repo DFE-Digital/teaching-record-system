@@ -41,14 +41,14 @@ public class TrainingProviderModel(
         TrainingProviderId = journey.State.TrainingProviderId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state => state.TrainingProviderId = TrainingProviderId);
 
@@ -57,6 +57,8 @@ public class TrainingProviderModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         TrainingProviderRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.TrainingProvider);
         TrainingProviders = await referenceDataCache.GetTrainingProvidersAsync();
 

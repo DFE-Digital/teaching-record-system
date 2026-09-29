@@ -54,16 +54,16 @@ public class MatchesModel(
             .ToArray();
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
         // Verify the submitted ID is legit
@@ -73,7 +73,7 @@ public class MatchesModel(
             return BadRequest();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var nextStepUrl = PersonId == ResolveTeacherPensionsPotentialDuplicateState.KeepRecordSeparatePersonIdSentinel ?
             linkGenerator.SupportTasks.TeacherPensions.Resolve.KeepRecordSeparate(Journey.InstanceId) :
@@ -99,7 +99,7 @@ public class MatchesModel(
         });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(MatchesModel),
@@ -114,7 +114,8 @@ public class MatchesModel(
                 SupportTaskReference = SupportTask!.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         Journey.DeleteInstance();
 
@@ -126,9 +127,9 @@ public class MatchesModel(
         return Redirect(Journey.State.CompletionUrl);
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceController.DeleteUploadedFileAsync(Journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         Journey.DeleteInstance();
 
         return Redirect(Journey.State.CompletionUrl);
@@ -136,12 +137,14 @@ public class MatchesModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         SupportTask = GetSupportTask();
         RequestData = SupportTask!.TrnRequestMetadata!;
 
         BackLink = Journey.GetBackLink() ?? Journey.State.CompletionUrl;
 
-        var person = await DbContext.Persons.Include(x => x.OneLoginUsers).SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId);
+        var person = await DbContext.Persons.Include(x => x.OneLoginUsers).SingleOrDefaultAsync(x => x.PersonId == SupportTask!.PersonId, cancellationToken);
         if (person != null)
         {
             Trn = person.Trn;
@@ -175,7 +178,7 @@ public class MatchesModel(
                     .ToArray(),
                 HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
             })
-            .ToArrayAsync())
+            .ToArrayAsync(cancellationToken))
             // matchedPersonIds is ordered by best match first; ensure we maintain that order
             .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId))
             .Select((r, i) => r with

@@ -8,11 +8,11 @@ public record GetQtlsCommand(string Trn) : ICommand<QtlsResult>;
 
 public class GetQtlsHandler(TrsDbContext dbContext) : ICommandHandler<GetQtlsCommand, QtlsResult>
 {
-    public async Task<ApiResult<QtlsResult>> ExecuteAsync(GetQtlsCommand command)
+    public async Task<ApiResult<QtlsResult>> ExecuteAsync(GetQtlsCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .Include(p => p.Qualifications)
-            .SingleOrDefaultAsync(p => p.Trn == command.Trn);
+            .SingleOrDefaultAsync(p => p.Trn == command.Trn, cancellationToken);
 
         if (person is null)
         {

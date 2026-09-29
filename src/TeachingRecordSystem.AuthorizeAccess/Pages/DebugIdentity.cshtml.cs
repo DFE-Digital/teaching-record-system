@@ -59,7 +59,7 @@ public class DebugIdentityModel(
         }
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         string[][]? verifiedNames;
         DateOnly[]? verifiedDatesOfBirth;
@@ -117,20 +117,22 @@ public class DebugIdentityModel(
                 verifiedDatesOfBirth,
                 coreIdentityClaimVc: null);
 
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
         else if (AttemptedIdentityVerification)
         {
             coordinator.UpdateState(s => s.AttemptedIdentityVerification = true);
         }
 
-        await coordinator.OnOneLoginCallbackAsync(coordinator.State.OneLoginAuthenticationTicket!);
+        await coordinator.OnOneLoginCallbackAsync(coordinator.State.OneLoginAuthenticationTicket!, cancellationToken);
 
         return coordinator.GetNextPage().ToActionResult();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         if (!optionsAccessor.Value.ShowDebugPages)
         {
             context.Result = NotFound();
@@ -149,13 +151,13 @@ public class DebugIdentityModel(
 
         _oneLoginUser = await dbContext.OneLoginUsers
             .Include(o => o.Person)
-            .SingleOrDefaultAsync(o => o.Subject == Subject);
+            .SingleOrDefaultAsync(o => o.Subject == Subject, cancellationToken);
 
         if (_oneLoginUser is null)
         {
             _oneLoginUser = new OneLoginUser { Subject = Subject!, EmailAddress = Email };
             dbContext.OneLoginUsers.Add(_oneLoginUser);
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         if (_oneLoginUser?.Person is Person person)

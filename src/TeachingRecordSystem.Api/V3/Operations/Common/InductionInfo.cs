@@ -9,7 +9,8 @@ public record InductionInfo
 
     public static async Task<InductionInfo> CreateAsync(
         PostgresModels.Person person,
-        ReferenceDataCache referenceDataCache)
+        ReferenceDataCache referenceDataCache,
+        CancellationToken cancellationToken = default)
     {
         return new InductionInfo
         {
@@ -19,7 +20,7 @@ public record InductionInfo
             ExemptionReasons = await person.GetAllInductionExemptionReasonIds()
                 .ToAsyncEnumerable()
                 .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
-                .ToArrayAsync()
+                .ToArrayAsync(cancellationToken)
         };
     }
 }

@@ -59,7 +59,7 @@ public class Matches(
         journey.State.ApplySavedModelStateValues(nameof(Matches), ModelState);
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
@@ -70,10 +70,10 @@ public class Matches(
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var nextStepUrl = MatchedPersonId != ResolveOneLoginUserMatchingState.NotMatchedPersonIdSentinel ?
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmConnect(journey.InstanceId) :
@@ -88,7 +88,7 @@ public class Matches(
             });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(Matches),
@@ -107,7 +107,8 @@ public class Matches(
                 SupportTaskReference = _supportTask.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
 
@@ -123,6 +124,8 @@ public class Matches(
         PageHandlerExecutingContext context,
         PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         BackLink = journey.GetBackLink() ?? journey.State.CompletionUrl;
@@ -167,7 +170,7 @@ public class Matches(
                 p.PreviousNames,
                 p.Qualifications
             })
-            .ToArrayAsync())
+            .ToArrayAsync(cancellationToken))
             .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId));
 
         SuggestedMatches = await Task.WhenAll(

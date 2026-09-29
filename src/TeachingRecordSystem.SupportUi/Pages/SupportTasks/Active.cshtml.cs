@@ -118,7 +118,7 @@ public class Active(
 
     public bool IsSelected(string supportTaskReference) => SelectedTaskReferenceLookup.Contains(supportTaskReference);
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
         var sortBy = SortBy ?? SupportTasksSortByOption.RequestedOn;
@@ -126,7 +126,7 @@ public class Active(
         var searchOptions = new SupportTasksSearchOptions(Type, AssignedToUserId, statuses, sortBy, sortDirection);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var result = await searchService.SearchSupportTasksAsync(searchOptions, paginationOptions);
+        var result = await searchService.SearchSupportTasksAsync(searchOptions, paginationOptions, cancellationToken);
 
         TotalTaskCount = result.TotalTaskCount;
         Results = result.SearchResults;
@@ -160,7 +160,8 @@ public class Active(
 
         var assignableUsers = await supportTaskService.GetAssignableUsersAsync(
             includeAdministrators: assignmentOptions.Value.IncludeAdministrators,
-            includeCurrentAssignees: true);
+            includeCurrentAssignees: true,
+            cancellationToken: cancellationToken);
 
         ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
 

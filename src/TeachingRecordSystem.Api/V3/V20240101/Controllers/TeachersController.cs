@@ -23,7 +23,8 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
+        CancellationToken cancellationToken)
     {
         var command = new GetPersonCommand(
             trn,
@@ -35,7 +36,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
                 ApplyLegacyAlertsBehavior = true
             });
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(GetTeacherResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
@@ -52,7 +53,8 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateNameChangeAsync(
-        [FromBody] CreateNameChangeRequestRequest request)
+        [FromBody] CreateNameChangeRequestRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new CreateNameChangeRequestCommand()
         {
@@ -65,7 +67,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
             EmailAddress = null
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(_ => NoContent());
     }
@@ -79,7 +81,8 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateDateOfBirthChangeAsync(
-        [FromBody] CreateDateOfBirthChangeRequestRequest request)
+        [FromBody] CreateDateOfBirthChangeRequestRequest request,
+        CancellationToken cancellationToken)
     {
         var command = new CreateDateOfBirthChangeRequestCommand()
         {
@@ -90,7 +93,7 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
             EmailAddress = null
         };
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(_ => NoContent());
     }
@@ -103,10 +106,10 @@ public class TeachersController(ICommandDispatcher commandDispatcher) : Controll
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request)
+    public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request, CancellationToken cancellationToken)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r =>
             Ok(new FindTeachersResponse()

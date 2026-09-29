@@ -150,7 +150,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         SupportEmailAddress = _user.AppContent?.SupportEmailAddress;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         // Sanitize roles
         var newApiRoles = ApiRoles!.Where(r => Core.ApiRoles.All.Contains(r)).ToArray();
@@ -197,7 +197,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             }
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         if (IsOidcClient)
         {
@@ -273,7 +273,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         var processContext = new ProcessContext(ProcessType.ApplicationUserUpdating, timeProvider.UtcNow, User.GetUserId());
 
-        await userService.UpdateApplicationUserAsync(options, processContext);
+        await userService.UpdateApplicationUserAsync(options, processContext, cancellationToken);
 
         TempData.SetFlashNotificationBanner("Application user updated");
         return Redirect(linkGenerator.ApplicationUsers.Index());
@@ -281,9 +281,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _user = await dbContext.ApplicationUsers
             .Include(r => r.ApiKeys)
-            .SingleOrDefaultAsync(u => u.UserId == UserId);
+            .SingleOrDefaultAsync(u => u.UserId == UserId, cancellationToken);
 
         if (_user is null)
         {

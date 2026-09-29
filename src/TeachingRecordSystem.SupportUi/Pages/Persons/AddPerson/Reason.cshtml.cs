@@ -66,18 +66,18 @@ public class ReasonModel(
         AdditionalInformation = journey.State.AdditionalInformation;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
         // Upload the evidence file before validating so that it's retained if the form is re-rendered
         // with errors.
-        await evidenceUploadManager.UploadAsync(Evidence);
+        await evidenceUploadManager.UploadAsync(Evidence, cancellationToken);
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.AddPerson.CheckAnswers(journey.InstanceId),

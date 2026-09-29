@@ -41,7 +41,7 @@ public class ConfirmConnect(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -64,7 +64,8 @@ public class ConfirmConnect(
                     MatchedPersonId = MatchedPersonId,
                     MatchedAttributes = matchedPerson.MatchedAttributes
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -77,7 +78,8 @@ public class ConfirmConnect(
                     MatchedPersonId = MatchedPersonId,
                     MatchedAttributes = matchedPerson.MatchedAttributes
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         journey.DeleteInstance();
@@ -91,6 +93,8 @@ public class ConfirmConnect(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = context.HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         BackLink = journey.GetBackLink();
@@ -99,7 +103,7 @@ public class ConfirmConnect(
 
         var matchedPerson = await dbContext.Persons
             .Include(p => p.PreviousNames)
-            .SingleAsync(p => p.PersonId == journey.State.MatchedPersonId);
+            .SingleAsync(p => p.PersonId == journey.State.MatchedPersonId, cancellationToken);
 
         MatchedPersonId = matchedPerson.PersonId;
         MatchedPersonName = $"{matchedPerson.FirstName} {matchedPerson.MiddleName} {matchedPerson.LastName}";

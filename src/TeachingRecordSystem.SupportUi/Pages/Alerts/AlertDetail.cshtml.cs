@@ -30,7 +30,7 @@ public class AlertDetailModel(
 
     public bool CanEdit { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         Alert = HttpContext.GetCurrentAlertFeature().Alert;
         var personId = HttpContext.GetCurrentPersonFeature().PersonId;
@@ -53,13 +53,13 @@ public class AlertDetailModel(
             ORDER BY
             	created DESC
             """)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         ChangeReason = changeReasonInfo?.ChangeReason;
         ChangeReasonDetail = changeReasonInfo?.ChangeReasonDetail;
         EvidenceFileName = changeReasonInfo?.EvidenceFileName;
         UploadedEvidenceFileUrl = changeReasonInfo?.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(changeReasonInfo.EvidenceFileId!.Value, WebConstants.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(changeReasonInfo.EvidenceFileId!.Value, WebConstants.FileUrlExpiry, cancellationToken) :
             null;
         ExternalLinkUri = TrsUriHelper.TryCreateWebsiteUri(Alert.ExternalLink, out var linkUri) ? linkUri : null;
 

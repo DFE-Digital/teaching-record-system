@@ -46,7 +46,8 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
     public static async Task<ResolveOneLoginUserMatchingState> CreateStateAsync(
         OneLoginService oneLoginService,
         SupportTask supportTask,
-        string completionUrl)
+        string completionUrl,
+        CancellationToken cancellationToken = default)
     {
         Debug.Assert(supportTask.SupportTaskType is SupportTaskType.OneLoginUserIdVerification or SupportTaskType.OneLoginUserRecordMatching);
         var requestData = supportTask.GetData<IOneLoginUserMatchingData>();
@@ -69,7 +70,7 @@ public class ResolveOneLoginUserMatchingJourneyCoordinator(
                 Trn: requestData.StatedTrn,
                 TrnTokenTrnHint: requestData.TrnTokenTrn);
 
-            suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(matchOptions);
+            suggestedMatches = await oneLoginService.GetSuggestedPersonMatchesAsync(matchOptions, cancellationToken);
 
             var matchResult = oneLoginService.MatchPerson(matchOptions, suggestedMatches);
             if (matchResult is not null)

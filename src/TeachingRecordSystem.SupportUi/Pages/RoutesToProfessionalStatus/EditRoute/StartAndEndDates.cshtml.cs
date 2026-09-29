@@ -47,14 +47,14 @@ public class StartAndEndDateModel(
         TrainingEndDate = journey.State.TrainingEndDate;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         journey.UpdateState(state =>
         {
@@ -74,6 +74,8 @@ public class StartAndEndDateModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         StartAndEndDatesRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.StartAndEndDate);
 
 

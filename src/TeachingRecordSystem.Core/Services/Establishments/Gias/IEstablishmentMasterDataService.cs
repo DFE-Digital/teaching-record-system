@@ -2,5 +2,5 @@ namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 public interface IEstablishmentMasterDataService
 {
-    IAsyncEnumerable<Establishment> GetEstablishmentsAsync();
+    IAsyncEnumerable<Establishment> GetEstablishmentsAsync(CancellationToken cancellationToken = default);
 }

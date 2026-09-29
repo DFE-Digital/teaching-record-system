@@ -18,11 +18,11 @@ public record GetTrnRequestCommand(string RequestId, GetTrnRequestCommandOptions
 public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider) :
     ICommandHandler<GetTrnRequestCommand, TrnRequestInfo>
 {
-    public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(GetTrnRequestCommand command)
+    public async Task<ApiResult<TrnRequestInfo>> ExecuteAsync(GetTrnRequestCommand command, CancellationToken cancellationToken)
     {
         var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var trnRequestInfo = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId);
+        var trnRequestInfo = await trnRequestService.GetTrnRequestAsync(currentApplicationUserId, command.RequestId, cancellationToken);
 
         if (trnRequestInfo is null)
         {

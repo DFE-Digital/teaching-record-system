@@ -71,7 +71,7 @@ public class JourneySignInHandler(IJourneyInstanceProvider journeyInstanceProvid
 
         var result = coordinator.ShowDebugPages ?
             coordinator.OnOneLoginCallbackDebug(ticket) :
-            await coordinator.OnOneLoginCallbackAsync(ticket);
+            await coordinator.OnOneLoginCallbackAsync(ticket, _context.RequestAborted);
 
         await result.ExecuteAsync(_context);
     }

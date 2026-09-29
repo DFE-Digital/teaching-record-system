@@ -63,20 +63,20 @@ public class CheckAnswersModel(
         await next();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
             return CancelJourney();
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var oneLoginUserFeature = HttpContext.GetCurrentOneLoginUserFeature();
 
         var person = await dbContext.Persons
             .Where(p => p.PersonId == journey.State.PersonId)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         var changeReason = new ChangeReasonWithDetailsAndEvidence()
         {
@@ -108,7 +108,8 @@ public class CheckAnswersModel(
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = []
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -120,7 +121,8 @@ public class CheckAnswersModel(
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = []
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         var personName = string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName);

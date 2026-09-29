@@ -18,7 +18,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrent
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAsync()
+    public async Task<IActionResult> GetAsync(CancellationToken cancellationToken)
     {
         if (!currentUserProvider.TryGetTrnRequestId(out var trnRequestId))
         {
@@ -28,7 +28,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrent
         var command = new GetTrnRequestCommand(
             trnRequestId,
             GetTrnRequestCommandOptions.SupportsDormantRequests | GetTrnRequestCommandOptions.SupportsRejectedRequests);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(TrnRequestInfo.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
@@ -41,7 +41,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrent
         Description = "Activates the dormant request created by Teacher Auth.")]
     [Authorize(AuthorizationPolicies.TeacherAuthAccessToken)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ActivateAsync()
+    public async Task<IActionResult> ActivateAsync(CancellationToken cancellationToken)
     {
         if (!currentUserProvider.TryGetTrnRequestId(out var trnRequestId))
         {
@@ -49,7 +49,7 @@ public class TrnRequestController(ICommandDispatcher commandDispatcher, ICurrent
         }
 
         var command = new ActivateTrnRequestCommand(trnRequestId);
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(
                 r => StatusCode(

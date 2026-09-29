@@ -42,11 +42,11 @@ public class CheckAnswersModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         // The user may have been verified or connected to a teaching record in another journey while this
         // page was open, which makes a support request redundant
-        if (await coordinator.TryAdvanceIfVerifiedOrConnectedAsync() is { } nextPage)
+        if (await coordinator.TryAdvanceIfVerifiedOrConnectedAsync(cancellationToken) is { } nextPage)
         {
             return nextPage.ToActionResult();
         }
@@ -56,7 +56,7 @@ public class CheckAnswersModel(
         var subject = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
 
-        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow);
+        var processContext = await ProcessContext.FromDbAsync(dbContext, state.SigningInProcessId, timeProvider.UtcNow, cancellationToken);
 
         SupportTask supportTask;
         string? trnRequestId = null;
@@ -67,7 +67,7 @@ public class CheckAnswersModel(
             {
                 await coordinator.UpdateStateAsync(async state =>
                 {
-                    trnRequestId = await coordinator.CompleteWithDeferredMatchingAsync(state);
+                    trnRequestId = await coordinator.CompleteWithDeferredMatchingAsync(state, cancellationToken: cancellationToken);
                     return state;
                 });
             }
@@ -90,7 +90,8 @@ public class CheckAnswersModel(
                     SubjectName = QtsSubjectName,
                     TrnRequestId = trnRequestId
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -114,7 +115,8 @@ public class CheckAnswersModel(
                     SubjectId = state.QtsSubjectId,
                     SubjectName = QtsSubjectName
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         coordinator.UpdateState(s => s.CreatedSupportTaskReference = supportTask.SupportTaskReference);

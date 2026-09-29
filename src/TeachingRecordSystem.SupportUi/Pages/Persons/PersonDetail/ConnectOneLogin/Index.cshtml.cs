@@ -39,7 +39,7 @@ public class IndexModel(
         EmailAddress = journey.State.OneLoginEmailAddress;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -47,11 +47,11 @@ public class IndexModel(
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Where(u => u.EmailAddress == EmailAddress)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (oneLoginUser is null)
         {
@@ -76,7 +76,8 @@ public class IndexModel(
                 Names = oneLoginUser.VerifiedNames ?? [],
                 DatesOfBirth = oneLoginUser.VerifiedDatesOfBirth ?? [],
                 EmailAddress = oneLoginUser.EmailAddress
-            });
+            },
+            cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.PersonDetail.ConnectOneLogin.Match(journey.InstanceId),

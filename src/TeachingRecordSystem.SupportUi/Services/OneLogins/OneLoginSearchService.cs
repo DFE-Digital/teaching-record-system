@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Services.OneLogins;
 
 public class OneLoginSearchService(TrsDbContext dbContext)
 {
-    public async Task<OneLoginSearchResult> SearchAsync(OneLoginSearchOptions options, PaginationOptions paginationOptions)
+    public async Task<OneLoginSearchResult> SearchAsync(OneLoginSearchOptions options, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
     {
         var search = options.Search?.Trim() ?? string.Empty;
         var sortBy = options.SortBy ?? OneLoginSearchSortByOption.Email;
@@ -69,7 +69,7 @@ public class OneLoginSearchService(TrsDbContext dbContext)
 
         query = query.Include(o => o.Person);
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         var results = await query
             .Select(o => new OneLoginSearchResultItem(
@@ -78,7 +78,7 @@ public class OneLoginSearchService(TrsDbContext dbContext)
                 o.VerifiedNames,
                 o.VerifiedDatesOfBirth,
                 o.Person != null ? o.Person.Trn : null))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount);
+            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount, cancellationToken);
 
         return new OneLoginSearchResult
         {

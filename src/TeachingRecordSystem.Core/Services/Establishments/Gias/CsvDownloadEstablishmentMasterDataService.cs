@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -18,18 +19,18 @@ public class CsvDownloadEstablishmentMasterDataService : IEstablishmentMasterDat
         _timeProvider = timeProvider;
     }
 
-    public async IAsyncEnumerable<Establishment> GetEstablishmentsAsync()
+    public async IAsyncEnumerable<Establishment> GetEstablishmentsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var filename = GetLatestEstablishmentsCsvFilename();
-        using var response = await _httpClient.GetAsync(filename, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await _httpClient.GetAsync(filename, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        using var stream = await response.Content.ReadAsStreamAsync();
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         // The CSV file is encoded in Windows 1252 encoding which is almost identical to Latin1 and allows Welsh and other special characters to be read correctly
         using var reader = new StreamReader(stream, Encoding.Latin1);
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true });
 
-        await foreach (var item in csv.GetRecordsAsync<EstablishmentCsvRow>())
+        await foreach (var item in csv.GetRecordsAsync<EstablishmentCsvRow>(cancellationToken))
         {
             yield return new Establishment
             {

@@ -67,11 +67,11 @@ public class CheckAnswersModel(
         AdditionalInformation = journey.State.AdditionalInformation;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return await CancelAsync();
+            return await CancelAsync(cancellationToken);
         }
 
         var processContext = new ProcessContext(
@@ -96,7 +96,8 @@ public class CheckAnswersModel(
                 StartDate = StartDate,
                 EndDate = null
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
         TempData.SetFlashNotificationBanner("Alert added");
@@ -104,9 +105,9 @@ public class CheckAnswersModel(
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }
 
-    private async Task<IActionResult> CancelAsync()
+    private async Task<IActionResult> CancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(journey.State.Evidence.UploadedEvidenceFile, cancellationToken);
         journey.DeleteInstance();
         return Redirect(linkGenerator.Persons.PersonDetail.Alerts(PersonId));
     }

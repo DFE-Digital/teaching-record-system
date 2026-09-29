@@ -26,9 +26,9 @@ public class SetPiiHandler(
     PersonService personService) :
     ICommandHandler<SetPiiCommand, SetPiiResult>
 {
-    public async Task<ApiResult<SetPiiResult>> ExecuteAsync(SetPiiCommand command)
+    public async Task<ApiResult<SetPiiResult>> ExecuteAsync(SetPiiCommand command, CancellationToken cancellationToken)
     {
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn, cancellationToken);
 
         if (person is null)
         {
@@ -69,7 +69,8 @@ public class SetPiiHandler(
                 NationalInsuranceNumber = Option.Some(command.NationalInsuranceNumber is string niNumber ? NationalInsuranceNumber.Parse(niNumber) : null),
                 Gender = Option.Some(command.Gender)
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return new SetPiiResult();
     }

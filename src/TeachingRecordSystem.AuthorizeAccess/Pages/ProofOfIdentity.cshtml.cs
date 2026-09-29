@@ -29,14 +29,14 @@ public class ProofOfIdentity(SignInJourneyCoordinator coordinator, ISafeFileServ
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         var validationContext = ValidationContext<ProofOfIdentity>.CreateWithOptions(this, options => options.ThrowOnFailures());
-        await _validator.ValidateAsync(validationContext);
+        await _validator.ValidateAsync(validationContext, cancellationToken);
 
         await using var stream = File!.OpenReadStream();
 
-        if (!await fileService.TrySafeUploadAsync(stream, validationContext.GetMimeType(), out var fileId))
+        if (!await fileService.TrySafeUploadAsync(stream, validationContext.GetMimeType(), out var fileId, cancellationToken: cancellationToken))
         {
             ModelState.AddModelError(nameof(File), "The selected file contains a virus");
             return this.PageWithErrors();

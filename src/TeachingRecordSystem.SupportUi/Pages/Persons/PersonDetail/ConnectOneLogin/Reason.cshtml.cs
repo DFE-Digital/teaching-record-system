@@ -48,7 +48,7 @@ public class ReasonModel(
         ReasonDetail = journey.State.ReasonDetail;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -56,7 +56,7 @@ public class ReasonModel(
             return Redirect(linkGenerator.Persons.PersonDetail.Index(PersonId));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.Persons.PersonDetail.ConnectOneLogin.CheckAnswers(journey.InstanceId),

@@ -43,14 +43,14 @@ public class StatusModel(
         Status = journey.Status;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         if (CompletingRoute)
         {
@@ -86,6 +86,8 @@ public class StatusModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
         Route = await journey.GetRouteTypeAsync();
 

@@ -22,9 +22,9 @@ public class PublishApiClient : IPublishApiClient
             .Build();
     }
 
-    public async Task<IReadOnlyCollection<ProviderResource>> GetAccreditedProvidersAsync()
+    public async Task<IReadOnlyCollection<ProviderResource>> GetAccreditedProvidersAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _resiliencePipeline.ExecuteAsync(async _ => await _httpClient.GetAsync("recruitment_cycles/current/providers?filter[is_accredited_body]=true&page[per_page]=500", _));
+        var response = await _resiliencePipeline.ExecuteAsync(async _ => await _httpClient.GetAsync("recruitment_cycles/current/providers?filter[is_accredited_body]=true&page[per_page]=500", _), cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -32,7 +32,7 @@ public class PublishApiClient : IPublishApiClient
             throw new InvalidOperationException(errorMessage);
         }
 
-        var providerList = await response.Content.ReadFromJsonAsync<ProviderListResponse>();
+        var providerList = await response.Content.ReadFromJsonAsync<ProviderListResponse>(cancellationToken);
         // Unfortunately the Publish API still includes some training providers that are no longer accredited, so we need to filter these out
         return providerList!.Data.Where(p => p.Attributes.Ukprn is not null && !_noLongerAccreditedTrainingProviders.Contains(p.Attributes.Ukprn)).AsReadOnly();
     }

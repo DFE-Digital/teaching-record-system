@@ -177,7 +177,7 @@ public record GetPersonResultRouteToProfessionalStatusInductionExemption
 public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbContext, ReferenceDataCache referenceDataCache) :
     ICommandHandler<GetPersonCommand, GetPersonResult>
 {
-    public async Task<ApiResult<GetPersonResult>> ExecuteAsync(GetPersonCommand command)
+    public async Task<ApiResult<GetPersonResult>> ExecuteAsync(GetPersonCommand command, CancellationToken cancellationToken)
     {
         var options = command.Options ?? new GetPersonCommandOptions();
 
@@ -208,7 +208,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                     (t.SupportTaskType == SupportTaskType.ChangeDateOfBirthRequest || t.SupportTaskType == SupportTaskType.ChangeNameRequest))
                 .Select(t => t.SupportTaskType)
                 .Distinct()
-                .ToArrayAsync();
+                .ToArrayAsync(cancellationToken);
 
             return (openTaskTypes.Any(t => t == SupportTaskType.ChangeNameRequest),
                     openTaskTypes.Any(t => t == SupportTaskType.ChangeDateOfBirthRequest));
@@ -223,17 +223,17 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
         }
 
-        var person = await personQuery.SingleOrDefaultAsync();
+        var person = await personQuery.SingleOrDefaultAsync(cancellationToken);
 
         if (person is null)
         {
-            var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn);
+            var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn, cancellationToken);
             if (getPersonResult.TryPickT0(out var error, out var resolvedPerson))
             {
                 return error;
             }
 
-            return await ExecuteAsync(command with { Trn = resolvedPerson.Trn });
+            return await ExecuteAsync(command with { Trn = resolvedPerson.Trn }, cancellationToken);
         }
 
         // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
@@ -254,7 +254,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                     .Where(e => e.PersonId == person.PersonId && e.NationalInsuranceNumber != null)
                     .Select(e => e.NationalInsuranceNumber)
                     .Distinct()
-                    .ToArrayAsync();
+                    .ToArrayAsync(cancellationToken);
 
                 if (!employmentNinos.Any(n => NationalInsuranceNumber.Normalize(n) == normalizedNino))
                 {
@@ -271,7 +271,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
         Option<GetPersonResultInduction> induction = default;
         if (command.Include.HasFlag(GetPersonCommandIncludes.Induction))
         {
-            var mappedInduction = await MapInductionAsync(person);
+            var mappedInduction = await MapInductionAsync(person, cancellationToken);
             dqtInduction = Option.Some(mappedInduction.DqtInduction);
             induction = Option.Some(mappedInduction.Induction);
         }
@@ -305,7 +305,8 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                         await MapInitialTeacherTrainingAsync(
                             person.Qualifications!
                                 .OfType<PostgresModels.RouteToProfessionalStatus>()
-                                .OrderBy(q => q.CreatedOn)),
+                                .OrderBy(q => q.CreatedOn),
+                            cancellationToken),
                         options.ApplyAppropriateBodyUserRestrictions)) :
                 default,
             RoutesToProfessionalStatuses = command.Include.HasFlag(GetPersonCommandIncludes.RoutesToProfessionalStatuses) ?
@@ -314,7 +315,8 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                         await MapRoutesToProfessionalStatusesAsync(
                             person.Qualifications!
                                 .OfType<PostgresModels.RouteToProfessionalStatus>()
-                                .OrderBy(q => q.CreatedOn)),
+                                .OrderBy(q => q.CreatedOn),
+                            cancellationToken),
                         options.ApplyAppropriateBodyUserRestrictions)) :
                 default,
             MandatoryQualifications = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
@@ -364,7 +366,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
         };
     }
 
-    private async Task<(GetPersonResultDqtInduction? DqtInduction, GetPersonResultInduction Induction)> MapInductionAsync(PostgresModels.Person person)
+    private async Task<(GetPersonResultDqtInduction? DqtInduction, GetPersonResultInduction Induction)> MapInductionAsync(PostgresModels.Person person, CancellationToken cancellationToken = default)
     {
         var status = person.InductionStatus;
         var dqtStatusName = status.ToDqtInductionStatus(out var dqtStatusDescription);
@@ -398,7 +400,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             ExemptionReasons = await person.GetAllInductionExemptionReasonIds()
                 .ToAsyncEnumerable()
                 .Select(async (Guid id, CancellationToken _) => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
-                .ToArrayAsync()
+                .ToArrayAsync(cancellationToken)
         };
 
         return (dqtInduction, inductionInfo);
@@ -431,7 +433,8 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
             : RoutesResult.FromT0(routes.AsReadOnly());
 
     private async Task<IEnumerable<GetPersonResultRouteToProfessionalStatus>> MapRoutesToProfessionalStatusesAsync(
-        IEnumerable<PostgresModels.RouteToProfessionalStatus> routes) =>
+        IEnumerable<PostgresModels.RouteToProfessionalStatus> routes,
+        CancellationToken cancellationToken) =>
         await routes
             .ToAsyncEnumerable()
             .Select(async (r, ct) => new GetPersonResultRouteToProfessionalStatus()
@@ -464,10 +467,11 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                         .AsReadOnly()
                 }
             })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
     private async Task<IEnumerable<GetPersonResultInitialTeacherTraining>> MapInitialTeacherTrainingAsync(
-        IEnumerable<PostgresModels.RouteToProfessionalStatus> routes) =>
+        IEnumerable<PostgresModels.RouteToProfessionalStatus> routes,
+        CancellationToken cancellationToken) =>
         await routes
             .ToAsyncEnumerable()
             .Select(async (r, ct) => new GetPersonResultInitialTeacherTraining()
@@ -484,7 +488,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                     .Select(subject => new GetPersonResultInitialTeacherTrainingSubject() { Code = subject.Reference, Name = subject.Name })
                     .ToArrayAsync(ct)
             })
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
     private static GetPersonResultInitialTeacherTrainingAgeRange? MapAgeRange(
         TrainingAgeSpecialismType? trainingAge,

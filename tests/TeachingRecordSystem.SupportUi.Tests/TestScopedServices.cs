@@ -25,18 +25,18 @@ public class TestScopedServices
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BlobStorageFileServiceMock = new();
         BlobStorageFileServiceMock
-            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Guid.NewGuid());
         BlobStorageFileServiceMock
-            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
-            .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
+            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid id, TimeSpan time, CancellationToken _) => $"{FakeBlobStorageFileUrlBase}{id}");
         BlobStorageFileServiceMock
-            .Setup(s => s.TryGetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
-            .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
+            .Setup(s => s.TryGetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid id, TimeSpan time, CancellationToken _) => $"{FakeBlobStorageFileUrlBase}{id}");
         BlobStorageSafeFileServiceMock = new();
         BlobStorageSafeFileServiceMock
-            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
-            .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
+            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid id, TimeSpan time, CancellationToken _) => $"{FakeBlobStorageFileUrlBase}{id}");
         TrnRequestOptions = new TrnRequestOptions();
         SupportTaskAssignmentOptions = new SupportTaskAssignmentOptions { IncludeAdministrators = true };
         BackgroundJobScheduler = new(serviceProvider);

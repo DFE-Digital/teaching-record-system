@@ -34,20 +34,22 @@ public class TrainingProviderModel(AddRouteJourneyCoordinator journey, Reference
         TrainingProviderId = journey.State.TrainingProviderId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return await journey.AnswerAndAdvanceAsync(AddRoutePage.TrainingProvider, state => state.TrainingProviderId = TrainingProviderId);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         TrainingProviderRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.TrainingProvider);
         TrainingProviders = await referenceDataCache.GetTrainingProvidersAsync();
 

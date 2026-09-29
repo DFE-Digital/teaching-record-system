@@ -77,9 +77,9 @@ public class AddRouteJourneyCoordinator(
     }
 
     // Returns the URL to send the user back to.
-    public async Task<string> CancelAsync()
+    public async Task<string> CancelAsync(CancellationToken cancellationToken = default)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.ChangeReasonDetail.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.ChangeReasonDetail.Evidence.UploadedEvidenceFile, cancellationToken);
         DeleteInstance();
         return linkGenerator.Persons.PersonDetail.Qualifications(PersonId);
     }

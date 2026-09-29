@@ -54,7 +54,9 @@ public class DeactivateModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
+        var cancellationToken = context.HttpContext.RequestAborted;
+
+        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId, cancellationToken);
 
         if (_user is null)
         {
@@ -69,7 +71,7 @@ public class DeactivateModel(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (!_user!.Active)
         {
@@ -82,8 +84,8 @@ public class DeactivateModel(
             return BadRequest();
         }
 
-        await evidenceUploadManager.ValidateAndUploadAsync<DeactivateModel>(m => m.Evidence, ViewData);
-        await this.ThrowIfInvalidAsync(_validator);
+        await evidenceUploadManager.ValidateAndUploadAsync<DeactivateModel>(m => m.Evidence, ViewData, cancellationToken);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.UserDeactivating, timeProvider.UtcNow, User.GetUserId());
 
@@ -95,16 +97,17 @@ public class DeactivateModel(
                 DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
                 EvidenceFileId = Evidence.UploadedEvidenceFile?.FileId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner($"{_user.Name}\u2019s account has been deactivated");
 
         return Redirect(linkGenerator.Users.Index());
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public async Task<IActionResult> OnPostCancelAsync(CancellationToken cancellationToken)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(Evidence.UploadedEvidenceFile, cancellationToken);
         return Redirect(linkGenerator.Users.EditUser.Index(UserId));
     }
 }

@@ -37,14 +37,14 @@ public class HoldsFromModel(
         HoldsFrom = journey.State.HoldsFrom;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var detailUrl = linkGenerator.RoutesToProfessionalStatus.EditRoute.Detail(journey.InstanceId);
 
@@ -74,6 +74,8 @@ public class HoldsFromModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         HoldsFromRequired = await journey.QuestionIsMandatoryAsync(EditRoutePage.HoldsFrom);
 
         BackLink = journey.GetReturnUrlOrDefault(

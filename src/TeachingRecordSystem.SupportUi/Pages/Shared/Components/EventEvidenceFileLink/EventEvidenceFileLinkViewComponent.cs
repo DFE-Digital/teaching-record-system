@@ -10,12 +10,14 @@ public class EventEvidenceFileLinkViewComponent(
 {
     public async Task<IViewComponentResult> InvokeAsync(EventModels.File? evidenceFile)
     {
+        var cancellationToken = HttpContext.RequestAborted;
+
         UploadedEvidenceFile? uploadedEvidenceFile = null;
         if (evidenceFile is EventModels.File file)
         {
             uploadedEvidenceFile = new UploadedEvidenceFile(file.FileId, file.Name);
 
-            var fileUrl = await fileService.TryGetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry);
+            var fileUrl = await fileService.TryGetFileUrlAsync(file.FileId, WebConstants.FileUrlExpiry, cancellationToken);
             if (fileUrl is not null)
             {
                 uploadedEvidenceFile.PreviewUrl = linkGenerator.Files.File(file.Name, fileUrl);

@@ -10,12 +10,12 @@ public class IndexModel(TrsDbContext dbContext) : PageModel
 {
     public ApplicationUserInfo[]? Users { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         Users = await dbContext.ApplicationUsers
             .OrderBy(u => u.Name)
             .Select(u => new ApplicationUserInfo(u.UserId, u.Name))
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
     }
 
     public record ApplicationUserInfo(Guid UserId, string Name);

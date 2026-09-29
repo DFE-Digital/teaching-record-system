@@ -51,7 +51,7 @@ public class NotConnecting(
         journey.State.ApplySavedModelStateValues(nameof(NotConnecting), ModelState);
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
@@ -62,10 +62,10 @@ public class NotConnecting(
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return journey.AdvanceTo(
             linkGenerator.SupportTasks.OneLoginUserMatching.Resolve.ConfirmNotConnecting(journey.InstanceId),
@@ -77,7 +77,7 @@ public class NotConnecting(
             });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(NotConnecting),
@@ -96,7 +96,8 @@ public class NotConnecting(
                 SupportTaskReference = _supportTask.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
 

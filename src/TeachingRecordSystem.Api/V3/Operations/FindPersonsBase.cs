@@ -28,14 +28,14 @@ public abstract class FindPersonsHandlerBase(
 {
     protected TrsDbContext DbContext => dbContext;
 
-    protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Guid> matchedPersonIds)
+    protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Guid> matchedPersonIds, CancellationToken cancellationToken = default)
     {
         var persons = await dbContext.Persons
             .Include(p => p.Alerts!).AsSplitQuery()
             .Include(p => p.Qualifications!).AsSplitQuery()
             .Include(p => p.PreviousNames).AsSplitQuery()
             .Where(p => matchedPersonIds.Contains(p.PersonId))
-            .ToDictionaryAsync(p => p.PersonId, p => p);
+            .ToDictionaryAsync(p => p.PersonId, p => p, cancellationToken);
 
         var items = await matchedPersonIds
             .ToAsyncEnumerable()
@@ -68,7 +68,7 @@ public abstract class FindPersonsHandlerBase(
                         LastName = name.LastName
                     })
                     .AsReadOnly(),
-                Induction = await InductionInfo.CreateAsync(person, referenceDataCache),
+                Induction = await InductionInfo.CreateAsync(person, referenceDataCache, _),
                 DqtInductionStatus = person.InductionStatus.ToDqtInductionStatus(out var statusDescription) is string inductionStatus ?
                     new DqtInductionStatusInfo()
                     {
@@ -81,7 +81,7 @@ public abstract class FindPersonsHandlerBase(
                 QtlsStatus = person.QtlsStatus
             })
             .OrderBy(c => c.Trn)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         return new FindPersonsResult(items.Length, items);
     }

@@ -34,14 +34,14 @@ public class QtsDetailsModel(
         SubjectId = coordinator.State.QtsSubjectId;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Skip)
         {
             return coordinator.AdvanceTo(links => links.CheckAnswers());
         }
 
-        await this.ThrowIfInvalidAsync(CreateValidator());
+        await this.ThrowIfInvalidAsync(CreateValidator(), cancellationToken);
 
 
         coordinator.UpdateState(state => state.SetQtsDetails(

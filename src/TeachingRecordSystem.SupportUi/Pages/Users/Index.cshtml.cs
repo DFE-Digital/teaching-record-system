@@ -34,7 +34,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
     public FiltersViewModel? Filters { get; private set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var showAdminRole = User.IsInRole(UserRoles.Administrator);
         var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);
@@ -69,11 +69,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         var filteredQuery = filters.Apply(baseQuery);
 
-        var totalUserCount = await filters.CalculateFilterCountsAsync(filteredQuery);
+        var totalUserCount = await filters.CalculateFilterCountsAsync(filteredQuery, cancellationToken);
 
         var paginatedUsers = await filteredQuery
             .OrderBy(u => u.Name)
-            .GetPageAsync(PageNumber, UsersPerPage, totalUserCount);
+            .GetPageAsync(PageNumber, UsersPerPage, totalUserCount, cancellationToken);
 
         HasUsers = totalUserCount > 0;
         CurrentPageUsers = paginatedUsers.Select(CreateViewModel);

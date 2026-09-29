@@ -392,13 +392,13 @@ public sealed class HostFixture : InitializeDbFixture
                 {
                     var fileService = new Mock<IFileService>();
                     fileService
-                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Guid.NewGuid());
                     fileService
-                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                     fileService
-                        .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>()))
+                        .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
                     return fileService.Object;
                 }
@@ -411,8 +411,9 @@ public sealed class HostFixture : InitializeDbFixture
                             It.IsAny<Stream>(),
                             It.IsAny<string?>(),
                             out It.Ref<Guid>.IsAny,
-                            null))
-                        .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride) =>
+                            null,
+                            It.IsAny<CancellationToken>()))
+                        .Callback((Stream stream, string? contentType, out Guid fileId, Guid? fileIdOverride, CancellationToken _) =>
                         {
                             fileId = fileIdOverride ?? Guid.NewGuid();
                         })
@@ -461,10 +462,10 @@ public sealed class HostFixture : InitializeDbFixture
                 {
                     var fileService = new Mock<IFileService>();
                     fileService
-                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+                        .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(Guid.NewGuid());
                     fileService
-                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                     return fileService.Object;
                 }
@@ -473,7 +474,7 @@ public sealed class HostFixture : InitializeDbFixture
                 {
                     var safeFileService = new Mock<ISafeFileService>();
                     safeFileService
-                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                        .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
                         .ReturnsAsync("https://fake.blob.core.windows.net/fake");
 
                     return safeFileService.Object;
@@ -483,16 +484,16 @@ public sealed class HostFixture : InitializeDbFixture
                 {
                     var userService = new Mock<IAadUserService>();
                     userService
-                        .Setup(s => s.GetUserByEmailAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.Email))
+                        .Setup(s => s.GetUserByEmailAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.Email, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
                     userService
-                        .Setup(s => s.GetUserByEmailAsync(TestUsers.TestAzureActiveDirectoryUser.Email))
+                        .Setup(s => s.GetUserByEmailAsync(TestUsers.TestAzureActiveDirectoryUser.Email, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                     userService
-                        .Setup(s => s.GetUserByIdAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.UserId))
+                        .Setup(s => s.GetUserByIdAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.UserId, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
                     userService
-                        .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId))
+                        .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                     return userService.Object;
                 }

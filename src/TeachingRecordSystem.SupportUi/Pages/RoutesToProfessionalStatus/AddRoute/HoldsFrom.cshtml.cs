@@ -34,20 +34,22 @@ public class HoldsFromModel(AddRouteJourneyCoordinator journey, TimeProvider tim
         HoldsFrom = journey.State.HoldsFrom;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
-            return Redirect(await journey.CancelAsync());
+            return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         return await journey.AnswerAndAdvanceAsync(AddRoutePage.HoldsFrom, state => state.HoldsFrom = HoldsFrom);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         HoldsFromRequired = await journey.QuestionIsMandatoryAsync(AddRoutePage.HoldsFrom);
 
         BackLink = journey.GetBackLink();

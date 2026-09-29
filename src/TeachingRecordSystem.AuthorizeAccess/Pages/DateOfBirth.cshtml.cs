@@ -21,9 +21,9 @@ public class DateOfBirthModel(SignInJourneyCoordinator coordinator) : PageModel
         DateOfBirth = coordinator.State.DateOfBirth;
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         coordinator.UpdateState(state => state.SetDateOfBirth(DateOfBirth!.Value));
 

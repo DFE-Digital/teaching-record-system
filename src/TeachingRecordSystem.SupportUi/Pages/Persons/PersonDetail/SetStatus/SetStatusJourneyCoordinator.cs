@@ -20,8 +20,8 @@ public class SetStatusJourneyCoordinator(
     /// Gets the person whose status is being changed, or <see langword="null"/> if no such record
     /// exists.
     /// </summary>
-    public Task<Person?> GetPersonAsync() =>
-        personService.GetPersonAsync(PersonId, includeDeactivatedPersons: true);
+    public Task<Person?> GetPersonAsync(CancellationToken cancellationToken = default) =>
+        personService.GetPersonAsync(PersonId, includeDeactivatedPersons: true, cancellationToken);
 
     /// <summary>
     /// Gets whether the status change this journey is for still applies to <paramref name="person"/>.
@@ -42,9 +42,9 @@ public class SetStatusJourneyCoordinator(
     /// Discards the journey along with any evidence file uploaded during it and returns the URL to
     /// send the user back to.
     /// </summary>
-    public async Task<string> CancelAsync()
+    public async Task<string> CancelAsync(CancellationToken cancellationToken = default)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile, cancellationToken);
         DeleteInstance();
         return linkGenerator.Persons.PersonDetail.Index(PersonId);
     }

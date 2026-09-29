@@ -29,7 +29,7 @@ public class IndexModel(OneLoginSearchService searchService, SupportUiLinkGenera
 
     public PaginationViewModel? Pagination { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         Search = Search?.Trim() ?? string.Empty;
 
@@ -46,7 +46,7 @@ public class IndexModel(OneLoginSearchService searchService, SupportUiLinkGenera
         };
         var paginationOptions = new PaginationOptions(PageNumber, ResultsPerPage);
 
-        var result = await searchService.SearchAsync(searchOptions, paginationOptions);
+        var result = await searchService.SearchAsync(searchOptions, paginationOptions, cancellationToken);
 
         SearchResults = result.Results;
 

@@ -22,7 +22,7 @@ public class TestModel(
     [FromQuery(Name = "trn_token")]
     public string? TrnToken { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(AuthenticationScheme))
         {
@@ -34,7 +34,7 @@ public class TestModel(
             var applicationUser = await dbContext.ApplicationUsers
                 .Where(u => u.OneLoginAuthenticationSchemeName == AuthenticationScheme)
                 .Select(u => new { u.UserId, u.ClientId, u.RecordMatchingPolicy, u.Name, u.AppContent })
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync(cancellationToken);
 
             if (applicationUser is null)
             {

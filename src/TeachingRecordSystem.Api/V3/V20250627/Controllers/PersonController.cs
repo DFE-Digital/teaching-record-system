@@ -21,9 +21,10 @@ public class PersonController(ICommandDispatcher commandDispatcher, ICurrentUser
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAsync(
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
+        CancellationToken cancellationToken)
     {
-        var trn = await currentUserProvider.GetTrnAsync();
+        var trn = await currentUserProvider.GetTrnAsync(cancellationToken);
         if (trn is null)
         {
             return Forbid();
@@ -35,7 +36,7 @@ public class PersonController(ICommandDispatcher commandDispatcher, ICurrentUser
             DateOfBirth: null,
             NationalInsuranceNumber: null);
 
-        var result = await commandDispatcher.DispatchAsync(command);
+        var result = await commandDispatcher.DispatchAsync(command, cancellationToken);
 
         return result.ToActionResult(r => Ok(GetPersonResponse.Create(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);

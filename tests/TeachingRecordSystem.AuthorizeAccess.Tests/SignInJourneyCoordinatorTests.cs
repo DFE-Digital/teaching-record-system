@@ -923,7 +923,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 clientApplicationUserId: default,
                 recordMatchingPolicy: RecordMatchingPolicy.Required),
             m => m
-                .Setup(mock => mock.MatchPersonAsync(It.IsAny<GetSuggestedPersonMatchesOptions>()))
+                .Setup(mock => mock.MatchPersonAsync(It.IsAny<GetSuggestedPersonMatchesOptions>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(value: null),
             async coordinator =>
             {
@@ -970,7 +970,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 clientApplicationUserId: default,
                 recordMatchingPolicy: RecordMatchingPolicy.Required),
             m => m
-                .Setup(mock => mock.MatchPersonAsync(It.IsAny<GetSuggestedPersonMatchesOptions>()))
+                .Setup(mock => mock.MatchPersonAsync(It.IsAny<GetSuggestedPersonMatchesOptions>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new MatchPersonResult(
                     person.PersonId,
                     person.Trn,

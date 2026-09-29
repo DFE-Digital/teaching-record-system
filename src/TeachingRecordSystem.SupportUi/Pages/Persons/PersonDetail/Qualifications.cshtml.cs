@@ -32,12 +32,12 @@ public class QualificationsModel(
 
     public bool CanEdit { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         ProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
             .Where(x => x.PersonId == PersonId)
             .OrderBy(x => x.CreatedOn)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var uniqueSubjectIds = ProfessionalStatuses
             .SelectMany(x => x.TrainingSubjectIds)
@@ -53,13 +53,13 @@ public class QualificationsModel(
 
         MandatoryQualifications = await dbContext.MandatoryQualifications
             .Where(q => q.PersonId == PersonId)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var personIsActive = await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => p.PersonId == PersonId)
             .Select(p => p.Status == PersonStatus.Active)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         CanEdit = personIsActive &&
             (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.NonPersonOrAlertDataEdit)).Succeeded;

@@ -38,12 +38,12 @@ public class Index(SupportTaskSearchService supportTaskSearchService, SupportUiL
     [BindProperty(SupportsGet = true, Name = "_f")]
     public bool FormSubmitted { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var searchOptions = new TrnRequestManualChecksSearchOptions(Search, SortBy, SortDirection, FormSubmitted ? Sources : null);
         var paginationOptions = new PaginationOptions(PageNumber, TasksPerPage);
 
-        var result = await supportTaskSearchService.SearchTrnRequestManualChecksAsync(searchOptions, paginationOptions);
+        var result = await supportTaskSearchService.SearchTrnRequestManualChecksAsync(searchOptions, paginationOptions, cancellationToken);
         TotalTaskCount = result.TotalTaskCount;
         Sources = result.Sources.ToArray();
         Facets = result.Facets;

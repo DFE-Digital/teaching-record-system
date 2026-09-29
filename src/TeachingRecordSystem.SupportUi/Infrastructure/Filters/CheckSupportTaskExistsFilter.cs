@@ -9,6 +9,8 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         if (context.RouteData.Values["supportTaskReference"] is not string supportTaskReference)
         {
             context.Result = new BadRequestResult();
@@ -56,7 +58,7 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool excludeCl
             .Include(t => t.AssignedTo)
             .Include(t => t.CompletedBy);
 
-        var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();
+        var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync(cancellationToken);
 
         if (currentSupportTask is null ||
             !supportTaskTypes.Contains(currentSupportTask.SupportTaskType) ||

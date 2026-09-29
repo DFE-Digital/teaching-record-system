@@ -32,7 +32,7 @@ public class AcceptModel(
 
     public DateOfBirthChangeRequestInfo? DateOfBirthChangeRequest { get; set; }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         var processContext = new ProcessContext(
             ChangeType is SupportTaskType.ChangeNameRequest ? ProcessType.ChangeOfNameRequestApproving : ProcessType.ChangeOfDateOfBirthRequestApproving,
@@ -41,7 +41,8 @@ public class AcceptModel(
 
         await changeRequestSupportTaskService.ApproveChangeRequestAsync(
             new ApproveChangeRequestSupportTaskOptions { SupportTask = _supportTask! },
-            processContext);
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner(
             "The request has been accepted",

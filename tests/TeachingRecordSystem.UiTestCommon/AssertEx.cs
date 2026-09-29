@@ -315,18 +315,18 @@ public static partial class AssertEx
 
     public static async Task<Guid> AssertFileWasUploadedAsync(this Mock<IFileService> fileServiceMock)
     {
-        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Once);
+        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null, It.IsAny<CancellationToken>()), Times.Once);
         return await Assert.IsType<Task<Guid>>(fileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
     }
 
     public static void AssertFileWasNotUploaded(this Mock<IFileService> fileServiceMock)
     {
-        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
+        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null, It.IsAny<CancellationToken>()), Times.Never);
     }
 
     public static void AssertFileWasDeleted(this Mock<IFileService> fileServiceMock, Guid fileId)
     {
-        fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
+        fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId, It.IsAny<CancellationToken>()));
     }
 
     public static void AssertSummaryListHasRows(this IElement element, params (string Key, string? Value)[] expectedKeysAndValues)

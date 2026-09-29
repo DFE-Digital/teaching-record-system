@@ -156,9 +156,9 @@ public class EditInductionJourneyCoordinator(
         State.Evidence.IsComplete;
 
     // Returns the URL to send the user back to.
-    public async Task<string> CancelAsync()
+    public async Task<string> CancelAsync(CancellationToken cancellationToken = default)
     {
-        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile);
+        await evidenceUploadManager.DeleteUploadedFileAsync(State.Evidence.UploadedEvidenceFile, cancellationToken);
         DeleteInstance();
         return InductionUrl;
     }

@@ -12,7 +12,7 @@ public partial class OneLoginUserMatchingSupportTaskService(
     TrnRequestService trnRequestService,
     TrsDbContext dbContext)
 {
-    public Task<ApplicationUser> GetApplicationUserAsync(SupportTask supportTask)
+    public Task<ApplicationUser> GetApplicationUserAsync(SupportTask supportTask, CancellationToken cancellationToken = default)
     {
         var applicationUserId = supportTask.Data switch
         {
@@ -21,10 +21,10 @@ public partial class OneLoginUserMatchingSupportTaskService(
             _ => throw new ArgumentException($"Unknown task type: '{supportTask.SupportTaskType}'.")
         };
 
-        return dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUserId);
+        return dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUserId, cancellationToken);
     }
 
-    public Task<AppContent?> GetAppContentAsync(SupportTask supportTask)
+    public Task<AppContent?> GetAppContentAsync(SupportTask supportTask, CancellationToken cancellationToken = default)
     {
         var applicationUserId = supportTask.Data switch
         {
@@ -36,12 +36,12 @@ public partial class OneLoginUserMatchingSupportTaskService(
         return dbContext.ApplicationUsers
             .Where(u => u.UserId == applicationUserId)
             .Select(u => u.AppContent)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
     }
 
-    public Task<AppContent?> GetAppContentAsync(Guid applicationUserId) =>
+    public Task<AppContent?> GetAppContentAsync(Guid applicationUserId, CancellationToken cancellationToken = default) =>
         dbContext.ApplicationUsers
             .Where(u => u.UserId == applicationUserId)
             .Select(u => u.AppContent)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 }

@@ -23,17 +23,17 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
 
     public bool ShowOpenAlertFlag { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var alerts = await dbContext.Alerts
             .Where(a => a.PersonId == PersonId)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         var personIsActive = await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => p.PersonId == PersonId)
             .Select(p => p.Status == PersonStatus.Active)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         var alertTypePermissions = await alerts
             .Select(a => a.AlertTypeId)
@@ -45,7 +45,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
                 CanRead: await authorizationService.AuthorizeAsync(User, id, new AlertTypePermissionRequirement(Permissions.Alerts.Read)) is { Succeeded: true },
                 CanWrite: personIsActive &&
                     await authorizationService.AuthorizeAsync(User, id, new AlertTypePermissionRequirement(Permissions.Alerts.Write)) is { Succeeded: true }))
-            .ToDictionaryAsync(t => t.AlertTypeId);
+            .ToDictionaryAsync(t => t.AlertTypeId, cancellationToken: cancellationToken);
 
         var authorizedAlerts = alerts
             .Where(a => alertTypePermissions[a.AlertTypeId].CanRead)
@@ -62,7 +62,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
         CanAddAlert = personIsActive &&
             await referenceDataCache.GetAlertTypesAsync(activeOnly: true)
                 .ToAsyncEnumerableAsync()
-                .AnyAsync(async (at, _) => (await authorizationService.AuthorizeAsync(User, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true });
+                .AnyAsync(async (at, _) => (await authorizationService.AuthorizeAsync(User, at.AlertTypeId, new AlertTypePermissionRequirement(Permissions.Alerts.Write))) is { Succeeded: true }, cancellationToken);
 
         ShowOpenAlertFlag = alerts.Any(a => a.IsOpen && alertTypePermissions[a.AlertTypeId] is { CanFlag: true, CanRead: false });
     }

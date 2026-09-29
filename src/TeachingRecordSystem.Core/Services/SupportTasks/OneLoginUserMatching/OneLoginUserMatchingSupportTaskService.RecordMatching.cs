@@ -9,7 +9,8 @@ public partial class OneLoginUserMatchingSupportTaskService
 {
     public async Task<SupportTask> CreateRecordMatchingSupportTaskAsync(
         CreateOneLoginUserRecordMatchingSupportTaskOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var trnRequest = options.TrnRequestId is not null
             ? (options.ClientApplicationUserId, options.TrnRequestId)
@@ -41,21 +42,23 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Subject = SupportTask.Subject.FromOneLoginUser(options.VerifiedNames!),
                 SourceApplicationUserId = options.ClientApplicationUserId
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         return supportTask;
     }
 
     public async Task<ResolveRecordMatchingSupportTaskResult> ResolveRecordMatchingSupportTaskAsync(
         NotConnectingOutcomeOptions options,
-        ProcessContext processContext)
+        ProcessContext processContext,
+        CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
-        var applicationUser = await GetApplicationUserAsync(supportTask);
+        var applicationUser = await GetApplicationUserAsync(supportTask, cancellationToken);
         var appContent = applicationUser.AppContent;
         var recordMatchingPolicy = applicationUser.RecordMatchingPolicy;
 
@@ -72,7 +75,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserRecordMatching_NotConnecting
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (supportTask.TrnRequestId is not null)
         {
@@ -83,7 +87,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 await trnRequestService.TryResolveAsync(
                     supportTask.TrnRequestApplicationUserId!.Value,
                     supportTask.TrnRequestId,
-                    processContext);
+                    processContext,
+                    cancellationToken);
             }
         }
 
@@ -100,7 +105,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 name,
                 reason,
                 templateId,
-                processContext);
+                processContext,
+                cancellationToken: cancellationToken);
 
             return new() { EmailSent = true };
         }
@@ -108,14 +114,14 @@ public partial class OneLoginUserMatchingSupportTaskService
         return new() { EmailSent = false };
     }
 
-    public async Task<ResolveRecordMatchingSupportTaskResult> ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext)
+    public async Task<ResolveRecordMatchingSupportTaskResult> ResolveRecordMatchingSupportTaskAsync(NoMatchesOutcomeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
 
         var data = supportTask.GetData<OneLoginUserRecordMatchingData>();
 
-        var applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == data.ClientApplicationUserId);
+        var applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == data.ClientApplicationUserId, cancellationToken);
         var appContent = applicationUser.AppContent;
 
         await supportTaskService.UpdateSupportTaskAsync(
@@ -129,7 +135,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserRecordMatching_NoMatches
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (supportTask.TrnRequestId is not null)
         {
@@ -140,7 +147,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 await trnRequestService.TryResolveAsync(
                     supportTask.TrnRequestApplicationUserId!.Value,
                     supportTask.TrnRequestId,
-                    processContext);
+                    processContext,
+                    cancellationToken);
             }
         }
 
@@ -158,7 +166,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 name,
                 emailTemplateId,
                 appContent?.SupportEmailAddressNotifyId,
-                processContext);
+                processContext,
+                cancellationToken: cancellationToken);
 
             return new() { EmailSent = true };
         }
@@ -166,7 +175,7 @@ public partial class OneLoginUserMatchingSupportTaskService
         return new() { EmailSent = false };
     }
 
-    public async Task ResolveRecordMatchingSupportTaskAsync(ConnectedOutcomeOptions options, ProcessContext processContext)
+    public async Task ResolveRecordMatchingSupportTaskAsync(ConnectedOutcomeOptions options, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var supportTask = options.SupportTask;
         ThrowIfSupportTaskIsClosed(supportTask);
@@ -181,7 +190,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 MatchRoute = OneLoginUserMatchRoute.SupportUi,
                 MatchedAttributes = options.MatchedAttributes
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         await supportTaskService.UpdateSupportTaskAsync(
             new UpdateSupportTaskOptions<OneLoginUserRecordMatchingData>
@@ -195,7 +205,8 @@ public partial class OneLoginUserMatchingSupportTaskService
                 Status = SupportTaskStatus.Closed,
                 Outcome = SupportTaskOutcome.OneLoginUserRecordMatching_Connected
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         if (supportTask.TrnRequestId is not null)
         {
@@ -204,11 +215,12 @@ public partial class OneLoginUserMatchingSupportTaskService
                 supportTask.TrnRequestId,
                 options.MatchedPersonId,
                 [],
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
-            var appContent = await GetAppContentAsync(data.ClientApplicationUserId);
+            var appContent = await GetAppContentAsync(data.ClientApplicationUserId, cancellationToken);
 
             var firstVerifiedOrStatedName = data.VerifiedOrStatedNames!.First();
             var name = $"{firstVerifiedOrStatedName.First()} {firstVerifiedOrStatedName.LastOrDefault()}";
@@ -217,7 +229,7 @@ public partial class OneLoginUserMatchingSupportTaskService
                 supportTask.OneLoginUser!.EmailAddress!,
                 name,
                 appContent?.OneLoginRecordMatchedEmailTemplateId,
-                appContent?.SupportEmailAddressNotifyId, processContext);
+                appContent?.SupportEmailAddressNotifyId, processContext, cancellationToken);
         }
     }
 }

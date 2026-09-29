@@ -19,7 +19,7 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
     public bool CanAddNotes { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         CanViewNotes = (await authorizationService.AuthorizeAsync(User, PersonId, AuthorizationPolicies.NotesView)) is { Succeeded: true };
 
@@ -27,14 +27,14 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => p.PersonId == PersonId)
             .Select(p => p.Status == PersonStatus.Active)
-            .SingleAsync();
+            .SingleAsync(cancellationToken);
 
         CanAddNotes = CanViewNotes && personIsActive;
 
         var notesResult = await dbContext.Notes
             .Include(n => n.CreatedBy)
             .Where(n => n.PersonId == PersonId)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
 
         Notes = await notesResult
             .ToAsyncEnumerable()
@@ -47,7 +47,7 @@ public class NotesModel(TrsDbContext dbContext, IAuthorizationService authorizat
                 n.CreatedByDqtUserName ?? n.CreatedBy?.Name
             ))
             .OrderByDescending(x => x.CreatedOn)
-            .ToArrayAsync();
+            .ToArrayAsync(cancellationToken);
     }
 }
 

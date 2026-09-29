@@ -34,7 +34,7 @@ public class ConfirmReject(
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (Cancel)
         {
@@ -52,7 +52,8 @@ public class ConfirmReject(
                 RejectReason = journey.State.RejectReason!.Value,
                 RejectionAdditionalDetails = journey.State.RejectionAdditionalDetails
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         journey.DeleteInstance();
 

@@ -78,7 +78,7 @@ public class Merge(
         Comments = Journey.State.Comments;
     }
 
-    public async Task<IActionResult> OnPostAsync(string? action)
+    public async Task<IActionResult> OnPostAsync(string? action, CancellationToken cancellationToken)
     {
         if (action is Actions.Cancel)
         {
@@ -89,7 +89,7 @@ public class Merge(
 
         if (action is Actions.SaveAndComeBackLater)
         {
-            return await HandleSaveAndReturnAsync();
+            return await HandleSaveAndReturnAsync(cancellationToken);
         }
 
         if (FirstName!.Different && FirstNameSource is null)
@@ -149,7 +149,7 @@ public class Merge(
             });
     }
 
-    private async Task<IActionResult> HandleSaveAndReturnAsync()
+    private async Task<IActionResult> HandleSaveAndReturnAsync(CancellationToken cancellationToken)
     {
         var savedJourneyState = this.CreateSavedJourneyState(
             nameof(Merge),
@@ -164,7 +164,8 @@ public class Merge(
                 SupportTaskReference = _supportTask!.SupportTaskReference,
                 SavedJourneyState = savedJourneyState
             },
-            processContext);
+            processContext,
+            cancellationToken);
 
         Journey.DeleteInstance();
 
@@ -178,6 +179,8 @@ public class Merge(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         _supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
 
         var requestData = GetRequestData();
@@ -186,7 +189,7 @@ public class Merge(
 
         BackLink = Journey.GetBackLink();
 
-        var personAttributes = await GetPersonAttributesAsync(personId);
+        var personAttributes = await GetPersonAttributesAsync(personId, cancellationToken);
         var attributeMatches = state.MatchedPersons
             .Single(m => m.PersonId == personId)
             .MatchedAttributes;

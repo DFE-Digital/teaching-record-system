@@ -23,6 +23,8 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         if (context.RouteData.Values["alertId"] is not string alertIdParam ||
             !Guid.TryParse(alertIdParam, out Guid alertId))
         {
@@ -41,7 +43,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
         // we need to return a BadRequest instead of a NotFound result
         var currentAlertWithPotentiallyDeactivatedPerson = await query
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (currentAlertWithPotentiallyDeactivatedPerson is not null &&
             currentAlertWithPotentiallyDeactivatedPerson.Person!.Status == PersonStatus.Deactivated)
@@ -52,7 +54,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
 
         // Query again with query filters to make sure deleted Alerts are ignored
         var currentAlert = await query
-            .SingleOrDefaultAsync();
+            .SingleOrDefaultAsync(cancellationToken);
 
         if (currentAlert is null)
         {

@@ -42,9 +42,9 @@ public class RejectModel(
     [Display(Name = " ")]
     public ChangeRequestRejectReason? RejectionReasonChoice { get; set; }
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
-        await this.ThrowIfInvalidAsync(_validator);
+        await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         string requestStatus;
         string flashMessage;
@@ -63,7 +63,8 @@ public class RejectModel(
 
             await changeRequestSupportTaskService.CancelChangeRequestAsync(
                 new CancelChangeRequestSupportTaskOptions { SupportTask = SupportTask! },
-                processContext);
+                processContext,
+                cancellationToken);
         }
         else
         {
@@ -83,7 +84,8 @@ public class RejectModel(
                     SupportTask = SupportTask!,
                     RejectionReason = RejectionReasonChoice.Value
                 },
-                processContext);
+                processContext,
+                cancellationToken);
         }
 
         TempData.SetFlashNotificationBanner(
@@ -95,10 +97,12 @@ public class RejectModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var cancellationToken = context.HttpContext.RequestAborted;
+
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var person = await dbContext.Persons
            .AsNoTracking()
-           .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId);
+           .SingleOrDefaultAsync(p => p.PersonId == supportTask.PersonId, cancellationToken);
         if (person is null)
         {
             context.Result = NotFound();
