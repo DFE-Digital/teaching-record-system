@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 using PaginationOptions = TeachingRecordSystem.SupportUi.Services.PaginationOptions;
@@ -343,6 +344,112 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(ProcessType.NoteCreating, entry.Process.ProcessType);
     }
 
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesSupportTaskDeletingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+        var supportTask = CreateEventSupportTask(person.PersonId);
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.SupportTaskDeleting,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskDeletedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                SupportTask = supportTask,
+                ReasonDetail = null
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.SupportTaskDeleting, entry.Process.ProcessType);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesSupportTaskAllocatingProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+        var assignedToUser = await TestData.CreateUserAsync();
+        var oldSupportTask = CreateEventSupportTask(person.PersonId);
+        var supportTask = oldSupportTask with { AssignedToUserId = assignedToUser.UserId };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.SupportTaskAllocating,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.AssignedToUserId,
+                OldSupportTask = oldSupportTask,
+                SupportTask = supportTask,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.SupportTaskAllocating, entry.Process.ProcessType);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesSupportTasksAssigningProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+        var supportTask = CreateEventSupportTask(person.PersonId);
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.SupportTasksAssigning,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.AssignedToUserId,
+                OldSupportTask = supportTask,
+                SupportTask = supportTask,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.SupportTasksAssigning, entry.Process.ProcessType);
+    }
 
     [Theory]
     [InlineData(false, UserRoles.Viewer, true)]
@@ -680,6 +787,22 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
                     RejectionReason = null
                 })
                 .ToArray());
+
+    private EventModels.SupportTask CreateEventSupportTask(Guid? personId = null, string? oneLoginUserSubject = null, string supportTaskReference = "TEST-ST-1") =>
+        new()
+        {
+            SupportTaskReference = supportTaskReference,
+            SupportTaskType = SupportTaskType.TrnRequest,
+            Status = SupportTaskStatus.Open,
+            OneLoginUserSubject = oneLoginUserSubject,
+            PersonId = personId,
+            Data = new TrnRequestData(),
+            SourceApplicationUserId = null,
+            ResolveJourneySavedState = null,
+            AssignedToUserId = null,
+            ZendeskTickets = [],
+            Outcome = null
+        };
 
     private Task<Process> CreateReactivatingProcessAsync(Guid personId, Guid userId) =>
         TestData.CreateProcessAsync(

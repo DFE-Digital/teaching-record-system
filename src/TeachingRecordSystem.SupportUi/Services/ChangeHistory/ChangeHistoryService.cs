@@ -141,7 +141,10 @@ public class ChangeHistoryService(
             ProcessType.TrnAllocating,
             ProcessType.TrnRequestCreating,
             ProcessType.TrnRequestResolving,
-            ProcessType.TrnRequestActivating
+            ProcessType.TrnRequestActivating,
+            ProcessType.SupportTaskDeleting,
+            ProcessType.SupportTaskAllocating,
+            ProcessType.SupportTasksAssigning
         };
 
         var processes = await dbContext.Processes
