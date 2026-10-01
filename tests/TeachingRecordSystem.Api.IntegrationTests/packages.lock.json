@@ -46,11 +46,11 @@
       },
       "Moq": {
         "type": "Direct",
-        "requested": "[4.20.72, )",
-        "resolved": "4.20.72",
-        "contentHash": "EA55cjyNn8eTNWrgrdZJH5QLFp2L43oxl1tlkoYUKIE9pRwL784OWiTXeCV5ApS+AMYEAlt7Fo03A2XfouvHmQ==",
+        "requested": "[4.21.0, )",
+        "resolved": "4.21.0",
+        "contentHash": "HUjrhhzEJ/AfbSBCnR8lPkpveVGpV/dNuOlnpfqBNTME93izly1CRV4N5zBySqz4m2yCRlHLPy/PnPzYokbwIg==",
         "dependencies": {
-          "Castle.Core": "5.1.1"
+          "Castle.Core": "5.2.1"
         }
       },
       "xunit.v3": {
@@ -846,7 +846,7 @@
           "JetBrains.Annotations": "[2026.2.0, )",
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.12, )",
-          "Moq": "[4.20.72, )",
+          "Moq": "[4.21.0, )",
           "RedisRateLimiting.AspNetCore": "[1.2.1, )",
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
@@ -904,7 +904,7 @@
           "Faker.Net": "[2.0.163, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "Microsoft.Extensions.TimeProvider.Testing": "[10.10.0, )",
-          "Moq": "[4.20.72, )",
+          "Moq": "[4.21.0, )",
           "Respawn": "[7.0.0, )",
           "SSH.NET": "[2026.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -988,8 +988,8 @@
       "Castle.Core": {
         "type": "CentralTransitive",
         "requested": "[5.1.1, )",
-        "resolved": "5.1.1",
-        "contentHash": "rpYtIczkzGpf+EkZgDr9CClTdemhsrwA/W5hMoPjLkRFnXzH44zDLoovXeKtmxb1ykXK9aJVODSpiJml8CTw2g=="
+        "resolved": "5.2.1",
+        "contentHash": "wHARzQA695jwwKreOzNsq54KiGqKP38tv8hi8e2FXDEC/sA6BtrX90tVPDkOfVu13PbEzr00TCV8coikl+D1Iw=="
       },
       "CloudNative.CloudEvents": {
         "type": "CentralTransitive",
