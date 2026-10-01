@@ -12,7 +12,7 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
         var person = await TestData.CreatePersonAsync();
         var assignedToUser = await TestData.CreateUserAsync();
         var process = await CreateProcessAsync(
-            (person.PersonId, oneLoginUserSubject: null, assignedToUser.UserId, "TEST-ST-1"));
+            (person.PersonId, null, assignedToUser.UserId, "TEST-ST-1"));
 
         // Act
         var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
@@ -33,7 +33,7 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
         var person = await TestData.CreatePersonAsync();
         var assignedToUser = await TestData.CreateUserAsync();
         var process = await CreateProcessAsync(
-            (person.PersonId, oneLoginUserSubject: null, assignedToUser.UserId, "TEST-ST-1"));
+            (person.PersonId, null, assignedToUser.UserId, "TEST-ST-1"));
 
         // Act
         var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "supportTask", supportTaskReference: "TEST-ST-1");
@@ -77,7 +77,7 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var process = await CreateProcessAsync(
-            (person.PersonId, oneLoginUserSubject: null, assignedToUserId: null, "TEST-ST-1"));
+            (person.PersonId, null, null, "TEST-ST-1"));
 
         // Act
         var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
@@ -98,8 +98,8 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
         var assignedToUser1 = await TestData.CreateUserAsync();
         var assignedToUser2 = await TestData.CreateUserAsync();
         var process = await CreateProcessAsync(
-            (person1.PersonId, oneLoginUserSubject: null, assignedToUser1.UserId, "TEST-ST-1"),
-            (person2.PersonId, oneLoginUserSubject: null, assignedToUser2.UserId, "TEST-ST-2"));
+            (person1.PersonId, null, assignedToUser1.UserId, "TEST-ST-1"),
+            (person2.PersonId, null, assignedToUser2.UserId, "TEST-ST-2"));
 
         // Act
         var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person1.PersonId);
@@ -123,8 +123,8 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
         var assignedToUser1 = await TestData.CreateUserAsync();
         var assignedToUser2 = await TestData.CreateUserAsync();
         var process = await CreateProcessAsync(
-            (person1.PersonId, oneLoginUserSubject: null, assignedToUser1.UserId, "TEST-ST-1"),
-            (person2.PersonId, oneLoginUserSubject: null, assignedToUser2.UserId, "TEST-ST-2"));
+            (person1.PersonId, null, assignedToUser1.UserId, "TEST-ST-1"),
+            (person2.PersonId, null, assignedToUser2.UserId, "TEST-ST-2"));
 
         // Act
         var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "supportTask", supportTaskReference: "TEST-ST-2");
