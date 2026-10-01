@@ -57,7 +57,7 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
         var oneLoginUser = await TestData.CreateOneLoginUserAsync();
         var assignedToUser = await TestData.CreateUserAsync();
         var process = await CreateProcessAsync(
-            (personId: null, oneLoginUser.Subject, assignedToUser.UserId, "TEST-ST-1"));
+            (null, oneLoginUser.Subject, assignedToUser.UserId, "TEST-ST-1"));
 
         // Act
         var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "oneLogin", oneLoginSubject: oneLoginUser.Subject);
