@@ -1,13 +1,15 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
+public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.Link;
     private const string ThisStep = JourneySteps.StartDate;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

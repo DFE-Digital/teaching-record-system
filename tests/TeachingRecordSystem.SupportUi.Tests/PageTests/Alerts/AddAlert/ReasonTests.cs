@@ -3,14 +3,16 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture), IAsyncLifetime
+public class ReasonTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.StartDate;
     private const string ThisStep = JourneySteps.Reason;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

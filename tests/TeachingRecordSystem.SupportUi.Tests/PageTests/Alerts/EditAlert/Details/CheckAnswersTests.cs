@@ -3,11 +3,13 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
-public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFixture), IAsyncLifetime
+public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFixture)
 {
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

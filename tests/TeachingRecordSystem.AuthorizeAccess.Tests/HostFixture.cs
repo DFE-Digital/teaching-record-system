@@ -9,13 +9,14 @@ using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 [assembly: AssemblyFixture(typeof(HostFixture))]
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
-public class HostFixture : InitializeDbFixture
+public class HostFixture : IAsyncLifetime
 {
     private readonly AuthorizeAccessWebApplicationFactory _webApplicationFactory;
 
@@ -30,12 +31,14 @@ public class HostFixture : InitializeDbFixture
 
     public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
+        await TestDatabases.InitializeAsync();
 
         _ = Services;  // Start the server
     }
+
+    public async ValueTask DisposeAsync() => await TestDatabases.DisposeAsync();
 
     private class AuthorizeAccessWebApplicationFactory : WebApplicationFactory<Program>
     {
@@ -80,13 +83,15 @@ public class HostFixture : InitializeDbFixture
                 });
 
                 services
-                    .AddSingleton(DbHelper.Instance)
                     .AddSingleton<TestData>()
                     .AddSingleton(GetMockFileService())
                     .AddSingleton<IStartupFilter, ExecuteScheduledJobsStartupFilter>()
                     .AddGovUkQuestionsTestingServices();
 
                 TestScopedServices.ConfigureServices(services);
+
+                // Route every TrsDbContext at the database leased by the running test.
+                services.AddPooledTestDatabase();
 
                 IFileService GetMockFileService()
                 {

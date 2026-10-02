@@ -2,11 +2,13 @@ using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
-public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFixture), IAsyncLifetime
+public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
 {
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

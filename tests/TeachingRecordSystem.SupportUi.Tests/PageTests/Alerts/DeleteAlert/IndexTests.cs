@@ -3,14 +3,16 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
-public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture), IAsyncLifetime
+public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.New;
     private const string ThisStep = JourneySteps.Index;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

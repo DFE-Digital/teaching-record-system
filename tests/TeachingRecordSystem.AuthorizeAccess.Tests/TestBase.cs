@@ -8,14 +8,16 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.TestCommon.Database;
 using JourneyInstanceId = GovUk.Questions.AspNetCore.JourneyInstanceId;
 using RecordMatchingPolicy = TeachingRecordSystem.Core.Models.RecordMatchingPolicy;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
-public abstract class TestBase
+public abstract class TestBase : IAsyncLifetime
 {
     private readonly TestScopedServices _testServices;
+    private TestDatabaseLease? _databaseLease;
 
     protected TestBase(HostFixture hostFixture)
     {
@@ -30,6 +32,28 @@ public abstract class TestBase
     }
 
     protected HostFixture HostFixture { get; }
+
+    protected string DatabaseName => _databaseLease?.DatabaseName ?? throw new InvalidOperationException("No database leased.");
+
+    public virtual async ValueTask InitializeAsync() =>
+        _databaseLease = await TestDatabases.AcquireAsync(TestContext.Current.CancellationToken);
+
+    public virtual async ValueTask DisposeAsync()
+    {
+        if (_databaseLease is null)
+        {
+            return;
+        }
+
+        // Keep a failing test's data so it can be inspected: psql -d <name>
+        if (TestContext.Current.TestState?.Result == TestResult.Failed)
+        {
+            TestContext.Current.SendDiagnosticMessage($"Retained test database '{_databaseLease.DatabaseName}'.");
+            _databaseLease.Retain();
+        }
+
+        await _databaseLease.DisposeAsync();
+    }
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

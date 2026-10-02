@@ -2,17 +2,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.TestCommon;
+using TeachingRecordSystem.TestCommon.Database;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-[Collection(nameof(DisableParallelization))]
-public abstract class CommandTestBase(IServiceProvider services)
+public abstract class CommandTestBase(IServiceProvider services) : PooledDatabaseTestBase
 {
     protected FakeTimeProvider TimeProvider => (FakeTimeProvider)services.GetRequiredService<TimeProvider>();
 
-    protected DbHelper DbHelper => services.GetRequiredService<DbHelper>();
-
-    protected IConfiguration Configuration => services.GetRequiredService<IConfiguration>();
+    // The CLI commands build their own host from configuration, so they can't see the ambient data source.
+    // Overlaying the leased database's connection string points them at the same database as the test.
+    protected IConfiguration Configuration => new ConfigurationBuilder()
+        .AddConfiguration(services.GetRequiredService<IConfiguration>())
+        .AddInMemoryCollection([
+            KeyValuePair.Create($"ConnectionStrings:{TrsDbContext.ConnectionName}", (string?)DatabaseConnectionString)
+        ])
+        .Build();
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

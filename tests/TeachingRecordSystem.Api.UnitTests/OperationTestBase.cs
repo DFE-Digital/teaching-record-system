@@ -1,4 +1,3 @@
-using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
@@ -6,35 +5,26 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
-public abstract class OperationTestBase : IDisposable
+public abstract class OperationTestBase : PooledDatabaseTestBase
 {
-    private readonly TransactionScope _transactionScope;
 
     protected OperationTestBase(OperationTestFixture operationTestFixture)
     {
-        _transactionScope = new TransactionScope(
-            TransactionScopeOption.RequiresNew,
-            new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted },
-            TransactionScopeAsyncFlowOption.Enabled);
-
         TestScopedServices.Reset(operationTestFixture.Services);
 
         Services = operationTestFixture.Services;
     }
-
-    public virtual void Dispose() => _transactionScope.Dispose();
 
     public IServiceProvider Services { get; }
 
     protected FakeTimeProvider TimeProvider => TestScopedServices.GetCurrent().TimeProvider;
 
     protected ICurrentUserProvider CurrentUserProvider => Services.GetRequiredService<ICurrentUserProvider>();
-
-    protected DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 

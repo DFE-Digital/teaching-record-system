@@ -2,7 +2,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240101;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class FindTeachersTests : TestBase
 {
     public FindTeachersTests(HostFixture hostFixture)
