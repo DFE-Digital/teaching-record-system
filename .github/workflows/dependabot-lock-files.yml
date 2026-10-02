@@ -1,0 +1,72 @@
+name: Update Dependabot lock files
+
+# Dependabot doesn't update the 'requested' ranges in packages.lock.json when bumping a centrally-managed package
+# (https://github.com/dependabot/dependabot-core/issues/10863), so the locked-mode restore in CI fails.
+# This regenerates the lock files and pushes them back to the Dependabot branch.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_XMLDOC_MODE: skip
+
+jobs:
+  update_lock_files:
+    name: Update lock files
+    runs-on: ubuntu-latest
+    # Only for changes pushed by Dependabot itself; this also stops the workflow re-running on its own commit
+    if: >-
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      startsWith(github.head_ref, 'dependabot/nuget/')
+
+    steps:
+      # Pushes made with GITHUB_TOKEN don't trigger workflows, so use an app token to get CI to run on the new commit
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.LOCK_FILE_UPDATER_APP_ID }}
+          private-key: ${{ secrets.LOCK_FILE_UPDATER_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Regenerate lock files
+        run: dotnet restore --force-evaluate
+
+      - name: Verify locked-mode restore
+        run: dotnet restore --locked-mode
+
+      - name: Commit and push
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          if git diff --quiet -- '**/packages.lock.json'; then
+            echo "Lock files are up to date"
+            exit 0
+          fi
+
+          user_id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${user_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+
+          git add -- '**/packages.lock.json'
+          git commit -m "Update packages.lock.json files"
+          git push
