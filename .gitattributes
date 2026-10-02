@@ -5,3 +5,6 @@
 *.pdf binary
 *.nupkg binary
 *.jpg binary
+
+src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations/*.Designer.cs linguist-generated=true
+src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations/*ModelSnapshot.cs linguist-generated=true
