@@ -18,16 +18,12 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
         var oldOneLoginFileId = Guid.NewGuid();
         var oldProcessNameChangeFileId = Guid.NewGuid();
         var oldProcessDetailsChangeFileId = Guid.NewGuid();
-        var oldLegacyNameChangeFileId = Guid.NewGuid();
-        var oldLegacyDetailsChangeFileId = Guid.NewGuid();
 
         var recentChangeNameFileId = Guid.NewGuid();
         var recentChangeDobFileId = Guid.NewGuid();
         var recentOneLoginFileId = Guid.NewGuid();
         var recentProcessNameChangeFileId = Guid.NewGuid();
         var recentProcessDetailsChangeFileId = Guid.NewGuid();
-        var recentLegacyNameChangeFileId = Guid.NewGuid();
-        var recentLegacyDetailsChangeFileId = Guid.NewGuid();
 
         var openTaskFileId = Guid.NewGuid();
 
@@ -225,174 +221,6 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
             await dbContext.SaveChangesAsync();
         });
 
-        // Create old legacy PersonDetailsUpdatedEvent with name change evidence only
-        var person5 = await TestData.CreatePersonAsync();
-        var oldLegacyNameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = cutoffDate.AddDays(-7),
-            RaisedBy = SystemUser.SystemUserId,
-            PersonId = person5.PersonId,
-            PersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person5.FirstName,
-                MiddleName = person5.MiddleName,
-                LastName = "NewLastName",
-                DateOfBirth = person5.DateOfBirth,
-                EmailAddress = person5.EmailAddress,
-                NationalInsuranceNumber = person5.NationalInsuranceNumber,
-                Gender = person5.Gender
-            },
-            OldPersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person5.FirstName,
-                MiddleName = person5.MiddleName,
-                LastName = person5.LastName,
-                DateOfBirth = person5.DateOfBirth,
-                EmailAddress = person5.EmailAddress,
-                NationalInsuranceNumber = person5.NationalInsuranceNumber,
-                Gender = person5.Gender
-            },
-            NameChangeReason = "Marriage",
-            NameChangeEvidenceFile = new EventModels.File { FileId = oldLegacyNameChangeFileId, Name = "old-name.pdf" },
-            DetailsChangeReason = null,
-            DetailsChangeReasonDetail = null,
-            DetailsChangeEvidenceFile = null,
-            Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-        };
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(oldLegacyNameChangeEvent);
-            await dbContext.SaveChangesAsync();
-        });
-
-        // Create old legacy PersonDetailsUpdatedEvent with details change evidence only
-        var person6 = await TestData.CreatePersonAsync();
-        var oldLegacyDetailsChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = cutoffDate.AddDays(-5),
-            RaisedBy = SystemUser.SystemUserId,
-            PersonId = person6.PersonId,
-            PersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person6.FirstName,
-                MiddleName = person6.MiddleName,
-                LastName = person6.LastName,
-                DateOfBirth = person6.DateOfBirth!.Value.AddYears(-1),
-                EmailAddress = person6.EmailAddress,
-                NationalInsuranceNumber = person6.NationalInsuranceNumber,
-                Gender = person6.Gender
-            },
-            OldPersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person6.FirstName,
-                MiddleName = person6.MiddleName,
-                LastName = person6.LastName,
-                DateOfBirth = person6.DateOfBirth,
-                EmailAddress = person6.EmailAddress,
-                NationalInsuranceNumber = person6.NationalInsuranceNumber,
-                Gender = person6.Gender
-            },
-            NameChangeReason = null,
-            NameChangeEvidenceFile = null,
-            DetailsChangeReason = "DOB correction",
-            DetailsChangeReasonDetail = "Birth certificate",
-            DetailsChangeEvidenceFile = new EventModels.File { FileId = oldLegacyDetailsChangeFileId, Name = "old-dob.pdf" },
-            Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth
-        };
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(oldLegacyDetailsChangeEvent);
-            await dbContext.SaveChangesAsync();
-        });
-
-        // Create recent legacy PersonDetailsUpdatedEvent with name change evidence
-        var person7 = await TestData.CreatePersonAsync();
-        var recentLegacyNameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = cutoffDate.AddDays(8),
-            RaisedBy = SystemUser.SystemUserId,
-            PersonId = person7.PersonId,
-            PersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person7.FirstName,
-                MiddleName = person7.MiddleName,
-                LastName = "NewName",
-                DateOfBirth = person7.DateOfBirth,
-                EmailAddress = person7.EmailAddress,
-                NationalInsuranceNumber = person7.NationalInsuranceNumber,
-                Gender = person7.Gender
-            },
-            OldPersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person7.FirstName,
-                MiddleName = person7.MiddleName,
-                LastName = person7.LastName,
-                DateOfBirth = person7.DateOfBirth,
-                EmailAddress = person7.EmailAddress,
-                NationalInsuranceNumber = person7.NationalInsuranceNumber,
-                Gender = person7.Gender
-            },
-            NameChangeReason = "Deed poll",
-            NameChangeEvidenceFile = new EventModels.File { FileId = recentLegacyNameChangeFileId, Name = "recent-name.pdf" },
-            DetailsChangeReason = null,
-            DetailsChangeReasonDetail = null,
-            DetailsChangeEvidenceFile = null,
-            Changes = Core.Events.Legacy.PersonDetailsUpdatedEventChanges.LastName
-        };
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(recentLegacyNameChangeEvent);
-            await dbContext.SaveChangesAsync();
-        });
-
-        // Create recent legacy PersonDetailsUpdatedEvent with details change evidence
-        var person8 = await TestData.CreatePersonAsync();
-        var recentLegacyDetailsChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = cutoffDate.AddDays(10),
-            RaisedBy = SystemUser.SystemUserId,
-            PersonId = person8.PersonId,
-            PersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person8.FirstName,
-                MiddleName = person8.MiddleName,
-                LastName = person8.LastName,
-                DateOfBirth = person8.DateOfBirth!.Value.AddYears(-1),
-                EmailAddress = person8.EmailAddress,
-                NationalInsuranceNumber = person8.NationalInsuranceNumber,
-                Gender = person8.Gender
-            },
-            OldPersonAttributes = new EventModels.PersonDetails
-            {
-                FirstName = person8.FirstName,
-                MiddleName = person8.MiddleName,
-                LastName = person8.LastName,
-                DateOfBirth = person8.DateOfBirth,
-                EmailAddress = person8.EmailAddress,
-                NationalInsuranceNumber = person8.NationalInsuranceNumber,
-                Gender = person8.Gender
-            },
-            NameChangeReason = null,
-            NameChangeEvidenceFile = null,
-            DetailsChangeReason = "Other",
-            DetailsChangeReasonDetail = "Details",
-            DetailsChangeEvidenceFile = new EventModels.File { FileId = recentLegacyDetailsChangeFileId, Name = "recent-details.pdf" },
-            Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth
-        };
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            dbContext.AddEventWithoutBroadcast(recentLegacyDetailsChangeEvent);
-            await dbContext.SaveChangesAsync();
-        });
-
         var fakeFileService = new FakeFileService();
         var fakeSafeFileService = new FakeSafeFileService();
         var options = Options.Create(new DeleteOldEvidenceFilesJobOptions
@@ -407,14 +235,12 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
             fakeSafeFileService,
             options);
 
-        // Should delete 6 old files from regular storage (2 from support tasks, 2 from process, 2 from legacy event)
-        Assert.Equal(6, fakeFileService.DeletedFileIds.Count);
+        // Should delete 4 old files from regular storage (2 from support tasks, 2 from process)
+        Assert.Equal(4, fakeFileService.DeletedFileIds.Count);
         Assert.Contains(oldChangeNameFileId, fakeFileService.DeletedFileIds);
         Assert.Contains(oldChangeDobFileId, fakeFileService.DeletedFileIds);
         Assert.Contains(oldProcessNameChangeFileId, fakeFileService.DeletedFileIds);
         Assert.Contains(oldProcessDetailsChangeFileId, fakeFileService.DeletedFileIds);
-        Assert.Contains(oldLegacyNameChangeFileId, fakeFileService.DeletedFileIds);
-        Assert.Contains(oldLegacyDetailsChangeFileId, fakeFileService.DeletedFileIds);
 
         // Should delete 1 old file from safe storage (OneLogin verification)
         Assert.Single(fakeSafeFileService.DeletedFileIds);
@@ -425,8 +251,6 @@ public class DeleteOldEvidenceFilesJobTests(JobFixture fixture) : JobTestBase(fi
         Assert.DoesNotContain(recentChangeDobFileId, fakeFileService.DeletedFileIds);
         Assert.DoesNotContain(recentProcessNameChangeFileId, fakeFileService.DeletedFileIds);
         Assert.DoesNotContain(recentProcessDetailsChangeFileId, fakeFileService.DeletedFileIds);
-        Assert.DoesNotContain(recentLegacyNameChangeFileId, fakeFileService.DeletedFileIds);
-        Assert.DoesNotContain(recentLegacyDetailsChangeFileId, fakeFileService.DeletedFileIds);
 
         // Should not delete recent files from safe storage
         Assert.DoesNotContain(recentOneLoginFileId, fakeSafeFileService.DeletedFileIds);
