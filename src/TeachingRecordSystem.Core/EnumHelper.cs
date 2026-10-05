@@ -96,6 +96,6 @@ public static class EnumHelper
     public static bool HasAnyFlag<TEnum>(this TEnum enumValue, TEnum flags)
         where TEnum : struct, Enum
     {
-        return ((int)(object)enumValue & (int)(object)flags) > 0;
+        return ((int)(object)enumValue & (int)(object)flags) != 0;
     }
 }
