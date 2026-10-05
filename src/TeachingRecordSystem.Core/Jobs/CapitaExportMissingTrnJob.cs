@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -202,23 +201,22 @@ public class CapitaExportMissingTrnJob([FromKeyedServices("sftpstorage")] DataLa
     /// </summary>
     /// <param name="person"></param>
     /// <returns></returns>
-    /// <exception cref="Exception"></exception>
     public async Task<string> GetNewPersonWithPreviousLastNameAsStringRowAsync(Person person, CancellationToken cancellationToken)
     {
-        var eventNames = EventBase.GetEventNamesForBaseType(typeof(IEventWithPersonAttributes));
-        var lastNameChangeFlag = PersonAttributesChanges.LastName;
+        var eventName = nameof(PersonDetailsUpdatedEvent);
+        var lastNameChangeFlag = (int)PersonDetailsUpdatedEventChanges.LastName;
 
         var previousNameResult = await dbContext.Database.SqlQuery<CapitaExportNewJobResult>(
         $"""
         select
             person_ids[1] as person_id,
-            payload->'OldPersonAttributes'->>'LastName' as "previous_last_name",
-            created as "Created"
-        from events
-        where event_name = any({eventNames})
+            payload->'OldPersonDetails'->>'LastName' as "previous_last_name",
+            created_on as "Created"
+        from process_events
+        where event_name = {eventName}
+          and person_ids @> ARRAY[{person.PersonId}]
           and ((payload->>'Changes')::int & {lastNameChangeFlag}) = {lastNameChangeFlag}
-          and person_id = {person.PersonId}
-        order by created desc
+        order by created_on desc
         limit 1
         """)
        .ToListAsync(cancellationToken);
@@ -229,13 +227,6 @@ public class CapitaExportMissingTrnJob([FromKeyedServices("sftpstorage")] DataLa
         if (string.IsNullOrEmpty(previousName))
         {
             return string.Empty;
-        }
-
-        {
-        }
-        if (string.IsNullOrEmpty(previousName))
-        {
-            throw new Exception($"Previous name not found in {nameof(LegacyEvents.PersonDetailsUpdatedEvent)} events.");
         }
 
         var gender = " ";
