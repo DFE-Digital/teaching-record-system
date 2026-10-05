@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.ChangeReasons;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using PersonDetailsUpdatedEventChanges = TeachingRecordSystem.Core.Events.Legacy.PersonDetailsUpdatedEventChanges;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -419,15 +418,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
     }
 
     [Theory]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.LastName)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.Gender)]
-    [InlineData(LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName | LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName | LegacyEvents.PersonDetailsUpdatedEventChanges.LastName | LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth | LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress | LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | LegacyEvents.PersonDetailsUpdatedEventChanges.Gender)]
-    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(LegacyEvents.PersonDetailsUpdatedEventChanges changes)
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.LastName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth)]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    [InlineData(PersonDetailsUpdatedEventChanges.Gender)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.Gender)]
+    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -439,13 +438,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
             .WithNationalInsuranceNumber("AB123456C")
             .WithGender(Gender.Other));
 
-        var firstName = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
-        var middleName = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
-        var lastName = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
-        var dateOfBirth = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
-        var emailAddress = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.EmailAddress;
-        var nationalInsuranceNumber = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
-        var gender = changes.HasFlag(LegacyEvents.PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
+        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
+        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
+        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
+        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.EmailAddress;
+        var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
+        var gender = changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? Gender.Female : person.Gender;
 
         var nameEvidenceFileId = Guid.NewGuid();
         var otherEvidenceFileId = Guid.NewGuid();
@@ -486,8 +485,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
                 };
             }));
 
-        EventObserver.Clear();
-
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
 
         // Act
@@ -514,33 +511,21 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
             Assert.Equal(gender, updatedPersonRecord.Gender);
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<LegacyEvents.PersonDetailsUpdatedEvent>(e);
-
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, actualEvent.PersonId);
-            Assert.Equal(firstName, actualEvent.PersonAttributes.FirstName);
-            Assert.Equal(middleName, actualEvent.PersonAttributes.MiddleName);
-            Assert.Equal(lastName, actualEvent.PersonAttributes.LastName);
-            Assert.Equal(dateOfBirth, actualEvent.PersonAttributes.DateOfBirth);
-            Assert.Equal(emailAddress, actualEvent.PersonAttributes.EmailAddress);
-            Assert.Equal(nationalInsuranceNumber, actualEvent.PersonAttributes.NationalInsuranceNumber);
-            Assert.Equal(gender, actualEvent.PersonAttributes.Gender);
-            Assert.Equal("Correcting an error", actualEvent.NameChangeReason);
-            Assert.Equal(nameEvidenceFileId, actualEvent.NameChangeEvidenceFile!.FileId);
-            Assert.Equal("name-evidence.pdf", actualEvent.NameChangeEvidenceFile.Name);
-            Assert.Equal("Another reason", actualEvent.DetailsChangeReason);
-            Assert.Equal(ChangeReasonDetails, actualEvent.DetailsChangeReasonDetail);
-            Assert.Equal(otherEvidenceFileId, actualEvent.DetailsChangeEvidenceFile!.FileId);
-            Assert.Equal("other-evidence.png", actualEvent.DetailsChangeEvidenceFile.Name);
-            Assert.Equal(changes, actualEvent.Changes);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.PersonDetailsUpdating, p.ProcessContext.ProcessType);
-            p.AssertProcessHasEvents<PersonDetailsUpdatedEvent>();
+            p.AssertProcessHasEvents<PersonDetailsUpdatedEvent>(e =>
+            {
+                Assert.Equal(person.PersonId, e.PersonId);
+                Assert.Equal(firstName, e.PersonDetails.FirstName);
+                Assert.Equal(middleName, e.PersonDetails.MiddleName);
+                Assert.Equal(lastName, e.PersonDetails.LastName);
+                Assert.Equal(dateOfBirth, e.PersonDetails.DateOfBirth);
+                Assert.Equal(emailAddress, e.PersonDetails.EmailAddress);
+                Assert.Equal(nationalInsuranceNumber, e.PersonDetails.NationalInsuranceNumber);
+                Assert.Equal(gender, e.PersonDetails.Gender);
+                Assert.Equal(changes, e.Changes);
+            });
 
             var changeReasonInfo = Assert.IsType<PersonDetailsChangeReasonInfo>(p.ProcessContext.Process.ChangeReason);
             Assert.Equal("Another reason", changeReasonInfo.Reason);

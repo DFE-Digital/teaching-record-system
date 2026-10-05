@@ -24,18 +24,5 @@ public enum PersonDetailsUpdatedEventChanges
     NationalInsuranceNumber = 1 << 5,
     Gender = 1 << 6,
     NameChange = FirstName | MiddleName | LastName,
-    OtherThanNameChange = ~None & ~NameChange
-}
-
-public static class PersonDetailsUpdatedEventExtensions
-{
-    public static LegacyEvents.PersonDetailsUpdatedEventChanges ToLegacyPersonDetailsUpdatedEventChanges(this PersonDetailsUpdatedEventChanges changes) =>
-        LegacyEvents.PersonDetailsUpdatedEventChanges.None
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.PersonDetailsUpdatedEventChanges.FirstName : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? LegacyEvents.PersonDetailsUpdatedEventChanges.MiddleName : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? LegacyEvents.PersonDetailsUpdatedEventChanges.LastName : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0)
-        | (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? LegacyEvents.PersonDetailsUpdatedEventChanges.Gender : 0);
+    OtherThanNameChange = DateOfBirth | EmailAddress | NationalInsuranceNumber | Gender
 }
