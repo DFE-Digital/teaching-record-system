@@ -229,7 +229,7 @@ public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : 
             newFirstName: null);
 
         // The address on the record changed after the request was rejected.
-        await AddLegacyPersonDetailsUpdatedEventAsync(
+        await AddPersonDetailsUpdatedProcessAsync(
             person,
             process.CreatedOn.AddDays(1),
             oldEmailAddress: emailAddressAtTheTime,
@@ -420,27 +420,49 @@ public class BackfillChangeRequestEmailSentEventsJobTests(JobFixture fixture) : 
         Gender = null
     };
 
-    private Task AddLegacyPersonDetailsUpdatedEventAsync(
+    private Task AddPersonDetailsUpdatedProcessAsync(
         Person person,
-        DateTime createdUtc,
+        DateTime createdOn,
         string? oldEmailAddress,
         string? emailAddress) =>
         WithDbContextAsync(async dbContext =>
         {
-            dbContext.AddEventWithoutBroadcast(new LegacyEvents.PersonDetailsUpdatedEvent
+            var processId = Guid.NewGuid();
+
+            var personDetailsUpdatedEvent = new PersonDetailsUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = createdUtc,
-                RaisedBy = SystemUser.SystemUserId,
                 PersonId = person.PersonId,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.EmailAddress,
-                PersonAttributes = CreatePersonDetails(person.FirstName, person.LastName, emailAddress),
-                OldPersonAttributes = CreatePersonDetails(person.FirstName, person.LastName, oldEmailAddress),
-                NameChangeReason = null,
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null
+                PersonDetails = CreatePersonDetails(person.FirstName, person.LastName, emailAddress),
+                OldPersonDetails = CreatePersonDetails(person.FirstName, person.LastName, oldEmailAddress),
+                Changes = PersonDetailsUpdatedEventChanges.EmailAddress
+            };
+
+            dbContext.Processes.Add(new Process
+            {
+                ProcessId = processId,
+                ProcessType = ProcessType.PersonDetailsUpdating,
+                CreatedOn = createdOn,
+                UpdatedOn = createdOn,
+                UserId = SystemUser.SystemUserId,
+                DqtUserId = null,
+                DqtUserName = null,
+                PersonIds = [person.PersonId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                ChangeReason = null
+            });
+
+            dbContext.ProcessEvents.Add(new ProcessEvent
+            {
+                ProcessEventId = personDetailsUpdatedEvent.EventId,
+                ProcessId = processId,
+                EventName = nameof(PersonDetailsUpdatedEvent),
+                Payload = personDetailsUpdatedEvent,
+                PersonIds = [person.PersonId],
+                OneLoginUserSubjects = [],
+                SupportTaskReferences = [],
+                CreatedOn = createdOn
             });
 
             await dbContext.SaveChangesAsync();
