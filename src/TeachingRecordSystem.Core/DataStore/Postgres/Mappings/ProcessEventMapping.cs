@@ -27,5 +27,6 @@ public class ProcessEventMapping : IEntityTypeConfiguration<ProcessEvent>
         builder.HasIndex(e => new { e.OneLoginUserSubjects, e.EventName }).HasMethod("GIN").IsCreatedConcurrently();
         builder.HasIndex(e => new { e.SupportTaskReferences, e.EventName }).HasMethod("GIN").IsCreatedConcurrently();
         builder.HasIndex(e => e.ProcessId).IsCreatedConcurrently();
+        builder.HasIndex(e => new { e.EventName, e.CreatedOn }).IsCreatedConcurrently();
     }
 }
