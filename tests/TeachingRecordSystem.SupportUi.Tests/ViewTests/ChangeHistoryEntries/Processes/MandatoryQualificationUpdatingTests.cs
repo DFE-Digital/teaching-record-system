@@ -50,13 +50,13 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
 
         var reasonBlock = entry.GetElementByTestId("reason-for-change");
         Assert.NotNull(reasonBlock);
-        Assert.Equal(changeReason.Reason, reasonBlock.GetElementByTestId("change-reason")?.TrimmedText());
+        Assert.Equal(changeReason.Reason, reasonBlock.GetElementByTestId("reason")?.TrimmedText());
 
         Assert.Null(entry.GetElementByTestId("previous-data"));
     }
 
     [Theory]
-    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Another reason", "Some reason details", "Some reason details")]
     [InlineData("Correcting an error", null, "Correcting an error")]
     [InlineData("Correcting an error", "", "Correcting an error")]
     public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
@@ -102,7 +102,7 @@ public class MandatoryQualificationUpdatingTests(HostFixture hostFixture) : Chan
         var reasonBlockSummary = reasonBlock.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for change", reasonBlockSummary?.TrimmedText());
 
-        reasonBlock.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
+        reasonBlock.AssertSummaryListRowValueContentMatches("Reason", expectedReasonDetails);
     }
 
     [Fact]

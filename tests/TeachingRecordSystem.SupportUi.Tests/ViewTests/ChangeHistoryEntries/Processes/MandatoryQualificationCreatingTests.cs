@@ -171,7 +171,7 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
         var reasonBlockSummary = reasonBlock.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for adding mandatory qualification", reasonBlockSummary?.TrimmedText());
 
-        reasonBlock.AssertSummaryListRowValueContentMatches("Reason details", changeReason.Reason!);
+        reasonBlock.AssertSummaryListRowValueContentMatches("Reason", changeReason.Reason!);
         reasonBlock.AssertSummaryListRowValueContentMatches("Additional information", changeReason.AdditionalInformation);
         Assert.Equal($"{changeReason.EvidenceFile.Name} (opens in new tab)", reasonBlock.GetElementByTestId("evidence")?.TrimmedText());
     }
@@ -214,7 +214,7 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
     }
 
     [Theory]
-    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Another reason", "Some reason details", "Some reason details")]
     [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
     [InlineData("Identified during data reconciliation with stakeholder", "", "Identified during data reconciliation with stakeholder")]
     public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
@@ -254,7 +254,7 @@ public class MandatoryQualificationCreatingTests(HostFixture hostFixture) : Chan
         var reasonBlockSummary = reasonBlock.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for adding mandatory qualification", reasonBlockSummary?.TrimmedText());
 
-        reasonBlock.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
+        reasonBlock.AssertSummaryListRowValueContentMatches("Reason", expectedReasonDetails);
     }
 
     [Fact]

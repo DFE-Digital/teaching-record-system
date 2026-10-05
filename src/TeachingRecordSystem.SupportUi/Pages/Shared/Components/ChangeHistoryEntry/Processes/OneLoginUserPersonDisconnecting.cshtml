@@ -26,18 +26,18 @@
         }
     </p>
 
-    @if (changeReason is not null)
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
             <summary>Reason for change</summary>
             <text>
                 <govuk-summary-list>
                     <row>
-                        <key>Reason details</key>
-                        <value use-empty-fallback>
+                        <key>Reason</key>
+                        <value use-empty-fallback data-testid="reason">
                             @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
                             {
-                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
                             }
                             else
                             {

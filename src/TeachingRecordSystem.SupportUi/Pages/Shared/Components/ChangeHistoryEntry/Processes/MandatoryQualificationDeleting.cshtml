@@ -15,39 +15,45 @@
     <p class="govuk-body">@bodyText</p>
 
 
-    <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
-        <summary>Reason for deletion</summary>
-        <text>
-            <govuk-summary-list>
-                <row>
-                    <key>Reason details</key>
-                    <value data-testid="deletion-reason" use-empty-fallback>
-                        @if (changeReason?.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
-                        {
-                            @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
-                        }
-                        else
-                        {
-                            @changeReason?.Reason
-                        }
-                    </value>
-                </row>
-                <row>
-                    <key>Additional information</key>
-                    <value data-testid="additional-information" use-empty-fallback>
-                        @Html.ConvertNewlinesToLineBreaks(changeReason?.AdditionalInformation)
-                    </value>
-                </row>
-                @if (changeReason?.EvidenceFile is not null)
-                {
+    @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
+            <summary>Reason for deletion</summary>
+            <text>
+                <govuk-summary-list>
                     <row>
-                        <key>Evidence</key>
-                        <value data-testid="evidence">
-                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                        <key>Reason</key>
+                        <value data-testid="reason" use-empty-fallback>
+                            @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
+                            {
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
+                            }
+                            else
+                            {
+                                @changeReason.Reason
+                            }
                         </value>
                     </row>
-                }
-            </govuk-summary-list>
-        </text>
-    </govuk-details>
+                    @if (!string.IsNullOrEmpty(changeReason.AdditionalInformation))
+                    {
+                        <row>
+                            <key>Additional information</key>
+                            <value data-testid="additional-information" use-empty-fallback>
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                            </value>
+                        </row>
+                    }
+                    @if (changeReason.EvidenceFile is not null)
+                    {
+                        <row>
+                            <key>Evidence</key>
+                            <value data-testid="evidence">
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </value>
+                        </row>
+                    }
+                </govuk-summary-list>
+            </text>
+        </govuk-details>
+    }
 </timeline-entry>
