@@ -141,7 +141,7 @@ public class DeleteOldEvidenceFilesJob
             }
         }
 
-        // Get file IDs from PersonDetailsUpdating processes (newer structure)
+        // Get file IDs from PersonDetailsUpdating processes
         // Use process UpdatedOn date as the completion timestamp
         var personDetailsUpdatingProcesses = await _dbContext.Processes
             .Where(p => p.ProcessType == ProcessType.PersonDetailsUpdating
@@ -162,30 +162,6 @@ public class DeleteOldEvidenceFilesJob
                 {
                     regularFileIds.Add(changeReason.EvidenceFile.FileId);
                 }
-            }
-        }
-
-        // Get file IDs from legacy PersonDetailsUpdatedEvent (manual changes before processes were introduced)
-        // Use event Created date as the completion timestamp
-        // TODO: This can be removed once we backfill old legacy events to the new process model
-        var personDetailsEvents = await _dbContext.Events
-            .Where(e => e.EventName == "PersonDetailsUpdatedEvent"
-                && e.Created < currentCutoffDate.UtcDateTime
-                && (previousCutoffDate == null || e.Created >= previousCutoffDate.Value.UtcDateTime))
-            .ToListAsync(cancellationToken);
-
-        foreach (var evt in personDetailsEvents)
-        {
-            var @event = (LegacyEvents.PersonDetailsUpdatedEvent)evt.ToEventBase();
-
-            if (@event.NameChangeEvidenceFile is not null)
-            {
-                regularFileIds.Add(@event.NameChangeEvidenceFile.FileId);
-            }
-
-            if (@event.DetailsChangeEvidenceFile is not null)
-            {
-                regularFileIds.Add(@event.DetailsChangeEvidenceFile.FileId);
             }
         }
 
