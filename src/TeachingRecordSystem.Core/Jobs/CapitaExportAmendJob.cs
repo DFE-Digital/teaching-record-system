@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -263,30 +262,31 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
     {
         var capitaUserId = capitaUser.Value.CapitaTpsUserId;
         var capitaPersonsWithEvents = new List<(CapitaExportAmendJobResult, CapitaAmendExportType)>();
-        var combinedChangeFlags = PersonAttributesChanges.NationalInsuranceNumber | PersonAttributesChanges.DateOfBirth;
+        var combinedChangeFlags = (int)(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber | PersonDetailsUpdatedEventChanges.DateOfBirth);
         var processedPersons = new List<Guid>();
 
         // eligibile events
-        var eventNames = EventBase.GetEventNamesForBaseType(typeof(IEventWithPersonAttributes));
+        var eventName = nameof(PersonDetailsUpdatedEvent);
         var filteredGenders = new[] { Gender.Male, Gender.Female };
         var changeEvents = await dbContext.Database.SqlQuery<CapitaExportAmendJobResult>(
         $"""
             select
                 e.person_ids[1] as person_id,
-                e.payload->'PersonAttributes'->>'NationalInsuranceNumber' as "national_insurance_number",
-                (e.payload->'PersonAttributes'->>'DateOfBirth')::date as "date_of_birth",
-                e.created as "Created",
+                e.payload->'PersonDetails'->>'NationalInsuranceNumber' as "national_insurance_number",
+                (e.payload->'PersonDetails'->>'DateOfBirth')::date as "date_of_birth",
+                e.created_on as "Created",
                 p.trn as "Trn",
                 p.gender as "Gender",
                 (e.payload->>'Changes')::int as "change_type",
                 p.last_name
-            from events e
+            from process_events e
+            inner join processes pr on pr.process_id = e.process_id
             inner join persons p on p.person_id = e.person_ids[1]
-            where event_name = any({eventNames})
-                and(e.payload->'PersonAttributes'->> 'Gender')::int = any({filteredGenders})
-                and(e.payload->> 'RaisedBy')::uuid != {capitaUserId}
+            where e.event_name = {eventName}
+                and (e.payload->'PersonDetails'->>'Gender')::int = any({filteredGenders})
+                and pr.user_id is distinct from {capitaUserId}
                 and ((e.payload->>'Changes')::int & {combinedChangeFlags}) != 0
-                and e.created > {lastRunDate}
+                and e.created_on > {lastRunDate}
             order by "Created" desc, "Trn" desc
         """).ToListAsync(cancellationToken);
 
@@ -301,11 +301,11 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
             }
 
             processedPersons.Add(person.PersonId);
-            if (person.ChangeType.HasFlag(PersonAttributesChanges.NationalInsuranceNumber))
+            if (person.ChangeType.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
             {
                 capitaPersonsWithEvents.Add((person, CapitaAmendExportType.NINumber));
             }
-            if (person.ChangeType.HasFlag(PersonAttributesChanges.DateOfBirth))
+            if (person.ChangeType.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
             {
                 capitaPersonsWithEvents.Add((person, CapitaAmendExportType.DateOfBirth));
             }
@@ -322,7 +322,7 @@ public class CapitaExportAmendJobResult
     public required string Trn { get; set; }
     public required DateOnly? DateOfBirth { get; set; }
     public required Gender? Gender { get; set; }
-    public required PersonAttributesChanges ChangeType { get; set; }
+    public required PersonDetailsUpdatedEventChanges ChangeType { get; set; }
     public required string LastName { get; set; }
 }
 

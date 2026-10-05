@@ -2,6 +2,7 @@ using Azure;
 using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.Logging.Abstractions;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs;
 
@@ -174,22 +175,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             });
             var trsPerson = await dbContext.Persons.FirstAsync(x => x.PersonId == person1.PersonId);
             var personDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = personDetails,
-                OldPersonAttributes = personDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.None
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, personDetails, personDetails, PersonDetailsUpdatedEventChanges.None, TimeProvider.UtcNow.AddYears(-2));
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -380,22 +366,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var oldPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = newLastName;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails, newPersonDetails, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow.AddYears(-2));
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -430,22 +401,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var oldPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = newLastName;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails, newPersonDetails, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow.AddYears(-2));
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -480,22 +436,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var oldPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = newLastName;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails, newPersonDetails, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow.AddYears(-2));
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -534,64 +475,19 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var oldPersonDetails1 = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = updateLastName1;
             var newPersonDetails1 = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent1 = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddYears(-3),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails1,
-                OldPersonAttributes = oldPersonDetails1,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails1, newPersonDetails1, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow.AddYears(-3));
 
             // second marriage
             var oldPersonDetails2 = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = updateLastName2;
             var newPersonDetails2 = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent2 = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddYears(-2),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails2,
-                OldPersonAttributes = oldPersonDetails2,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent2);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails2, newPersonDetails2, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow.AddYears(-2));
 
             // third marriage
             var oldPersonDetails3 = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = updateLastName3;
             var newPersonDetails3 = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent3 = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails3,
-                OldPersonAttributes = oldPersonDetails3,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent3);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails3, newPersonDetails3, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -754,22 +650,7 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var oldPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.LastName = updateLastName;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var nameChangeEvent1 = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = trsPerson.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
+            AddPersonDetailsUpdatedProcess(dbContext, trsPerson.PersonId, oldPersonDetails, newPersonDetails, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -840,42 +721,12 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             var oldPersonDetails1 = EventModels.PersonDetails.FromModel(trsPerson1);
             trsPerson1.LastName = updateLastName1;
             var newPersonDetails1 = EventModels.PersonDetails.FromModel(trsPerson1);
-            var nameChangeEvent1 = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = person1.PersonId,
-                PersonAttributes = newPersonDetails1,
-                OldPersonAttributes = oldPersonDetails1,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
+            AddPersonDetailsUpdatedProcess(dbContext, person1.PersonId, oldPersonDetails1, newPersonDetails1, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow);
 
             var oldPersonDetails2 = EventModels.PersonDetails.FromModel(trsPerson2);
             trsPerson2.LastName = updateLastName2;
             var newPersonDetails2 = EventModels.PersonDetails.FromModel(trsPerson2);
-            var nameChangeEvent2 = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = person2.PersonId,
-                PersonAttributes = newPersonDetails2,
-                OldPersonAttributes = oldPersonDetails2,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.LastName
-            };
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent1);
-            dbContext.AddEventWithoutBroadcast(nameChangeEvent2);
+            AddPersonDetailsUpdatedProcess(dbContext, person2.PersonId, oldPersonDetails2, newPersonDetails2, PersonDetailsUpdatedEventChanges.LastName, TimeProvider.UtcNow);
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -981,5 +832,52 @@ public class CapitaExportNewJobTests(JobFixture fixture) : JobTestBase(fixture)
             .ReturnsAsync(Mock.Of<Response<PathInfo>>());
 
         return dataLakeServiceClientMock.Object;
+    }
+
+    private static void AddPersonDetailsUpdatedProcess(
+        TrsDbContext dbContext,
+        Guid personId,
+        EventModels.PersonDetails oldPersonDetails,
+        EventModels.PersonDetails personDetails,
+        PersonDetailsUpdatedEventChanges changes,
+        DateTime createdOn)
+    {
+        var processId = Guid.NewGuid();
+
+        var personDetailsUpdatedEvent = new PersonDetailsUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            PersonId = personId,
+            PersonDetails = personDetails,
+            OldPersonDetails = oldPersonDetails,
+            Changes = changes
+        };
+
+        dbContext.Processes.Add(new Process
+        {
+            ProcessId = processId,
+            ProcessType = ProcessType.PersonDetailsUpdating,
+            CreatedOn = createdOn,
+            UpdatedOn = createdOn,
+            UserId = SystemUser.SystemUserId,
+            DqtUserId = null,
+            DqtUserName = null,
+            PersonIds = [personId],
+            OneLoginUserSubjects = [],
+            SupportTaskReferences = [],
+            ChangeReason = null
+        });
+
+        dbContext.Set<ProcessEvent>().Add(new ProcessEvent
+        {
+            ProcessEventId = personDetailsUpdatedEvent.EventId,
+            ProcessId = processId,
+            EventName = nameof(PersonDetailsUpdatedEvent),
+            Payload = personDetailsUpdatedEvent,
+            PersonIds = [personId],
+            OneLoginUserSubjects = [],
+            SupportTaskReferences = [],
+            CreatedOn = createdOn
+        });
     }
 }

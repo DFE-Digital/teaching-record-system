@@ -4,7 +4,6 @@ using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -81,22 +80,18 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             var oldPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.DateOfBirth = updatedDateOfBirth;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddHours(-1),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = person.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth
-            };
-            dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
+            await TestData.CreateProcessAsync(
+                ProcessType.PersonDetailsUpdating,
+                SystemUser.SystemUserId,
+                changeReason: null,
+                new PersonDetailsUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    PersonDetails = newPersonDetails,
+                    OldPersonDetails = oldPersonDetails,
+                    Changes = PersonDetailsUpdatedEventChanges.DateOfBirth
+                });
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -164,22 +159,18 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             var oldPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
             trsPerson.NationalInsuranceNumber = (string?)updatedNationalInsuranceNumber;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow.AddHours(-1),
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = person.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber
-            };
-            dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
+            await TestData.CreateProcessAsync(
+                ProcessType.PersonDetailsUpdating,
+                SystemUser.SystemUserId,
+                changeReason: null,
+                new PersonDetailsUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    PersonDetails = newPersonDetails,
+                    OldPersonDetails = oldPersonDetails,
+                    Changes = PersonDetailsUpdatedEventChanges.NationalInsuranceNumber
+                });
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -248,22 +239,18 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
             trsPerson.DateOfBirth = updatedDateOfBirth;
             trsPerson.NationalInsuranceNumber = (string?)updatedNationalInsuranceNumber;
             var newPersonDetails = EventModels.PersonDetails.FromModel(trsPerson);
-            var personUpdatedEvent = new LegacyEvents.PersonDetailsUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = TimeProvider.UtcNow,
-                RaisedBy = SystemUser.SystemUserId,
-                PersonId = person.PersonId,
-                PersonAttributes = newPersonDetails,
-                OldPersonAttributes = oldPersonDetails,
-                NameChangeReason = "",
-                NameChangeEvidenceFile = null,
-                DetailsChangeReason = null,
-                DetailsChangeReasonDetail = null,
-                DetailsChangeEvidenceFile = null,
-                Changes = LegacyEvents.PersonDetailsUpdatedEventChanges.DateOfBirth | LegacyEvents.PersonDetailsUpdatedEventChanges.NationalInsuranceNumber
-            };
-            dbContext.AddEventWithoutBroadcast(personUpdatedEvent!);
+            await TestData.CreateProcessAsync(
+                ProcessType.PersonDetailsUpdating,
+                SystemUser.SystemUserId,
+                changeReason: null,
+                new PersonDetailsUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = person.PersonId,
+                    PersonDetails = newPersonDetails,
+                    OldPersonDetails = oldPersonDetails,
+                    Changes = PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber
+                });
             await dbContext.SaveChangesAsync();
 
             // Act
@@ -329,7 +316,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                 NationalInsuranceNumber = null,
                 PersonId = trsPerson.PersonId,
                 Gender = trsPerson.Gender,
-                ChangeType = PersonAttributesChanges.DateOfBirth,
+                ChangeType = PersonDetailsUpdatedEventChanges.DateOfBirth,
                 Created = DateTime.UtcNow
             };
 
@@ -376,7 +363,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                 NationalInsuranceNumber = null,
                 PersonId = trsPerson.PersonId,
                 Gender = trsPerson.Gender,
-                ChangeType = PersonAttributesChanges.DateOfBirth,
+                ChangeType = PersonDetailsUpdatedEventChanges.DateOfBirth,
                 Created = DateTime.UtcNow
             };
 
@@ -423,7 +410,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                 NationalInsuranceNumber = null,
                 PersonId = trsPerson.PersonId,
                 Gender = trsPerson.Gender,
-                ChangeType = PersonAttributesChanges.DateOfBirth,
+                ChangeType = PersonDetailsUpdatedEventChanges.DateOfBirth,
                 Created = DateTime.UtcNow
             };
 
@@ -473,7 +460,7 @@ public class CapitaExportAmendJobTests(JobFixture fixture) : JobTestBase(fixture
                 NationalInsuranceNumber = person.NationalInsuranceNumber,
                 PersonId = trsPerson.PersonId,
                 Gender = trsPerson.Gender,
-                ChangeType = PersonAttributesChanges.NationalInsuranceNumber,
+                ChangeType = PersonDetailsUpdatedEventChanges.NationalInsuranceNumber,
                 Created = DateTime.UtcNow
             };
 
