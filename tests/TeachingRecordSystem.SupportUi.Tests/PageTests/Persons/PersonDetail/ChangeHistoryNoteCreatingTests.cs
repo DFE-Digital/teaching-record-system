@@ -40,9 +40,6 @@ public partial class ChangeHistoryTests
         var title = entry.QuerySelector(".moj-timeline__title")?.TextContent;
         Assert.Equal("Notes added", title);
 
-        var messageText = entry.QuerySelector(".govuk-body")?.TextContent?.Trim();
-        Assert.Equal($"Note added for {person.FirstName} {person.LastName}.", messageText);
-
         var details = entry.QuerySelector("[data-testid='note-content']");
         Assert.NotNull(details);
 

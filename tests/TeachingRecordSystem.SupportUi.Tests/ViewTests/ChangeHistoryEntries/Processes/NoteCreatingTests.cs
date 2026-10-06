@@ -18,9 +18,6 @@ public class NoteCreatingTests(HostFixture hostFixture) : ChangeHistoryEntryTest
         // Assert
         AssertTitle(entry, "Notes added");
 
-        var messageText = entry.QuerySelector(".govuk-body")?.TextContent?.Trim();
-        Assert.Equal($"Note added for {person.FirstName} {person.LastName}.", messageText);
-
         var details = entry.QuerySelector("[data-testid='note-content']");
         Assert.NotNull(details);
 

@@ -32,7 +32,7 @@ public class ChangeLogDqtInitialTeacherTrainingProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "DQT initial teacher training created",
+            "Initial teacher training created in DQT",
             user.Name,
             process.CreatedOn,
             [("Result", "Pass")]);
@@ -75,7 +75,7 @@ public class ChangeLogDqtInitialTeacherTrainingProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "DQT initial teacher training updated",
+            "Initial teacher training updated in DQT",
             user.Name,
             process.CreatedOn,
             [("Result", "Pass")],

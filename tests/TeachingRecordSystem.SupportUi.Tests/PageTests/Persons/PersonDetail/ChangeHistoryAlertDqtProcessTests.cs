@@ -33,7 +33,7 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Alert imported",
+            "Alert imported into DQT",
             SystemUser.SystemUserName,
             process.CreatedOn,
             [
@@ -71,7 +71,7 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Alert reactivated",
+            "Alert reactivated in DQT",
             SystemUser.SystemUserName,
             process.CreatedOn,
             [
@@ -110,7 +110,7 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Alert deactivated",
+            "Alert deactivated in DQT",
             SystemUser.SystemUserName,
             process.CreatedOn,
             [
@@ -154,7 +154,7 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Alert migrated",
+            "Alert migrated from DQT",
             SystemUser.SystemUserName,
             process.CreatedOn,
             [

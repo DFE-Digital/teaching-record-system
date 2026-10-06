@@ -7,7 +7,7 @@
         induction.StartDate.HasValue || induction.CompletionDate.HasValue;
 }
 
-<timeline-entry title="Induction created" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Induction created in DQT" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     @if (hasInductionDetails)
     {
         <govuk-summary-list>
