@@ -15,8 +15,7 @@ public class SupportTaskDeletingTests(HostFixture hostFixture) : ChangeHistoryEn
         var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
 
         // Assert
-        AssertTitle(entry, "Support task deleted");
-        Assert.Equal($"Task deleted for {person.FirstName} {person.LastName}.", entry.QuerySelector(".govuk-body")?.TrimmedText());
+        AssertTitle(entry, "TRN request support task deleted by Admin");
     }
 
     [Fact]
@@ -31,8 +30,7 @@ public class SupportTaskDeletingTests(HostFixture hostFixture) : ChangeHistoryEn
         var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "oneLogin", oneLoginSubject: oneLoginUser.Subject);
 
         // Assert
-        AssertTitle(entry, "Support task deleted");
-        Assert.Equal($"Task deleted for {person.FirstName} {person.LastName}.", entry.QuerySelector(".govuk-body")?.TrimmedText());
+        AssertTitle(entry, "TRN request support task deleted by Admin");
     }
 
     [Fact]
@@ -46,8 +44,7 @@ public class SupportTaskDeletingTests(HostFixture hostFixture) : ChangeHistoryEn
         var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "oneLogin", oneLoginSubject: oneLoginUser.Subject);
 
         // Assert
-        AssertTitle(entry, "Support task deleted");
-        Assert.Equal($"Task deleted for {oneLoginUser.EmailAddress}.", entry.QuerySelector(".govuk-body")?.TrimmedText());
+        AssertTitle(entry, "TRN request support task deleted by Admin");
     }
 
     private Task<Core.DataStore.Postgres.Models.Process> CreateProcessAsync(Guid? personId, string? oneLoginUserSubject)
@@ -55,11 +52,11 @@ public class SupportTaskDeletingTests(HostFixture hostFixture) : ChangeHistoryEn
         var supportTask = new EventModels.SupportTask
         {
             SupportTaskReference = "TEST-ST-1",
-            SupportTaskType = SupportTaskType.NpqTrnRequest,
+            SupportTaskType = SupportTaskType.TrnRequest,
             Status = SupportTaskStatus.Open,
             OneLoginUserSubject = oneLoginUserSubject,
             PersonId = personId,
-            Data = new NpqTrnRequestData(),
+            Data = new TrnRequestData(),
             SourceApplicationUserId = null,
             ResolveJourneySavedState = null,
             AssignedToUserId = null,

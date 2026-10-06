@@ -3,11 +3,7 @@
 @{
     var deletedEvent = Model.GetEvent<SupportTaskDeletedEvent>();
     var supportTask = deletedEvent.SupportTask;
-    var personInfo = supportTask.PersonId is Guid personId ? Model.Context.TryGetPersonInfo(personId) : null;
-    var oneLoginUserInfo = supportTask.OneLoginUserSubject is string subject ? Model.Context.GetOneLoginUserInfo(subject) : null;
-    var name = personInfo is not null ? $"{personInfo.FirstName} {personInfo.LastName}" : oneLoginUserInfo?.EmailAddress;
 }
 
-<timeline-entry title="Support task deleted" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    <p class="govuk-body">Task deleted for @name.</p>
+<timeline-entry title="@($"{supportTask.SupportTaskType.GetTitle()} support task deleted by Admin")" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
 </timeline-entry>

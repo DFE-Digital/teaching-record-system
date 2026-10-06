@@ -15,7 +15,7 @@ public class NotifyingTrnRecipientTests(HostFixture hostFixture) : ChangeHistory
         var entry = await PublishEmailSentEventAsync(person);
 
         // Assert
-        AssertTitle(entry, $"TRN email sent to {person.FirstName} {person.LastName}");
+        AssertTitle(entry, "TRN email sent");
 
         var emailSentMessage = entry.GetElementByTestId("email-sent-message");
         Assert.NotNull(emailSentMessage);
