@@ -129,6 +129,11 @@
         "resolved": "3.0.114",
         "contentHash": "9E7B1ixZR2to7ZTPZKIcTfQwGKuBu11F7tFykmi2X+icjTy6bJY9N/LLJ9tAW7PhaAmgM15o3t7P9aBg0kbUxw=="
       },
+      "Apache.Arrow": {
+        "type": "Transitive",
+        "resolved": "22.1.0",
+        "contentHash": "mTdHWGsNCWpKyQxqyNcSS+q4BtBTSOUfhdG+Lwo6eAOznCLSwrZQ5VKtDG2G8VrUp1ul4DwWHefoBS1umjO/VQ=="
+      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.61.0",
@@ -169,11 +174,11 @@
       },
       "Azure.Storage.Common": {
         "type": "Transitive",
-        "resolved": "12.28.0",
-        "contentHash": "5l8YhNrks38zKLGFW2BBFLwieyamH/xauABSASsdpZv79G0f+n2n22IjkRmUqCmALSupkwRHh2LOhbW3yj5Qgw==",
+        "resolved": "12.29.0",
+        "contentHash": "0VqPcAinzXFJDAELqC+VPFUL6AaU1mmIpDAHarr7DVw3zcJrlo4k3Xc3TCTVBkDgY6YUOjJ00Fd9ZB9En5H2Jg==",
         "dependencies": {
-          "Azure.Core": "1.55.0",
-          "System.IO.Hashing": "10.0.3"
+          "Azure.Core": "1.60.0",
+          "System.IO.Hashing": "10.0.9"
         }
       },
       "Dapper": {
@@ -867,8 +872,8 @@
       },
       "System.IO.Hashing": {
         "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "La6ICwsdTKhVX+LKN+pvFjQRR3LhLwq3uKdi2knjLzRyPYBSydF4cjXidYxIiTcDD6XVYdsBWQEI8ZxiZ/OdIg=="
+        "resolved": "10.0.9",
+        "contentHash": "vixglGnKEexAJDeIRhyayZYzxyrgK1K9GU3K/zRZVwDbaDcMkSqj4WDHoVmQMNfsdUtLALfNSJw6mBIpdxie4A=="
       },
       "System.Management": {
         "type": "Transitive",
@@ -902,7 +907,7 @@
         "type": "Project",
         "dependencies": {
           "AngleSharp": "[1.7.2, )",
-          "Azure.Storage.Blobs": "[12.29.2, )",
+          "Azure.Storage.Blobs": "[12.30.0, )",
           "Azure.Storage.Files.DataLake": "[12.24.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.9.0, )",
@@ -1004,12 +1009,13 @@
       },
       "Azure.Storage.Blobs": {
         "type": "CentralTransitive",
-        "requested": "[12.29.2, )",
-        "resolved": "12.29.2",
-        "contentHash": "NeZmk7bphspT2BYn8XaNCTV4/9vQG+ea79F85MBTi2o2WiXIIJNsRBtFyeBrzK2HIk476rfSqLNwPt4vXgOEkQ==",
+        "requested": "[12.30.0, )",
+        "resolved": "12.30.0",
+        "contentHash": "pf6tqkzNANU5Fvfibse3fVRNWJol4jb9iA/wjHu1EHEpWpFHasHaiVNc11fncvOwnphzm4xaZwXzrg34yAI2hw==",
         "dependencies": {
-          "Azure.Core": "1.55.0",
-          "Azure.Storage.Common": "12.28.0"
+          "Apache.Arrow": "22.1.0",
+          "Azure.Core": "1.60.0",
+          "Azure.Storage.Common": "12.29.0"
         }
       },
       "Azure.Storage.Files.DataLake": {
