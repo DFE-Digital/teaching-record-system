@@ -192,7 +192,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
-        item.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
+        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(comments, v.TrimmedText()));
         item.AssertSummaryListRowValue("change-reason", "Evidence", v => Assert.Equal($"{evidenceFile.Name} (opens in new tab)", v.TrimmedText()));
     }
 
@@ -226,7 +226,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
         Assert.Null(item.GetElementByTestId("details"));
         Assert.Null(item.GetElementByTestId("previous-details"));
 
-        item.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
+        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(comments, v.TrimmedText()));
     }
 
     [Theory]

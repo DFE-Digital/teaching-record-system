@@ -95,15 +95,18 @@
             <text>
                 <govuk-summary-list>
                     <row>
-                        <key>Comments</key>
-                        <value use-empty-fallback>@changeReason.Details</value>
+                        <key>Reason</key>
+                        <value use-empty-fallback data-testid="reason">@changeReason.Details</value>
                     </row>
-                    <row>
-                        <key>Evidence</key>
-                        <value>
-                            <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
-                        </value>
-                    </row>
+                    @if (changeReason.EvidenceFile is not null)
+                    {
+                        <row>
+                            <key>Evidence</key>
+                            <value>
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </value>
+                        </row>
+                    }
                 </govuk-summary-list>
             </text>
         </govuk-details>

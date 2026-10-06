@@ -60,11 +60,11 @@
             <text>
                 <govuk-summary-list>
                     <row>
-                        <key>Reason details</key>
-                        <value data-testid="change-reason" use-empty-fallback>
+                        <key>Reason</key>
+                        <value data-testid="reason" use-empty-fallback>
                             @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
                             {
-                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
                             }
                             else
                             {
@@ -72,12 +72,15 @@
                             }
                         </value>
                     </row>
-                    <row>
-                        <key>Additional information</key>
-                        <value data-testid="additional-information" use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
-                        </value>
-                    </row>
+                    @if (!string.IsNullOrEmpty(changeReason.AdditionalInformation))
+                    {
+                        <row>
+                            <key>Additional information</key>
+                            <value data-testid="additional-information" use-empty-fallback>
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                            </value>
+                        </row>
+                    }
                     @if (changeReason.EvidenceFile is not null)
                     {
                         <row>

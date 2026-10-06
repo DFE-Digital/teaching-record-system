@@ -63,7 +63,7 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
     }
 
     [Theory]
-    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Another reason", "Some reason details", "Some reason details")]
     [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
     public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
     {
@@ -90,7 +90,7 @@ public class AlertDeletingTests(HostFixture hostFixture) : ChangeHistoryEntryTes
         var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for deleting alert", changeReasonDetailsSummary?.TrimmedText());
 
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
+        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason", expectedReasonDetails);
     }
 
     private Task<IHtmlElement> PublishAlertDeletedEventAsync(AlertType alertType, IChangeReasonInfo? changeReason = null)

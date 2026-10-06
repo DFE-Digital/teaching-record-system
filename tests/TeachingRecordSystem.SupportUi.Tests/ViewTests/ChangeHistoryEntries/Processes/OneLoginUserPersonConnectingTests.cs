@@ -36,7 +36,7 @@ public class OneLoginUserPersonConnectingTests(HostFixture hostFixture) : Change
     }
 
     [Theory]
-    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Another reason", "Some reason details", "Some reason details")]
     [InlineData("New information received", null, "New information received")]
     public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonText)
     {
@@ -64,7 +64,7 @@ public class OneLoginUserPersonConnectingTests(HostFixture hostFixture) : Change
         var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for change", changeReasonDetailsSummary?.TrimmedText());
 
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonText);
+        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason", expectedReasonText);
     }
 
     [Theory]

@@ -84,11 +84,11 @@
             <text>
                 <govuk-summary-list>
                     <row>
-                        <key>Reason details</key>
-                        <value use-empty-fallback>
+                        <key>Reason</key>
+                        <value use-empty-fallback data-testid="reason">
                             @if (changeReason.Reason == "Another reason" && !string.IsNullOrEmpty(changeReason.Details))
                             {
-                                @Html.ConvertNewlinesToLineBreaks($"{changeReason.Reason}: {changeReason.Details}")
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.Details)
                             }
                             else
                             {
@@ -96,12 +96,24 @@
                             }
                         </value>
                     </row>
-                    <row>
-                        <key>Additional information</key>
-                        <value use-empty-fallback>
-                            @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
-                        </value>
-                    </row>
+                    @if (!string.IsNullOrEmpty(changeReason.AdditionalInformation))
+                    {
+                        <row>
+                            <key>Additional information</key>
+                            <value use-empty-fallback>
+                                @Html.ConvertNewlinesToLineBreaks(changeReason.AdditionalInformation)
+                            </value>
+                        </row>
+                    }
+                    @if (changeReason.EvidenceFile is not null)
+                    {
+                        <row>
+                            <key>Evidence</key>
+                            <value data-testid="evidence">
+                                <vc:event-evidence-file-link evidence-file="@changeReason.EvidenceFile" />
+                            </value>
+                        </row>
+                    }
                 </govuk-summary-list>
             </text>
         </govuk-details>

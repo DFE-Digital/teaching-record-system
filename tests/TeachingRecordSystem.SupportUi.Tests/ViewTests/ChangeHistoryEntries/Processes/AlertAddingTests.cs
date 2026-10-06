@@ -63,7 +63,7 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
     }
 
     [Theory]
-    [InlineData("Another reason", "Some reason details", "Another reason: Some reason details")]
+    [InlineData("Another reason", "Some reason details", "Some reason details")]
     [InlineData("Routine notification from stakeholder", null, "Routine notification from stakeholder")]
     [InlineData("Identified during data reconciliation with stakeholder", "", "Identified during data reconciliation with stakeholder")]
     public async Task WithChangeReason_RendersCorrectly(string reason, string? details, string expectedReasonDetails)
@@ -91,7 +91,7 @@ public class AlertAddingTests(HostFixture hostFixture) : ChangeHistoryEntryTestB
         var changeReasonDetailsSummary = changeReasonDetails.GetElementsByTagName("summary").SingleOrDefault();
         Assert.Equal("Reason for adding alert", changeReasonDetailsSummary?.TrimmedText());
 
-        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason details", expectedReasonDetails);
+        changeReasonDetails.AssertSummaryListRowValueContentMatches("Reason", expectedReasonDetails);
     }
 
     [Fact]
