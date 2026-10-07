@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.WebhookData;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 using TrnRequestStatus = TeachingRecordSystem.Core.Models.TrnRequestStatus;
 
@@ -52,7 +53,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId, ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -104,7 +105,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId, ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -144,7 +145,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId, ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.Null(notification);
@@ -190,7 +191,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = applicationUser.UserId, ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.Null(notification);
@@ -220,7 +221,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = otherApplicationUser.UserId });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = otherApplicationUser.UserId, ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.Null(notification);

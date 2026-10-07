@@ -32,7 +32,7 @@ public class WebhookMessageFactory(
             }
         };
 
-    public async Task<IEnumerable<WebhookMessage>> CreateMessagesAsync(IEvent @event)
+    public async Task<IEnumerable<WebhookMessage>> CreateMessagesAsync(IEvent @event, ProcessContext processContext)
     {
         var endpoints = await memoryCache.GetOrCreateAsync(
             CacheKeys.EnabledWebhookEndpoints(),
@@ -78,7 +78,7 @@ public class WebhookMessageFactory(
 
             foreach (var applicationUserEndpoints in endpointCloudEventTypeVersions[(version, cloudEventType)].GroupBy(e => e.ApplicationUserId))
             {
-                var context = new EventMapperContext { ApplicationUserId = applicationUserEndpoints.Key };
+                var context = new EventMapperContext { ApplicationUserId = applicationUserEndpoints.Key, ProcessContext = processContext };
 
                 var payload = await mapper.MapEventAsync(@event, context);
                 if (payload is null)

@@ -6,7 +6,7 @@ public class SendWebhookMessagesEventHandler(WebhookMessageFactory webhookMessag
 {
     public async Task HandleEventAsync(IEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
-        var messages = await webhookMessageFactory.CreateMessagesAsync(@event);
+        var messages = await webhookMessageFactory.CreateMessagesAsync(@event, processContext);
 
         foreach (var message in messages)
         {

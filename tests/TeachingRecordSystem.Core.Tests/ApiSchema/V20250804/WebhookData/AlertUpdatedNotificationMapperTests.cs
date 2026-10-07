@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250804.WebhookData;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20250804.WebhookData;
@@ -54,7 +55,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             });
 
             // Act
-            var notification = await mapper.MapEventAsync(@event!, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event!, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -114,7 +115,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             });
 
             // Act
-            var notification = await mapper.MapEventAsync(@event!, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event!, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.Null(notification);
@@ -165,7 +166,7 @@ public class AlertUpdatedNotificationMapperTests(ServiceFixture fixture) : Servi
             });
 
             // Act
-            var notification = await mapper.MapEventAsync(@event!, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event!, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.Null(notification);

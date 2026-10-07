@@ -32,6 +32,16 @@ public class OneLoginUserUpdatedNotificationMapper(PersonInfoCache personInfoCac
             return null;
         }
 
+        // Changes made while the user is signing in for the first time aren't notified
+        var userCreatedInProcess = context.ProcessContext.Events
+            .OfType<OneLoginUserCreatedEvent>()
+            .Any(e => e.OneLoginUser.Subject == @event.OneLoginUser.Subject);
+
+        if (userCreatedInProcess)
+        {
+            return null;
+        }
+
         OneLoginUserConnectedPersonInfo? connectedPerson = null;
         if (@event.OneLoginUser.PersonId is Guid personId)
         {

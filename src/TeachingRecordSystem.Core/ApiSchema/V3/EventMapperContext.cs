@@ -4,4 +4,7 @@ public record EventMapperContext
 {
     // The application user that owns the webhook endpoint the message is being created for
     public required Guid ApplicationUserId { get; init; }
+
+    // The process the event was raised in
+    public required ProcessContext ProcessContext { get; init; }
 }

@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260224.WebhookData;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.V20260224.WebhookData;
@@ -34,7 +35,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -61,7 +62,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -90,7 +91,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -119,7 +120,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -148,7 +149,40 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
+
+            // Assert
+            Assert.Null(notification);
+        });
+
+    [Fact]
+    public Task MapEventAsync_UserCreatedInSameProcess_ReturnsNull() =>
+        WithServiceAsync<OneLoginUserUpdatedNotificationMapper>(async mapper =>
+        {
+            // Arrange
+            var person = await TestData.CreatePersonAsync();
+            var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+
+            var processContext = new ProcessContext(ProcessType.TeacherSigningIn, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+            await WithServiceAsync<EventPublisher>(publisher => ((IEventPublisher)publisher).PublishSingleEventAsync(
+                new OneLoginUserCreatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser)
+                },
+                processContext));
+
+            var @event = new OneLoginUserUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                OneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser) with { PersonId = person.PersonId },
+                OldOneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser) with { PersonId = null },
+                Changes = OneLoginUserUpdatedEventChanges.PersonId
+            };
+
+            // Act
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = processContext });
 
             // Assert
             Assert.Null(notification);
@@ -183,7 +217,7 @@ public class OneLoginUserUpdatedNotificationMapperTests(ServiceFixture fixture) 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
