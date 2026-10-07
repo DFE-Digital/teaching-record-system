@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.ApiSchema.V3;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260612.WebhookData;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Tests.Services;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema.VNext.WebhookData;
@@ -32,7 +33,7 @@ public class PersonDeactivatedNotificationMapperTests(ServiceFixture fixture) : 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);
@@ -64,7 +65,7 @@ public class PersonDeactivatedNotificationMapperTests(ServiceFixture fixture) : 
             };
 
             // Act
-            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid() });
+            var notification = await mapper.MapEventAsync(@event, new EventMapperContext { ApplicationUserId = Guid.NewGuid(), ProcessContext = new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId) });
 
             // Assert
             Assert.NotNull(notification);

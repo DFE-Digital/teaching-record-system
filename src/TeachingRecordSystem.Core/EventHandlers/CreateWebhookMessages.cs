@@ -6,6 +6,6 @@ public class CreateWebhookMessages(WebhookMessageFactory webhookMessageFactory) 
 {
     public async Task HandleEventAsync(IEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
-        await webhookMessageFactory.CreateMessagesAsync(@event);
+        await webhookMessageFactory.CreateMessagesAsync(@event, processContext);
     }
 }

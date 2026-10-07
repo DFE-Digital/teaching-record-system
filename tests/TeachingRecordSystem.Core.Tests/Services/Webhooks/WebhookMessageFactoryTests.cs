@@ -94,7 +94,7 @@ public class WebhookMessageFactoryTests(ServiceFixture fixture) : ServiceTestBas
 
         // Act
         var messages = await WithServiceAsync<WebhookMessageFactory, IEnumerable<WebhookMessage>>(
-            factory => factory.CreateMessagesAsync(@event));
+            factory => factory.CreateMessagesAsync(@event, new ProcessContext(default, TimeProvider.UtcNow, SystemUser.SystemUserId)));
 
         // Assert
         var message = Assert.Single(messages);
