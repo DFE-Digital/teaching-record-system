@@ -29,6 +29,9 @@ RUN apk --no-cache add postgresql17-client
 # Fix for invoking trscli
 RUN apk --no-cache add libc6-compat
 
+# Pick up security fixes not yet in the base image (e.g. zlib CVE fixed in 1.3.2-r1)
+RUN apk --no-cache upgrade zlib
+
 ENV SENTRY_RELEASE=${GIT_SHA}
 ENV GIT_SHA=${GIT_SHA}
 ENV ASPNETCORE_HTTP_PORTS=3000
