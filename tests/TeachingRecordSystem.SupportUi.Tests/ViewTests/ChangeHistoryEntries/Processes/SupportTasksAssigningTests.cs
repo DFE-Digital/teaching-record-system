@@ -139,6 +139,52 @@ public class SupportTasksAssigningTests(HostFixture hostFixture) : ChangeHistory
     }
 
     [Fact]
+    public async Task MultipleTasksForSamePerson_PersonContext_RendersMessageForEachTask()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var assignedToUser1 = await TestData.CreateUserAsync();
+        var assignedToUser2 = await TestData.CreateUserAsync();
+        var process = await CreateProcessAsync(
+            (person.PersonId, null, assignedToUser1.UserId, "TEST-ST-1"),
+            (person.PersonId, null, assignedToUser2.UserId, "TEST-ST-2"));
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
+
+        // Assert
+        AssertTitle(entry, "Support task assigned");
+        var messages = entry.GetAllElementsByTestId("task-assigned-message");
+        Assert.Equal(2, messages.Count);
+        Assert.Contains(messages, m => m.TextContent.Contains(assignedToUser1.Name));
+        Assert.Contains(messages, m => m.TextContent.Contains(assignedToUser2.Name));
+        Assert.All(messages, m => Assert.Contains($"{person.FirstName} {person.LastName}", m.TextContent));
+    }
+
+    [Fact]
+    public async Task MultipleTasksForSameOneLoginUser_OneLoginContext_RendersMessageForEachTask()
+    {
+        // Arrange
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync();
+        var assignedToUser1 = await TestData.CreateUserAsync();
+        var assignedToUser2 = await TestData.CreateUserAsync();
+        var process = await CreateProcessAsync(
+            (null, oneLoginUser.Subject, assignedToUser1.UserId, "TEST-ST-1"),
+            (null, oneLoginUser.Subject, assignedToUser2.UserId, "TEST-ST-2"));
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "oneLogin", oneLoginSubject: oneLoginUser.Subject);
+
+        // Assert
+        AssertTitle(entry, "Support task assigned");
+        var messages = entry.GetAllElementsByTestId("task-assigned-message");
+        Assert.Equal(2, messages.Count);
+        Assert.Contains(messages, m => m.TextContent.Contains(assignedToUser1.Name));
+        Assert.Contains(messages, m => m.TextContent.Contains(assignedToUser2.Name));
+        Assert.All(messages, m => Assert.Contains(oneLoginUser.EmailAddress!, m.TextContent));
+    }
+
+    [Fact]
     public async Task AssignedToUser_WithBothPersonAndOneLogin_LinksToBoth()
     {
         // Arrange

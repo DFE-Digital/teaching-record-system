@@ -6,75 +6,80 @@
 @inject SupportUiLinkGenerator LinkGenerator
 @model ChangeHistoryEntryViewModel
 @{
-    var supportTaskUpdatedEvent = Model.Events.OfType<SupportTaskUpdatedEvent>()
-        .Single(e => Model.Context.ContextType switch
+    var supportTaskUpdatedEvents = Model.Events.OfType<SupportTaskUpdatedEvent>()
+        .Where(e => Model.Context.ContextType switch
         {
             ChangeHistoryContextType.SupportTask => e.SupportTask.SupportTaskReference == Model.Context.SupportTaskReference,
             ChangeHistoryContextType.Person => e.SupportTask.PersonId == Model.Context.PersonId,
             ChangeHistoryContextType.OneLogin => e.SupportTask.OneLoginUserSubject == Model.Context.OneLoginUserSubject,
             _ => false
-        });
-    var supportTask = supportTaskUpdatedEvent.SupportTask;
-    var supportTaskReference = supportTask.SupportTaskReference;
-
-    var assignedToUserId = supportTask.AssignedToUserId;
-    var assignedToUserName = assignedToUserId is Guid assignedUserId
-        ? await DbContext.Users.Where(u => u.UserId == assignedUserId).Select(u => u.Name).SingleOrDefaultAsync()
-        : null;
-
-    var personInfo = supportTask.PersonId is Guid personId ? Model.Context.TryGetPersonInfo(personId) : null;
-    var oneLoginUserInfo = supportTask.OneLoginUserSubject is string subject
-        ? Model.Context.GetOneLoginUserInfo(subject)
-        : null;
+        })
+        .ToArray();
 }
 
 <timeline-entry title="Support task assigned" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
-    <p class="govuk-body" data-testid="task-assigned-message">
-        @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
-        {
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">
-                Task<span class="govuk-visually-hidden"> @supportTaskReference (opens in new tab)</span>
-            </a>
-        }
-        else
-        {
-            @:Task
-        }
-        @if (assignedToUserName is not null)
-        {
-            <text> assigned to </text>
-            <span data-testid="assigned-to-user-name">@assignedToUserName</span>
-        }
-        else
-        {
-            @:unassigned
-        }
-        @if (personInfo is not null)
-        {
-            var personLinkText = $"{personInfo.FirstName} {personInfo.LastName}";
-            <text> for </text>
-            @if (Model.Context.ContextType == ChangeHistoryContextType.Person)
+    @foreach (var supportTaskUpdatedEvent in supportTaskUpdatedEvents)
+    {
+        var supportTask = supportTaskUpdatedEvent.SupportTask;
+        var supportTaskReference = supportTask.SupportTaskReference;
+
+        var assignedToUserId = supportTask.AssignedToUserId;
+        var assignedToUserName = assignedToUserId is Guid assignedUserId
+            ? await DbContext.Users.Where(u => u.UserId == assignedUserId).Select(u => u.Name).SingleOrDefaultAsync()
+            : null;
+
+        var personInfo = supportTask.PersonId is Guid personId ? Model.Context.TryGetPersonInfo(personId) : null;
+        var oneLoginUserInfo = supportTask.OneLoginUserSubject is string subject
+            ? Model.Context.GetOneLoginUserInfo(subject)
+            : null;
+
+        <p class="govuk-body" data-testid="task-assigned-message">
+            @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
             {
-                @personLinkText
+                <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">
+                    Task<span class="govuk-visually-hidden"> @supportTaskReference (opens in new tab)</span>
+                </a>
             }
             else
             {
-                <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                @:Task
             }
-        }
-        @if (oneLoginUserInfo is not null)
-        {
-            <text>@(personInfo is not null ? " and" : " for")</text>
-            <text> GOV.UK One Login </text>
-            @if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+            @if (assignedToUserName is not null)
             {
-                @oneLoginUserInfo.EmailAddress
+                <text> assigned to </text>
+                <span data-testid="assigned-to-user-name">@assignedToUserName</span>
             }
             else
             {
-                <a class="govuk-link" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserInfo.OneLoginUserSubject)" target="_blank" data-testid="one-login-link">@oneLoginUserInfo.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                @:unassigned
             }
-        }
-        <text>.</text>
-    </p>
+            @if (personInfo is not null)
+            {
+                var personLinkText = $"{personInfo.FirstName} {personInfo.LastName}";
+                <text> for </text>
+                @if (Model.Context.ContextType == ChangeHistoryContextType.Person)
+                {
+                    @personLinkText
+                }
+                else
+                {
+                    <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                }
+            }
+            @if (oneLoginUserInfo is not null)
+            {
+                <text>@(personInfo is not null ? " and" : " for")</text>
+                <text> GOV.UK One Login </text>
+                @if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+                {
+                    @oneLoginUserInfo.EmailAddress
+                }
+                else
+                {
+                    <a class="govuk-link" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserInfo.OneLoginUserSubject)" target="_blank" data-testid="one-login-link">@oneLoginUserInfo.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                }
+            }
+            <text>.</text>
+        </p>
+    }
 </timeline-entry>
