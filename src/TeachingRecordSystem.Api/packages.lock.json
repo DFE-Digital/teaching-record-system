@@ -535,8 +535,8 @@
       },
       "Sentry": {
         "type": "Transitive",
-        "resolved": "6.11.1",
-        "contentHash": "wBC0H/5xpGo+RFK3k4j5Xa1IhVMgQr1qhoAMMkZGpI1SkyG9UhRv97rU/+O29+SJVzwU2CimBKo48/qZKyKy5w=="
+        "resolved": "6.12.0",
+        "contentHash": "7IRSoMWSxzjD204mFrQs0+kU7/ZAQRcqNdiFB8tN9R8CxgwZvP/rrD2nuWmQnFleQwA3yZYcpR8m3EtGfP5x5w=="
       },
       "Serilog.Extensions.Logging": {
         "type": "Transitive",
@@ -757,7 +757,7 @@
           "NSign.Client": "[1.2.5, )",
           "NSign.SignatureProviders": "[1.2.5, )",
           "OpenIddict.EntityFrameworkCore": "[7.7.1, )",
-          "Sentry.AspNetCore": "[6.11.1, )",
+          "Sentry.AspNetCore": "[6.12.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
@@ -1155,20 +1155,20 @@
       },
       "Sentry.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[6.11.1, )",
-        "resolved": "6.11.1",
-        "contentHash": "vPhlHXXs0lU4mmH52wSXBEaJqF8ptLck0spkb4Ni4Xcv7piy/wlP6Qx9+PAqbmx5VRTxGgxLevQl1b8is0femA==",
+        "requested": "[6.12.0, )",
+        "resolved": "6.12.0",
+        "contentHash": "znVAGER3PL9M9JaF9OjJBxaNxyiANWuP2ofWN172e0eGM+vsmeIIEYr9RKn/hUQ167zGFfo8JtHzdbZp4i9Wqw==",
         "dependencies": {
-          "Sentry.Extensions.Logging": "6.11.1"
+          "Sentry.Extensions.Logging": "6.12.0"
         }
       },
       "Sentry.Extensions.Logging": {
         "type": "CentralTransitive",
-        "requested": "[6.11.1, )",
-        "resolved": "6.11.1",
-        "contentHash": "9EvUjyjrInho0uZx051dUKb7Uy42aj79+dRFYuiMf5FGq25+A6jewOV4Y92dcgkM0mZ+AVXMBON0ae/mn6+gdw==",
+        "requested": "[6.12.0, )",
+        "resolved": "6.12.0",
+        "contentHash": "I3IQzkJvjl2CcCeWYGwQ6YnGm9e5wAXYBPjij/adEc3G5jNg6QnoUwHebmwWGDfa2zgrR13Ho4Kz3pe2dBbyBg==",
         "dependencies": {
-          "Sentry": "6.11.1"
+          "Sentry": "6.12.0"
         }
       },
       "Serilog": {
