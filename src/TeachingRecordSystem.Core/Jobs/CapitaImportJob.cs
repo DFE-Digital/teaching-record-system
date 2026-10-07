@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.DataLake.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -416,7 +417,7 @@ public class CapitaImportJob(
         var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         var fileNames = new List<string>();
 
-        await foreach (var pathItem in fileSystemClient.GetPathsAsync($"{PickupFolder}/", recursive: false, cancellationToken: cancellationToken))
+        await foreach (var pathItem in fileSystemClient.GetPathsAsync(new DataLakeGetPathsOptions { Path = $"{PickupFolder}/", Recursive = false }, cancellationToken))
         {
             // Only add files, skip directories
             if (pathItem.IsDirectory == false)

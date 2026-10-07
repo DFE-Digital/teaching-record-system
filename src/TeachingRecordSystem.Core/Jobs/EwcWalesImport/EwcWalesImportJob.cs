@@ -1,4 +1,5 @@
 using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.DataLake.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -17,7 +18,7 @@ public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServic
         var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         var fileNames = new List<string>();
 
-        await foreach (var pathItem in fileSystemClient.GetPathsAsync($"{PickupFolder}/", recursive: false, cancellationToken: cancellationToken))
+        await foreach (var pathItem in fileSystemClient.GetPathsAsync(new DataLakeGetPathsOptions { Path = $"{PickupFolder}/", Recursive = false }, cancellationToken))
         {
             // Only add files, skip directories
             if (pathItem.IsDirectory == false)
