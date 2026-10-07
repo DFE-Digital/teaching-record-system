@@ -148,6 +148,128 @@ public class ChangeLogChangeNameOrDobRequestProcessTests(HostFixture hostFixture
     }
 
     [Fact]
+    public async Task Person_WithChangeOfNameRequestCancellingProcess_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
+        var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
+        var newLastName = TestData.GenerateChangedLastName(person.LastName);
+
+        var dbSupportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            person.PersonId,
+            b => b
+                .WithFirstName(newFirstName)
+                .WithMiddleName(newMiddleName)
+                .WithLastName(newLastName));
+
+        var oldSupportTask = EventModels.SupportTask.FromModel(dbSupportTask);
+        var supportTask = oldSupportTask with
+        {
+            Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Cancelled
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.ChangeOfNameRequestCancelling,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.Status,
+                SupportTask = supportTask,
+                OldSupportTask = oldSupportTask,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        // Act
+        var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "Change of Name request cancelled",
+            user.Name,
+            process.CreatedOn);
+
+        var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(item);
+        Assert.Equal("Request to change name cancelled as no longer required.", item.GetElementByTestId("change-request-context")?.TrimmedText());
+
+        var supportTaskLink = item.GetElementByTestId("support-task-link");
+        Assert.NotNull(supportTaskLink);
+        Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Person_WithChangeOfNameRequestRejectingProcess_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
+        var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
+        var newLastName = TestData.GenerateChangedLastName(person.LastName);
+
+        var dbSupportTask = await TestData.CreateChangeNameRequestSupportTaskAsync(
+            person.PersonId,
+            b => b
+                .WithFirstName(newFirstName)
+                .WithMiddleName(newMiddleName)
+                .WithLastName(newLastName));
+
+        var oldSupportTask = EventModels.SupportTask.FromModel(dbSupportTask);
+        var supportTask = oldSupportTask with
+        {
+            Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeNameRequest_Rejected
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.ChangeOfNameRequestRejecting,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.Status,
+                SupportTask = supportTask,
+                OldSupportTask = oldSupportTask,
+                Comments = null,
+                RejectionReason = "No evidence supplied"
+            });
+
+        // Act
+        var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "Change of Name request rejected",
+            user.Name,
+            process.CreatedOn);
+
+        var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(item);
+        Assert.Equal("Request to change name rejected.", item.GetElementByTestId("change-request-context")?.TrimmedText());
+
+        var supportTaskLink = item.GetElementByTestId("support-task-link");
+        Assert.NotNull(supportTaskLink);
+        Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink.GetAttribute("href"));
+    }
+
+    [Fact]
     public async Task Person_WithChangeOfDateOfBirthRequestCreatingProcess_RendersExpectedContent()
     {
         // Arrange
@@ -275,6 +397,118 @@ public class ChangeLogChangeNameOrDobRequestProcessTests(HostFixture hostFixture
         Assert.Equal(
             $"Date of birth changed from {person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat)} to {newDateOfBirth.ToString(WebConstants.DateDisplayFormat)}.",
             item.GetElementByTestId("change-request-context")?.TrimmedText());
+
+        var supportTaskLink = item.GetElementByTestId("support-task-link");
+        Assert.NotNull(supportTaskLink);
+        Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Person_WithChangeOfDateOfBirthRequestCancellingProcess_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value);
+
+        var dbSupportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(newDateOfBirth));
+
+        var oldSupportTask = EventModels.SupportTask.FromModel(dbSupportTask);
+        var supportTask = oldSupportTask with
+        {
+            Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeDateOfBirthRequest_Cancelled
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.ChangeOfDateOfBirthRequestCancelling,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.Status,
+                SupportTask = supportTask,
+                OldSupportTask = oldSupportTask,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        // Act
+        var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "Change of date of birth request cancelled",
+            user.Name,
+            process.CreatedOn);
+
+        var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(item);
+        Assert.Equal("Request to change date of birth cancelled as no longer required.", item.GetElementByTestId("change-request-context")?.TrimmedText());
+
+        var supportTaskLink = item.GetElementByTestId("support-task-link");
+        Assert.NotNull(supportTaskLink);
+        Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Person_WithChangeOfDateOfBirthRequestRejectingProcess_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+
+        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth!.Value);
+
+        var dbSupportTask = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync(
+            person.PersonId,
+            b => b.WithDateOfBirth(newDateOfBirth));
+
+        var oldSupportTask = EventModels.SupportTask.FromModel(dbSupportTask);
+        var supportTask = oldSupportTask with
+        {
+            Status = SupportTaskStatus.Closed,
+            Outcome = SupportTaskOutcome.ChangeDateOfBirthRequest_Rejected
+        };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.ChangeOfDateOfBirthRequestRejecting,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                Changes = SupportTaskUpdatedEventChanges.Status,
+                SupportTask = supportTask,
+                OldSupportTask = oldSupportTask,
+                Comments = null,
+                RejectionReason = "No evidence supplied"
+            });
+
+        // Act
+        var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertHasChangeHistoryEntry(
+            process.ProcessId,
+            "Change of date of birth request rejected",
+            user.Name,
+            process.CreatedOn);
+
+        var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
+        Assert.NotNull(item);
+        Assert.Equal("Request to change date of birth rejected.", item.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var supportTaskLink = item.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
