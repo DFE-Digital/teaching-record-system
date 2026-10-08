@@ -45,6 +45,7 @@ module "airbyte" {
   is_dotnet_application        = true
   dotnet_application_directory = "/Apps/TrsCli"
   airbyte_sync_mode            = "incremental_deduped_history"
+  use_legacy_dotnet_shim       = false
 }
 
 locals {
