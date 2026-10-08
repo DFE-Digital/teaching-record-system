@@ -101,7 +101,6 @@
     <PackageReference Include="CloudNative.CloudEvents" />
     <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="CsvHelper" />
-    <PackageReference Include="dbup-sqlserver" />
     <PackageReference Include="DfeAnalytics.EFCore" />
     <PackageReference Include="EFCore.BulkExtensions.PostgreSql" />
     <PackageReference Include="EFCore.NamingConventions" />
@@ -112,7 +111,6 @@
     <PackageReference Include="Hangfire.NetCore" />
     <PackageReference Include="Hangfire.PostgreSql" />
     <PackageReference Include="IdentityModel" />
-    <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />

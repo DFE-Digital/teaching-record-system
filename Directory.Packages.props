@@ -17,7 +17,6 @@
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.9.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.9.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
-    <PackageVersion Include="dbup-sqlserver" Version="5.0.37" />
     <PackageVersion Include="DfeAnalytics.AspNetCore" Version="0.6.2" />
     <PackageVersion Include="DfeAnalytics.EFCore" Version="0.6.2" />
     <PackageVersion Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.1" />
@@ -51,7 +50,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.12" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.12" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.12" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.12" />
