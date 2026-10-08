@@ -4,7 +4,7 @@
     var mandatoryQualification = migratedEvent.MandatoryQualification;
 }
 
-<timeline-entry title="Mandatory qualification migrated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Mandatory qualification migrated from DQT" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     @if (migratedEvent.Changes != MandatoryQualificationMigratedEventChanges.None)
     {
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">

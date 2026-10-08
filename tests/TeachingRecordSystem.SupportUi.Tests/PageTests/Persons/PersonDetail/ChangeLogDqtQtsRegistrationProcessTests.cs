@@ -61,7 +61,7 @@ public class ChangeLogDqtQtsRegistrationProcessTests(HostFixture hostFixture) : 
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "DQT QTS registration created",
+            "QTS registration created in DQT",
             user.Name,
             process.CreatedOn,
             expectedRows,
@@ -144,7 +144,7 @@ public class ChangeLogDqtQtsRegistrationProcessTests(HostFixture hostFixture) : 
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "DQT QTS registration updated",
+            "QTS registration updated in DQT",
             user.Name,
             process.CreatedOn,
             expectedRows,

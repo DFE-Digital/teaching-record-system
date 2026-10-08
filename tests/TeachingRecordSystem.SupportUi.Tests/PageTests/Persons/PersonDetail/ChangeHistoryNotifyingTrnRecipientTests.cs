@@ -42,7 +42,7 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            $"TRN email sent to {person.FirstName} {person.LastName}",
+            "TRN email sent",
             "System",
             process.CreatedOn);
     }

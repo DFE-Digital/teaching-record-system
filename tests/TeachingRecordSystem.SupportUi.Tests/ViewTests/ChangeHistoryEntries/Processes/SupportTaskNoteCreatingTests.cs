@@ -15,7 +15,7 @@ public class SupportTaskNoteCreatingTests(HostFixture hostFixture) : ChangeHisto
         var entry = await PublishSupportTaskNoteCreatedEventAsync(user.UserId, noteContent);
 
         // Assert
-        AssertTitle(entry, "Support task note created");
+        AssertTitle(entry, "Noted added");
 
         var details = entry.QuerySelector("[data-testid='note-content']");
         Assert.NotNull(details);

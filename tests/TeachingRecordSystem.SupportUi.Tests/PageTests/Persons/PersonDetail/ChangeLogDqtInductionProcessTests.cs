@@ -84,7 +84,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Induction created",
+            "Induction created in DQT",
             raisedBy.DqtUserName!,
             process.CreatedOn,
             expectedRows,
@@ -115,7 +115,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction imported", raisedBy.DqtUserName!, process.CreatedOn);
+        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction imported into DQT", raisedBy.DqtUserName!, process.CreatedOn);
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction deactivated", raisedBy.DqtUserName!, process.CreatedOn);
+        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction deactivated in DQT", raisedBy.DqtUserName!, process.CreatedOn);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction reactivated", raisedBy.DqtUserName!, process.CreatedOn);
+        doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction reactivated in DQT", raisedBy.DqtUserName!, process.CreatedOn);
     }
 
     [Theory]
@@ -272,7 +272,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "DQT induction updated",
+            "Induction updated in DQT",
             raisedBy.DqtUserName!,
             process.CreatedOn,
             expectedRows,
@@ -307,7 +307,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Person induction status updated",
+            "Person induction status updated in DQT",
             raisedBy.DqtUserName!,
             process.CreatedOn,
             [("Induction status", inductionStatus.ToString())],

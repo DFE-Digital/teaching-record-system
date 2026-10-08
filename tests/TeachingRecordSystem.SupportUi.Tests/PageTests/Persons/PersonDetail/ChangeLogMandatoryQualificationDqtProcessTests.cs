@@ -31,7 +31,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Mandatory qualification deactivated",
+            "Mandatory qualification deactivated in DQT",
             user.Name,
             process.CreatedOn,
             [
@@ -139,7 +139,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Mandatory qualification imported",
+            "Mandatory qualification imported into DQT",
             user.Name,
             process.CreatedOn);
     }
@@ -165,7 +165,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Mandatory qualification migrated",
+            "Mandatory qualification migrated from DQT",
             user.Name,
             process.CreatedOn);
     }
@@ -213,7 +213,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Mandatory qualification migrated",
+            "Mandatory qualification migrated from DQT",
             SystemUser.SystemUserName,
             process.CreatedOn,
             [],
@@ -240,7 +240,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Mandatory qualification migrated",
+            "Mandatory qualification migrated from DQT",
             SystemUser.SystemUserName,
             process.CreatedOn,
             [],
