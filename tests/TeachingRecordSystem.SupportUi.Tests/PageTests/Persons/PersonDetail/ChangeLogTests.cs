@@ -135,38 +135,21 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     private async Task<Person> CreatePersonWithEventsAsync(int eventCount)
     {
         var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
 
-        await WithDbContextAsync(async dbContext =>
+        for (int i = 0; i < eventCount; i++)
         {
-            for (int i = 0; i < eventCount; i++)
-            {
-                var @event = new LegacyEvents.MandatoryQualificationDqtReactivatedEvent
+            await TestData.CreateProcessAsync(
+                ProcessType.PersonReactivating,
+                user.UserId,
+                changeReason: null,
+                new PersonReactivatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    CreatedUtc = TimeProvider.UtcNow.AddMinutes(-i),
-                    RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
                     PersonId = person.PersonId,
-                    Key = null,
-                    MandatoryQualification = new EventModels.MandatoryQualification
-                    {
-                        QualificationId = Guid.NewGuid(),
-                        Provider = new EventModels.MandatoryQualificationProvider
-                        {
-                            MandatoryQualificationProviderId = Guid.NewGuid(),
-                            Name = $"Provider {i}"
-                        },
-                        Specialism = MandatoryQualificationSpecialism.Hearing,
-                        Status = MandatoryQualificationStatus.Passed,
-                        StartDate = new DateOnly(2020, 1, 1),
-                        EndDate = new DateOnly(2021, 1, 1)
-                    }
-                };
-
-                dbContext.AddEventWithoutBroadcast(@event);
-            }
-
-            await dbContext.SaveChangesAsync();
-        });
+                    Changes = PersonReactivatedEventChanges.PersonStatus
+                });
+        }
 
         return person;
     }

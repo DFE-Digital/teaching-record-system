@@ -21,12 +21,7 @@ public class ChangeHistoryService(
     {
         var eventTypes = new[]
         {
-            nameof(LegacyEvents.MandatoryQualificationDqtReactivatedEvent),
-            nameof(LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent),
-            nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent),
-            nameof(LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent),
-            nameof(LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent),
-            nameof(OneLoginUserUpdatedEvent)
+            nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)
         };
 
         var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
@@ -112,8 +107,12 @@ public class ChangeHistoryService(
             ProcessType.QtsRegistrationUpdatingInDqt,
             ProcessType.ChangeOfNameRequestCreating,
             ProcessType.ChangeOfNameRequestApproving,
+            ProcessType.ChangeOfNameRequestCancelling,
+            ProcessType.ChangeOfNameRequestRejecting,
             ProcessType.ChangeOfDateOfBirthRequestCreating,
             ProcessType.ChangeOfDateOfBirthRequestApproving,
+            ProcessType.ChangeOfDateOfBirthRequestCancelling,
+            ProcessType.ChangeOfDateOfBirthRequestRejecting,
             ProcessType.NpqTrnRequestApproving,
             ProcessType.MandatoryQualificationCreating,
             ProcessType.MandatoryQualificationUpdating,
