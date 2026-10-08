@@ -184,31 +184,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
                 Assert.Equal(subject.Name, data.SubjectName);
 
-                LegacyEventPublisher.AssertEventsSaved(e =>
-                {
-                    var supportTaskCreatedEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
-                    Assert.Equal(TimeProvider.UtcNow, supportTaskCreatedEvent.CreatedUtc);
-                    Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
-                    Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
-                    Assert.Equal(SupportTaskType.OneLoginUserRecordMatching, supportTaskCreatedEvent.SupportTask.SupportTaskType);
-                    Assert.Equal(SupportTaskStatus.Open, supportTaskCreatedEvent.SupportTask.Status);
-                    Assert.Equal(oneLoginUser.Subject, supportTaskCreatedEvent.SupportTask.OneLoginUserSubject);
-                    var eventData = Assert.IsType<OneLoginUserRecordMatchingData>(supportTask.Data);
-                    Assert.Equal(oneLoginUser.Subject, eventData.OneLoginUserSubject);
-                    Assert.Equal(oneLoginUser.EmailAddress, eventData.OneLoginUserEmail);
-                    Assert.Equal(oneLoginUser.VerifiedNames, eventData.VerifiedNames);
-                    Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, eventData.VerifiedDatesOfBirth);
-                    Assert.Equal(nationalInsuranceNumber, eventData.StatedNationalInsuranceNumber);
-                    Assert.Equal(trn, eventData.StatedTrn);
-                    Assert.Equal(trnToken.Trn, eventData.TrnTokenTrn);
-                    Assert.Equal(applicationUser.UserId, eventData.ClientApplicationUserId);
-                    Assert.Equal(qtsYearReceived, eventData.YearQtsReceived);
-                    Assert.Equal(trainingProvider.TrainingProviderId, eventData.TrainingProviderId);
-                    Assert.Equal(trainingProvider.Name, eventData.TrainingProviderName);
-                    Assert.Equal(subject.TrainingSubjectId, eventData.SubjectId);
-                    Assert.Equal(subject.Name, eventData.SubjectName);
-                });
-
                 Events.AssertProcessesCreated(p =>
                 {
                     Assert.Equal(ProcessType.TeacherSigningIn, p.ProcessContext.ProcessType);
@@ -296,32 +271,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(trainingProvider.Name, data.TrainingProviderName);
                 Assert.Equal(subject.TrainingSubjectId, data.SubjectId);
                 Assert.Equal(subject.Name, data.SubjectName);
-
-                LegacyEventPublisher.AssertEventsSaved(e =>
-                {
-                    var supportTaskCreatedEvent = Assert.IsType<LegacyEvents.SupportTaskCreatedEvent>(e);
-                    Assert.Equal(TimeProvider.UtcNow, supportTaskCreatedEvent.CreatedUtc);
-                    Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
-                    Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
-                    Assert.Equal(SupportTaskType.OneLoginUserIdVerification, supportTaskCreatedEvent.SupportTask.SupportTaskType);
-                    Assert.Equal(SupportTaskStatus.Open, supportTaskCreatedEvent.SupportTask.Status);
-                    Assert.Equal(oneLoginUser.Subject, supportTaskCreatedEvent.SupportTask.OneLoginUserSubject);
-                    var eventData = Assert.IsType<OneLoginUserIdVerificationData>(supportTask.Data);
-                    Assert.Null(eventData.Verified);
-                    Assert.Equal(oneLoginUser.Subject, eventData.OneLoginUserSubject);
-                    Assert.Equal(firstName, eventData.StatedFirstName);
-                    Assert.Equal(lastName, eventData.StatedLastName);
-                    Assert.Equal(dateOfBirth, eventData.StatedDateOfBirth);
-                    Assert.Equal(nationalInsuranceNumber, eventData.StatedNationalInsuranceNumber);
-                    Assert.Equal(trn, eventData.StatedTrn);
-                    Assert.Equal(trnToken.Trn, eventData.TrnTokenTrn);
-                    Assert.Equal(applicationUser.UserId, eventData.ClientApplicationUserId);
-                    Assert.Equal(qtsYearReceived, eventData.YearQtsReceived);
-                    Assert.Equal(trainingProvider.TrainingProviderId, eventData.TrainingProviderId);
-                    Assert.Equal(trainingProvider.Name, eventData.TrainingProviderName);
-                    Assert.Equal(subject.TrainingSubjectId, eventData.SubjectId);
-                    Assert.Equal(subject.Name, eventData.SubjectName);
-                });
 
                 Events.AssertProcessesCreated(p =>
                 {

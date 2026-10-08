@@ -465,12 +465,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
         Assert.Null(supportTaskData.SelectedPersonAttributes);
 
-        EventObserver.AssertEventsSaved(@event =>
-        {
-            var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
-            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: false, expectedPersonId: person.PersonId, comments);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.TrnRequestResolving, p.ProcessContext.ProcessType);
@@ -546,12 +540,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var supportTaskData = updatedSupportTask.GetData<TrnRequestData>();
         AssertPersonAttributesMatchPerson(supportTaskData.ResolvedAttributes, person);
         AssertPersonAttributesMatchPerson(supportTaskData.SelectedPersonAttributes, matchedPerson);
-
-        EventObserver.AssertEventsSaved(@event =>
-        {
-            var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
-            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: true, expectedPersonId: matchedPerson.PersonId, comments);
-        });
 
         Events.AssertProcessesCreated(p =>
         {

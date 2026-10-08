@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests.EditChangeRequest;
@@ -199,26 +198,6 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             }
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            if (isNameChange)
-            {
-                var actualEvent = Assert.IsType<ChangeNameRequestSupportTaskRejectedEvent>(e);
-                Assert.Equal("Request and proof don’t match", actualEvent.RejectionReason);
-                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-                Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
-                Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
-            }
-            else
-            {
-                var actualEvent = Assert.IsType<ChangeDateOfBirthRequestSupportTaskRejectedEvent>(e);
-                Assert.Equal("Request and proof don’t match", actualEvent.RejectionReason);
-                Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-                Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
-                Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
-            }
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(
@@ -295,21 +274,11 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
             }
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        Events.AssertProcessesCreated(p =>
         {
-            LegacyEvents.SupportTaskUpdatedEvent? actualEvent;
-            if (isNameChange)
-            {
-                actualEvent = Assert.IsType<ChangeNameRequestSupportTaskCancelledEvent>(e);
-            }
-            else
-            {
-                actualEvent = Assert.IsType<ChangeDateOfBirthRequestSupportTaskCancelledEvent>(e);
-            }
-
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(SupportTaskStatus.Open, actualEvent.OldSupportTask.Status);
-            Assert.Equal(SupportTaskStatus.Closed, actualEvent.SupportTask.Status);
+            Assert.Equal(
+                isNameChange ? ProcessType.ChangeOfNameRequestCancelling : ProcessType.ChangeOfDateOfBirthRequestCancelling,
+                p.ProcessContext.ProcessType);
         });
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
