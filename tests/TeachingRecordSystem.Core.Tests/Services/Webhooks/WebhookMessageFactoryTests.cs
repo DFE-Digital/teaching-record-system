@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260515.WebhookData;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20260915.WebhookData;
@@ -8,7 +7,6 @@ using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class WebhookMessageFactoryTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     private static readonly JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web);
@@ -89,8 +87,6 @@ public class WebhookMessageFactoryTests(ServiceFixture fixture) : ServiceTestBas
             await dbContext.SaveChangesAsync();
             return (e, other);
         });
-
-        Services.GetRequiredService<IMemoryCache>().Remove(CacheKeys.EnabledWebhookEndpoints());
 
         // Act
         var messages = await WithServiceAsync<WebhookMessageFactory, IEnumerable<WebhookMessage>>(

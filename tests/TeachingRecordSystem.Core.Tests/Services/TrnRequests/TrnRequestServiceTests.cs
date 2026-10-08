@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrnRequests;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public partial class TrnRequestServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     private IOptions<AccessYourTeachingQualificationsOptions> AytqOptionsAccessor { get; } = Options.Create(new AccessYourTeachingQualificationsOptions()

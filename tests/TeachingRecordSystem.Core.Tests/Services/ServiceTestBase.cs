@@ -1,11 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.TestCommon.Database;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Core.Tests.Services;
 
-public abstract class ServiceTestBase
+public abstract class ServiceTestBase : PooledDatabaseTestBase
 {
     private readonly ServiceFixture _fixture;
 

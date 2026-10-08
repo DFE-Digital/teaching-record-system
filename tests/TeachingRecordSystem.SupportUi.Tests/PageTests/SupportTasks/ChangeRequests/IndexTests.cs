@@ -3,7 +3,6 @@ using AngleSharp.Html.Dom;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ChangeRequests;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]

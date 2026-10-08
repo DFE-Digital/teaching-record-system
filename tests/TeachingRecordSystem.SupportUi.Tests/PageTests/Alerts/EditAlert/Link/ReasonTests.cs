@@ -2,14 +2,16 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
-public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IAsyncLifetime
+public class ReasonTests(HostFixture hostFixture) : LinkTestBase(hostFixture)
 {
     private const string PreviousStep = JourneySteps.Index;
     private const string ThisStep = JourneySteps.Reason;
 
-    async ValueTask IAsyncLifetime.InitializeAsync() => SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AlertsManagerTraDbs));
+    }
 
     [Theory]
     [RolesWithoutAlertWritePermissionData]

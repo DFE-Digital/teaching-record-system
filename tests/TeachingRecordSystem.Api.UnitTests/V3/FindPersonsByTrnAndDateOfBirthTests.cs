@@ -2,7 +2,6 @@ using TeachingRecordSystem.Api.V3.Operations;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class FindPersonsByTrnAndDateOfBirthTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture)
 {
     [Fact]

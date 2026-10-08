@@ -1,6 +1,5 @@
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20260515;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class ActivateTrnRequestTests(HostFixture hostFixture) : V20260416.TestBase(hostFixture)
 {
     [Fact]

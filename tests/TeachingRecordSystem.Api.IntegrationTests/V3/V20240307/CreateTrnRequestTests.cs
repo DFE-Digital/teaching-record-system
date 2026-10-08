@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240307;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase
 {
     public CreateTrnRequestTests(HostFixture hostFixture)

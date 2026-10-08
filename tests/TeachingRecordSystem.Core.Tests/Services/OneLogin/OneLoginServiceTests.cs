@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 
 namespace TeachingRecordSystem.Core.Tests.Services.OneLogin;
 
-[ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public partial class OneLoginServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]

@@ -28,26 +28,23 @@ Assert.IsType<ArgumentException>(exception);
 
 Assume that dependencies for running tests (a local postgres database, Playwright etc.) are already configured.
 
-### Running tests in a git worktree
+### Test databases
 
-Each worktree must use its own test database; sharing one with other worktrees will cause tests to interfere with each other.
-When working in a git worktree, set the following environment variables before running tests:
+Every test leases a Postgres database of its own, cloned from a template that is built once per schema and seed
+data and rebuilt automatically when either changes; see `docs/test-databases.md`. Nothing is shared between tests,
+so there is no data to clear down and no schema cache to reset.
 
-- `UseTestContainers` to `true`, so the tests spin up their own postgres container.
-- `TestContainersPostgresPort` to a random free port, so the container doesn't clash with the ones other worktrees are using.
+In a git worktree, set `UseTestContainers` to `true` so the tests use a postgres container. Worktrees and test
+projects can share that container, and can run at the same time, so `TestContainersPostgresPort` is only needed if
+something else is using the default port. When `UseTestContainers` is set the container's connection string
+overrides any `ConnectionStrings:DefaultConnection` from user secrets or the environment, so don't set
+`ConnectionStrings__DefaultConnection` as well.
 
-These two are sufficient — when `UseTestContainers` is set the container's connection string (database `trs` on
-`TestContainersPostgresPort`) overrides any `ConnectionStrings:DefaultConnection` from user secrets or the environment, so don't
-set `ConnectionStrings__DefaultConnection` as well.
-
-### Resetting the database schema and data
-
-The test database schema is cached in a `.tests-schema-version.txt` file at the root of the repository (this file is git-ignored, so each
-worktree has its own). If the schema gets out of sync — tests fail with Postgres errors about missing tables or columns — remove the cache
-file to force the schema and data to be recreated on the next test run:
+A failing test's database is kept and named in the test output so it can be inspected with `psql`. To drop these,
+and templates for old schemas, run:
 
 ```shell
-just remove-tests-schema-cache
+just drop-test-databases
 ```
 
 ### Boolean Expressions

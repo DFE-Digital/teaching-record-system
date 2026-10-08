@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.Events.ChangeReasons;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyncLifetime
+public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private readonly string _oldFirstName = "Alfred";
     private readonly string _oldMiddleName = "The";
@@ -25,8 +25,10 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
     private Person? _person;
     private Person? _secondaryPerson;
 
-    async ValueTask IAsyncLifetime.InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
+        await base.InitializeAsync();
+
         // Toggle between GMT and BST to ensure we're testing rendering dates in local time
         var nows = new[]
         {
@@ -49,8 +51,6 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
             await dbContext.SaveChangesAsync();
         });
     }
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     [Theory]
     [InlineData(PersonDetailsUpdatedEventChanges.FirstName, false, false)]

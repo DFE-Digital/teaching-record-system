@@ -2,12 +2,13 @@ using System.CommandLine;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
-public class AddTrnRangeTests(IServiceProvider services) : CommandTestBase(services), IAsyncLifetime
+public class AddTrnRangeTests(IServiceProvider services) : CommandTestBase(services)
 {
-    async ValueTask IAsyncLifetime.InitializeAsync() =>
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
         await WithDbContextAsync(dbContext => dbContext.TrnRanges.ExecuteDeleteAsync());
-
-    async ValueTask IAsyncDisposable.DisposeAsync() => await DbHelper.ClearDataAsync();  // Restore TRN ranges for other tests
+    }
 
     [Theory]
     [InlineData(999999)]

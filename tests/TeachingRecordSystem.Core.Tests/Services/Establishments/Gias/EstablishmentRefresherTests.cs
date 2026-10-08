@@ -3,7 +3,6 @@ using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Gias;
 
-[Collection(nameof(DisableParallelization)), ClearDbBeforeTest]
 public class EstablishmentRefresherTests(ServiceFixture fixture) : ServiceTestBase(fixture)
 {
     [Fact]
