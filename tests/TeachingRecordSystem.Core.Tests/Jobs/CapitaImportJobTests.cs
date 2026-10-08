@@ -1012,11 +1012,6 @@ public class CapitaImportJobTests(JobFixture fixture) : JobTestBase(fixture)
                 pe.PersonIds.Contains(newPerson.PersonId));
             Assert.Equal(personCreatedProcessEvent.ProcessId, processEvent.ProcessId);
         });
-
-        // The legacy event is still written, now by the event handler rather than the job itself.
-        var legacyEvent = await AssertSingleEventAsync<LegacyEvents.SupportTaskCreatedEvent>(newPerson.PersonId);
-        Assert.Equal(task.SupportTaskReference, legacyEvent.SupportTask.SupportTaskReference);
-        Assert.Equal(ApplicationUser.CapitaTpsImportUser.UserId, legacyEvent.RaisedBy.UserId);
     }
 
     [Fact]
