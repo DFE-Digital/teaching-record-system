@@ -1,86 +1,13 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models.SupportTasks;
 
 namespace TeachingRecordSystem.Core.EventHandlers;
 
 public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
-    IEventHandler<SupportTaskCreatedEvent>,
     IEventHandler<SupportTaskUpdatedEvent>
 {
-    public async Task HandleEventAsync(SupportTaskCreatedEvent @event, ProcessContext processContext, IEventScope eventScope)
-    {
-        var legacyEvent = new LegacyEvents.SupportTaskCreatedEvent
-        {
-            EventId = @event.EventId,
-            CreatedUtc = processContext.Now,
-            RaisedBy = processContext.Process.UserId!,
-            SupportTask = @event.SupportTask
-        };
-
-        dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-        await dbContext.SaveChangesAsync();
-    }
-
     public async Task HandleEventAsync(SupportTaskUpdatedEvent @event, ProcessContext processContext, IEventScope eventScope)
     {
-        if (processContext.ProcessType is ProcessType.TrnRequestResolving)
-        {
-            var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
-            var personDetailsUpdatedEvent = processContext.Events.OfType<PersonDetailsUpdatedEvent>().SingleOrDefault();
-
-            var resolvedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == trnRequestUpdatedEvent.TrnRequest.ResolvedPersonId);
-
-            var changes = LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.Status;
-            EventModels.PersonDetails? oldPersonAttributes;
-
-            if (personDetailsUpdatedEvent is { })
-            {
-                changes |=
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName : 0) |
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName : 0) |
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0) |
-                    (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender) ? LegacyEvents.ApiTrnRequestSupportTaskUpdatedEventChanges.PersonGender : 0);
-
-                oldPersonAttributes = personDetailsUpdatedEvent.OldPersonDetails;
-            }
-            else
-            {
-                oldPersonAttributes = null;
-            }
-
-            var legacyEvent = new LegacyEvents.ApiTrnRequestSupportTaskUpdatedEvent()
-            {
-                PersonId = resolvedPerson.PersonId,
-                SupportTask = @event.SupportTask,
-                OldSupportTask = @event.OldSupportTask,
-                RequestData = trnRequestUpdatedEvent.TrnRequest,
-                Changes = changes,
-                PersonAttributes = new EventModels.PersonDetails
-                {
-                    FirstName = resolvedPerson.FirstName,
-                    MiddleName = resolvedPerson.MiddleName,
-                    LastName = resolvedPerson.LastName,
-                    DateOfBirth = resolvedPerson.DateOfBirth,
-                    EmailAddress = resolvedPerson.EmailAddress,
-                    NationalInsuranceNumber = resolvedPerson.NationalInsuranceNumber,
-                    Gender = resolvedPerson.Gender
-                },
-                OldPersonAttributes = oldPersonAttributes,
-                Comments = @event.Comments,
-                EventId = @event.EventId,
-                CreatedUtc = processContext.Now,
-                RaisedBy = processContext.UserId
-            };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-        else if (processContext.ProcessType is ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge)
+        if (processContext.ProcessType is ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge)
         {
             var trnRequestUpdatedEvent = processContext.Events.OfType<TrnRequestUpdatedEvent>().Single();
 
@@ -149,68 +76,6 @@ public class CreateLegacySupportTaskEvents(TrsDbContext dbContext) :
                 SupportTask = @event.SupportTask,
                 OldSupportTask = @event.OldSupportTask
             };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-        else if (processContext.ProcessType is ProcessType.ChangeOfNameRequestRejecting or ProcessType.ChangeOfDateOfBirthRequestRejecting)
-        {
-            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
-
-            LegacyEvents.EventBase legacyEvent = processContext.ProcessType is ProcessType.ChangeOfNameRequestRejecting
-                ? new LegacyEvents.ChangeNameRequestSupportTaskRejectedEvent
-                {
-                    PersonId = @event.SupportTask.PersonId!.Value,
-                    RequestData = EventModels.ChangeNameRequestData.FromModel(supportTask.GetData<ChangeNameRequestData>()),
-                    RejectionReason = @event.RejectionReason,
-                    SupportTask = @event.SupportTask,
-                    OldSupportTask = @event.OldSupportTask,
-                    EventId = @event.EventId,
-                    CreatedUtc = processContext.Now,
-                    RaisedBy = processContext.UserId
-                }
-                : new LegacyEvents.ChangeDateOfBirthRequestSupportTaskRejectedEvent
-                {
-                    PersonId = @event.SupportTask.PersonId!.Value,
-                    RequestData = EventModels.ChangeDateOfBirthRequestData.FromModel(supportTask.GetData<ChangeDateOfBirthRequestData>()),
-                    RejectionReason = @event.RejectionReason,
-                    SupportTask = @event.SupportTask,
-                    OldSupportTask = @event.OldSupportTask,
-                    EventId = @event.EventId,
-                    CreatedUtc = processContext.Now,
-                    RaisedBy = processContext.UserId
-                };
-
-            dbContext.AddEventWithoutBroadcast(legacyEvent);
-
-            await dbContext.SaveChangesAsync();
-        }
-        else if (processContext.ProcessType is ProcessType.ChangeOfNameRequestCancelling or ProcessType.ChangeOfDateOfBirthRequestCancelling)
-        {
-            var supportTask = (await dbContext.SupportTasks.FindAsync(@event.SupportTask.SupportTaskReference))!;
-
-            LegacyEvents.EventBase legacyEvent = processContext.ProcessType is ProcessType.ChangeOfNameRequestCancelling
-                ? new LegacyEvents.ChangeNameRequestSupportTaskCancelledEvent
-                {
-                    PersonId = @event.SupportTask.PersonId!.Value,
-                    RequestData = EventModels.ChangeNameRequestData.FromModel(supportTask.GetData<ChangeNameRequestData>()),
-                    SupportTask = @event.SupportTask,
-                    OldSupportTask = @event.OldSupportTask,
-                    EventId = @event.EventId,
-                    CreatedUtc = processContext.Now,
-                    RaisedBy = processContext.UserId
-                }
-                : new LegacyEvents.ChangeDateOfBirthRequestSupportTaskCancelledEvent
-                {
-                    PersonId = @event.SupportTask.PersonId!.Value,
-                    RequestData = EventModels.ChangeDateOfBirthRequestData.FromModel(supportTask.GetData<ChangeDateOfBirthRequestData>()),
-                    SupportTask = @event.SupportTask,
-                    OldSupportTask = @event.OldSupportTask,
-                    EventId = @event.EventId,
-                    CreatedUtc = processContext.Now,
-                    RaisedBy = processContext.UserId
-                };
 
             dbContext.AddEventWithoutBroadcast(legacyEvent);
 
