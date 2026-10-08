@@ -16,6 +16,7 @@ public static class HostApplicationBuilderExtensions
             {
                 options.Dsn = builder.Configuration.GetRequiredValue("Sentry:Dsn");
                 options.IsGlobalModeEnabled = true;
+                options.AddExceptionFilterForType<OperationCanceledException>();
             });
         }
 

@@ -232,6 +232,10 @@ public static class Extensions
 
         config.MinimumLevel.Override("Serilog.AspNetCore.RequestLoggingMiddleware", LogEventLevel.Information);
 
+        // Cancellations (e.g. a client disconnecting or the host shutting down) aren't errors;
+        // TaskCanceledException derives from OperationCanceledException so this covers both
+        config.Filter.ByExcluding(e => e.Exception is OperationCanceledException);
+
         if (environment.IsProduction())
         {
             config.WriteTo.Console(new CompactJsonFormatter());
