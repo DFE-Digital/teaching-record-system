@@ -16,7 +16,11 @@ public static class WebApplicationBuilderExtensions
 
         if (builder.Environment.IsProduction())
         {
-            builder.WebHost.UseSentry(dsn: builder.Configuration.GetRequiredValue("Sentry:Dsn"));
+            builder.WebHost.UseSentry(options =>
+            {
+                options.Dsn = builder.Configuration.GetRequiredValue("Sentry:Dsn");
+                options.AddExceptionFilterForType<OperationCanceledException>();
+            });
         }
 
         builder.Services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
