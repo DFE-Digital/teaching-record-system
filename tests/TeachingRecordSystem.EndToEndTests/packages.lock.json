@@ -1625,7 +1625,7 @@
           "RedisRateLimiting.AspNetCore": "[1.2.1, )",
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
-          "System.IdentityModel.Tokens.Jwt": "[8.19.2, )",
+          "System.IdentityModel.Tokens.Jwt": "[8.23.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "TeachingRecordSystem.WebCommon": "[1.0.0, )"
         }
@@ -2608,7 +2608,7 @@
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "CentralTransitive",
-        "requested": "[8.19.2, )",
+        "requested": "[8.23.0, )",
         "resolved": "8.23.0",
         "contentHash": "mUuRjk0KKvF3dlF7CKcnjHn/4TFaWRDGjDRtn1rACitoIflv96apfLD9KPDisyCEuc/0ierocnHCvIXBvCL4Sw==",
         "dependencies": {
