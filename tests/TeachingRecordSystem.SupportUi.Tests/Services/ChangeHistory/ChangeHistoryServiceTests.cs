@@ -441,6 +441,80 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(ProcessType.SupportTasksAssigning, entry.Process.ProcessType);
     }
 
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesTeacherPensionsDuplicateSupportTaskResolvingWithMergeProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+        var supportTask = CreateEventSupportTask(person.PersonId);
+        var oldSupportTask = supportTask with { Status = SupportTaskStatus.Open, Outcome = null };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                SupportTask = supportTask with { Status = SupportTaskStatus.Closed, Outcome = SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithMerge },
+                OldSupportTask = oldSupportTask,
+                Changes = SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Outcome,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, entry.Process.ProcessType);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesTeacherPensionsDuplicateSupportTaskResolvingWithoutMergeProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var user = await TestData.CreateUserAsync();
+        var supportTask = CreateEventSupportTask(person.PersonId);
+        var oldSupportTask = supportTask with { Status = SupportTaskStatus.Open, Outcome = null };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTaskReference = supportTask.SupportTaskReference,
+                SupportTask = supportTask with { Status = SupportTaskStatus.Closed, Outcome = SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithoutMerge },
+                OldSupportTask = oldSupportTask,
+                Changes = SupportTaskUpdatedEventChanges.Status | SupportTaskUpdatedEventChanges.Outcome,
+                Comments = null,
+                RejectionReason = null
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var item = Assert.Single(result);
+        Assert.Equal(TimelineItemType.Process, item.ItemType);
+        Assert.Equal(person.PersonId, item.PersonId);
+
+        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, entry.Process.ProcessType);
+    }
+
     [Theory]
     [InlineData(false, UserRoles.Viewer, true)]
     [InlineData(false, null, false)]
