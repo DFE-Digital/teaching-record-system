@@ -1,6 +1,5 @@
 using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions.Resolve;
@@ -442,18 +441,6 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
             Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
             Assert.Equal(SupportTaskOutcome.TeacherPensionsPotentialDuplicate_ResolvedWithMerge, updatedSupportTask.Outcome);
             Assert.Equal(TimeProvider.UtcNow, updatedSupportTask.UpdatedOn);
-        });
-
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
-            Assert.NotNull(actualEvent);
-            Assert.Equal(mergeComments, actualEvent.Comments);
-            Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNameChange));
-            Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonFirstName));
-            Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonLastName));
-            Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonDateOfBirth));
-            Assert.True(actualEvent.Changes.HasFlag(TeacherPensionsPotentialDuplicateSupportTaskResolvedEventChanges.PersonNationalInsuranceNumber));
         });
 
         Events.AssertProcessesCreated(p =>

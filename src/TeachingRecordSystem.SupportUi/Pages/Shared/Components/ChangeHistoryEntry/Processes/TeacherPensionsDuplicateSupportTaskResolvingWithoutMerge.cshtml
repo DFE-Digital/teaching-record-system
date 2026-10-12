@@ -1,6 +1,96 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model ChangeHistoryEntryViewModel
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var supportTaskReference = supportTaskUpdatedEvent.SupportTaskReference;
+    var personId = supportTaskUpdatedEvent.SupportTask.PersonId!.Value;
+    var personTrn = Model.Context.GetPersonInfo(personId).Trn;
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+    var hasOneLoginUserUpdatedEvent = Model.TryGetEvent<OneLoginUserUpdatedEvent>(out var oneLoginUserUpdatedEvent);
+    var hasSupportTaskCreatedEvent = Model.TryGetEvent<SupportTaskCreatedEvent>(out var supportTaskCreatedEvent);
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    var isPersonContext = Model.Context.ContextType == ChangeHistoryContextType.Person;
+    var isSupportTaskContext = Model.Context.ContextType == ChangeHistoryContextType.SupportTask;
+    var isOneLoginContext = Model.Context.ContextType == ChangeHistoryContextType.OneLogin;
+}
+
+<timeline-entry title="Teachers’ Pensions potential duplicate task resolved" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="kept-separate-message">
+        @if (isPersonContext)
+        {
+            @:Record kept as a separate record.
+        }
+        else
+        {
+            @:TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(personId)" class="govuk-link" target="_blank" data-testid="person-link">@personTrn <span class="govuk-visually-hidden">(opens in new tab)</span></a> kept as a separate record.
+        }
+    </p>
+
+    <p class="govuk-body" data-testid="task-closed-message">
+        @if (!isSupportTaskContext)
+        {
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
+                Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
+            </a>
+            <text> closed.</text>
+        }
+        else
+        {
+            <text>Task closed.</text>
+        }
+    </p>
+
+    @if (hasOneLoginUserUpdatedEvent && oneLoginUserUpdatedEvent!.OneLoginUser.PersonId is not null)
+    {
+        var oneLoginSubject = oneLoginUserUpdatedEvent.OneLoginUser.Subject;
+        var oneLoginEmail = oneLoginUserUpdatedEvent.OneLoginUser.EmailAddress;
+        var matchedPersonId = oneLoginUserUpdatedEvent.OneLoginUser.PersonId!.Value;
+
+        <p class="govuk-body" data-testid="one-login-matched-message">
+            @if (isOneLoginContext)
+            {
+                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="matched-person-link">@personTrn <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+            else if (isPersonContext)
+            {
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to record.
+            }
+            else
+            {
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="matched-person-link">@personTrn <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            }
+        </p>
+    }
+
+    @if (hasSupportTaskCreatedEvent)
+    {
+        var createdTaskReference = supportTaskCreatedEvent!.SupportTask.SupportTaskReference;
+
+        <p class="govuk-body" data-testid="support-task-created-message">
+            @if (!isSupportTaskContext)
+            {
+                <text>TRN request manual checks needed support task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference <span class="govuk-visually-hidden">(opens in new tab)</span></a> was created.</text>
+            }
+            else
+            {
+                <text>TRN request manual checks needed support task @createdTaskReference was created.</text>
+            }
+        </p>
+    }
+
+    @if (!string.IsNullOrEmpty(supportTaskUpdatedEvent.Comments))
+    {
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <summary>Reason for change</summary>
+            <text>
+                <govuk-summary-list>
+                    <row>
+                        <key>Reason</key>
+                        <value use-empty-fallback data-testid="reason">@supportTaskUpdatedEvent.Comments</value>
+                    </row>
+                </govuk-summary-list>
+            </text>
+        </govuk-details>
+    }
 </timeline-entry>
