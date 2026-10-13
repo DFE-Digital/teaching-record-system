@@ -26,9 +26,9 @@ public class ChangeHistoryEntryViewTestController(TrsDbContext dbContext, Change
         {
             Context = contextType switch
             {
-                "oneLogin" => ChangeHistoryContext.ForOneLoginUser(oneLoginSubject ?? string.Empty, contextData.AllPersons, contextData.AllOneLoginUsers),
-                "supportTask" => ChangeHistoryContext.ForSupportTask(supportTaskReference ?? string.Empty, contextData.AllPersons, contextData.AllOneLoginUsers),
-                _ => ChangeHistoryContext.ForPerson(personId ?? Guid.Empty, contextData.AllPersons, contextData.AllOneLoginUsers),
+                "oneLogin" => ChangeHistoryContext.ForOneLoginUser(oneLoginSubject ?? string.Empty, contextData),
+                "supportTask" => ChangeHistoryContext.ForSupportTask(supportTaskReference ?? string.Empty, contextData),
+                _ => ChangeHistoryContext.ForPerson(personId ?? Guid.Empty, contextData),
             },
             Timestamp = process.CreatedOn,
             UserName = process.User?.Name ?? process.DqtUserName!,

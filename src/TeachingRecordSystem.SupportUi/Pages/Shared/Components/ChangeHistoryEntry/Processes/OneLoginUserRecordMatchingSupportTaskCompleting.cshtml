@@ -1,5 +1,3 @@
-@using Microsoft.EntityFrameworkCore
-@using TeachingRecordSystem.Core.DataStore.Postgres
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Models
 @using TeachingRecordSystem.Core.Models.SupportTasks
@@ -7,7 +5,6 @@
 @using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @inject PersonInfoCache PersonInfoCache
 @inject SupportUiLinkGenerator LinkGenerator
-@inject TrsDbContext DbContext
 @model ChangeHistoryEntryViewModel
 @{
     var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
@@ -119,11 +116,7 @@
             @if (wasPersonCreated)
             {
                 var applicationUserId = trnRequestUpdatedEvent.SourceApplicationUserId;
-                var applicationUser = await DbContext.ApplicationUsers
-                    .Where(u => u.UserId == applicationUserId)
-                    .Select(u => new { u.ShortName })
-                    .SingleOrDefaultAsync();
-                var appShortName = applicationUser?.ShortName ?? "Application";
+                var appShortName = Model.Context.TryGetApplicationUserInfo(applicationUserId)?.ShortName ?? "Application";
 
                 @($"{appShortName} TRN request resolved.")
             }

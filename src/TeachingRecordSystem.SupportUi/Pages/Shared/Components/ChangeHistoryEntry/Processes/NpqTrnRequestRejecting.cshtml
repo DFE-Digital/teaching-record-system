@@ -1,19 +1,13 @@
-@using Microsoft.EntityFrameworkCore
-@using TeachingRecordSystem.Core.DataStore.Postgres
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
 @using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry
 @inject IFileService FileService
-@inject TrsDbContext DbContext
 @model ChangeHistoryEntryViewModel
 @{
     var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
     var requestData = Model.GetEvent<TrnRequestUpdatedEvent>().TrnRequest;
 
-    var applicationUserName = await DbContext.ApplicationUsers
-        .Where(u => u.UserId == requestData.ApplicationUserId)
-        .Select(u => u.Name)
-        .SingleOrDefaultAsync();
+    var applicationUserName = Model.Context.TryGetApplicationUserInfo(requestData.ApplicationUserId)?.Name;
 
     var requestDataName = string.JoinNonEmpty(' ', requestData.FirstName, requestData.MiddleName, requestData.LastName);
     var evidenceFileUrl = requestData.NpqEvidenceFileId is not null
