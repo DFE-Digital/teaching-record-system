@@ -1,3 +1,4 @@
+using System.Transactions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -90,9 +91,13 @@ public class MergePersonJourneyCoordinator(
 
     public async Task<IReadOnlyList<MergeCandidate>> GetMergeCandidatesAsync(Guid[] personIds, CancellationToken cancellationToken = default)
     {
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
+
+        // Lock the rows for the rest of the request so they can't change between the eligibility check and the merge.
+        // Locking in a consistent order stops two merges of the same pair deadlocking.
         var candidates = (await dbContext.Persons
+            .FromSql($"select * from persons where person_id = any({personIds}) order by person_id for update")  // https://github.com/dotnet/efcore/issues/26042
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .Where(p => personIds.Contains(p.PersonId))
             .Select(p => new MergeCandidate
             {
                 Trn = p.Trn,
