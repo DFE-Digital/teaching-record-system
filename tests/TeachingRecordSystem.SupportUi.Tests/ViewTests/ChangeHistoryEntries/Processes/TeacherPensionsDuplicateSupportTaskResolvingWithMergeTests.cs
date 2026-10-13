@@ -122,7 +122,7 @@ public class TeacherPensionsDuplicateSupportTaskResolvingWithMergeTests(HostFixt
         // Assert
         var createdMessage = entry.GetElementByTestId("support-task-created-message");
         Assert.NotNull(createdMessage);
-        Assert.Contains("TRN request manual checks needed task", createdMessage!.TextContent);
+        Assert.Contains("TRN request manual checks needed support task", createdMessage!.TextContent);
         Assert.NotNull(entry.GetElementByTestId("created-task-link"));
     }
 
