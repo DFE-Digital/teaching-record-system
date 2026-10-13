@@ -499,15 +499,16 @@
 }
 
 .trs-task-link {
+  // Names still wrap, but a single word too long for the column is truncated with an ellipsis
+  // rather than overflowing into the next column
   &__name {
-    white-space: pre-wrap;
-
-    &:after {
-      content: '\A';
-    }
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__reference {
+    display: block;
     font-size: 1rem;
   }
 }
