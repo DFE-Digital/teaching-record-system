@@ -2,42 +2,29 @@ namespace TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
 public sealed record ChangeHistoryContext
 {
-    private readonly IReadOnlyDictionary<Guid, PersonInfo> _allPersons;
-    private readonly IReadOnlyDictionary<string, OneLoginUserInfo> _allOneLoginUsers;
+    private readonly ChangeHistoryService.ContextData _contextData;
 
-    private ChangeHistoryContext(
-        IReadOnlyDictionary<Guid, PersonInfo> allPersons,
-        IReadOnlyDictionary<string, OneLoginUserInfo> allOneLoginUsers)
+    private ChangeHistoryContext(ChangeHistoryService.ContextData contextData)
     {
-        _allPersons = allPersons;
-        _allOneLoginUsers = allOneLoginUsers;
+        _contextData = contextData;
     }
 
-    public static ChangeHistoryContext ForPerson(
-        Guid personId,
-        IReadOnlyDictionary<Guid, PersonInfo> allPersons,
-        IReadOnlyDictionary<string, OneLoginUserInfo> allOneLoginUsers) =>
-        new(allPersons, allOneLoginUsers)
+    public static ChangeHistoryContext ForPerson(Guid personId, ChangeHistoryService.ContextData contextData) =>
+        new(contextData)
         {
             ContextType = ChangeHistoryContextType.Person,
             PersonId = personId
         };
 
-    public static ChangeHistoryContext ForSupportTask(
-        string supportTaskReference,
-        IReadOnlyDictionary<Guid, PersonInfo> allPersons,
-        IReadOnlyDictionary<string, OneLoginUserInfo> allOneLoginUsers) =>
-        new(allPersons, allOneLoginUsers)
+    public static ChangeHistoryContext ForSupportTask(string supportTaskReference, ChangeHistoryService.ContextData contextData) =>
+        new(contextData)
         {
             ContextType = ChangeHistoryContextType.SupportTask,
             SupportTaskReference = supportTaskReference
         };
 
-    public static ChangeHistoryContext ForOneLoginUser(
-        string oneLoginUserSubject,
-        IReadOnlyDictionary<Guid, PersonInfo> allPersons,
-        IReadOnlyDictionary<string, OneLoginUserInfo> allOneLoginUsers) =>
-        new(allPersons, allOneLoginUsers)
+    public static ChangeHistoryContext ForOneLoginUser(string oneLoginUserSubject, ChangeHistoryService.ContextData contextData) =>
+        new(contextData)
         {
             ContextType = ChangeHistoryContextType.OneLogin,
             OneLoginUserSubject = oneLoginUserSubject
@@ -71,13 +58,20 @@ public sealed record ChangeHistoryContext
         private set;
     }
 
-    public PersonInfo GetPersonInfo(Guid personId) => _allPersons[personId];
+    public PersonInfo GetPersonInfo(Guid personId) => _contextData.AllPersons[personId];
 
-    public PersonInfo? TryGetPersonInfo(Guid personId) => _allPersons.TryGetValue(personId, out var personInfo) ? personInfo : null;
+    public PersonInfo? TryGetPersonInfo(Guid personId) => _contextData.AllPersons.TryGetValue(personId, out var personInfo) ? personInfo : null;
 
-    public OneLoginUserInfo GetOneLoginUserInfo(string subject) => _allOneLoginUsers[subject];
+    public OneLoginUserInfo GetOneLoginUserInfo(string subject) => _contextData.AllOneLoginUsers[subject];
+
+    public string? TryGetUserName(Guid userId) => _contextData.AllUserNames.TryGetValue(userId, out var name) ? name : null;
+
+    public ApplicationUserInfo? TryGetApplicationUserInfo(Guid userId) =>
+        _contextData.AllApplicationUsers.TryGetValue(userId, out var applicationUserInfo) ? applicationUserInfo : null;
 
     public record PersonInfo(Guid PersonId, string Trn, string FirstName, string LastName);
 
     public record OneLoginUserInfo(string OneLoginUserSubject, string? EmailAddress);
+
+    public record ApplicationUserInfo(Guid UserId, string Name, string? ShortName);
 }

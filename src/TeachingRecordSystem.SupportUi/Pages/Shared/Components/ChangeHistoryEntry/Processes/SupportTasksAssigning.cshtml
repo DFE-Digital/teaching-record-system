@@ -1,8 +1,5 @@
-@using Microsoft.EntityFrameworkCore
-@using TeachingRecordSystem.Core.DataStore.Postgres
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.SupportUi.Services.ChangeHistory
-@inject TrsDbContext DbContext
 @inject SupportUiLinkGenerator LinkGenerator
 @model ChangeHistoryEntryViewModel
 @{
@@ -25,7 +22,7 @@
 
         var assignedToUserId = supportTask.AssignedToUserId;
         var assignedToUserName = assignedToUserId is Guid assignedUserId
-            ? await DbContext.Users.Where(u => u.UserId == assignedUserId).Select(u => u.Name).SingleOrDefaultAsync()
+            ? Model.Context.TryGetUserName(assignedUserId)
             : null;
 
         var personInfo = supportTask.PersonId is Guid personId ? Model.Context.TryGetPersonInfo(personId) : null;

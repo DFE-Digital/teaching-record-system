@@ -190,7 +190,7 @@ public class ChangeHistoryService(
         }).ToList();
 
         var contextData = await GetContextDataAsync(filteredProcesses, cancellationToken);
-        var context = ChangeHistoryContext.ForPerson(personId, contextData.AllPersons, contextData.AllOneLoginUsers);
+        var context = ChangeHistoryContext.ForPerson(personId, contextData);
 
         var allResults = eventsWithUser.Select(e => MapLegacyEvent(e, personId))
             .Concat(filteredProcesses.Select(p => MapProcess(p, personId, context)))
@@ -226,7 +226,7 @@ public class ChangeHistoryService(
             .ToArrayAsync(cancellationToken);
 
         var contextData = await GetContextDataAsync(results.Select(r => r.Process).AsReadOnly(), cancellationToken);
-        var context = ChangeHistoryContext.ForSupportTask(supportTaskReference, contextData.AllPersons, contextData.AllOneLoginUsers);
+        var context = ChangeHistoryContext.ForSupportTask(supportTaskReference, contextData);
 
         return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context)).AsReadOnly();
     }
@@ -252,7 +252,7 @@ public class ChangeHistoryService(
             .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount, cancellationToken);
 
         var contextData = await GetContextDataAsync(results.Select(r => r.Process), cancellationToken);
-        var context = ChangeHistoryContext.ForOneLoginUser(oneLoginUserSubject, contextData.AllPersons, contextData.AllOneLoginUsers);
+        var context = ChangeHistoryContext.ForOneLoginUser(oneLoginUserSubject, contextData);
 
         return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context));
     }
@@ -311,9 +311,40 @@ public class ChangeHistoryService(
             .Select(u => new ChangeHistoryContext.OneLoginUserInfo(u.Subject, u.EmailAddress))
             .ToArrayAsync(cancellationToken);
 
+        var allEvents = allResults.SelectMany(r => r.Events!).Select(e => e.Payload).ToArray();
+
+        var allUserIds = allEvents
+            .OfType<SupportTaskUpdatedEvent>()
+            .Select(e => e.SupportTask.AssignedToUserId)
+            .OfType<Guid>()
+            .Distinct()
+            .ToArray();
+
+        var allUserNames = allUserIds.Length > 0
+            ? await dbContext.Users
+                .Where(u => allUserIds.Contains(u.UserId))
+                .Select(u => new { u.UserId, u.Name })
+                .ToDictionaryAsync(u => u.UserId, u => u.Name, cancellationToken)
+            : [];
+
+        var allApplicationUserIds = allEvents
+            .OfType<TrnRequestUpdatedEvent>()
+            .SelectMany(e => new[] { e.TrnRequest.ApplicationUserId, e.SourceApplicationUserId })
+            .Distinct()
+            .ToArray();
+
+        var allApplicationUsers = allApplicationUserIds.Length > 0
+            ? await dbContext.ApplicationUsers
+                .Where(u => allApplicationUserIds.Contains(u.UserId))
+                .Select(u => new ChangeHistoryContext.ApplicationUserInfo(u.UserId, u.Name, u.ShortName))
+                .ToDictionaryAsync(u => u.UserId, u => u, cancellationToken)
+            : [];
+
         return new(
             allPersons.ToDictionary(p => p.PersonId, p => p),
-            allOneLoginUsers.ToDictionary(u => u.OneLoginUserSubject, u => u));
+            allOneLoginUsers.ToDictionary(u => u.OneLoginUserSubject, u => u),
+            allUserNames,
+            allApplicationUsers);
     }
 
     private TimelineItem MapProcess(Process process, Guid personId, ChangeHistoryContext context) =>
@@ -338,5 +369,7 @@ public class ChangeHistoryService(
 
     public record ContextData(
         IReadOnlyDictionary<Guid, ChangeHistoryContext.PersonInfo> AllPersons,
-        IReadOnlyDictionary<string, ChangeHistoryContext.OneLoginUserInfo> AllOneLoginUsers);
+        IReadOnlyDictionary<string, ChangeHistoryContext.OneLoginUserInfo> AllOneLoginUsers,
+        IReadOnlyDictionary<Guid, string> AllUserNames,
+        IReadOnlyDictionary<Guid, ChangeHistoryContext.ApplicationUserInfo> AllApplicationUsers);
 }
