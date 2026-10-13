@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
@@ -10,8 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 [AllowDeactivatedPerson]
 public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizationService) : PageModel
 {
-    private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
@@ -55,10 +54,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
         CanMerge =
             canEditNonPersonOrAlertData &&
-            !HasOpenAlert &&
-            Person!.IsActive &&
-            (PersonProfessionalStatus is not PersonProfessionalStatusInfo professionalStatus ||
-                !_invalidInductionStatusesForMerge.Contains(professionalStatus.InductionStatus));
+            PersonService.GetMergeBlockers(person.Status, person.InductionStatus, HasOpenAlert) is PersonMergeBlockers.None;
 
         // Person cannot be reactivated if they were deactivated as part of a merge
         // where they were merged into another Person (i.e. they were the secondary

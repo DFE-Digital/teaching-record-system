@@ -967,6 +967,83 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task MergePersonsAsync_PersonHasOpenAlert_ThrowsInvalidOperationException(bool alertIsOnRetainedPerson)
+    {
+        // Arrange
+        var personToDeactivate = await TestData.CreatePersonAsync(p =>
+        {
+            if (!alertIsOnRetainedPerson)
+            {
+                p.WithAlert(a => a.WithEndDate(null));
+            }
+        });
+        var personToRetain = await TestData.CreatePersonAsync(p =>
+        {
+            if (alertIsOnRetainedPerson)
+            {
+                p.WithAlert(a => a.WithEndDate(null));
+            }
+        });
+
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    public async Task MergePersonsAsync_PersonHasInductionStatusBlockingMerge_ThrowsInvalidOperationException(InductionStatus status)
+    {
+        // Arrange
+        var personToDeactivate = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+        var personToRetain = await TestData.CreatePersonAsync();
+
+        var options = new MergePersonsOptions
+        {
+            DeactivatingPersonId = personToDeactivate.PersonId,
+            RetainedPersonId = personToRetain.PersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Theory]
     [MemberData(nameof(GetPersonAttributeInfoData))]
     public async Task MergePersonsAsync_ValidRequest_UpdatesRetainedPersonAndDeactivatesDeactivatingPersonAndPublishesEvents(
         PersonAttributeInfo sourcedFromDeactivatingPersonAttribute,

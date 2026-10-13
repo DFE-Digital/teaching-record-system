@@ -6,6 +6,8 @@ namespace TeachingRecordSystem.Core.Services.Persons;
 
 public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginService, IEventPublisher eventPublisher)
 {
+    private static readonly InductionStatus[] _inductionStatusesBlockingMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
+
     public Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false, CancellationToken cancellationToken = default)
     {
         var persons = dbContext.Persons.AsQueryable();
@@ -287,11 +289,6 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             throw new NotFoundException(options.DeactivatingPersonId, nameof(Person));
         }
 
-        if (deactivatingPerson.Status is PersonStatus.Deactivated)
-        {
-            throw new InvalidOperationException("Cannot deactivate a person that is already deactivated.");
-        }
-
         var retainedPerson = await dbContext.Persons.IgnoreQueryFilters([QueryFilterNames.Person.Deactivated]).SingleOrDefaultAsync(p => p.PersonId == options.RetainedPersonId, cancellationToken);
 
         if (retainedPerson is null)
@@ -299,9 +296,15 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             throw new NotFoundException(options.RetainedPersonId, nameof(Person));
         }
 
-        if (retainedPerson.Status is PersonStatus.Deactivated)
+        foreach (var person in new[] { deactivatingPerson, retainedPerson })
         {
-            throw new InvalidOperationException("Cannot merge a person that is deactivated.");
+            var hasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == person.PersonId && a.IsOpen, cancellationToken);
+            var blockers = GetMergeBlockers(person.Status, person.InductionStatus, hasOpenAlert);
+
+            if (blockers is not PersonMergeBlockers.None)
+            {
+                throw new InvalidOperationException($"Person '{person.PersonId}' cannot be merged: {blockers}.");
+            }
         }
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
@@ -346,5 +349,27 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                 processContext,
                 cancellationToken);
         }
+    }
+
+    public static PersonMergeBlockers GetMergeBlockers(PersonStatus status, InductionStatus inductionStatus, bool hasOpenAlert)
+    {
+        var blockers = PersonMergeBlockers.None;
+
+        if (status is PersonStatus.Deactivated)
+        {
+            blockers |= PersonMergeBlockers.Deactivated;
+        }
+
+        if (hasOpenAlert)
+        {
+            blockers |= PersonMergeBlockers.OpenAlert;
+        }
+
+        if (_inductionStatusesBlockingMerge.Contains(inductionStatus))
+        {
+            blockers |= PersonMergeBlockers.InductionStatus;
+        }
+
+        return blockers;
     }
 }

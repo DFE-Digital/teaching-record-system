@@ -247,6 +247,50 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
     }
 
     [Fact]
+    public async Task Get_PersonAHasOpenAlert_ReturnsBadRequest()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_CancelWhenPersonAHasOpenAlert_DeletesJourneyAndRedirectsToPersonDetailPage()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
+        Assert.Null(GetJourneyInstanceState(journeyInstance));
+    }
+
+    [Fact]
     public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
     {
         // Arrange

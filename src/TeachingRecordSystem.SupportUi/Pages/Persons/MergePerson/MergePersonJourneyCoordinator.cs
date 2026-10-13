@@ -88,12 +88,12 @@ public class MergePersonJourneyCoordinator(
         }
     }
 
-    public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(Guid[] personIds, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<MergeCandidate>> GetMergeCandidatesAsync(Guid[] personIds, CancellationToken cancellationToken = default)
     {
-        var potentialDuplicates = (await dbContext.Persons
+        var candidates = (await dbContext.Persons
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
             .Where(p => personIds.Contains(p.PersonId))
-            .Select(p => new PotentialDuplicate
+            .Select(p => new MergeCandidate
             {
                 Trn = p.Trn,
                 PersonId = p.PersonId,
@@ -124,7 +124,7 @@ public class MergePersonJourneyCoordinator(
             .OrderBy(p => Array.IndexOf(personIds, p.PersonId))
             .ToArray();
 
-        return potentialDuplicates
+        return candidates
             .Select((r, i) => r with
             {
                 Identifier = (char)('A' + i),
@@ -139,7 +139,7 @@ public class MergePersonJourneyCoordinator(
                         PersonMatchedAttribute.Gender
                     ]
                     : GetPersonAttributeMatches(
-                        potentialDuplicates[0].Attributes,
+                        candidates[0].Attributes,
                         r.FirstName,
                         r.MiddleName,
                         r.LastName,
@@ -149,5 +149,15 @@ public class MergePersonJourneyCoordinator(
                         r.Gender)
             })
             .ToArray();
+    }
+
+    public async Task<MergePair> GetMergePairAsync(CancellationToken cancellationToken = default)
+    {
+        var candidates = await GetMergeCandidatesAsync([State.PersonAId!.Value, State.PersonBId!.Value], cancellationToken);
+        var primaryPersonId = State.PrimaryPersonId!.Value;
+
+        return new MergePair(
+            Primary: candidates.Single(p => p.PersonId == primaryPersonId),
+            Secondary: candidates.Single(p => p.PersonId != primaryPersonId));
     }
 }
