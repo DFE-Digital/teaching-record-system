@@ -67,7 +67,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
         Assert.Equal(process.CreatedOn, item.Timestamp);
 
@@ -239,7 +238,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -272,7 +270,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -305,7 +302,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -327,7 +323,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
@@ -359,7 +354,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -397,7 +391,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -433,7 +426,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -470,7 +462,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -507,7 +498,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         var item = Assert.Single(result);
-        Assert.Equal(TimelineItemType.Process, item.ItemType);
         Assert.Equal(person.PersonId, item.PersonId);
 
         var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
@@ -539,7 +529,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         if (shouldInclude)
         {
             var item = Assert.Single(result);
-            Assert.Equal(TimelineItemType.Process, item.ItemType);
         }
         else
         {
@@ -572,7 +561,6 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         if (shouldInclude)
         {
             var item = Assert.Single(result);
-            Assert.Equal(TimelineItemType.Process, item.ItemType);
         }
         else
         {

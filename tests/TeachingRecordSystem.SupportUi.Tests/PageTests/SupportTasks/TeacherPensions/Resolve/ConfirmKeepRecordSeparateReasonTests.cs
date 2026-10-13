@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Events.Legacy;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.TeacherPensions;
@@ -176,14 +175,6 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
             Assert.Null(supportTaskData.SelectedPersonAttributes);
         });
 
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
-            Assert.Equal(state.KeepSeparateReason.Value.GetDisplayName(), actualEvent.Comments);
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, actualEvent.PersonId);
-        });
-
         Events.AssertProcessesCreated(p =>
         {
             Assert.Equal(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, p.ProcessContext.ProcessType);
@@ -262,14 +253,6 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
             var supportTaskData = updatedSupportTask.GetData<TeacherPensionsPotentialDuplicateData>();
             Assert.Null(supportTaskData.ResolvedAttributes);
             Assert.Null(supportTaskData.SelectedPersonAttributes);
-        });
-
-        EventObserver.AssertEventsSaved(e =>
-        {
-            var actualEvent = Assert.IsType<TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent>(e);
-            Assert.Equal(keepReason, actualEvent.Comments);
-            Assert.Equal(TimeProvider.UtcNow, actualEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, actualEvent.PersonId);
         });
 
         Events.AssertProcessesCreated(p =>

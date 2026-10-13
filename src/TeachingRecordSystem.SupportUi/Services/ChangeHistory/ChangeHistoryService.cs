@@ -19,11 +19,6 @@ public class ChangeHistoryService(
         PaginationOptions paginationOptions,
         CancellationToken cancellationToken = default)
     {
-        var eventTypes = new[]
-        {
-            nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)
-        };
-
         var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
             .ToAsyncEnumerableAsync()
             .Select(async (AlertType at, CancellationToken _) => (
@@ -38,40 +33,6 @@ public class ChangeHistoryService(
             .Select(at => at.AlertType.DqtSanctionCode)
             .Where(sc => sc is not null)
             .ToArray();
-
-        var eventsWithUser = await dbContext.Database
-            .SqlQuery<EventWithUser>($"""
-                SELECT
-                    e.event_name,
-                    e.payload as event_payload,
-                    u.name as trs_user_name,
-                    e.payload #>> ARRAY['RaisedBy','DqtUserName'] as dqt_user_name,
-                    a.name as application_user_name,
-                    a.short_name as application_user_short_name
-                FROM
-                        events as e
-                    LEFT JOIN
-                        users as u ON
-                            CASE
-                                WHEN e.payload #>> ARRAY['RaisedBy','DqtUserId'] is null THEN
-                                    (e.payload ->> 'RaisedBy')::uuid
-                                ELSE
-                                    null
-                            END = u.user_id
-                    LEFT JOIN
-                        users as a ON ((e.payload #>> ARRAY['RequestData','ApplicationUserId']) :: uuid) = a.user_id
-                WHERE
-                    e.person_ids @> ARRAY[{personId}]
-                    AND e.event_name = any({eventTypes})
-
-                    -- Only return TPS resolved duplicate events that are merges where the imported record has not been kept
-                    AND
-                    (
-                        e.event_name <> {nameof(LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedEvent)}
-                        OR (e.payload->> 'ChangeReason')::int != {LegacyEvents.TeacherPensionsPotentialDuplicateSupportTaskResolvedReason.RecordKept}
-                    )
-                """)
-            .ToListAsync(cancellationToken);
 
         var processTypesToQuery = new[]
         {
@@ -194,9 +155,7 @@ public class ChangeHistoryService(
         var contextData = await GetContextDataAsync(filteredProcesses, cancellationToken);
         var context = ChangeHistoryContext.ForPerson(personId, contextData);
 
-        var allResults = eventsWithUser.Select(e => MapLegacyEvent(e, personId))
-            .Concat(filteredProcesses.Select(p => MapProcess(p, personId, context)))
-            .ToArray();
+        var allResults = filteredProcesses.Select(p => MapProcess(p, personId, context)).ToArray();
 
         var pageNumber = paginationOptions.PageNumber ?? 1;
 
@@ -257,27 +216,6 @@ public class ChangeHistoryService(
         var context = ChangeHistoryContext.ForOneLoginUser(oneLoginUserSubject, contextData);
 
         return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context));
-    }
-
-    private TimelineItem MapLegacyEvent(EventWithUser eventWithUser, Guid personId)
-    {
-        var @event = LegacyEvents.EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);
-
-        var raisedByUser = new RaisedByUserInfo
-        {
-            Name = eventWithUser.TrsUserName ?? eventWithUser.DqtUserName!
-        };
-
-        ApplicationUserInfo? applicationUser = eventWithUser.ApplicationUserName == null ? null : new()
-        {
-            Name = eventWithUser.ApplicationUserName,
-            ShortName = eventWithUser.ApplicationUserShortName ?? eventWithUser.ApplicationUserName
-        };
-
-        var timelineEventType = typeof(LegacyEventChangeHistoryEntry<>).MakeGenericType(@event.GetType());
-        var timelineEvent = (LegacyEventChangeHistoryEntry)Activator.CreateInstance(timelineEventType, @event, raisedByUser, applicationUser)!;
-        var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
-        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.LegacyEvent, personId, timelineEvent.Event.CreatedUtc, timelineEvent)!;
     }
 
     public async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults, CancellationToken cancellationToken = default)
@@ -351,21 +289,9 @@ public class ChangeHistoryService(
 
     private TimelineItem MapProcess(Process process, Guid personId, ChangeHistoryContext context) =>
         new TimelineItem<ProcessChangeHistoryEntry>(
-            TimelineItemType.Process,
             personId,
             process.CreatedOn,
             new ProcessChangeHistoryEntry(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, context));
-
-    [UsedImplicitly]
-    private record EventWithUser
-    {
-        public required string EventName { get; init; }
-        public required string EventPayload { get; init; }
-        public required string? TrsUserName { get; init; }
-        public required string? DqtUserName { get; init; }
-        public required string? ApplicationUserName { get; init; }
-        public required string? ApplicationUserShortName { get; init; }
-    }
 
     private record Result(Process Process, RaisedByUserInfo RaisedByUser);
 
