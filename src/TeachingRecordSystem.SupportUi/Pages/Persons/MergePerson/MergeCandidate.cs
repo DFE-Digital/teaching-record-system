@@ -1,11 +1,10 @@
 using TeachingRecordSystem.Core.Events.Models;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
-public record PotentialDuplicate
+public record MergeCandidate
 {
-    private static readonly InductionStatus[] _invalidInductionStatusesForMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
-
     public required char Identifier { get; init; }
     public required string Trn { get; init; }
     public required Guid PersonId { get; init; }
@@ -22,8 +21,6 @@ public record PotentialDuplicate
     public required PersonDetails Attributes { get; init; }
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
 
-    public bool HasActiveAlerts => ActiveAlertCount > 0;
-    public bool HasBeenDeactivated => Status == PersonStatus.Deactivated;
-    public bool HasInvalidInductionStatus => _invalidInductionStatusesForMerge.Contains(InductionStatus);
-    public bool IsInvalid => HasBeenDeactivated || HasInvalidInductionStatus || HasActiveAlerts;
+    public PersonMergeBlockers MergeBlockers => PersonService.GetMergeBlockers(Status, InductionStatus, hasOpenAlert: ActiveAlertCount > 0);
+    public bool CanMerge => MergeBlockers is PersonMergeBlockers.None;
 }

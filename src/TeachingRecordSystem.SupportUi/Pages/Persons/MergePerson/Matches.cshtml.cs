@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.Services.Persons;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.MergePerson;
 
@@ -25,7 +26,7 @@ public class MatchesModel(
 
     public string? CannotMergeReason { get; private set; }
 
-    public IReadOnlyList<PotentialDuplicate>? PotentialDuplicates { get; private set; }
+    public IReadOnlyList<MergeCandidate>? MergeCandidates { get; private set; }
 
     [BindProperty]
     public Guid? PrimaryPersonId { get; set; }
@@ -36,34 +37,12 @@ public class MatchesModel(
 
         BackLink = journey.GetBackLink();
 
-        PotentialDuplicates = await journey.GetPotentialDuplicatesAsync([journey.State.PersonAId!.Value, journey.State.PersonBId!.Value], cancellationToken);
+        MergeCandidates = await journey.GetMergeCandidatesAsync([journey.State.PersonAId!.Value, journey.State.PersonBId!.Value], cancellationToken);
 
-        foreach (var potentialDuplicate in PotentialDuplicates)
-        {
-            if (potentialDuplicate.HasBeenDeactivated)
-            {
-                CannotMergeReason = "One of these records has been deactivated";
-                break;
-            }
-
-            if (potentialDuplicate.HasActiveAlerts && potentialDuplicate.HasInvalidInductionStatus)
-            {
-                CannotMergeReason = $"One of these records has an alert and an induction status of {potentialDuplicate.InductionStatus.GetDisplayName()}";
-                break;
-            }
-
-            if (potentialDuplicate.HasActiveAlerts)
-            {
-                CannotMergeReason = "One of these records has an alert";
-                break;
-            }
-
-            if (potentialDuplicate.HasInvalidInductionStatus)
-            {
-                CannotMergeReason = $"The induction status of one of these records is {potentialDuplicate.InductionStatus.GetDisplayName()}";
-                break;
-            }
-        }
+        CannotMergeReason = MergeCandidates
+            .Where(c => !c.CanMerge)
+            .Select(GetCannotMergeReason)
+            .FirstOrDefault();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
@@ -82,7 +61,7 @@ public class MatchesModel(
             return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        if (PotentialDuplicates!.Any(p => p.IsInvalid))
+        if (CannotMergeReason is not null)
         {
             return BadRequest();
         }
@@ -111,4 +90,18 @@ public class MatchesModel(
                 state.PrimaryPersonId = PrimaryPersonId;
             });
     }
+
+    private static string GetCannotMergeReason(MergeCandidate candidate) =>
+        candidate.MergeBlockers switch
+        {
+            var b when b.HasFlag(PersonMergeBlockers.Deactivated) =>
+                "One of these records has been deactivated",
+            var b when b.HasFlag(PersonMergeBlockers.OpenAlert | PersonMergeBlockers.InductionStatus) =>
+                $"One of these records has an alert and an induction status of {candidate.InductionStatus.GetDisplayName()}",
+            var b when b.HasFlag(PersonMergeBlockers.OpenAlert) =>
+                "One of these records has an alert",
+            var b when b.HasFlag(PersonMergeBlockers.InductionStatus) =>
+                $"The induction status of one of these records is {candidate.InductionStatus.GetDisplayName()}",
+            _ => throw new InvalidOperationException($"Person '{candidate.PersonId}' has no merge blockers.")
+        };
 }

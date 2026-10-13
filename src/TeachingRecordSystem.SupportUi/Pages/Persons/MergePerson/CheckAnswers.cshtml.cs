@@ -38,7 +38,7 @@ public class CheckAnswersModel(
     public UploadedEvidenceFile? EvidenceFile { get; set; }
     public string? Comments { get; set; }
 
-    private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
+    private MergePair? _mergePair;
 
     public IEnumerable<ResolvedMergedAttribute>? ResolvableAttributes { get; private set; }
 
@@ -58,16 +58,19 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var cancellationToken = context.HttpContext.RequestAborted;
+        _mergePair = await journey.GetMergePairAsync(context.HttpContext.RequestAborted);
+
+        if (!_mergePair.CanMerge && !Cancel)
+        {
+            context.Result = BadRequest();
+            return;
+        }
+
+        var (primaryPerson, secondaryPerson) = _mergePair;
 
         BackLink = journey.GetBackLink();
 
         var state = journey.State;
-        var personAId = state.PersonAId!.Value;
-        var personBId = state.PersonBId!.Value;
-        var primaryPersonId = state.PrimaryPersonId!.Value;
-
-        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync([personAId, personBId], cancellationToken);
 
         ResolvableAttributes = changedService.GetResolvableMergedAttributes(
              new List<ResolvedMergedAttribute>
@@ -80,11 +83,6 @@ public class CheckAnswersModel(
                  new(PersonMatchedAttribute.NationalInsuranceNumber, state.NationalInsuranceNumberSource),
                  new(PersonMatchedAttribute.EmailAddress, state.EmailAddressSource)
              });
-
-        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
-
-        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
-        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
 
         FirstName = state.FirstNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.FirstName : secondaryPerson.FirstName;
         MiddleName = state.MiddleNameSource == PersonAttributeSource.PrimaryPerson ? primaryPerson.MiddleName : secondaryPerson.MiddleName;
@@ -112,14 +110,9 @@ public class CheckAnswersModel(
             return Redirect(await journey.CancelAsync(cancellationToken));
         }
 
-        if (_potentialDuplicates!.Any(p => p.IsInvalid))
-        {
-            return BadRequest();
-        }
-
         var state = journey.State;
-        var primaryPersonId = state.PrimaryPersonId!.Value;
-        var secondaryPersonId = primaryPersonId == state.PersonAId ? state.PersonBId!.Value : state.PersonAId!.Value;
+        var primaryPersonId = _mergePair!.Primary.PersonId;
+        var secondaryPersonId = _mergePair.Secondary.PersonId;
 
         var processContext = new ProcessContext(
             ProcessType.PersonMerging,

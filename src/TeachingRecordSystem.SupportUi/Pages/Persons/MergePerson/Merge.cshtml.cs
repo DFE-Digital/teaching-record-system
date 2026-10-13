@@ -59,24 +59,19 @@ public class MergeModel(
     [BindProperty]
     public string? Comments { get; set; }
 
-    private IReadOnlyList<PotentialDuplicate>? _potentialDuplicates;
-
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var cancellationToken = context.HttpContext.RequestAborted;
+        var pair = await journey.GetMergePairAsync(context.HttpContext.RequestAborted);
+
+        if (!pair.CanMerge && !Cancel)
+        {
+            context.Result = BadRequest();
+            return;
+        }
+
+        var (primaryPerson, secondaryPerson) = pair;
 
         BackLink = journey.GetBackLink();
-
-        var personAId = journey.State.PersonAId!.Value;
-        var personBId = journey.State.PersonBId!.Value;
-        var primaryPersonId = journey.State.PrimaryPersonId!.Value;
-
-        _potentialDuplicates = await journey.GetPotentialDuplicatesAsync([personAId, personBId], cancellationToken);
-
-        var secondaryPersonId = primaryPersonId == personAId ? personBId : personAId;
-
-        var primaryPerson = _potentialDuplicates.Single(p => p.PersonId == primaryPersonId);
-        var secondaryPerson = _potentialDuplicates.Single(p => p.PersonId == secondaryPersonId);
 
         var attributeMatches = journey.GetPersonAttributeMatches(
             primaryPerson.Attributes,
@@ -90,7 +85,7 @@ public class MergeModel(
 
         Trn = new PersonAttribute<string>(
             primaryPerson.Trn,
-            secondaryPerson.FirstName,
+            secondaryPerson.Trn,
             Different: true);
 
         FirstName = new PersonAttribute<string>(
@@ -149,11 +144,6 @@ public class MergeModel(
         if (Cancel)
         {
             return Redirect(await journey.CancelAsync(cancellationToken));
-        }
-
-        if (_potentialDuplicates!.Any(p => p.IsInvalid))
-        {
-            return BadRequest();
         }
 
         if (FirstName!.Different && FirstNameSource is null)

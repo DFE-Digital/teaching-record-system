@@ -37,11 +37,21 @@ public class EnterTrnModel(
     [BindProperty]
     public string? OtherTrn { get; set; }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var personA = (await journey.GetMergeCandidatesAsync([journey.State.PersonAId!.Value], context.HttpContext.RequestAborted)).Single();
+
+        if (!personA.CanMerge && !Cancel)
+        {
+            context.Result = BadRequest();
+            return;
+        }
+
         BackLink = journey.GetBackLink() ?? linkGenerator.Persons.PersonDetail.Index(PersonId);
 
         ThisTrn = journey.State.PersonATrn;
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public IActionResult OnGet()
@@ -56,13 +66,6 @@ public class EnterTrnModel(
         if (Cancel)
         {
             return Redirect(await journey.CancelAsync(cancellationToken));
-        }
-
-        var potentialDuplicates = await journey.GetPotentialDuplicatesAsync([journey.State.PersonAId!.Value], cancellationToken);
-
-        if (potentialDuplicates.Any(p => p.IsInvalid))
-        {
-            return BadRequest();
         }
 
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);

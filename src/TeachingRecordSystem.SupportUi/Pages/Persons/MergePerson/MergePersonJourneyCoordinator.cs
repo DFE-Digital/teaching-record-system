@@ -1,3 +1,4 @@
+using System.Transactions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Shared.Evidence;
@@ -88,12 +89,16 @@ public class MergePersonJourneyCoordinator(
         }
     }
 
-    public async Task<IReadOnlyList<PotentialDuplicate>> GetPotentialDuplicatesAsync(Guid[] personIds, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<MergeCandidate>> GetMergeCandidatesAsync(Guid[] personIds, CancellationToken cancellationToken = default)
     {
-        var potentialDuplicates = (await dbContext.Persons
+        _ = Transaction.Current ?? throw new InvalidOperationException("A TransactionScope is required.");
+
+        // Lock the rows for the rest of the request so they can't change between the eligibility check and the merge.
+        // Locking in a consistent order stops two merges of the same pair deadlocking.
+        var candidates = (await dbContext.Persons
+            .FromSql($"select * from persons where person_id = any({personIds}) order by person_id for update")  // https://github.com/dotnet/efcore/issues/26042
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .Where(p => personIds.Contains(p.PersonId))
-            .Select(p => new PotentialDuplicate
+            .Select(p => new MergeCandidate
             {
                 Trn = p.Trn,
                 PersonId = p.PersonId,
@@ -124,7 +129,7 @@ public class MergePersonJourneyCoordinator(
             .OrderBy(p => Array.IndexOf(personIds, p.PersonId))
             .ToArray();
 
-        return potentialDuplicates
+        return candidates
             .Select((r, i) => r with
             {
                 Identifier = (char)('A' + i),
@@ -139,7 +144,7 @@ public class MergePersonJourneyCoordinator(
                         PersonMatchedAttribute.Gender
                     ]
                     : GetPersonAttributeMatches(
-                        potentialDuplicates[0].Attributes,
+                        candidates[0].Attributes,
                         r.FirstName,
                         r.MiddleName,
                         r.LastName,
@@ -149,5 +154,15 @@ public class MergePersonJourneyCoordinator(
                         r.Gender)
             })
             .ToArray();
+    }
+
+    public async Task<MergePair> GetMergePairAsync(CancellationToken cancellationToken = default)
+    {
+        var candidates = await GetMergeCandidatesAsync([State.PersonAId!.Value, State.PersonBId!.Value], cancellationToken);
+        var primaryPersonId = State.PrimaryPersonId!.Value;
+
+        return new MergePair(
+            Primary: candidates.Single(p => p.PersonId == primaryPersonId),
+            Secondary: candidates.Single(p => p.PersonId != primaryPersonId));
     }
 }
