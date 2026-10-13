@@ -2580,6 +2580,15 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasKey("SupportTaskReference")
                         .HasName("pk_support_tasks");
 
+                    b.HasIndex("AssignedToUserId")
+                        .HasDatabaseName("ix_support_tasks_assigned_to_user_id")
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
+                    b.HasIndex("CreatedOn")
+                        .HasDatabaseName("ix_support_tasks_outstanding_created_on")
+                        .HasFilter("status <> 1 and deleted_on is null")
+                        .HasAnnotation("Npgsql:CreatedConcurrently", true);
+
                     b.HasIndex("OneLoginUserSubject")
                         .HasDatabaseName("ix_support_tasks_one_login_user_subject");
 

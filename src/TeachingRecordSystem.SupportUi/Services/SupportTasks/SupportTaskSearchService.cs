@@ -503,6 +503,13 @@ public class SupportTaskSearchService(TrsDbContext dbContext)
         if (searchOptions.Statuses is { Count: not 0 } statuses)
         {
             tasks = tasks.Where(t => statuses.Contains(t.Status));
+
+            // Redundant with the filter above, but as a literal it lets Postgres use the partial index
+            // on outstanding tasks, which it can't prove applies from the parameterised statuses.
+            if (!statuses.Contains(SupportTaskStatus.Closed))
+            {
+                tasks = tasks.Where(t => t.Status != SupportTaskStatus.Closed);
+            }
         }
 
         var totalFilteredTaskCount = await tasks.CountAsync(cancellationToken);
