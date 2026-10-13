@@ -40,8 +40,9 @@ public class MatchesModel(
         MergeCandidates = await journey.GetMergeCandidatesAsync([journey.State.PersonAId!.Value, journey.State.PersonBId!.Value], cancellationToken);
 
         CannotMergeReason = MergeCandidates
+            .Where(c => !c.CanMerge)
             .Select(GetCannotMergeReason)
-            .FirstOrDefault(r => r is not null);
+            .FirstOrDefault();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
@@ -90,7 +91,7 @@ public class MatchesModel(
             });
     }
 
-    private static string? GetCannotMergeReason(MergeCandidate candidate) =>
+    private static string GetCannotMergeReason(MergeCandidate candidate) =>
         candidate.MergeBlockers switch
         {
             var b when b.HasFlag(PersonMergeBlockers.Deactivated) =>
@@ -101,6 +102,6 @@ public class MatchesModel(
                 "One of these records has an alert",
             var b when b.HasFlag(PersonMergeBlockers.InductionStatus) =>
                 $"The induction status of one of these records is {candidate.InductionStatus.GetDisplayName()}",
-            _ => null
+            _ => throw new InvalidOperationException($"Person '{candidate.PersonId}' has no merge blockers.")
         };
 }
