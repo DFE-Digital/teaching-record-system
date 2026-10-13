@@ -19,6 +19,13 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
         builder.HasOne(t => t.Person).WithMany().HasForeignKey(p => p.PersonId).HasConstraintName("fk_support_tasks_person");
         builder.HasIndex(t => t.OneLoginUserSubject);
         builder.HasIndex(t => t.PersonId);
+        builder.HasIndex(t => t.AssignedToUserId).IsCreatedConcurrently();
+        // Most tasks are closed; the active tasks list only ever wants the outstanding ones.
+        // Queries must filter on status <> Closed as a literal (not a parameter) for this to be used.
+        builder.HasIndex(t => t.CreatedOn)
+            .HasDatabaseName("ix_support_tasks_outstanding_created_on")
+            .HasFilter($"status <> {(int)SupportTaskStatus.Closed} and deleted_on is null")
+            .IsCreatedConcurrently();
         builder.Property(t => t.PersonId).ConfigureAnalyticsSync(hidden: true);
         builder.Property(t => t.OneLoginUserSubject).ConfigureAnalyticsSync(hidden: true);
         builder.Property(t => t.Data)
