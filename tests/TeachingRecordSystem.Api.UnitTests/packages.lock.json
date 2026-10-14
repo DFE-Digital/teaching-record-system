@@ -1195,8 +1195,8 @@
           "System.Security.Cryptography.Xml": "[10.0.11, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "Testcontainers.PostgreSql": "[4.15.0, )",
-          "xunit.v3.assert": "[4.0.1, )",
-          "xunit.v3.extensibility.core": "[4.0.1, )"
+          "xunit.v3.assert": "[4.0.2, )",
+          "xunit.v3.extensibility.core": "[4.0.2, )"
         }
       },
       "teachingrecordsystem.webcommon": {
@@ -1951,13 +1951,13 @@
       },
       "xunit.v3.assert": {
         "type": "CentralTransitive",
-        "requested": "[4.0.1, )",
+        "requested": "[4.0.2, )",
         "resolved": "4.0.2",
         "contentHash": "5PKRexYlvufWFdXenRcRGKqvaJBBZFJZpqUGlUs9p13eKEgVdOrLpkPknjzUvLY5kEUicK9871DIUDcCPA6AXA=="
       },
       "xunit.v3.extensibility.core": {
         "type": "CentralTransitive",
-        "requested": "[4.0.1, )",
+        "requested": "[4.0.2, )",
         "resolved": "4.0.2",
         "contentHash": "ARTt+pGyd86mdtiFBkKpyBQvRC3u0rr8oidBlII2GsAg7D6TfOsDFCsoQtFij83V5pE57m3whUIqT4xjiARXbQ==",
         "dependencies": {
