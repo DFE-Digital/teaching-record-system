@@ -687,7 +687,7 @@
         "dependencies": {
           "AngleSharp": "[1.8.3, )",
           "Azure.Storage.Blobs": "[12.30.1, )",
-          "Azure.Storage.Files.DataLake": "[12.27.0, )",
+          "Azure.Storage.Files.DataLake": "[12.28.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
           "CloudNative.CloudEvents.SystemTextJson": "[2.9.0, )",
           "CsvHelper": "[33.1.0, )",
@@ -742,13 +742,13 @@
       },
       "Azure.Storage.Files.DataLake": {
         "type": "CentralTransitive",
-        "requested": "[12.27.0, )",
-        "resolved": "12.27.0",
-        "contentHash": "fTJn2xMo7iHZ2/zwVfiUqRomlX3E0kQkoYZSB/A7eYBkXv8gPi2H5Wi1brcoA3ZdwTnwSInSE1WSZprdGkOS2w==",
+        "requested": "[12.28.0, )",
+        "resolved": "12.28.0",
+        "contentHash": "xFWz4tHmG5gDm7ErqwDNDjoAq2GI13uwkCj0hfP7q27zWli9yt+I4m96W5PF2BkBWnt0j+CAVFAFFDhXFQ71Kg==",
         "dependencies": {
-          "Azure.Core": "1.55.0",
-          "Azure.Storage.Blobs": "12.29.0",
-          "Azure.Storage.Common": "12.28.0"
+          "Azure.Core": "1.60.0",
+          "Azure.Storage.Blobs": "12.30.0",
+          "Azure.Storage.Common": "12.29.0"
         }
       },
       "CloudNative.CloudEvents": {
