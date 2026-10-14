@@ -900,7 +900,7 @@
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
-          "AngleSharp": "[1.8.3, )",
+          "AngleSharp": "[1.8.4, )",
           "Azure.Storage.Blobs": "[12.30.1, )",
           "Azure.Storage.Files.DataLake": "[12.27.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
@@ -991,9 +991,9 @@
       },
       "AngleSharp": {
         "type": "CentralTransitive",
-        "requested": "[1.8.3, )",
-        "resolved": "1.8.3",
-        "contentHash": "IiXdbBHzeKRUDayOFT/5nAqkY7Tqbtzr9dqoWrsfseLRs2r1j94qP8MmKnfs9aX+WHucmlmX8xq9QosIUJ/sbA=="
+        "requested": "[1.8.4, )",
+        "resolved": "1.8.4",
+        "contentHash": "lbwt3oqjyxI6x01NT0kRqnudE+gxLqRAs/X49/iVWyguj6OtRfYCanV1mL+jYZgeeAqnGqWzqi7+s5gdtBF1Ag=="
       },
       "AspNetCore.HealthChecks.NpgSql": {
         "type": "CentralTransitive",
