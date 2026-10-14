@@ -23,7 +23,7 @@
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="6.0.6" />
     <PackageVersion Include="Faker.Net" Version="2.0.163" />
-    <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    <PackageVersion Include="FluentValidation" Version="12.2.0" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <!-- FluentValidation.AspNetCore 11.3.1 pulls in 11.11.0, whose nuspec misspells its
          Microsoft.Extensions.DependencyInjection.Abstractions dependency and breaks restore. -->
