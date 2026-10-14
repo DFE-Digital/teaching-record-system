@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using File = System.IO.File;
@@ -74,6 +75,8 @@ public static partial class Commands
                     .AddWebhookMessageFactory()
                     .AddEventPublisher()
                     .AddPersonService()
+                    .AddRoutesToProfessionalStatusService()
+                    .AddSingleton<ReferenceDataCache>()
                     .AddOneLoginService()
                     .AddSupportTaskServices()
                     .AddTrnRequestService(configuration)

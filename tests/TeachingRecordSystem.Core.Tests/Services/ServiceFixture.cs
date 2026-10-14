@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Tests.Services;
@@ -27,6 +28,7 @@ public class ServiceFixture : ServiceProviderFixture
             .AddOneLoginService()
             .AddSupportTaskService()
             .AddPersonService()
+            .AddRoutesToProfessionalStatusService()
             .AddTransient<TrnRequestService>()
             .AddSingleton<IOptions<AccessYourTeachingQualificationsOptions>>(Options.Create(new AccessYourTeachingQualificationsOptions { BaseAddress = "http://localhost" }))
             .AddSingleton<IOptions<TrnRequestOptions>>(Options.Create(new TrnRequestOptions()))

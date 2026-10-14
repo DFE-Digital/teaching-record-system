@@ -1190,6 +1190,70 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateHasRoutes_CopiesNonDeletedRoutesToRetainedPerson()
+    {
+        // Arrange
+        var personToRetain = await TestData.CreatePersonAsync();
+        var personToDeactivate = await TestData.CreatePersonAsync(p => p
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus)
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+
+        var routes = await WithDbContextAsync(dbContext => dbContext.RouteToProfessionalStatuses
+            .Include(r => r.RouteToProfessionalStatusType)
+            .Where(r => r.PersonId == personToDeactivate.PersonId)
+            .ToArrayAsync());
+        var routeToCopy = routes.Single(r => r.RouteToProfessionalStatusType!.ProfessionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus);
+        var deletedRoute = routes.Single(r => r.RouteToProfessionalStatusType!.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus);
+
+        await WithDbContextAsync(dbContext => dbContext.RouteToProfessionalStatuses
+            .Where(r => r.QualificationId == deletedRoute.QualificationId)
+            .ExecuteUpdateAsync(u => u.SetProperty(r => r.DeletedOn, TimeProvider.UtcNow)));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var retainedPersonRoutes = await WithDbContextAsync(dbContext => dbContext.RouteToProfessionalStatuses
+            .IgnoreQueryFilters([QueryFilterNames.Deleted])
+            .Where(r => r.PersonId == personToRetain.PersonId)
+            .ToArrayAsync());
+        var copiedRoute = Assert.Single(retainedPersonRoutes);
+        Assert.NotEqual(routeToCopy.QualificationId, copiedRoute.QualificationId);
+        Assert.Equal(routeToCopy.RouteToProfessionalStatusTypeId, copiedRoute.RouteToProfessionalStatusTypeId);
+        Assert.Equal(routeToCopy.Status, copiedRoute.Status);
+        Assert.Equal(routeToCopy.HoldsFrom, copiedRoute.HoldsFrom);
+        Assert.Equal(routeToCopy.TrainingStartDate, copiedRoute.TrainingStartDate);
+        Assert.Equal(routeToCopy.TrainingEndDate, copiedRoute.TrainingEndDate);
+        Assert.Equal(routeToCopy.TrainingSubjectIds, copiedRoute.TrainingSubjectIds);
+        Assert.Equal(routeToCopy.TrainingAgeSpecialismType, copiedRoute.TrainingAgeSpecialismType);
+        Assert.Equal(routeToCopy.TrainingAgeSpecialismRangeFrom, copiedRoute.TrainingAgeSpecialismRangeFrom);
+        Assert.Equal(routeToCopy.TrainingAgeSpecialismRangeTo, copiedRoute.TrainingAgeSpecialismRangeTo);
+        Assert.Equal(routeToCopy.TrainingCountryId, copiedRoute.TrainingCountryId);
+        Assert.Equal(routeToCopy.TrainingProviderId, copiedRoute.TrainingProviderId);
+        Assert.Equal(routeToCopy.DegreeTypeId, copiedRoute.DegreeTypeId);
+        Assert.Equal(routeToCopy.ExemptFromInduction, copiedRoute.ExemptFromInduction);
+
+        var retainedPerson = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(routeToCopy.HoldsFrom, retainedPerson.QtsDate);
+
+        var deactivatedPersonRouteIds = await WithDbContextAsync(dbContext => dbContext.RouteToProfessionalStatuses
+            .IgnoreQueryFilters([QueryFilterNames.Deleted])
+            .Where(r => r.PersonId == personToDeactivate.PersonId)
+            .Select(r => r.QualificationId)
+            .ToArrayAsync());
+        Assert.Equivalent(new[] { routeToCopy.QualificationId, deletedRoute.QualificationId }, deactivatedPersonRouteIds);
+
+        Events.AssertProcessesCreated(p => p.AssertProcessHasEvent<RouteToProfessionalStatusCreatedEvent>(e =>
+        {
+            Assert.Equal(personToRetain.PersonId, e.PersonId);
+            Assert.Equal(copiedRoute.QualificationId, e.RouteToProfessionalStatus.QualificationId);
+        }));
+    }
+
+    [Fact]
     public async Task DeactivatePersonViaMergeAsync_PersonToDeactivateIsAssociatedWithOneLoginUser_AssociatesThatOneLoginUserWithRetainedPerson()
     {
         // Arrange
@@ -1365,4 +1429,18 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         return (personToRetain, personToDeactivate);
     }
+
+    private static MergePersonsOptions CreateMergePersonsOptionsWithNoAttributeChanges(Guid deactivatingPersonId, Guid retainedPersonId) =>
+        new()
+        {
+            DeactivatingPersonId = deactivatingPersonId,
+            RetainedPersonId = retainedPersonId,
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            DateOfBirth = Option.None<DateOnly?>(),
+            EmailAddress = Option.None<EmailAddress?>(),
+            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
+            Gender = Option.None<Gender?>(),
+        };
 }

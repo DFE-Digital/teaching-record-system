@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 
@@ -50,6 +51,8 @@ public partial class Commands
                     .AddWebhookMessageFactory()
                     .AddEventPublisher()
                     .AddPersonService()
+                    .AddRoutesToProfessionalStatusService()
+                    .AddSingleton<ReferenceDataCache>()
                     .AddOneLoginService()
                     .AddSupportTaskServices()
                     .AddTrnRequestService(configuration)
