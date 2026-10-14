@@ -1,10 +1,15 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.OneLogin;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.Core.Services.Persons;
 
-public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginService, IEventPublisher eventPublisher)
+public class PersonService(
+    TrsDbContext dbContext,
+    OneLoginService oneLoginService,
+    RoutesToProfessionalStatusService routesToProfessionalStatusService,
+    IEventPublisher eventPublisher)
 {
     private static readonly InductionStatus[] _inductionStatusesBlockingMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
 
@@ -325,6 +330,8 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
             processContext,
             cancellationToken);
 
+        await CopyRoutesToRetainedPersonAsync(options.DeactivatingPersonId, options.RetainedPersonId, processContext, cancellationToken);
+
         await DeactivatePersonViaMergeAsync(
             new DeactivatePersonViaMergeOptions(options.DeactivatingPersonId, options.RetainedPersonId),
             processContext,
@@ -345,6 +352,45 @@ public class PersonService(TrsDbContext dbContext, OneLoginService oneLoginServi
                     MatchedPersonId = retainedPerson.PersonId,
                     MatchRoute = OneLoginUserMatchRoute.SupportUi,
                     MatchedAttributes = null
+                },
+                processContext,
+                cancellationToken);
+        }
+    }
+
+    private async Task CopyRoutesToRetainedPersonAsync(
+        Guid deactivatingPersonId,
+        Guid retainedPersonId,
+        ProcessContext processContext,
+        CancellationToken cancellationToken)
+    {
+        // The Deleted query filter leaves out any routes that have been deleted
+        var routes = await dbContext.RouteToProfessionalStatuses
+            .Where(r => r.PersonId == deactivatingPersonId)
+            .OrderBy(r => r.CreatedOn)
+            .ToArrayAsync(cancellationToken);
+
+        foreach (var route in routes)
+        {
+            await routesToProfessionalStatusService.CreateRouteToProfessionalStatusAsync(
+                new CreateRouteToProfessionalStatusOptions
+                {
+                    PersonId = retainedPersonId,
+                    RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
+                    Status = route.Status,
+                    SourceApplicationUserId = route.SourceApplicationUserId,
+                    SourceApplicationReference = route.SourceApplicationReference,
+                    HoldsFrom = route.HoldsFrom,
+                    TrainingStartDate = route.TrainingStartDate,
+                    TrainingEndDate = route.TrainingEndDate,
+                    TrainingSubjectIds = route.TrainingSubjectIds,
+                    TrainingAgeSpecialismType = route.TrainingAgeSpecialismType,
+                    TrainingAgeSpecialismRangeFrom = route.TrainingAgeSpecialismRangeFrom,
+                    TrainingAgeSpecialismRangeTo = route.TrainingAgeSpecialismRangeTo,
+                    TrainingCountryId = route.TrainingCountryId,
+                    TrainingProviderId = route.TrainingProviderId,
+                    DegreeTypeId = route.DegreeTypeId,
+                    IsExemptFromInduction = route.ExemptFromInduction
                 },
                 processContext,
                 cancellationToken);

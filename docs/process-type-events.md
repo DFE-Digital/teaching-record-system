@@ -108,6 +108,9 @@ Support UI *Merge person*.
 | `PersonDeactivatedEvent` | Always | The secondary record is deactivated and linked to the retained record. |
 | `PersonDetailsUpdatedEvent` | Sometimes | The retained record's attributes are changed to values taken from the secondary record. |
 | `OneLoginUserUpdatedEvent` | Sometimes | The deactivated record had linked One Login users, which are re-pointed to the retained record. |
+| `RouteToProfessionalStatusCreatedEvent` | Sometimes | The deactivated record had non-deleted routes, each of which is copied onto the retained record. |
+| `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | A copied route changes the retained record's professional status attributes (e.g. QTS date). |
+| `PersonInductionUpdatedEvent` | Sometimes | A copied QTS route changes the retained record's induction. |
 
 Merges from before the journey moved onto `PersonService` were back-filled from the legacy `PersonsMergedEvent`s by
 [`BackfillPersonMergeProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonMergeProcessesJob.cs). Those
@@ -120,9 +123,9 @@ processes carry the two person events but no `OneLoginUserUpdatedEvent`, which t
 | --- | --- | --- |
 | `PersonUnmergedEvent` | Always | — |
 
-The command only reverses the deactivation and the link back to the retained record. The details the merge copied onto
-the retained record and any One Login users it re-pointed are deliberately left alone, so no `PersonDetailsUpdatedEvent`
-or `OneLoginUserUpdatedEvent` is emitted.
+The command only reverses the deactivation and the link back to the retained record. The details and routes the merge
+copied onto the retained record and any One Login users it re-pointed are deliberately left alone, so no
+`PersonDetailsUpdatedEvent`, `RouteToProfessionalStatusDeletedEvent` or `OneLoginUserUpdatedEvent` is emitted.
 
 ### `TeacherPensionsRecordImporting` (28)
 [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs) (Teachers' Pensions import).
