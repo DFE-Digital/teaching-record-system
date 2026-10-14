@@ -1,6 +1,4 @@
 @page "/persons/{personId}/change-history"
-@using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events
-@using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Processes
 @using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeHistoryModel
 @{
@@ -22,12 +20,7 @@ else
     <div class="moj-timeline">
         @foreach (var timelineItem in Model.TimelineItems)
         {
-            var viewName = timelineItem.ItemType switch
-            {
-                TimelineItemType.LegacyEvent => $"./Timeline/Events/{((LegacyEventChangeHistoryEntry)timelineItem.ItemModel).Event.GetEventName()}.cshtml",
-                TimelineItemType.Process => $"./Timeline/Processes/{((ProcessChangeHistoryEntry)timelineItem.ItemModel).Process.ProcessType.ToString()}.cshtml",
-                _ => $"./Timeline/{timelineItem.ItemType}.cshtml"
-            };
+            var viewName = $"./Timeline/Processes/{((ProcessChangeHistoryEntry)timelineItem.ItemModel).Process.ProcessType}.cshtml";
 
             <partial name="@viewName" for="@timelineItem" />
         }
