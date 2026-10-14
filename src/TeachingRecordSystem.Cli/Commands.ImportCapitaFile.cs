@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Persons;
+using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using File = System.IO.File;
@@ -54,6 +55,8 @@ public static partial class Commands
                 .AddWebhookMessageFactory()
                 .AddEventPublisher()
                 .AddPersonService()
+                .AddRoutesToProfessionalStatusService()
+                .AddSingleton<ReferenceDataCache>()
                 .AddSupportTaskServices()
                 .AddTrnRequestService(configuration)
                 .BuildServiceProvider();
