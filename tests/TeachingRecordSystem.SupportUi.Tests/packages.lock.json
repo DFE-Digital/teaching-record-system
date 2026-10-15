@@ -998,7 +998,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.105.1, )",
-          "GovUk.Frontend.AspNetCore": "[5.0.0, )",
+          "GovUk.Frontend.AspNetCore": "[5.0.1, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
@@ -1234,9 +1234,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[5.0.0, )",
-        "resolved": "5.0.0",
-        "contentHash": "a88uadVKTc66G75oz/AnAfKunq1/wCbUOXkeuENLhd44W5TO0ryk0mDze334GUp9Vr7U0COCKznPL7NRJHyPqA=="
+        "requested": "[5.0.1, )",
+        "resolved": "5.0.1",
+        "contentHash": "GtizNEpQmgaFCKlfayrwwcu7JdXyoOTvIpY6HjnHg9S1kG1YFeA74h2cqMWlrpTy0KBmohJfK5TB8QMLSxkouA=="
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",
