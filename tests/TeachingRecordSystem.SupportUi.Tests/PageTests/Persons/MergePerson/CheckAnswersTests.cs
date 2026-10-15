@@ -515,7 +515,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
     }
 
     [Fact]
-    public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
+    public async Task Get_PrimaryPersonHasOpenAlert_ReturnsOk()
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences(p => p
@@ -535,34 +535,25 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
                 };
             }));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePersonPostRequestContentBuilder()
-                .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
-                .WithUploadEvidence(false)
-                .BuildFormUrlEncoded()
-        };
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
+    [InlineData(InductionStatus.None, InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.Failed, InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.RequiredToComplete, InductionStatus.Failed)]
+    public async Task Post_InductionStatusesBlockMerge_ReturnsBadRequest(InductionStatus primaryPersonStatus, InductionStatus secondaryPersonStatus)
     {
         // Arrange
-        var (personA, personB) = await CreatePersonsWithNoDifferences(p => p
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+        var (personA, personB) = await CreatePersonsWithNoDifferences(
+            p => WithInductionStatus(p, primaryPersonStatus),
+            p => WithInductionStatus(p, secondaryPersonStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -578,12 +569,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
                 };
             }));
 
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
                 .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
+                .WithPrimaryPersonId(personA.PersonId)
                 .WithUploadEvidence(false)
                 .BuildFormUrlEncoded()
         };
@@ -723,50 +713,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
                 };
             }));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new MergePersonPostRequestContentBuilder()
-                .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
-                .WithUploadEvidence(false)
-                .BuildFormUrlEncoded()
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonBHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
-    {
-        // Arrange
-        var (personA, personB) = await CreatePersonsWithNoDifferences(configurePersonB: p => p
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            CreateState(personA, s =>
-            {
-                s.PersonBId = personB.PersonId;
-                s.PersonBTrn = personB.Trn;
-                s.PrimaryPersonId = personA.PersonId;
-                s.PersonAttributeSourcesSet = true;
-                s.Evidence = new()
-                {
-                    UploadEvidence = false
-                };
-            }));
-
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()

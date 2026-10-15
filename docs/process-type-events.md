@@ -110,7 +110,7 @@ Support UI *Merge person*.
 | `OneLoginUserUpdatedEvent` | Sometimes | The deactivated record had linked One Login users, which are re-pointed to the retained record. |
 | `RouteToProfessionalStatusCreatedEvent` | Sometimes | The deactivated record had non-deleted routes, each of which is copied onto the retained record. |
 | `PersonProfessionalStatusAttributesUpdatedEvent` | Sometimes | A copied route changes the retained record's professional status attributes (e.g. QTS date). |
-| `PersonInductionUpdatedEvent` | Sometimes | A copied QTS route changes the retained record's induction. |
+| `PersonInductionUpdatedEvent` | Sometimes | A copied QTS route changes the retained record's induction, or the retained record takes the higher priority induction status, status without exemption (with its dates) or exemption reasons from the deactivated record. |
 
 Merges from before the journey moved onto `PersonService` were back-filled from the legacy `PersonsMergedEvent`s by
 [`BackfillPersonMergeProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillPersonMergeProcessesJob.cs). Those

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
@@ -54,7 +53,7 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
 
         CanMerge =
             canEditNonPersonOrAlertData &&
-            PersonService.GetMergeBlockers(person.Status, person.InductionStatus, HasOpenAlert) is PersonMergeBlockers.None;
+            Person.IsActive;
 
         // Person cannot be reactivated if they were deactivated as part of a merge
         // where they were merged into another Person (i.e. they were the secondary

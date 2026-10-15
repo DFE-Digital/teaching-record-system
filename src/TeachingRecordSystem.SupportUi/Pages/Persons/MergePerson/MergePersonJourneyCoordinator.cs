@@ -113,6 +113,9 @@ public class MergePersonJourneyCoordinator(
                 Gender = p.Gender,
                 Status = p.Status,
                 InductionStatus = p.InductionStatus,
+                InductionStatusWithoutExemption = p.InductionStatusWithoutExemption,
+                InductionStartDate = p.InductionStartDate,
+                InductionCompletedDate = p.InductionCompletedDate,
                 ActiveAlertCount = p.Alerts!.Count(a => a.IsOpen && a.DeletedOn == null),
                 Attributes = new PersonDetails
                 {

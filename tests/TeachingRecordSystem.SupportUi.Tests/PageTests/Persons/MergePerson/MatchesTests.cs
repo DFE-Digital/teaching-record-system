@@ -203,7 +203,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
     }
 
     [Fact]
-    public async Task Get_PersonBHasOpenAlert_ShowsWarningAndHidesContinueButton()
+    public async Task Get_PersonBHasOpenAlert_ShowsPrimaryPersonOptionsAndContinueButton()
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync();
@@ -231,30 +231,63 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
         var continueButton = doc.GetElementByTestId("continue-button");
 
+        Assert.Null(warningText);
+        Assert.NotNull(primaryPersonOptions);
+        Assert.NotNull(continueButton);
+    }
+
+    [Fact]
+    public async Task Get_BothPersonsHaveOpenAlert_ShowsWarningAndHidesContinueButton()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var expectedReason = "Both records have an alert";
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var warningText = doc.GetElementByTestId("warning-text");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
+        var continueButton = doc.GetElementByTestId("continue-button");
+
         Assert.NotNull(warningText);
-        Assert.Contains("One of these records has an alert. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
+        Assert.Contains($"{expectedReason}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
         Assert.Null(primaryPersonOptions);
         Assert.Null(continueButton);
     }
 
     [Theory]
-    [InlineData(InductionStatus.InProgress, false)]
-    [InlineData(InductionStatus.Passed, false)]
-    [InlineData(InductionStatus.Failed, false)]
-    [InlineData(InductionStatus.None, true)]
-    [InlineData(InductionStatus.Exempt, true)]
-    [InlineData(InductionStatus.FailedInWales, true)]
-    [InlineData(InductionStatus.RequiredToComplete, true)]
-    public async Task Get_PersonBWithInductionStatus_ShowsWarningAndHidesContinueButtonAsExpected(InductionStatus status, bool expectMergeToBeAllowed)
+    [InlineData(InductionStatus.None, InductionStatus.InProgress)]
+    [InlineData(InductionStatus.InProgress, InductionStatus.Passed)]
+    [InlineData(InductionStatus.Exempt, InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.None, InductionStatus.Failed)]
+    [InlineData(InductionStatus.RequiredToComplete, InductionStatus.FailedInWales)]
+    public async Task Get_InductionStatusesAllowMerge_ShowsPrimaryPersonOptionsAndContinueButton(
+        InductionStatus personAStatus,
+        InductionStatus personBStatus)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync();
+        var personA = await TestData.CreatePersonAsync(p => WithInductionStatus(p, personAStatus));
 
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+        var personB = await TestData.CreatePersonAsync(p => WithInductionStatus(p, personBStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -276,36 +309,24 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
         var continueButton = doc.GetElementByTestId("continue-button");
 
-        if (expectMergeToBeAllowed)
-        {
-            Assert.Null(warningText);
-            Assert.NotNull(primaryPersonOptions);
-            Assert.NotNull(continueButton);
-        }
-        else
-        {
-            Assert.NotNull(warningText);
-            Assert.Contains($"The induction status of one of these records is {status.GetDisplayName()}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
-            Assert.Null(primaryPersonOptions);
-            Assert.Null(continueButton);
-        }
+        Assert.Null(warningText);
+        Assert.NotNull(primaryPersonOptions);
+        Assert.NotNull(continueButton);
     }
 
     [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Get_PersonBHasOpenAlertAndInvalidInductionStatus_ShowsWarningAndHidesContinueButton(InductionStatus status)
+    [InlineData(InductionStatus.Failed, InductionStatus.RequiredToComplete, "One of these records has an induction status of failed")]
+    [InlineData(InductionStatus.Passed, InductionStatus.Failed, "One of these records has an induction status of failed")]
+    [InlineData(InductionStatus.FailedInWales, InductionStatus.FailedInWales, "Both records have an induction status of failed in Wales")]
+    public async Task Get_InductionStatusesBlockMerge_ShowsWarningAndHidesContinueButton(
+        InductionStatus personAStatus,
+        InductionStatus personBStatus,
+        string expectedReason)
     {
         // Arrange
-        var personA = await TestData.CreatePersonAsync();
+        var personA = await TestData.CreatePersonAsync(p => WithInductionStatus(p, personAStatus));
 
-        var personB = await TestData.CreatePersonAsync(p => p
-            .WithAlert(a => a.WithEndDate(null))
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+        var personB = await TestData.CreatePersonAsync(p => WithInductionStatus(p, personBStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -328,7 +349,129 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var continueButton = doc.GetElementByTestId("continue-button");
 
         Assert.NotNull(warningText);
-        Assert.Contains($"One of these records has an alert and an induction status of {status.GetDisplayName()}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
+        Assert.Contains($"{expectedReason}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
+        Assert.Null(primaryPersonOptions);
+        Assert.Null(continueButton);
+    }
+
+    [Theory]
+    [InlineData(true, "The induction start dates do not match")]
+    [InlineData(false, "The induction completed dates do not match")]
+    public async Task Get_InductionDatesDoNotMatch_ShowsWarningAndHidesContinueButton(bool startDatesDiffer, string expectedReason)
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.Passed)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(new DateOnly(2025, 1, 1))));
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.Passed)
+                .WithStartDate(startDatesDiffer ? new DateOnly(2024, 2, 1) : new DateOnly(2024, 1, 1))
+                .WithCompletedDate(startDatesDiffer ? new DateOnly(2025, 1, 1) : new DateOnly(2025, 2, 1))));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var warningText = doc.GetElementByTestId("warning-text");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
+        var continueButton = doc.GetElementByTestId("continue-button");
+
+        Assert.NotNull(warningText);
+        Assert.Contains($"{expectedReason}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
+        Assert.Null(primaryPersonOptions);
+        Assert.Null(continueButton);
+    }
+
+    [Fact]
+    public async Task Get_InductionDatesOnlySetOnOnePerson_ShowsPrimaryPersonOptionsAndContinueButton()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.Passed)
+                .WithStartDate(null)
+                .WithCompletedDate(new DateOnly(2025, 1, 1))));
+
+        var personB = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.InProgress)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(null)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var warningText = doc.GetElementByTestId("warning-text");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
+        var continueButton = doc.GetElementByTestId("continue-button");
+
+        Assert.Null(warningText);
+        Assert.NotNull(primaryPersonOptions);
+        Assert.NotNull(continueButton);
+    }
+
+    [Fact]
+    public async Task Get_PersonAHasOpenAlertAndPersonBIsFailedInWales_ShowsWarningAndHidesContinueButton()
+    {
+        // Arrange
+        var personA = await TestData.CreatePersonAsync(p => p
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var personB = await TestData.CreatePersonAsync(p => WithInductionStatus(p, InductionStatus.FailedInWales));
+
+        var expectedReason = "One of these records has an alert and the other has an induction status of failed in Wales";
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(personA, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var warningText = doc.GetElementByTestId("warning-text");
+        var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
+        var continueButton = doc.GetElementByTestId("continue-button");
+
+        Assert.NotNull(warningText);
+        Assert.Contains($"{expectedReason}. Refer this to the Teaching Regulation Agency (TRA).", warningText.TrimmedText());
         Assert.Null(primaryPersonOptions);
         Assert.Null(continueButton);
     }
@@ -681,32 +824,26 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
     }
 
     [Fact]
-    public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
+    public async Task Post_SecondaryPersonHasOpenAlert_ShowsPageError()
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences(p => p
             .WithAlert(a => a.WithEndDate(null)));
 
+        var primaryPersonId = personB.PersonId;
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
             CreateState(personA, s =>
             {
                 s.PersonBId = personB.PersonId;
                 s.PersonBTrn = personB.Trn;
-                s.PrimaryPersonId = personA.PersonId;
-                s.PersonAttributeSourcesSet = true;
-                s.Evidence = new()
-                {
-                    UploadEvidence = false
-                };
             }));
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
-                .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
-                .WithUploadEvidence(false)
+                .WithPrimaryPersonId(primaryPersonId)
                 .BuildFormUrlEncoded()
         };
 
@@ -714,21 +851,16 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The secondary record has an alert");
     }
 
-    [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
+    [Fact]
+    public async Task Post_SecondaryPersonIsFailedInWales_ShowsPageError()
     {
         // Arrange
-        var (personA, personB) = await CreatePersonsWithNoDifferences(p => p
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+        var (personA, personB) = await CreatePersonsWithNoDifferences(p => WithInductionStatus(p, InductionStatus.FailedInWales));
+
+        var primaryPersonId = personB.PersonId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -736,21 +868,12 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             {
                 s.PersonBId = personB.PersonId;
                 s.PersonBTrn = personB.Trn;
-                s.PrimaryPersonId = personA.PersonId;
-                s.PersonAttributeSourcesSet = true;
-                s.Evidence = new()
-                {
-                    UploadEvidence = false
-                };
             }));
 
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
-                .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
-                .WithUploadEvidence(false)
+                .WithPrimaryPersonId(primaryPersonId)
                 .BuildFormUrlEncoded()
         };
 
@@ -758,7 +881,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The induction status of the secondary record is failed in Wales");
     }
 
     [Fact]
@@ -805,11 +928,19 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
     }
 
     [Fact]
-    public async Task Post_PersonBHasOpenAlert_ReturnsBadRequest()
+    public async Task Post_SecondaryPersonIsExemptWithFailedInWalesStatusWithoutExemption_ShowsPageError()
     {
         // Arrange
-        var (personA, personB) = await CreatePersonsWithNoDifferences(configurePersonB: p => p
-            .WithAlert(a => a.WithEndDate(null)));
+        var (personA, personB) = await CreatePersonsWithNoDifferences(p => WithInductionStatus(p, InductionStatus.FailedInWales));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(personA);
+            personA.AddInductionExemptionReason(InductionExemptionReason.ExemptId, TimeProvider.UtcNow);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var primaryPersonId = personB.PersonId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -817,20 +948,12 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             {
                 s.PersonBId = personB.PersonId;
                 s.PersonBTrn = personB.Trn;
-                s.PrimaryPersonId = personA.PersonId;
-                s.PersonAttributeSourcesSet = true;
-                s.Evidence = new()
-                {
-                    UploadEvidence = false
-                };
             }));
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
-                .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
-                .WithUploadEvidence(false)
+                .WithPrimaryPersonId(primaryPersonId)
                 .BuildFormUrlEncoded()
         };
 
@@ -838,21 +961,17 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The induction status of the secondary record is failed in Wales");
     }
 
-    [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonBHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
+    [Fact]
+    public async Task Post_PrimaryPersonHasOpenAlert_RedirectsToNextPage()
     {
         // Arrange
         var (personA, personB) = await CreatePersonsWithNoDifferences(configurePersonB: p => p
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var primaryPersonId = personB.PersonId;
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             personA.PersonId,
@@ -860,21 +979,47 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             {
                 s.PersonBId = personB.PersonId;
                 s.PersonBTrn = personB.Trn;
-                s.PrimaryPersonId = personA.PersonId;
-                s.PersonAttributeSourcesSet = true;
-                s.Evidence = new()
-                {
-                    UploadEvidence = false
-                };
             }));
 
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
-                .WithOtherTrn(personB.Trn)
-                .WithPrimaryPersonId(personB.PersonId)
-                .WithUploadEvidence(false)
+                .WithPrimaryPersonId(primaryPersonId)
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Failed, InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.FailedInWales, InductionStatus.FailedInWales)]
+    public async Task Post_InductionStatusesBlockMerge_ReturnsBadRequest(InductionStatus personAStatus, InductionStatus personBStatus)
+    {
+        // Arrange
+        var (personA, personB) = await CreatePersonsWithNoDifferences(
+            p => WithInductionStatus(p, personAStatus),
+            p => WithInductionStatus(p, personBStatus));
+
+        var primaryPersonId = personA.PersonId;
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            personA.PersonId,
+            CreateState(personA, s =>
+            {
+                s.PersonBId = personB.PersonId;
+                s.PersonBTrn = personB.Trn;
+            }));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
+        {
+            Content = new MergePersonPostRequestContentBuilder()
+                .WithPrimaryPersonId(primaryPersonId)
                 .BuildFormUrlEncoded()
         };
 
