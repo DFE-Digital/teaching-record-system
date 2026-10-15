@@ -41,7 +41,7 @@ public class EnterTrnModel(
     {
         var personA = (await journey.GetMergeCandidatesAsync([journey.State.PersonAId!.Value], context.HttpContext.RequestAborted)).Single();
 
-        if (!personA.CanMerge && !Cancel)
+        if (personA.Status is PersonStatus.Deactivated && !Cancel)
         {
             context.Result = BadRequest();
             return;

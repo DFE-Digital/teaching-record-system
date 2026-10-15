@@ -966,39 +966,131 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         Assert.IsType<InvalidOperationException>(ex);
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task MergePersonsAsync_PersonHasOpenAlert_ThrowsInvalidOperationException(bool alertIsOnRetainedPerson)
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateHasOpenAlert_ThrowsInvalidOperationException()
     {
         // Arrange
-        var personToDeactivate = await TestData.CreatePersonAsync(p =>
-        {
-            if (!alertIsOnRetainedPerson)
-            {
-                p.WithAlert(a => a.WithEndDate(null));
-            }
-        });
-        var personToRetain = await TestData.CreatePersonAsync(p =>
-        {
-            if (alertIsOnRetainedPerson)
-            {
-                p.WithAlert(a => a.WithEndDate(null));
-            }
-        });
+        var personToDeactivate = await TestData.CreatePersonAsync(p => p.WithAlert(a => a.WithEndDate(null)));
+        var personToRetain = await TestData.CreatePersonAsync();
 
-        var options = new MergePersonsOptions
-        {
-            DeactivatingPersonId = personToDeactivate.PersonId,
-            RetainedPersonId = personToRetain.PersonId,
-            FirstName = Option.None<string>(),
-            MiddleName = Option.None<string>(),
-            LastName = Option.None<string>(),
-            DateOfBirth = Option.None<DateOnly?>(),
-            EmailAddress = Option.None<EmailAddress?>(),
-            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
-            Gender = Option.None<Gender?>(),
-        };
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_PersonToRetainHasOpenAlert_MergesPersons()
+    {
+        // Arrange
+        var personToDeactivate = await TestData.CreatePersonAsync();
+        var personToRetain = await TestData.CreatePersonAsync(p => p.WithAlert(a => a.WithEndDate(null)));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToDeactivate = await WithDbContextAsync(dbContext => dbContext.Persons
+            .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
+            .SingleAsync(p => p.PersonId == personToDeactivate.PersonId));
+        Assert.Equal(PersonStatus.Deactivated, updatedPersonToDeactivate.Status);
+        Assert.Equal(personToRetain.PersonId, updatedPersonToDeactivate.MergedWithPersonId);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.None, InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.RequiredToComplete, InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.FailedInWales, InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.Failed, InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.RequiredToComplete, InductionStatus.Failed)]
+    [InlineData(InductionStatus.Failed, InductionStatus.Exempt)]
+    [InlineData(InductionStatus.Passed, InductionStatus.Failed)]
+    [InlineData(InductionStatus.Failed, InductionStatus.Failed)]
+    public async Task MergePersonsAsync_InductionStatusesBlockMerge_ThrowsInvalidOperationException(
+        InductionStatus retainedPersonStatus,
+        InductionStatus deactivatingPersonStatus)
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(retainedPersonStatus);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(deactivatingPersonStatus);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateIsExemptWithFailedInWalesStatusWithoutExemption_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.RequiredToComplete);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.FailedInWales);
+        await AddInductionExemptionReasonAsync(personToDeactivate);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
+
+        // Assert
+        Assert.IsType<InvalidOperationException>(ex);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_RetainedPersonIsExemptWithFailedInWalesStatusWithoutExemption_MergesPersons()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.FailedInWales);
+        await AddInductionExemptionReasonAsync(personToRetain);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.RequiredToComplete);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Exempt, updatedPersonToRetain.InductionStatus);
+        Assert.Equal(InductionStatus.FailedInWales, updatedPersonToRetain.InductionStatusWithoutExemption);
+    }
+
+    [Theory]
+    [InlineData(2024, 2, 1, 2025, 1, 1)]
+    [InlineData(2024, 1, 1, 2025, 2, 1)]
+    public async Task MergePersonsAsync_InductionDatesDoNotMatch_ThrowsInvalidOperationException(
+        int deactivatingStartYear,
+        int deactivatingStartMonth,
+        int deactivatingStartDay,
+        int deactivatingCompletedYear,
+        int deactivatingCompletedMonth,
+        int deactivatingCompletedDay)
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(
+            InductionStatus.Passed,
+            startDate: new DateOnly(2024, 1, 1),
+            completedDate: new DateOnly(2025, 1, 1));
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(
+            InductionStatus.Passed,
+            startDate: new DateOnly(deactivatingStartYear, deactivatingStartMonth, deactivatingStartDay),
+            completedDate: new DateOnly(deactivatingCompletedYear, deactivatingCompletedMonth, deactivatingCompletedDay));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
         var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
@@ -1009,38 +1101,225 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
     }
 
     [Theory]
-    [InlineData(InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.Failed)]
-    public async Task MergePersonsAsync_PersonHasInductionStatusBlockingMerge_ThrowsInvalidOperationException(InductionStatus status)
+    [InlineData(InductionStatus.FailedInWales, InductionStatus.RequiredToComplete, InductionStatus.FailedInWales, InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.Failed, InductionStatus.None, InductionStatus.Failed, InductionStatus.Failed)]
+    [InlineData(InductionStatus.None, InductionStatus.Failed, InductionStatus.Failed, InductionStatus.Failed)]
+    [InlineData(InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Passed, InductionStatus.Passed)]
+    [InlineData(InductionStatus.Passed, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Passed)]
+    [InlineData(InductionStatus.InProgress, InductionStatus.Exempt, InductionStatus.Exempt, InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Exempt, InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.RequiredToComplete, InductionStatus.InProgress, InductionStatus.InProgress, InductionStatus.InProgress)]
+    public async Task MergePersonsAsync_InductionStatusesDoNotBlockMerge_SetsRetainedPersonInductionToHighestPriority(
+        InductionStatus retainedPersonStatus,
+        InductionStatus deactivatingPersonStatus,
+        InductionStatus expectedStatus,
+        InductionStatus expectedStatusWithoutExemption)
     {
         // Arrange
-        var personToDeactivate = await TestData.CreatePersonAsync(p => p
-            .WithInductionStatus(i => i
-                .WithStatus(status)
-                .WithStartDate(new DateOnly(2024, 1, 1))
-                .WithCompletedDate(new DateOnly(2024, 1, 1))));
-        var personToRetain = await TestData.CreatePersonAsync();
+        var personToRetain = await CreatePersonWithInductionStatusAsync(retainedPersonStatus);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(deactivatingPersonStatus);
+        var inductionChanged = expectedStatus != retainedPersonStatus ||
+            expectedStatusWithoutExemption != personToRetain.InductionStatusWithoutExemption ||
+            personToDeactivate.InductionExemptionReasonIds.Except(personToRetain.InductionExemptionReasonIds).Any();
 
-        var options = new MergePersonsOptions
-        {
-            DeactivatingPersonId = personToDeactivate.PersonId,
-            RetainedPersonId = personToRetain.PersonId,
-            FirstName = Option.None<string>(),
-            MiddleName = Option.None<string>(),
-            LastName = Option.None<string>(),
-            DateOfBirth = Option.None<DateOnly?>(),
-            EmailAddress = Option.None<EmailAddress?>(),
-            NationalInsuranceNumber = Option.None<NationalInsuranceNumber?>(),
-            Gender = Option.None<Gender?>(),
-        };
+        TimeProvider.Advance(TimeSpan.FromDays(1));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
         var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
-        var ex = await Record.ExceptionAsync(() => WithServiceAsync(s => s.MergePersonsAsync(options, processContext)));
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
 
         // Assert
-        Assert.IsType<InvalidOperationException>(ex);
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(expectedStatus, updatedPersonToRetain.InductionStatus);
+        Assert.Equal(expectedStatusWithoutExemption, updatedPersonToRetain.InductionStatusWithoutExemption);
+        Assert.Equivalent(
+            personToRetain.InductionExemptionReasonIds.Union(personToDeactivate.InductionExemptionReasonIds),
+            updatedPersonToRetain.InductionExemptionReasonIds);
+
+        Events.AssertProcessesCreated(p =>
+        {
+            if (inductionChanged)
+            {
+                p.AssertProcessHasEvent<PersonInductionUpdatedEvent>(e =>
+                {
+                    Assert.Equal(personToRetain.PersonId, e.PersonId);
+                    Assert.Equal(retainedPersonStatus, e.OldInduction.Status);
+                    Assert.Equal(expectedStatus, e.Induction.Status);
+                });
+            }
+            else
+            {
+                Assert.DoesNotContain(p.Events, e => e is PersonInductionUpdatedEvent);
+            }
+        });
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateIsExemptAndRetainedPersonIsInProgress_KeepsInProgressAsStatusWithoutExemption()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.InProgress, startDate: new DateOnly(2024, 3, 1));
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Exempt, updatedPersonToRetain.InductionStatus);
+        Assert.Equal(InductionStatus.InProgress, updatedPersonToRetain.InductionStatusWithoutExemption);
+        Assert.Equal(new DateOnly(2024, 3, 1), updatedPersonToRetain.InductionStartDate);
+        Assert.Equal(personToDeactivate.InductionExemptionReasonIds, updatedPersonToRetain.InductionExemptionReasonIds);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_RetainedPersonIsExemptAndPersonToDeactivateIsInProgress_TakesStatusWithoutExemptionAndDatesFromPersonToDeactivate()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.InProgress, startDate: new DateOnly(2024, 3, 1));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Exempt, updatedPersonToRetain.InductionStatus);
+        Assert.Equal(InductionStatus.InProgress, updatedPersonToRetain.InductionStatusWithoutExemption);
+        Assert.Equal(new DateOnly(2024, 3, 1), updatedPersonToRetain.InductionStartDate);
+        Assert.Null(updatedPersonToRetain.InductionCompletedDate);
+
+        Events.AssertProcessesCreated(p => p.AssertProcessHasEvent<PersonInductionUpdatedEvent>(e =>
+        {
+            Assert.Equal(InductionStatus.None, e.OldInduction.StatusWithoutExemption);
+            Assert.Equal(InductionStatus.InProgress, e.Induction.StatusWithoutExemption);
+            Assert.Equal(new DateOnly(2024, 3, 1), e.Induction.StartDate);
+        }));
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_BothPersonsExempt_CombinesExemptionReasons()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt, exemptionReasonIds: [InductionExemptionReason.PassedInWalesId]);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt, exemptionReasonIds: [InductionExemptionReason.ExemptId]);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Exempt, updatedPersonToRetain.InductionStatus);
+        Assert.Equivalent(
+            new[] { InductionExemptionReason.PassedInWalesId, InductionExemptionReason.ExemptId },
+            updatedPersonToRetain.InductionExemptionReasonIds);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_InductionDatesOnlySetOnOnePerson_MergesPersons()
+    {
+        // Arrange
+        var personToRetain = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.Passed)
+                .WithStartDate(null)
+                .WithCompletedDate(new DateOnly(2025, 1, 1))));
+        var personToDeactivate = await TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(InductionStatus.InProgress)
+                .WithStartDate(new DateOnly(2024, 1, 1))
+                .WithCompletedDate(null)));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Passed, updatedPersonToRetain.InductionStatus);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateIsExemptWithoutReason_SetsRetainedPersonExemptWithoutReason()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.RequiredToComplete);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt, exemptionReasonIds: []);
+        await SetInductionExemptWithoutReasonAsync(personToDeactivate);
+
+        TimeProvider.Advance(TimeSpan.FromDays(1));
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Exempt, updatedPersonToRetain.InductionStatus);
+        Assert.True(updatedPersonToRetain.InductionExemptWithoutReason);
+
+        Events.AssertProcessesCreated(p => p.AssertProcessHasEvent<PersonInductionUpdatedEvent>(e =>
+        {
+            Assert.Equal(personToRetain.PersonId, e.PersonId);
+            Assert.True(e.Induction.InductionExemptWithoutReason);
+            Assert.True(e.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptWithoutReason));
+        }));
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateIsExemptWithoutReasonAndRetainedPersonHasExemptionReason_DoesNotSetRetainedPersonExemptWithoutReason()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt, exemptionReasonIds: []);
+        await SetInductionExemptWithoutReasonAsync(personToDeactivate);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Exempt, updatedPersonToRetain.InductionStatus);
+        Assert.Equal(personToRetain.InductionExemptionReasonIds, updatedPersonToRetain.InductionExemptionReasonIds);
+        Assert.False(updatedPersonToRetain.InductionExemptWithoutReason);
+    }
+
+    [Fact]
+    public async Task MergePersonsAsync_PersonToDeactivateIsExemptWithoutReasonAndResolvedStatusIsNotExempt_DoesNotSetRetainedPersonExemptWithoutReason()
+    {
+        // Arrange
+        var personToRetain = await CreatePersonWithInductionStatusAsync(InductionStatus.Passed);
+        var personToDeactivate = await CreatePersonWithInductionStatusAsync(InductionStatus.Exempt, exemptionReasonIds: []);
+        await SetInductionExemptWithoutReasonAsync(personToDeactivate);
+
+        var options = CreateMergePersonsOptionsWithNoAttributeChanges(personToDeactivate.PersonId, personToRetain.PersonId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
+
+        // Act
+        await WithServiceAsync(s => s.MergePersonsAsync(options, processContext));
+
+        // Assert
+        var updatedPersonToRetain = await WithDbContextAsync(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == personToRetain.PersonId));
+        Assert.Equal(InductionStatus.Passed, updatedPersonToRetain.InductionStatus);
+        Assert.False(updatedPersonToRetain.InductionExemptWithoutReason);
     }
 
     [Theory]
@@ -1429,6 +1708,34 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
 
         return (personToRetain, personToDeactivate);
     }
+
+    private Task<Person> CreatePersonWithInductionStatusAsync(
+        InductionStatus status,
+        DateOnly? startDate = null,
+        DateOnly? completedDate = null,
+        Guid[]? exemptionReasonIds = null) =>
+        TestData.CreatePersonAsync(p => p
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(startDate ?? (status.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null))
+                .WithCompletedDate(completedDate ?? (status.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null))
+                .WithExemptionReasons(exemptionReasonIds ?? (status.RequiresExemptionReasons() ? [InductionExemptionReason.PassedInWalesId] : []))));
+
+    private Task AddInductionExemptionReasonAsync(Person person) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.AddInductionExemptionReason(InductionExemptionReason.ExemptId, TimeProvider.UtcNow);
+            await dbContext.SaveChangesAsync();
+        });
+
+    private Task SetInductionExemptWithoutReasonAsync(Person person) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person);
+            person.InductionExemptWithoutReason = true;
+            await dbContext.SaveChangesAsync();
+        });
 
     private static MergePersonsOptions CreateMergePersonsOptionsWithNoAttributeChanges(Guid deactivatingPersonId, Guid retainedPersonId) =>
         new()

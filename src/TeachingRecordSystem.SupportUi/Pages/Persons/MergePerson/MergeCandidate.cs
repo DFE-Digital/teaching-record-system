@@ -17,10 +17,13 @@ public record MergeCandidate
     public required Gender? Gender { get; init; }
     public required PersonStatus Status { get; init; }
     public required InductionStatus InductionStatus { get; init; }
+    public required InductionStatus InductionStatusWithoutExemption { get; init; }
+    public required DateOnly? InductionStartDate { get; init; }
+    public required DateOnly? InductionCompletedDate { get; init; }
     public required int ActiveAlertCount { get; init; }
     public required PersonDetails Attributes { get; init; }
     public required IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes { get; init; }
 
-    public PersonMergeBlockers MergeBlockers => PersonService.GetMergeBlockers(Status, InductionStatus, hasOpenAlert: ActiveAlertCount > 0);
-    public bool CanMerge => MergeBlockers is PersonMergeBlockers.None;
+    public PersonMergeDetails MergeDetails =>
+        new(Status, InductionStatus, InductionStatusWithoutExemption, InductionStartDate, InductionCompletedDate, HasOpenAlert: ActiveAlertCount > 0);
 }

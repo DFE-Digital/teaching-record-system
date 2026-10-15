@@ -194,6 +194,13 @@ public class MergePersonTestBase(HostFixture hostFixture)
     /// Builds the state the coordinator starts the journey with — the record being merged from —
     /// optionally applying the answers a test is interested in.
     /// </summary>
+    protected static CreatePersonBuilder WithInductionStatus(CreatePersonBuilder builder, InductionStatus status) =>
+        builder.WithInductionStatus(i => i
+            .WithStatus(status)
+            .WithStartDate(status.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null)
+            .WithCompletedDate(status.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null)
+            .WithExemptionReasons(status.RequiresExemptionReasons() ? [InductionExemptionReason.PassedInWalesId] : []));
+
     protected static MergePersonState CreateState(Person personA, Action<MergePersonState>? configure = null)
     {
         var state = new MergePersonState

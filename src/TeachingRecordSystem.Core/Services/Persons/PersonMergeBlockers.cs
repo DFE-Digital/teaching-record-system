@@ -6,5 +6,8 @@ public enum PersonMergeBlockers
     None = 0,
     Deactivated = 1 << 0,
     OpenAlert = 1 << 1,
-    InductionStatus = 1 << 2
+    InductionStatusFailedInWales = 1 << 2,
+    InductionStatusFailed = 1 << 3,
+    InductionStartDateMismatch = 1 << 4,
+    InductionCompletedDateMismatch = 1 << 5
 }

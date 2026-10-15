@@ -273,6 +273,53 @@ public class Person
         return true;
     }
 
+    public bool MergeInductionFrom(
+        Person deactivatingPerson,
+        IEnumerable<RouteToProfessionalStatus> routes,
+        DateTime now)
+    {
+        var oldEventInduction = EventModels.Induction.FromModel(this);
+
+        if (deactivatingPerson.InductionStatus.IsHigherPriorityThan(InductionStatus))
+        {
+            InductionStatus = deactivatingPerson.InductionStatus;
+        }
+
+        // The status without exemption is what we fall back to if the exemptions are removed so it's resolved separately,
+        // along with the dates that go with it
+        if (deactivatingPerson.InductionStatusWithoutExemption.IsHigherPriorityThan(InductionStatusWithoutExemption))
+        {
+            InductionStatusWithoutExemption = deactivatingPerson.InductionStatusWithoutExemption;
+            InductionStartDate = deactivatingPerson.InductionStartDate;
+            InductionCompletedDate = deactivatingPerson.InductionCompletedDate;
+        }
+        else if (deactivatingPerson.InductionStatusWithoutExemption == InductionStatusWithoutExemption)
+        {
+            InductionStartDate ??= deactivatingPerson.InductionStartDate;
+            InductionCompletedDate ??= deactivatingPerson.InductionCompletedDate;
+        }
+
+        InductionExemptionReasonIds = InductionExemptionReasonIds.Union(deactivatingPerson.InductionExemptionReasonIds).ToArray();
+
+        // Without this, a merged record that's exempt only because the deactivated record was exempt without a reason
+        // would lose its exemption if the status is ever recalculated
+        if (deactivatingPerson.InductionExemptWithoutReason &&
+            InductionStatus is InductionStatus.Exempt &&
+            GetAllInductionExemptionReasonIds(routes).Count == 0)
+        {
+            InductionExemptWithoutReason = true;
+        }
+
+        if (!InductionHasChanged(oldEventInduction))
+        {
+            return false;
+        }
+
+        InductionModifiedOn = now;
+
+        return true;
+    }
+
     private bool InductionHasChanged(EventModels.Induction oldInduction) =>
         InductionStatus != oldInduction.Status ||
         InductionStatusWithoutExemption != oldInduction.StatusWithoutExemption ||

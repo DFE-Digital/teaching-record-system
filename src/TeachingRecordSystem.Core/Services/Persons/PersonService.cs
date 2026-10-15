@@ -11,8 +11,6 @@ public class PersonService(
     RoutesToProfessionalStatusService routesToProfessionalStatusService,
     IEventPublisher eventPublisher)
 {
-    private static readonly InductionStatus[] _inductionStatusesBlockingMerge = [InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed];
-
     public Task<Person?> GetPersonAsync(Guid personId, bool includeDeactivatedPersons = false, CancellationToken cancellationToken = default)
     {
         var persons = dbContext.Persons.AsQueryable();
@@ -301,15 +299,13 @@ public class PersonService(
             throw new NotFoundException(options.RetainedPersonId, nameof(Person));
         }
 
-        foreach (var person in new[] { deactivatingPerson, retainedPerson })
-        {
-            var hasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == person.PersonId && a.IsOpen, cancellationToken);
-            var blockers = GetMergeBlockers(person.Status, person.InductionStatus, hasOpenAlert);
+        var blockers = GetMergeBlockers(
+            await GetMergeDetailsAsync(retainedPerson, cancellationToken),
+            await GetMergeDetailsAsync(deactivatingPerson, cancellationToken));
 
-            if (blockers is not PersonMergeBlockers.None)
-            {
-                throw new InvalidOperationException($"Person '{person.PersonId}' cannot be merged: {blockers}.");
-            }
+        if (blockers is not PersonMergeBlockers.None)
+        {
+            throw new InvalidOperationException($"Person '{deactivatingPerson.PersonId}' cannot be merged into person '{retainedPerson.PersonId}': {blockers}.");
         }
 
         await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
@@ -331,6 +327,8 @@ public class PersonService(
             cancellationToken);
 
         await CopyRoutesToRetainedPersonAsync(options.DeactivatingPersonId, options.RetainedPersonId, processContext, cancellationToken);
+
+        await MergeInductionIntoRetainedPersonAsync(deactivatingPerson, retainedPerson, processContext, cancellationToken);
 
         await DeactivatePersonViaMergeAsync(
             new DeactivatePersonViaMergeOptions(options.DeactivatingPersonId, options.RetainedPersonId),
@@ -397,23 +395,92 @@ public class PersonService(
         }
     }
 
-    public static PersonMergeBlockers GetMergeBlockers(PersonStatus status, InductionStatus inductionStatus, bool hasOpenAlert)
+    private async Task MergeInductionIntoRetainedPersonAsync(
+        Person deactivatingPerson,
+        Person retainedPerson,
+        ProcessContext processContext,
+        CancellationToken cancellationToken)
+    {
+        await using var eventScope = eventPublisher.GetOrCreateEventScope(processContext);
+
+        // Includes any routes just copied from the deactivating person
+        var retainedPersonRoutes = await dbContext.RouteToProfessionalStatuses
+            .Include(r => r.RouteToProfessionalStatusType)
+            .Where(r => r.PersonId == retainedPerson.PersonId)
+            .ToArrayAsync(cancellationToken);
+
+        var oldInduction = EventModels.Induction.FromModel(retainedPerson);
+
+        if (!retainedPerson.MergeInductionFrom(deactivatingPerson, retainedPersonRoutes, processContext.Now))
+        {
+            return;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        var induction = EventModels.Induction.FromModel(retainedPerson);
+
+        await eventScope.PublishEventAsync(
+            new PersonInductionUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = retainedPerson.PersonId,
+                Induction = induction,
+                OldInduction = oldInduction,
+                Changes = PersonInductionUpdatedEvent.GetChanges(induction, oldInduction)
+            },
+            cancellationToken);
+    }
+
+    private async Task<PersonMergeDetails> GetMergeDetailsAsync(Person person, CancellationToken cancellationToken) =>
+        new(
+            person.Status,
+            person.InductionStatus,
+            person.InductionStatusWithoutExemption,
+            person.InductionStartDate,
+            person.InductionCompletedDate,
+            HasOpenAlert: await dbContext.Alerts.AnyAsync(a => a.PersonId == person.PersonId && a.IsOpen, cancellationToken));
+
+    public static PersonMergeBlockers GetMergeBlockers(PersonMergeDetails retainedPerson, PersonMergeDetails deactivatingPerson)
     {
         var blockers = PersonMergeBlockers.None;
 
-        if (status is PersonStatus.Deactivated)
+        if (retainedPerson.Status is PersonStatus.Deactivated || deactivatingPerson.Status is PersonStatus.Deactivated)
         {
             blockers |= PersonMergeBlockers.Deactivated;
         }
 
-        if (hasOpenAlert)
+        // An alert on the retained person is fine; it's only an alert on the person being deactivated that would be lost
+        if (deactivatingPerson.HasOpenAlert)
         {
             blockers |= PersonMergeBlockers.OpenAlert;
         }
 
-        if (_inductionStatusesBlockingMerge.Contains(inductionStatus))
+        // Check the status without exemption too, otherwise an exempt record could bring a fallback of failed in Wales with it
+        if (deactivatingPerson.InductionStatus is InductionStatus.FailedInWales ||
+            deactivatingPerson.InductionStatusWithoutExemption is InductionStatus.FailedInWales)
         {
-            blockers |= PersonMergeBlockers.InductionStatus;
+            blockers |= PersonMergeBlockers.InductionStatusFailedInWales;
+        }
+
+        if ((retainedPerson.InductionStatus is InductionStatus.Failed && deactivatingPerson.InductionStatus is not InductionStatus.None) ||
+            (deactivatingPerson.InductionStatus is InductionStatus.Failed && retainedPerson.InductionStatus is not InductionStatus.None))
+        {
+            blockers |= PersonMergeBlockers.InductionStatusFailed;
+        }
+
+        if (retainedPerson.InductionStartDate is DateOnly retainedStartDate &&
+            deactivatingPerson.InductionStartDate is DateOnly deactivatingStartDate &&
+            retainedStartDate != deactivatingStartDate)
+        {
+            blockers |= PersonMergeBlockers.InductionStartDateMismatch;
+        }
+
+        if (retainedPerson.InductionCompletedDate is DateOnly retainedCompletedDate &&
+            deactivatingPerson.InductionCompletedDate is DateOnly deactivatingCompletedDate &&
+            retainedCompletedDate != deactivatingCompletedDate)
+        {
+            blockers |= PersonMergeBlockers.InductionCompletedDateMismatch;
         }
 
         return blockers;

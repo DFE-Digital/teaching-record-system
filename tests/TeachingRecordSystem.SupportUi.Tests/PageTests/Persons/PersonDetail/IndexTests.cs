@@ -427,7 +427,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_PersonHasOpenAlert_DoesNotShowMergeButton()
+    public async Task Get_PersonHasOpenAlert_ShowsMergeButton()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -440,7 +440,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("merge-button"));
+        Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
     [Fact]
@@ -460,14 +460,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(InductionStatus.InProgress, false)]
-    [InlineData(InductionStatus.Passed, false)]
-    [InlineData(InductionStatus.Failed, false)]
-    [InlineData(InductionStatus.None, true)]
-    [InlineData(InductionStatus.Exempt, true)]
-    [InlineData(InductionStatus.FailedInWales, true)]
-    [InlineData(InductionStatus.RequiredToComplete, true)]
-    public async Task Get_PersonWithInductionStatus_ShowsMergeButtonAsExpected(InductionStatus status, bool expectMergeButtonToBeShown)
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.None)]
+    [InlineData(InductionStatus.Exempt)]
+    [InlineData(InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.RequiredToComplete)]
+    public async Task Get_PersonWithInductionStatus_ShowsMergeButton(InductionStatus status)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -483,15 +483,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var mergeButton = doc.GetElementByTestId("merge-button");
-        if (expectMergeButtonToBeShown)
-        {
-            Assert.NotNull(mergeButton);
-        }
-        else
-        {
-            Assert.Null(mergeButton);
-        }
+        Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
     [Theory]

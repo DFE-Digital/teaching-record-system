@@ -39,10 +39,14 @@ public class MatchesModel(
 
         MergeCandidates = await journey.GetMergeCandidatesAsync([journey.State.PersonAId!.Value, journey.State.PersonBId!.Value], cancellationToken);
 
-        CannotMergeReason = MergeCandidates
-            .Where(c => !c.CanMerge)
-            .Select(GetCannotMergeReason)
-            .FirstOrDefault();
+        // Some blockers depend on which record is retained; only refuse outright if neither record can be the primary
+        var blockersWithAAsPrimary = new MergePair(MergeCandidates[0], MergeCandidates[1]).MergeBlockers;
+        var blockersWithBAsPrimary = new MergePair(MergeCandidates[1], MergeCandidates[0]).MergeBlockers;
+
+        if (blockersWithAAsPrimary is not PersonMergeBlockers.None && blockersWithBAsPrimary is not PersonMergeBlockers.None)
+        {
+            CannotMergeReason = GetCannotMergeReason(blockersWithAAsPrimary, blockersWithBAsPrimary);
+        }
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
@@ -68,6 +72,22 @@ public class MatchesModel(
 
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
+        var primaryPerson = MergeCandidates!.SingleOrDefault(c => c.PersonId == PrimaryPersonId);
+
+        if (primaryPerson is null)
+        {
+            return BadRequest();
+        }
+
+        var secondaryPerson = MergeCandidates!.Single(c => c.PersonId != PrimaryPersonId);
+        var blockers = new MergePair(primaryPerson, secondaryPerson).MergeBlockers;
+
+        if (blockers is not PersonMergeBlockers.None)
+        {
+            ModelState.AddModelError(nameof(PrimaryPersonId), GetInvalidPrimaryPersonReason(blockers));
+            return this.PageWithErrors();
+        }
+
         return journey.AdvanceTo(
             linkGenerator.Persons.MergePerson.Merge(journey.InstanceId),
             state =>
@@ -91,17 +111,32 @@ public class MatchesModel(
             });
     }
 
-    private static string GetCannotMergeReason(MergeCandidate candidate) =>
-        candidate.MergeBlockers switch
+    private static string GetCannotMergeReason(PersonMergeBlockers blockersWithAAsPrimary, PersonMergeBlockers blockersWithBAsPrimary) =>
+        (blockersWithAAsPrimary & blockersWithBAsPrimary) switch
         {
             var b when b.HasFlag(PersonMergeBlockers.Deactivated) =>
                 "One of these records has been deactivated",
-            var b when b.HasFlag(PersonMergeBlockers.OpenAlert | PersonMergeBlockers.InductionStatus) =>
-                $"One of these records has an alert and an induction status of {candidate.InductionStatus.GetDisplayName()}",
+            var b when b.HasFlag(PersonMergeBlockers.InductionStatusFailed) =>
+                "One of these records has an induction status of failed",
+            var b when b.HasFlag(PersonMergeBlockers.InductionStartDateMismatch) =>
+                "The induction start dates do not match",
+            var b when b.HasFlag(PersonMergeBlockers.InductionCompletedDateMismatch) =>
+                "The induction completed dates do not match",
             var b when b.HasFlag(PersonMergeBlockers.OpenAlert) =>
-                "One of these records has an alert",
-            var b when b.HasFlag(PersonMergeBlockers.InductionStatus) =>
-                $"The induction status of one of these records is {candidate.InductionStatus.GetDisplayName()}",
-            _ => throw new InvalidOperationException($"Person '{candidate.PersonId}' has no merge blockers.")
+                "Both records have an alert",
+            var b when b.HasFlag(PersonMergeBlockers.InductionStatusFailedInWales) =>
+                "Both records have an induction status of failed in Wales",
+            // Each record is blocked from being deactivated for a different reason
+            _ => "One of these records has an alert and the other has an induction status of failed in Wales"
+        };
+
+    private static string GetInvalidPrimaryPersonReason(PersonMergeBlockers blockers) =>
+        blockers switch
+        {
+            var b when b.HasFlag(PersonMergeBlockers.OpenAlert) =>
+                "The secondary record has an alert",
+            var b when b.HasFlag(PersonMergeBlockers.InductionStatusFailedInWales) =>
+                "The induction status of the secondary record is failed in Wales",
+            _ => throw new InvalidOperationException($"Unexpected merge blockers: {blockers}.")
         };
 }

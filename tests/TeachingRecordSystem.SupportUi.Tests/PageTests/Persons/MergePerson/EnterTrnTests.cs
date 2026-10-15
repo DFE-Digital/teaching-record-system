@@ -247,7 +247,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
     }
 
     [Fact]
-    public async Task Get_PersonAHasOpenAlert_ReturnsBadRequest()
+    public async Task Get_PersonAHasOpenAlert_ReturnsOk()
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
@@ -263,35 +263,11 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task Post_CancelWhenPersonAHasOpenAlert_DeletesJourneyAndRedirectsToPersonDetailPage()
-    {
-        // Arrange
-        var personA = await TestData.CreatePersonAsync(p => p
-            .WithAlert(a => a.WithEndDate(null)));
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            personA.PersonId,
-            CreateState(personA));
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
-        {
-            Content = new FormUrlEncodedContentBuilder().Add("Cancel", bool.TrueString)
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        AssertEx.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
-        Assert.Null(GetJourneyInstanceState(journeyInstance));
-    }
-
-    [Fact]
-    public async Task Post_PersonAHasOpenAlert_ReturnsBadRequest()
+    public async Task Post_PersonAHasOpenAlert_RedirectsToNextPage()
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
@@ -314,14 +290,16 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Theory]
     [InlineData(InductionStatus.InProgress)]
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.Failed)]
-    public async Task Post_PersonAHasInvalidInductionStatus_ReturnsBadRequest(InductionStatus status)
+    [InlineData(InductionStatus.FailedInWales)]
+    public async Task Post_PersonAHasInductionStatus_RedirectsToNextPage(InductionStatus status)
     {
         // Arrange
         var personA = await TestData.CreatePersonAsync(p => p
@@ -336,7 +314,6 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
             personA.PersonId,
             CreateState(personA));
 
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(personA, journeyInstance))
         {
             Content = new MergePersonPostRequestContentBuilder()
@@ -348,7 +325,8 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        AssertEx.ResponseIsRedirectTo(response,
+            $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
     [Fact]
