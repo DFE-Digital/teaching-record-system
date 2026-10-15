@@ -13,7 +13,7 @@ public class ChangeHistoryService(
     ReferenceDataCache referenceDataCache,
     IAuthorizationService authorizationService)
 {
-    public async Task<ResultPage<TimelineItem>> GetChangeHistoryByPersonAsync(
+    public async Task<ResultPage<ProcessChangeHistoryEntry>> GetChangeHistoryByPersonAsync(
         Guid personId,
         ClaimsPrincipal user,
         PaginationOptions paginationOptions,
@@ -113,6 +113,7 @@ public class ChangeHistoryService(
             .Where(p => p.PersonIds.Contains(personId) && processTypesToQuery.Contains(p.ProcessType))
             .Include(p => p.User)
             .Include(p => p.Events).AsSplitQuery()
+            .OrderByDescending(p => p.CreatedOn)
             .ToListAsync(cancellationToken);
 
         // Filter alert processes by alert type permissions
@@ -152,20 +153,22 @@ public class ChangeHistoryService(
                 || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
         }).ToList();
 
-        var contextData = await GetContextDataAsync(filteredProcesses, cancellationToken);
-        var context = ChangeHistoryContext.ForPerson(personId, contextData);
+        var totalItemCount = filteredProcesses.Count;
+        var pageNumber = ResultPage.ResolveCurrentPage(paginationOptions.PageNumber, paginationOptions.PageSize, totalItemCount);
 
-        var allResults = filteredProcesses.Select(p => MapProcess(p, personId, context)).ToArray();
-
-        var pageNumber = paginationOptions.PageNumber ?? 1;
-
-        var items = allResults
-            .OrderByDescending(i => i.Timestamp)
+        var pageOfProcesses = filteredProcesses
             .Skip((pageNumber - 1) * paginationOptions.PageSize)
             .Take(paginationOptions.PageSize)
             .ToArray();
 
-        return new ResultPage<TimelineItem>(items, pageNumber, paginationOptions.PageSize, allResults.Length);
+        var contextData = await GetContextDataAsync(pageOfProcesses, cancellationToken);
+        var context = ChangeHistoryContext.ForPerson(personId, contextData);
+
+        var items = pageOfProcesses
+            .Select(p => new ProcessChangeHistoryEntry(p, new RaisedByUserInfo { Name = p.DqtUserName ?? p.User?.Name! }, context))
+            .ToArray();
+
+        return new ResultPage<ProcessChangeHistoryEntry>(items, pageNumber, paginationOptions.PageSize, totalItemCount);
     }
 
     public async Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(
@@ -286,12 +289,6 @@ public class ChangeHistoryService(
             allUserNames,
             allApplicationUsers);
     }
-
-    private TimelineItem MapProcess(Process process, Guid personId, ChangeHistoryContext context) =>
-        new TimelineItem<ProcessChangeHistoryEntry>(
-            personId,
-            process.CreatedOn,
-            new ProcessChangeHistoryEntry(process, new RaisedByUserInfo { Name = process.DqtUserName ?? process.User?.Name! }, context));
 
     private record Result(Process Process, RaisedByUserInfo RaisedByUser);
 

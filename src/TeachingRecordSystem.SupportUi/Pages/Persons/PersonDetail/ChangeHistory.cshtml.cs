@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
+using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
@@ -17,7 +18,7 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
     [FromQuery]
     public int? PageNumber { get; set; }
 
-    public IReadOnlyCollection<TimelineItem>? TimelineItems { get; set; }
+    public IReadOnlyCollection<ChangeHistoryEntryViewModel>? ChangeHistory { get; set; }
 
     public PaginationViewModel? Pagination { get; set; }
 
@@ -35,10 +36,22 @@ public class ChangeHistoryModel(ChangeHistoryService changeHistoryService, Suppo
             User,
             new PaginationOptions(PageNumber, PageSize),
             cancellationToken);
-        TimelineItems = items;
+
+        ChangeHistory = items
+            .Select(e => new ChangeHistoryEntryViewModel
+            {
+                Context = e.Context,
+                Timestamp = e.Process.CreatedOn,
+                UserName = e.RaisedByUser.Name,
+                ProcessId = e.Process.ProcessId,
+                ProcessType = e.Process.ProcessType,
+                ChangeReason = e.Process.ChangeReason,
+                Events = e.Process.Events!.Select(v => v.Payload).AsReadOnly(),
+            })
+            .AsReadOnly();
 
         // If an 'out of bounds' page was requested, redirect to the first page
-        if (TimelineItems.Count == 0 && PageNumber > 1)
+        if (ChangeHistory.Count == 0 && PageNumber > 1)
         {
             return Redirect(linkGenerator.Persons.PersonDetail.ChangeHistory(PersonId, pageNumber: 1));
         }
