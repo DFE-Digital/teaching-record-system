@@ -31,6 +31,8 @@ public class User : UserBase
     public required string? Role { get; set; }
     public Guid? DqtUserId { get; set; }
     public DateTime? LastSignedInUtc { get; set; }
+    public Guid? TeamId { get; set; }
+    public Team? Team { get; set; }
 }
 
 public class ApplicationUser : UserBase

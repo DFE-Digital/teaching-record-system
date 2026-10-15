@@ -31,6 +31,9 @@ public class UserMapping : IEntityTypeConfiguration<User>
         builder.Property(e => e.AzureAdUserId).HasMaxLength(User.AzureAdUserIdMaxLength);
         builder.Property(e => e.Role).HasMaxLength(User.RoleMaxLength);
         builder.Property(e => e.DqtUserId).ConfigureAnalyticsSync(included: false);
+        builder.Property(e => e.TeamId).ConfigureAnalyticsSync(hidden: false);
+        builder.HasOne(e => e.Team).WithMany().HasForeignKey(e => e.TeamId);
+        builder.HasIndex(e => e.TeamId);
         builder.HasIndex(e => e.AzureAdUserId).IsUnique();
     }
 }

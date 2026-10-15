@@ -2659,6 +2659,42 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.ToTable("support_task_types", (string)null);
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Team", b =>
+                {
+                    b.Property<Guid>("TeamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("team_id");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("TeamId")
+                        .HasName("pk_teams");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_teams_name")
+                        .HasFilter("deleted_on is null");
+
+                    b.ToTable("teams", (string)null);
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TpsCsvExtract", b =>
                 {
                     b.Property<Guid>("TpsCsvExtractId")
@@ -3840,9 +3876,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("role");
 
+                    b.Property<Guid?>("TeamId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("team_id");
+
                     b.HasIndex("AzureAdUserId")
                         .IsUnique()
                         .HasDatabaseName("ix_users_azure_ad_user_id");
+
+                    b.HasIndex("TeamId")
+                        .HasDatabaseName("ix_users_team_id");
 
                     b.HasDiscriminator().HasValue(1);
                 });
@@ -4299,6 +4342,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("TrainingCountry");
 
                     b.Navigation("TrainingProvider");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.User", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .HasConstraintName("fk_users_teams_team_id");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", b =>
