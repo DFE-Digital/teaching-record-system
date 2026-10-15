@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.Shared.Components.ChangeHistoryEntry;
 
 namespace TeachingRecordSystem.SupportUi.Services.ChangeHistory;
 
@@ -18,19 +17,4 @@ public record ProcessChangeHistoryEntry(Process Process, RaisedByUserInfo Raised
         @event = Process.Events!.Select(pe => pe.Payload).OfType<T>().SingleOrDefault();
         return @event is not null;
     }
-}
-
-public static class ProcessChangeHistoryEntryExtensions
-{
-    public static ChangeHistoryEntryViewModel ToChangeHistoryEntryViewModel(this TimelineItem<ProcessChangeHistoryEntry> timelineItem) =>
-        new()
-        {
-            Context = timelineItem.ItemModel.Context,
-            Timestamp = timelineItem.Timestamp,
-            UserName = timelineItem.ItemModel.RaisedByUser.Name,
-            ProcessId = timelineItem.ItemModel.Process.ProcessId,
-            ProcessType = timelineItem.ItemModel.Process.ProcessType,
-            ChangeReason = timelineItem.ItemModel.Process.ChangeReason,
-            Events = timelineItem.ItemModel.Process.Events!.Select(e => e.Payload).AsReadOnly(),
-        };
 }

@@ -11,18 +11,16 @@
     <govuk-back-link href="@LinkGenerator.Persons.PersonDetail.Index(person.PersonId)">Back to record</govuk-back-link>
 }
 
-@if (Model.TimelineItems!.Count == 0)
+@if (Model.ChangeHistory!.Count == 0)
 {
     <p class="govuk-body" data-testid="no-changes">No changes</p>
 }
 else
 {
     <div class="moj-timeline">
-        @foreach (var timelineItem in Model.TimelineItems)
+        @foreach (var entry in Model.ChangeHistory!)
         {
-            var viewName = $"./Timeline/Processes/{((ProcessChangeHistoryEntry)timelineItem.ItemModel).Process.ProcessType}.cshtml";
-
-            <partial name="@viewName" for="@timelineItem" />
+            <vc:change-history-entry model="@entry" />
         }
     </div>
 

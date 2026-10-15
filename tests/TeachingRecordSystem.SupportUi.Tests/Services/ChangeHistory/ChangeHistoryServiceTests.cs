@@ -54,7 +54,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
     }
 
     [Fact]
-    public async Task GetChangeHistoryByPersonAsync_MapsProcessToTimelineItem()
+    public async Task GetChangeHistoryByPersonAsync_MapsProcessToEntry()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -66,12 +66,9 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-        Assert.Equal(process.CreatedOn, item.Timestamp);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(process.CreatedOn, entry.Process.CreatedOn);
         Assert.Equal(user.Name, entry.RaisedByUser.Name);
     }
 
@@ -128,8 +125,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal("Some DQT User", entry.RaisedByUser.Name);
     }
@@ -173,15 +169,15 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         // Assert
         Assert.Equal(
             [newest.ProcessId, middle.ProcessId, oldest.ProcessId],
-            result.Select(i => ((ProcessChangeHistoryEntry)i.ItemModel).Process.ProcessId));
+            result.Select(e => e.Process.ProcessId));
     }
 
     [Theory]
-    [InlineData(1, 2)]
-    [InlineData(2, 2)]
-    [InlineData(3, 1)]
-    [InlineData(4, 0)]
-    public async Task GetChangeHistoryByPersonAsync_Pagination(int pageNumber, int expectedItemCount)
+    [InlineData(1, 1, 2)]
+    [InlineData(2, 2, 2)]
+    [InlineData(3, 3, 1)]
+    [InlineData(4, 3, 1)]
+    public async Task GetChangeHistoryByPersonAsync_Pagination(int pageNumber, int expectedCurrentPage, int expectedItemCount)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -202,7 +198,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
 
         // Assert
         Assert.Equal(5, result.TotalItemCount);
-        Assert.Equal(pageNumber, result.CurrentPage);
+        Assert.Equal(expectedCurrentPage, result.CurrentPage);
         Assert.Equal(expectedItemCount, result.Count);
     }
 
@@ -237,10 +233,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.NotifyingTrnRecipient, entry.Process.ProcessType);
     }
@@ -269,10 +262,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.PersonDeceased, entry.Process.ProcessType);
     }
@@ -301,10 +291,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.PersonDetailsUpdating, entry.Process.ProcessType);
     }
@@ -322,9 +309,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.NoteCreating, entry.Process.ProcessType);
     }
@@ -353,10 +338,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.SupportTaskDeleting, entry.Process.ProcessType);
     }
@@ -390,10 +372,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.SupportTaskAllocating, entry.Process.ProcessType);
     }
@@ -425,10 +404,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.SupportTasksAssigning, entry.Process.ProcessType);
     }
@@ -461,10 +437,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge, entry.Process.ProcessType);
     }
@@ -497,10 +470,7 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
 
         // Assert
-        var item = Assert.Single(result);
-        Assert.Equal(person.PersonId, item.PersonId);
-
-        var entry = Assert.IsType<ProcessChangeHistoryEntry>(item.ItemModel);
+        var entry = Assert.Single(result);
         Assert.Equal(process.ProcessId, entry.Process.ProcessId);
         Assert.Equal(ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge, entry.Process.ProcessType);
     }
@@ -696,8 +666,8 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
         Assert.Equal(["Newest", "Middle", "Oldest"], GetNoteContents(result));
     }
 
-    private Task<ResultPage<TimelineItem>> GetChangeHistoryByPersonAsync(Guid personId, ClaimsPrincipal user, PaginationOptions paginationOptions) =>
-        WithServiceAsync<ChangeHistoryService, ResultPage<TimelineItem>>(service =>
+    private Task<ResultPage<ProcessChangeHistoryEntry>> GetChangeHistoryByPersonAsync(Guid personId, ClaimsPrincipal user, PaginationOptions paginationOptions) =>
+        WithServiceAsync<ChangeHistoryService, ResultPage<ProcessChangeHistoryEntry>>(service =>
             service.GetChangeHistoryByPersonAsync(personId, user, paginationOptions));
 
     private Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(string supportTaskReference) =>
