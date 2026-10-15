@@ -42,6 +42,8 @@ public partial class TrsDbContext(DbContextOptions<TrsDbContext> options) : DbCo
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<Team> Teams => Set<Team>();
+
     public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
 
     public DbSet<Person> Persons => Set<Person>();
