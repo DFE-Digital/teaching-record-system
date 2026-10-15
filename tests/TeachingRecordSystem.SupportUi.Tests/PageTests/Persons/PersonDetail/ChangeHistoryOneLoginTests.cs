@@ -120,12 +120,9 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "OneLogin Connected",
+            "GOV.UK One Login record matching task completed",
             user.Name,
-            process.Now,
-            [
-                ("Event Type", "Task Connection")
-            ]);
+            process.Now);
     }
 
     [Fact]
@@ -171,12 +168,9 @@ public partial class ChangeHistoryTests
 
         doc.AssertHasChangeHistoryEntry(
             processContext.ProcessId,
-            "OneLogin Connected",
+            "GOV.UK One Login ID verification task completed",
             SystemUser.SystemUserName,
-            processContext.Now,
-            [
-                ("Event Type", "Task Connection")
-            ]);
+            processContext.Now);
     }
 
     [Fact]
