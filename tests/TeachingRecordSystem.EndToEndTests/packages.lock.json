@@ -1712,7 +1712,7 @@
           "Joonasw.AspNetCore.SecurityHeaders": "[6.0.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.12, )",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.12, )",
-          "Microsoft.Graph": "[6.2.0, )",
+          "Microsoft.Graph": "[6.8.0, )",
           "Microsoft.Identity.Web": "[4.16.0, )",
           "Microsoft.Identity.Web.GraphServiceClientBeta": "[4.12.2, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.23.0, )",
@@ -2286,9 +2286,9 @@
       },
       "Microsoft.Graph": {
         "type": "CentralTransitive",
-        "requested": "[6.2.0, )",
-        "resolved": "6.2.0",
-        "contentHash": "s7Flvk+r/f/x64I4D4FiYc8sPVcrSjXmCZblTeBFVqBr0RXJOGg5SDMbiHtCqxiGoYtEvLp/fs8FN1G1nopl0g==",
+        "requested": "[6.8.0, )",
+        "resolved": "6.8.0",
+        "contentHash": "CBU0bRVkiYy8TLiGmGbIUTENCfPnXF+59FCZKCOATS+uN4RmoH350/2chiZheaWUWk22v7rOoWZaJWW4Qtbn7Q==",
         "dependencies": {
           "Microsoft.Graph.Core": "4.0.1"
         }
