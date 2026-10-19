@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Teams;
 
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]

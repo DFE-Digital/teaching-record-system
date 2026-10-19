@@ -7,8 +7,8 @@ using TeachingRecordSystem.SupportUi.Pages.OneLogins;
 using TeachingRecordSystem.SupportUi.Pages.Persons;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks;
-using TeachingRecordSystem.SupportUi.Pages.Users;
 using TeachingRecordSystem.SupportUi.Pages.Teams;
+using TeachingRecordSystem.SupportUi.Pages.Users;
 
 namespace TeachingRecordSystem.SupportUi;
 
