@@ -1,6 +1,37 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model ChangeHistoryEntryViewModel
+@{
+    var hasSupportTaskCreatedEvent = Model.TryGetEvent<SupportTaskCreatedEvent>(out var supportTaskCreatedEvent);
+    var hasTrnRequestCreatedEvent = Model.TryGetEvent<TrnRequestCreatedEvent>(out var trnRequestCreatedEvent);
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+    var isSupportTaskContext = Model.Context.ContextType == ChangeHistoryContextType.SupportTask;
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    var supportTaskReference = supportTaskCreatedEvent?.SupportTask.SupportTaskReference;
+    var sourceApplicationName = hasTrnRequestCreatedEvent
+        ? Model.Context.TryGetApplicationUserInfo(trnRequestCreatedEvent!.TrnRequest.ApplicationUserId)?.Name
+        : null;
+}
+
+<timeline-entry title="NPQ TRN request received" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (!string.IsNullOrWhiteSpace(sourceApplicationName))
+    {
+        <p class="govuk-body" data-testid="trn-request-summary">
+            TRN request received from @sourceApplicationName.
+        </p>
+    }
+
+    @if (hasSupportTaskCreatedEvent && supportTaskReference is not null)
+    {
+        <p class="govuk-body" data-testid="support-task-created-message">
+            @if (!isSupportTaskContext)
+            {
+                <text>TRN request support task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@supportTaskReference <span class="govuk-visually-hidden">(opens in new tab)</span></a> was created.</text>
+            }
+            else
+            {
+                <text>TRN request support task @supportTaskReference was created.</text>
+            }
+        </p>
+    }
 </timeline-entry>
