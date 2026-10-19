@@ -8,36 +8,39 @@
         ? parsedNino.ToDisplayString()
         : Model.NationalInsuranceNumber;
 }
-<div data-testid="details">
-    <govuk-summary-list>
-        <row>
-            <key>Name</key>
-            <value use-empty-fallback>@name</value>
-        </row>
-        <row>
-            <key>Date of birth</key>
-            <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
-        </row>
-        @if (email is not null)
-        {
+<govuk-details class="govuk-!-margin-bottom-2" data-testid="details">
+    <summary>Person details</summary>
+    <text>
+        <govuk-summary-list>
             <row>
-                <key>Email address</key>
-                <value use-empty-fallback>@email</value>
+                <key>Name</key>
+                <value use-empty-fallback>@name</value>
             </row>
-        }
-        @if (nino is not null)
-        {
             <row>
-                <key>National Insurance number</key>
-                <value use-empty-fallback>@nino</value>
+                <key>Date of birth</key>
+                <value use-empty-fallback>@Model.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)</value>
             </row>
-        }
-        @if (Model.Gender is not null)
-        {
-            <row>
-                <key>Gender</key>
-                <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
-            </row>
-        }
-    </govuk-summary-list>
-</div>
+            @if (email is not null)
+            {
+                <row>
+                    <key>Email address</key>
+                    <value use-empty-fallback>@email</value>
+                </row>
+            }
+            @if (nino is not null)
+            {
+                <row>
+                    <key>National Insurance number</key>
+                    <value use-empty-fallback>@nino</value>
+                </row>
+            }
+            @if (Model.Gender is not null)
+            {
+                <row>
+                    <key>Gender</key>
+                    <value use-empty-fallback>@Model.Gender?.GetDisplayName()</value>
+                </row>
+            }
+        </govuk-summary-list>
+    </text>
+</govuk-details>
