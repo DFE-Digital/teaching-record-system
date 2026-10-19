@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Html
+@using System.Text.Encodings.Web
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Events.ChangeReasons
 @model ChangeHistoryEntryViewModel
@@ -22,28 +24,40 @@
         : oldDetails.NationalInsuranceNumber;
 }
 
+@functions {
+    private static IHtmlContent ToDisplayValueOrFallback(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return new HtmlString("<span class=\"trs-empty-fallback\">None</span>");
+        }
+
+        return new HtmlString(HtmlEncoder.Default.Encode(value));
+    }
+}
+
 <timeline-entry title="Record updated" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
     @if (updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
     {
-        <p class="govuk-body" data-testid="name">Name changed from @oldName to @name</p>
+        <p class="govuk-body" data-testid="name">Name changed from @ToDisplayValueOrFallback(oldName) to @ToDisplayValueOrFallback(name)</p>
     }
     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
     {
         <p class="govuk-body" data-testid="date-of-birth">
-            Date of birth changed from @oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat) to @details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)
+            Date of birth changed from @ToDisplayValueOrFallback(oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat))
         </p>
     }
     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
     {
-        <p class="govuk-body" data-testid="email-address">Email address changed from @oldEmail to @email</p>
+        <p class="govuk-body" data-testid="email-address">Email address changed from @ToDisplayValueOrFallback(oldEmail) to @ToDisplayValueOrFallback(email)</p>
     }
     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
     {
-        <p class="govuk-body" data-testid="national-insurance-number">National Insurance number changed from @oldNino to @nino</p>
+        <p class="govuk-body" data-testid="national-insurance-number">National Insurance number changed from @ToDisplayValueOrFallback(oldNino) to @ToDisplayValueOrFallback(nino)</p>
     }
     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
     {
-        <p class="govuk-body" data-testid="gender">Gender changed from @oldDetails.Gender?.GetDisplayName() to @details.Gender?.GetDisplayName()</p>
+        <p class="govuk-body" data-testid="gender">Gender changed from @ToDisplayValueOrFallback(oldDetails.Gender?.GetDisplayName()) to @ToDisplayValueOrFallback(details.Gender?.GetDisplayName())</p>
     }
 
     @if (changeReason is not null && (!string.IsNullOrEmpty(changeReason.Reason) || !string.IsNullOrEmpty(changeReason.Details)))

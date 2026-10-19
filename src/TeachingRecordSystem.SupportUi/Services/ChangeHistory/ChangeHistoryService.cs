@@ -102,6 +102,8 @@ public class ChangeHistoryService(
             ProcessType.TrnRequestCreating,
             ProcessType.TrnRequestResolving,
             ProcessType.TrnRequestActivating,
+            ProcessType.TrnRequestManualChecksNeededTaskCompleting,
+            ProcessType.TrnRequestResetting,
             ProcessType.SupportTaskDeleting,
             ProcessType.SupportTaskAllocating,
             ProcessType.SupportTasksAssigning,

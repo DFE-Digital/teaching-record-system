@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Html
+@using System.Text.Encodings.Web
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model ChangeHistoryEntryViewModel
@@ -21,6 +23,18 @@
     var supportTaskReference = supportTaskUpdatedEvent?.SupportTaskReference;
     var oneLoginEmail = oneLoginUpdatedEvent?.OneLoginUser.EmailAddress;
     var oneLoginSubject = oneLoginUpdatedEvent?.OneLoginUser.Subject;
+}
+
+@functions {
+    private static IHtmlContent ToDisplayValueOrFallback(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return new HtmlString("<span class=\"trs-empty-fallback\">None</span>");
+        }
+
+        return new HtmlString(HtmlEncoder.Default.Encode(value));
+    }
 }
 
 <timeline-entry title="TRN request resolved" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
@@ -56,25 +70,25 @@
 
         if (personDetailsUpdatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
-            <p class="govuk-body" data-testid="name">Name changed from @oldName to @name</p>
+            <p class="govuk-body" data-testid="name">Name changed from @ToDisplayValueOrFallback(oldName) to @ToDisplayValueOrFallback(name)</p>
         }
         if (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
             <p class="govuk-body" data-testid="date-of-birth">
-                Date of birth changed from @oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat) to @details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)
+                Date of birth changed from @ToDisplayValueOrFallback(oldDetails.DateOfBirth?.ToString(WebConstants.DateDisplayFormat)) to @ToDisplayValueOrFallback(details.DateOfBirth?.ToString(WebConstants.DateDisplayFormat))
             </p>
         }
         if (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            <p class="govuk-body" data-testid="email-address">Email address changed from @oldDetails.EmailAddress to @details.EmailAddress</p>
+            <p class="govuk-body" data-testid="email-address">Email address changed from @ToDisplayValueOrFallback(oldDetails.EmailAddress) to @ToDisplayValueOrFallback(details.EmailAddress)</p>
         }
         if (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
         {
-            <p class="govuk-body" data-testid="national-insurance-number">National Insurance number changed from @oldDetails.NationalInsuranceNumber to @details.NationalInsuranceNumber</p>
+            <p class="govuk-body" data-testid="national-insurance-number">National Insurance number changed from @ToDisplayValueOrFallback(oldDetails.NationalInsuranceNumber) to @ToDisplayValueOrFallback(details.NationalInsuranceNumber)</p>
         }
         if (personDetailsUpdatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
         {
-            <p class="govuk-body" data-testid="gender">Gender changed from @oldDetails.Gender?.GetDisplayName() to @details.Gender?.GetDisplayName()</p>
+            <p class="govuk-body" data-testid="gender">Gender changed from @ToDisplayValueOrFallback(oldDetails.Gender?.GetDisplayName()) to @ToDisplayValueOrFallback(details.Gender?.GetDisplayName())</p>
         }
     }
 
