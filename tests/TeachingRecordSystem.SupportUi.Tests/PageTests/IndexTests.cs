@@ -5,6 +5,28 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests;
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.RecordManager, false)]
+    [InlineData(UserRoles.AlertsManagerTra, false)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, false)]
+    [InlineData(UserRoles.AccessManager, true)]
+    [InlineData(UserRoles.Administrator, true)]
+    public async Task Get_TeamsLink_OnlyVisibleToUserManagementRoles(string? role, bool shouldShowTeamsLink)
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+
+        // Act
+        var response = await HttpClient.GetAsync("/");
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var teamsLink = doc.QuerySelector("a[href='/teams']");
+        Assert.Equal(shouldShowTeamsLink, teamsLink is not null);
+    }
+
     [Fact]
     public async Task? Get_UserWithoutRole_DoesNotRenderSupportTaskPanel()
     {
