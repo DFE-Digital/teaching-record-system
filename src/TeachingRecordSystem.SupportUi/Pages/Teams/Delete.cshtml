@@ -1,0 +1,11 @@
+@page "/teams/{teamId:guid}/delete"
+@model TeachingRecordSystem.SupportUi.Pages.Teams.DeleteModel
+@{
+    ViewBag.Title = "Delete team";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Teams.Index()" />
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>

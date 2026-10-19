@@ -1,0 +1,26 @@
+@page "/teams"
+@model TeachingRecordSystem.SupportUi.Pages.Teams.IndexModel
+@{
+    ViewBag.Title = "Add and manage teams";
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<govuk-button-link href="@LinkGenerator.Teams.Add()">Add a new team</govuk-button-link>
+
+<govuk-table>
+    <table-head>
+        <table-head-cell>Team name</table-head-cell>
+        <table-head-cell><span class="govuk-visually-hidden">Actions</span></table-head-cell>
+    </table-head>
+    @foreach (var team in Model.Teams)
+    {
+        <table-row>
+            <table-cell>@team.Name</table-cell>
+            <table-cell>
+                <a class="govuk-link" href="@LinkGenerator.Teams.Edit(team.TeamId)">Change<span class="govuk-visually-hidden"> @team.Name</span></a>
+                <a class="govuk-link govuk-!-margin-left-4" href="@LinkGenerator.Teams.Delete(team.TeamId)">Delete<span class="govuk-visually-hidden"> @team.Name</span></a>
+            </table-cell>
+        </table-row>
+    }
+</govuk-table>

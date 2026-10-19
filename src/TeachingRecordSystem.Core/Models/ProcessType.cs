@@ -103,5 +103,6 @@ public enum ProcessType
     InductionMigratingFromDqt = 101,
     PersonUnmerging = 102,
     TpsEmploymentCreating = 103,
-    TpsEmploymentUpdating = 104
+    TpsEmploymentUpdating = 104,
+    TeamCreating = 105
 }

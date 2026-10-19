@@ -569,6 +569,14 @@ Edit / close / reopen alert.
 
 ---
 
+## Teams
+
+### `TeamCreating` (105)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TeamCreatedEvent` | Always | A team is added. |
+
 ## Users, application users and API keys
 
 ### `UserAdding` (46)

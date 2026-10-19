@@ -56,6 +56,12 @@
                         active="@(Context.Request.Path.StartsWithSegments("/users"))">
                         Add and manage users
                     </nav-item>
+                    <nav-item
+                        href="@LinkGenerator.Teams.Index()"
+                        current="@(Context.Request.Path == "/teams")"
+                        active="@(Context.Request.Path.StartsWithSegments("/teams"))">
+                        Add and manage teams
+                    </nav-item>
                 }
 
                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AdminOnly)).Succeeded)
