@@ -49,15 +49,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 column: "team_id",
                 principalTable: "teams",
                 principalColumn: "team_id");
-
-            migrationBuilder.Sql("ALTER PUBLICATION dqt_rep_sync ADD TABLE teams");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("ALTER PUBLICATION dqt_rep_sync DROP TABLE teams");
-
             migrationBuilder.DropForeignKey(
                 name: "fk_users_teams_team_id",
                 table: "users");
