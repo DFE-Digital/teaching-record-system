@@ -11,7 +11,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(UserRoles.RecordManager, false)]
     [InlineData(UserRoles.AlertsManagerTra, false)]
     [InlineData(UserRoles.AlertsManagerTraDbs, false)]
-    [InlineData(UserRoles.AccessManager, false)]
+    [InlineData(UserRoles.AccessManager, true)]
     [InlineData(UserRoles.Administrator, true)]
     public async Task Get_TeamsLink_OnlyVisibleToTeamManagementRoles(string? role, bool shouldShowTeamsLink)
     {

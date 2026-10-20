@@ -25,7 +25,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(UserRoles.RecordManager, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.AlertsManagerTra, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.AlertsManagerTraDbs, StatusCodes.Status403Forbidden)]
-    [InlineData(UserRoles.AccessManager, StatusCodes.Status403Forbidden)]
+    [InlineData(UserRoles.AccessManager, StatusCodes.Status200OK)]
     [InlineData(UserRoles.Administrator, StatusCodes.Status200OK)]
     public async Task Get_TeamPages_OnlyTeamManagementRolesCanView(string? role, int expectedStatusCode)
     {
@@ -47,7 +47,6 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(UserRoles.RecordManager)]
     [InlineData(UserRoles.AlertsManagerTra)]
     [InlineData(UserRoles.AlertsManagerTraDbs)]
-    [InlineData(UserRoles.AccessManager)]
     public async Task Post_WithoutTeamManagementRole_CannotCreateTeam(string? role)
     {
         // Arrange
@@ -72,7 +71,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithoutPermission_ReturnsForbidden(string path)
     {
         // Arrange
-        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AccessManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Viewer));
 
         // Act
         var response = await HttpClient.GetAsync(path);
@@ -81,11 +80,13 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Post_ValidName_CreatesTeamAndEvent()
+    [Theory]
+    [InlineData(UserRoles.AccessManager)]
+    [InlineData(UserRoles.Administrator)]
+    public async Task Post_ValidName_CreatesTeamAndEvent(string role)
     {
         // Arrange
-        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
         var name = $"Team {Guid.NewGuid()}";
         var request = new HttpRequestMessage(HttpMethod.Post, "/teams/add")
         {
