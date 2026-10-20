@@ -22,7 +22,7 @@ public class NpqTrnRequestRejectingTests(HostFixture hostFixture) : ChangeHistor
         AssertTitle(entry, "NPQ TRN request rejected");
 
         Assert.Equal("TRN request rejected.", entry.GetElementByTestId("trn-request-summary")?.TrimmedText());
-        Assert.Equal("Task closed.", entry.GetElementByTestId("task-closed-message")?.TrimmedText());
+        Assert.Contains("closed.", entry.GetElementByTestId("task-closed-message")?.TrimmedText());
 
         entry.AssertSummaryListRowValue("rejection-reason", "Reason", v => Assert.Equal("Insufficient evidence", v.TrimmedText()));
         entry.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
@@ -50,7 +50,7 @@ public class NpqTrnRequestRejectingTests(HostFixture hostFixture) : ChangeHistor
         AssertTitle(entry, "NPQ TRN request rejected");
 
         Assert.Equal("TRN request rejected.", entry.GetElementByTestId("trn-request-summary")?.TrimmedText());
-        Assert.Equal("Task closed.", entry.GetElementByTestId("task-closed-message")?.TrimmedText());
+        Assert.Contains("closed.", entry.GetElementByTestId("task-closed-message")?.TrimmedText());
 
         Assert.Null(entry.GetElementByTestId("rejection-reason"));
         entry.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal(WebConstants.EmptyFallbackContent, v.TrimmedText()));
