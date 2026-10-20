@@ -4,8 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class ChangeLogNpqTrnRequestProcessTests : TestBase
 {
-    private const string RecordCreatedReason = "Record created - no existing person identified during task resolution";
-    private const string RecordMergedReason = "Records merged - identified as same person during task resolution";
+    private const string NoneFallbackContent = "None";
 
     private readonly string _oldFirstName = "Alfred";
     private readonly string _oldMiddleName = "The";
@@ -111,7 +110,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Record updated from Apply for QTS TRN request",
+            "NPQ TRN request approved",
             createdByUser.Name,
             process.CreatedOn);
 
@@ -120,70 +119,62 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
-            item.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Name", v => Assert.Equal($"{_oldFirstName} {_oldMiddleName} {_oldLastName}", v.TrimmedText()));
+            Assert.Equal(
+                $"Name changed from {_oldFirstName} {_oldMiddleName} {_oldLastName} to {newFirstName} {newMiddleName} {newLastName}",
+                item.GetElementByTestId("name")?.TrimmedText());
         }
         else
         {
-            item.AssertSummaryListRowDoesNotExist("details", "Name");
-            item.AssertSummaryListRowDoesNotExist("previous-details", "Name");
+            Assert.Null(item.GetElementByTestId("name"));
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
-            item.AssertSummaryListRowValue("details", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Date of birth", v => Assert.Equal(_oldDob.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+            Assert.Equal(
+                $"Date of birth changed from {_oldDob.ToString(WebConstants.DateDisplayFormat)} to {newDob.ToString(WebConstants.DateDisplayFormat)}",
+                item.GetElementByTestId("date-of-birth")?.TrimmedText());
         }
         else
         {
-            item.AssertSummaryListRowDoesNotExist("details", "Date of birth");
-            item.AssertSummaryListRowDoesNotExist("previous-details", "Date of birth");
+            Assert.Null(item.GetElementByTestId("date-of-birth"));
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            item.AssertSummaryListRowValue("details", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Email address", v => Assert.Equal(oldEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            Assert.Equal(
+                $"Email address changed from {oldEmail ?? NoneFallbackContent} to {newEmail ?? NoneFallbackContent}",
+                item.GetElementByTestId("email-address")?.TrimmedText());
         }
         else
         {
-            item.AssertSummaryListRowDoesNotExist("details", "Email address");
-            item.AssertSummaryListRowDoesNotExist("previous-details", "Email address");
+            Assert.Null(item.GetElementByTestId("email-address"));
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
         {
-            item.AssertSummaryListRowValue("details", "National Insurance number", v => Assert.Equal(newNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "National Insurance number", v => Assert.Equal(oldNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            Assert.Equal(
+                $"National Insurance number changed from {oldNino ?? NoneFallbackContent} to {newNino ?? NoneFallbackContent}",
+                item.GetElementByTestId("national-insurance-number")?.TrimmedText());
         }
         else
         {
-            item.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
-            item.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
+            Assert.Null(item.GetElementByTestId("national-insurance-number"));
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.Gender))
         {
-            item.AssertSummaryListRowValue("details", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
-            item.AssertSummaryListRowValue("previous-details", "Gender", v => Assert.Equal(oldGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+            Assert.Equal(
+                $"Gender changed from {oldGender?.GetDisplayName() ?? NoneFallbackContent} to {newGender?.GetDisplayName() ?? NoneFallbackContent}",
+                item.GetElementByTestId("gender")?.TrimmedText());
         }
         else
         {
-            item.AssertSummaryListRowDoesNotExist("details", "Gender");
-            item.AssertSummaryListRowDoesNotExist("previous-details", "Gender");
+            Assert.Null(item.GetElementByTestId("gender"));
         }
 
-        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(RecordMergedReason, v.TrimmedText()));
-        item.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(comments, v.TrimmedText()));
-
-        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Created on", v => Assert.Equal(TimeProvider.NowGmt.ToString(WebConstants.DateAndTimeDisplayFormat), v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Date of birth", v => Assert.Equal(newDob.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Email address", v => Assert.Equal(newEmail ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "National Insurance number", v => Assert.Equal(newNino ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Gender", v => Assert.Equal(newGender?.GetDisplayName() ?? WebConstants.EmptyFallbackContent, v.TrimmedText()));
+        Assert.Equal("A TRN request was resolved to this record.", item.GetElementByTestId("trn-request-summary")?.TrimmedText());
+        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(comments, v.TrimmedText()));
+        Assert.Contains("closed.", item.GetElementByTestId("task-closed-message")?.TrimmedText());
     }
 
     [Fact]
@@ -220,22 +211,17 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Record created from Apply for QTS TRN request",
+            "NPQ TRN request approved",
             createdByUser.Name,
             process.CreatedOn);
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
 
-        // Creating a record isn't a change to an existing one, so there's nothing to show as changed or previous.
-        Assert.Null(item.GetElementByTestId("details"));
-        Assert.Null(item.GetElementByTestId("previous-details"));
-
-        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(RecordCreatedReason, v.TrimmedText()));
-        item.AssertSummaryListRowDoesNotExist("change-reason", "Comments");
-
-        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
-        item.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal($"{_firstName} {_middleName} {_lastName}", v.TrimmedText()));
+        Assert.Equal("Record created while resolving a TRN request.", item.GetElementByTestId("trn-request-summary")?.TrimmedText());
+        item.AssertSummaryListRowValue("details", "Name", v => Assert.Equal($"{_firstName} {_middleName} {_lastName}", v.TrimmedText()));
+        Assert.Null(item.GetElementByTestId("change-reason"));
+        Assert.Contains("closed.", item.GetElementByTestId("task-closed-message")?.TrimmedText());
     }
 
     [Fact]
@@ -265,18 +251,17 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Record updated from Apply for QTS TRN request",
+            "NPQ TRN request approved",
             createdByUser.Name,
             process.CreatedOn);
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
 
+        Assert.Equal("A TRN request was resolved to this record.", item.GetElementByTestId("trn-request-summary")?.TrimmedText());
         Assert.Null(item.GetElementByTestId("details"));
-        Assert.Null(item.GetElementByTestId("previous-details"));
-
-        item.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(RecordMergedReason, v.TrimmedText()));
-        item.AssertSummaryListRowValue("change-reason", "Comments", v => Assert.Equal(WebConstants.EmptyFallbackContent, v.TrimmedText()));
+        Assert.Null(item.GetElementByTestId("change-reason"));
+        Assert.Contains("closed.", item.GetElementByTestId("task-closed-message")?.TrimmedText());
     }
 
     [Fact]
@@ -312,13 +297,13 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
-            "Record created from TRN request of unknown source",
+            "NPQ TRN request approved",
             createdByUser.Name,
             process.CreatedOn);
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
-        item.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal(WebConstants.EmptyFallbackContent, v.TrimmedText()));
+        Assert.Equal("Record created while resolving a TRN request.", item.GetElementByTestId("trn-request-summary")?.TrimmedText());
     }
 
     [Fact]
