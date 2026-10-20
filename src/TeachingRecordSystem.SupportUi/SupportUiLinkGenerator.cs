@@ -7,6 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.OneLogins;
 using TeachingRecordSystem.SupportUi.Pages.Persons;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks;
+using TeachingRecordSystem.SupportUi.Pages.Teams;
 using TeachingRecordSystem.SupportUi.Pages.Users;
 
 namespace TeachingRecordSystem.SupportUi;
@@ -49,5 +50,6 @@ public class SupportUiLinkGenerator(LinkGenerator linkGenerator)
     public RoutesToProfessionalStatusLinkGenerator RoutesToProfessionalStatus => new(linkGenerator);
     public SupportTasksLinkGenerator SupportTasks => new(linkGenerator);
     public UsersLinkGenerator Users => new(linkGenerator);
+    public TeamsLinkGenerator Teams => new(linkGenerator);
     public FilesLinkGenerator Files => new(linkGenerator);
 }

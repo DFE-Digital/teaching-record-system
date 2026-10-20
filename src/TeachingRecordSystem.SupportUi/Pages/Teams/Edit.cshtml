@@ -1,0 +1,11 @@
+@page "/teams/{teamId:guid}"
+@model TeachingRecordSystem.SupportUi.Pages.Teams.EditModel
+@{
+    ViewBag.Title = "Change team";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Teams.Index()" />
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>

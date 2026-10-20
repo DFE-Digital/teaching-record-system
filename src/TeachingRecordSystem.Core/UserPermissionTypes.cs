@@ -20,6 +20,9 @@ public static class UserPermissionTypes
     [Display(Name = "Manage users", Description = "Add, manage, and remove other users from the TRS console")]
     public const string ManageUsers = nameof(ManageUsers);
 
+    [Display(Name = "Manage teams", Description = "Add, manage, and remove teams from the TRS console")]
+    public const string ManageTeams = nameof(ManageTeams);
+
     [Display(Name = "Support tasks", Description = "Access to the Support tasks area of the console")]
     public const string SupportTasks = nameof(SupportTasks);
 
@@ -30,6 +33,7 @@ public static class UserPermissionTypes
         NonDbsAlerts,
         DbsAlerts,
         ManageUsers,
+        ManageTeams,
         SupportTasks
     ];
 

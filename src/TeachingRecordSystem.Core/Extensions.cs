@@ -23,6 +23,7 @@ using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.Core.Services.Persons;
 using TeachingRecordSystem.Core.Services.RoutesToProfessionalStatus;
 using TeachingRecordSystem.Core.Services.SupportTasks;
+using TeachingRecordSystem.Core.Services.Teams;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.Core.Services.Webhooks;
@@ -121,6 +122,7 @@ public static class Extensions
             .AddMandatoryQualificationService()
             .AddRoutesToProfessionalStatusService()
             .AddUserService()
+            .AddTeamService()
             .AddInductionExemptionService()
             .AddInductionService()
             .AddOneLoginService();

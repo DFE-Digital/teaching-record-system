@@ -1,0 +1,26 @@
+@page "/teams/add"
+@model TeachingRecordSystem.SupportUi.Pages.Teams.AddModel
+@{
+    ViewBag.Title = "Add a team";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Teams.Index()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input for="Name" label-class="govuk-label--m">
+                <label>Team Name</label>
+            </govuk-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Confirm and add team</govuk-button>
+                <govuk-button-link class="govuk-button--secondary" href="@LinkGenerator.Teams.Index()">Cancel and return to teams</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

@@ -5,6 +5,44 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests;
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.RecordManager, false)]
+    [InlineData(UserRoles.AlertsManagerTra, false)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, false)]
+    [InlineData(UserRoles.AccessManager, true)]
+    [InlineData(UserRoles.Administrator, true)]
+    public async Task Get_TeamsLink_OnlyVisibleToTeamManagementRoles(string? role, bool shouldShowTeamsLink)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.TeamManagement);
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+
+        // Act
+        var response = await HttpClient.GetAsync("/");
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var teamsLink = doc.QuerySelector("a[href='/teams']");
+        Assert.Equal(shouldShowTeamsLink, teamsLink is not null);
+    }
+
+    [Fact]
+    public async Task Get_TeamsLink_FeatureDisabled_IsHidden()
+    {
+        // Arrange
+        FeatureProvider.Features.Remove(FeatureNames.TeamManagement);
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.GetAsync("/");
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.QuerySelector("a[href='/teams']"));
+    }
+
     [Fact]
     public async Task? Get_UserWithoutRole_DoesNotRenderSupportTaskPanel()
     {

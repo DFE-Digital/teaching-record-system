@@ -52,6 +52,7 @@ public static class UserRoles
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.Edit),
+        new(UserPermissionTypes.ManageTeams, UserPermissionLevel.Edit),
         new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
     ];
 
