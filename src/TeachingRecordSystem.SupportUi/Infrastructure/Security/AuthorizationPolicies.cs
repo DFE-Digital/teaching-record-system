@@ -11,5 +11,6 @@ public static class AuthorizationPolicies
     public const string AlertsEdit = nameof(AlertsEdit);
     public const string NotesView = nameof(NotesView);
     public const string UserManagement = nameof(UserManagement);
+    public const string TeamManagement = nameof(TeamManagement);
     public const string AdminOnly = nameof(AdminOnly);
 }

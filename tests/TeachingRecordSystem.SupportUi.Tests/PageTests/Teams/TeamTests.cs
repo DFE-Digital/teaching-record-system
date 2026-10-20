@@ -3,15 +3,31 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Teams;
 [ClearDbBeforeTest, Collection(nameof(DisableParallelization))]
 public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    [Fact]
+    public async Task Get_NoTeams_ShowsEmptyState()
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.GetAsync("/teams");
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Contains("No teams have been added yet.", doc.Body!.TextContent);
+        Assert.Null(doc.QuerySelector("table"));
+        Assert.NotNull(doc.QuerySelector("a[href='/teams/add']"));
+    }
+
     [Theory]
     [InlineData(null, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.Viewer, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.RecordManager, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.AlertsManagerTra, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.AlertsManagerTraDbs, StatusCodes.Status403Forbidden)]
-    [InlineData(UserRoles.AccessManager, StatusCodes.Status200OK)]
+    [InlineData(UserRoles.AccessManager, StatusCodes.Status403Forbidden)]
     [InlineData(UserRoles.Administrator, StatusCodes.Status200OK)]
-    public async Task Get_TeamPages_OnlyUserManagementRolesCanView(string? role, int expectedStatusCode)
+    public async Task Get_TeamPages_OnlyTeamManagementRolesCanView(string? role, int expectedStatusCode)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
@@ -31,7 +47,8 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(UserRoles.RecordManager)]
     [InlineData(UserRoles.AlertsManagerTra)]
     [InlineData(UserRoles.AlertsManagerTraDbs)]
-    public async Task Post_WithoutUserManagementRole_CannotCreateTeam(string? role)
+    [InlineData(UserRoles.AccessManager)]
+    public async Task Post_WithoutTeamManagementRole_CannotCreateTeam(string? role)
     {
         // Arrange
         SetCurrentUser(await TestData.CreateUserAsync(role: role));
@@ -55,7 +72,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithoutPermission_ReturnsForbidden(string path)
     {
         // Arrange
-        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.RecordManager));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AccessManager));
 
         // Act
         var response = await HttpClient.GetAsync(path);
@@ -64,13 +81,11 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(UserRoles.AccessManager)]
-    [InlineData(UserRoles.Administrator)]
-    public async Task Post_ValidName_CreatesTeamAndEvent(string role)
+    [Fact]
+    public async Task Post_ValidName_CreatesTeamAndEvent()
     {
         // Arrange
-        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
         var name = $"Team {Guid.NewGuid()}";
         var request = new HttpRequestMessage(HttpMethod.Post, "/teams/add")
         {
@@ -92,8 +107,8 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(ProcessType.TeamCreating, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<TeamCreatedEvent>(e =>
             {
-                Assert.Equal(team.TeamId, e.TeamId);
-                Assert.Equal(name, e.Name);
+                Assert.Equal(team.TeamId, e.Team.TeamId);
+                Assert.Equal(name, e.Team.Name);
             });
         });
 

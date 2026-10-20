@@ -122,7 +122,7 @@ public static class Extensions
             .AddMandatoryQualificationService()
             .AddRoutesToProfessionalStatusService()
             .AddUserService()
-            .AddTransient<TeamService>()
+            .AddTeamService()
             .AddInductionExemptionService()
             .AddInductionService()
             .AddOneLoginService();

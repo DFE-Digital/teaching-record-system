@@ -6,6 +6,5 @@ public record TeamCreatedEvent : IEvent
     Guid[] IEvent.PersonIds => [];
     string[] IEvent.OneLoginUserSubjects => [];
     string[] IEvent.SupportTaskReferences => [];
-    public required Guid TeamId { get; init; }
-    public required string Name { get; init; }
+    public required EventModels.Team Team { get; init; }
 }

@@ -8,7 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Teams;
 
-[Authorize(Policy = AuthorizationPolicies.UserManagement)]
+[Authorize(Policy = AuthorizationPolicies.TeamManagement)]
 public class AddModel(TrsDbContext dbContext, TeamService teamService, TimeProvider timeProvider, SupportUiLinkGenerator linkGenerator) : PageModel
 {
     private readonly InlineValidator<AddModel> _validator = new()

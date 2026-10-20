@@ -91,6 +91,7 @@ public static class Extensions
             .AddAdminOnlyPolicies()
             .AddSupportTasksPolicies()
             .AddUserManagementPolicies()
+            .AddTeamManagementPolicies()
             .AddAlertsPolicies()
             .AddNonPersonOrAlertDataPolicies()
             .AddPersonDataPolicies();

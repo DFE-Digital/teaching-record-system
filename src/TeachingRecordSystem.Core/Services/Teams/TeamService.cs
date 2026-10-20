@@ -21,8 +21,7 @@ public class TeamService(TrsDbContext dbContext, IEventPublisher eventPublisher)
             new TeamCreatedEvent
             {
                 EventId = Guid.NewGuid(),
-                TeamId = team.TeamId,
-                Name = team.Name
+                Team = EventModels.Team.FromModel(team)
             },
             processContext,
             cancellationToken);

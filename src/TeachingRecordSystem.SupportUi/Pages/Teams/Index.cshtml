@@ -8,19 +8,26 @@
 
 <govuk-button-link href="@LinkGenerator.Teams.Add()">Add a new team</govuk-button-link>
 
-<govuk-table>
-    <table-head>
-        <table-head-cell>Team name</table-head-cell>
-        <table-head-cell><span class="govuk-visually-hidden">Actions</span></table-head-cell>
-    </table-head>
-    @foreach (var team in Model.Teams)
-    {
-        <table-row>
-            <table-cell>@team.Name</table-cell>
-            <table-cell>
-                <a class="govuk-link" href="@LinkGenerator.Teams.Edit(team.TeamId)">Change<span class="govuk-visually-hidden"> @team.Name</span></a>
-                <a class="govuk-link govuk-!-margin-left-4" href="@LinkGenerator.Teams.Delete(team.TeamId)">Delete<span class="govuk-visually-hidden"> @team.Name</span></a>
-            </table-cell>
-        </table-row>
-    }
-</govuk-table>
+@if (Model.Teams.Length == 0)
+{
+    <p class="govuk-body">No teams have been added yet.</p>
+}
+else
+{
+    <govuk-table>
+        <table-head>
+            <table-head-cell>Team name</table-head-cell>
+            <table-head-cell><span class="govuk-visually-hidden">Actions</span></table-head-cell>
+        </table-head>
+        @foreach (var team in Model.Teams)
+        {
+            <table-row>
+                <table-cell>@team.Name</table-cell>
+                <table-cell>
+                    <a class="govuk-link" href="@LinkGenerator.Teams.Edit(team.TeamId)">Change<span class="govuk-visually-hidden"> @team.Name</span></a>
+                    <a class="govuk-link govuk-!-margin-left-4" href="@LinkGenerator.Teams.Delete(team.TeamId)">Delete<span class="govuk-visually-hidden"> @team.Name</span></a>
+                </table-cell>
+            </table-row>
+        }
+    </govuk-table>
+}

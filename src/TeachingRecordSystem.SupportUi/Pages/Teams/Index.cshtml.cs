@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Teams;
 
-[Authorize(Policy = AuthorizationPolicies.UserManagement)]
+[Authorize(Policy = AuthorizationPolicies.TeamManagement)]
 public class IndexModel(TrsDbContext dbContext) : PageModel
 {
     public TeamListItem[] Teams { get; private set; } = [];

@@ -6,10 +6,10 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Teams;
 
-[Authorize(Policy = AuthorizationPolicies.UserManagement)]
+[Authorize(Policy = AuthorizationPolicies.TeamManagement)]
 public class DeleteModel(TrsDbContext dbContext) : PageModel
 {
-    public string TeamName { get; private set; } = string.Empty;
+    public string? TeamName { get; set; }
 
     public async Task<IActionResult> OnGetAsync(Guid teamId, CancellationToken cancellationToken)
     {
