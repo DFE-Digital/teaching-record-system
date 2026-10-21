@@ -49,7 +49,6 @@ public class IndexModel(
     public Task OnGetAsync()
     {
         Name = _user!.Name;
-        IsActiveUser = _user.Active;
         Role = _user.Role;
         TeamId = _user.TeamId;
 
@@ -142,6 +141,7 @@ public class IndexModel(
         }
 
         Email = _user.Email;
+        IsActiveUser = _user.Active;
 
         var showAdminRole = User.IsInRole(UserRoles.Administrator);
         var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);

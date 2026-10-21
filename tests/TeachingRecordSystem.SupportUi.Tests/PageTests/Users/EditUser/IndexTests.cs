@@ -221,6 +221,34 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_InvalidActiveUser_RendersEditableFormWithSaveButton()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", "New Name" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var html = await AssertEx.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
+        Assert.False(html.QuerySelector("input[name=Name]")!.HasAttribute("disabled"));
+        Assert.False(html.QuerySelector("select[name=TeamId]")!.HasAttribute("disabled"));
+        Assert.All(html.QuerySelectorAll(".trs-user-roles input[type=radio]"), e => Assert.False(e.HasAttribute("disabled")));
+        Assert.Contains(html.QuerySelectorAll("button"), e => e.TrimmedText() == "Save changes");
+    }
+
+    [Fact]
     public async Task Post_UserWithoutAdministratorRole_UpdatingUserWithNonExistentRole_ReturnsBadRequest()
     {
         // Arrange
