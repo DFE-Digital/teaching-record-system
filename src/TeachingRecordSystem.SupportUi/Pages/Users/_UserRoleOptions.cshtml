@@ -3,7 +3,7 @@
 @{
     var errorMessage = ViewData.ModelState[Model.FieldName]?.Errors.FirstOrDefault()?.ErrorMessage;
     var errorId = $"{Model.FieldName}-error";
-    var permissionTypes = Model.Roles.FirstOrDefault()?.Permissions.Select(p => p.Type) ?? [];
+    var permissionTypes = UserPermissionTypes.All.Select(UserPermissionTypes.GetDisplayNameForPermissionType);
 }
 
 <div class="govuk-form-group @(errorMessage is not null ? "govuk-form-group--error" : "")">
