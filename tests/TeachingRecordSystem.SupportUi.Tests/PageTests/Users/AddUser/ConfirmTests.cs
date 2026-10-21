@@ -141,14 +141,15 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response);
-        var teamOptions = html.QuerySelectorAll("select[name=TeamId] option")
-            .Select(e => e.Attributes["value"]!.Value)
-            .ToArray();
+        var teamOptions = html.QuerySelectorAll("select[name=TeamId] option").ToArray();
 
-        Assert.Equal("", teamOptions.First());
+        Assert.Equal("", teamOptions.First().Attributes["value"]!.Value);
+        Assert.Equal("", teamOptions.First().TextContent.Trim());
         Assert.Equal(
             [teamA.TeamId.ToString(), teamB.TeamId.ToString()],
-            teamOptions.Where(v => v == teamA.TeamId.ToString() || v == teamB.TeamId.ToString()));
+            teamOptions
+                .Select(e => e.Attributes["value"]!.Value)
+                .Where(v => v == teamA.TeamId.ToString() || v == teamB.TeamId.ToString()));
     }
 
     [Fact]

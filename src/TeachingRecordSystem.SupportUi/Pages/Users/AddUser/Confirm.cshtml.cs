@@ -46,7 +46,7 @@ public class ConfirmModel(
 
     public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
 
-    public IReadOnlyCollection<Core.DataStore.Postgres.Models.Team> TeamOptions { get; set; } = [];
+    public IReadOnlyCollection<TeamViewModel> AllTeams { get; set; } = [];
 
     public IActionResult OnGet()
     {
@@ -70,7 +70,7 @@ public class ConfirmModel(
         }
 
         // Ensure submitted team is valid
-        if (TeamId is Guid teamId && TeamOptions.All(t => t.TeamId != teamId))
+        if (TeamId is Guid teamId && AllTeams.All(t => t.TeamId != teamId))
         {
             return BadRequest();
         }
@@ -129,8 +129,9 @@ public class ConfirmModel(
 
         });
 
-        TeamOptions = await dbContext.Teams
+        AllTeams = await dbContext.Teams
             .OrderBy(t => t.Name)
+            .Select(t => new TeamViewModel(t.TeamId, t.Name))
             .ToArrayAsync(cancellationToken);
 
         await next();

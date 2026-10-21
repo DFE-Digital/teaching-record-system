@@ -33,8 +33,8 @@
 
             <govuk-select for="TeamId" select-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)">
                 <label class="govuk-label--m">Team</label>
-                <select-item value="">Not assigned</select-item>
-                @foreach (var team in Model.TeamOptions)
+                <select-item value=""></select-item>
+                @foreach (var team in Model.AllTeams)
                 {
                     <select-item value="@team.TeamId">@team.Name</select-item>
                 }

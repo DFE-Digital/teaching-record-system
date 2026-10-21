@@ -110,6 +110,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var teamOptions = html.QuerySelectorAll("select[name=TeamId] option").ToArray();
 
         Assert.Equal("", teamOptions.First().Attributes["value"]!.Value);
+        Assert.Equal("", teamOptions.First().TextContent.Trim());
         Assert.Equal(
             [teamA.TeamId.ToString(), teamB.TeamId.ToString()],
             teamOptions
