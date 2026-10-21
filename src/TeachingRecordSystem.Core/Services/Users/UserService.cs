@@ -14,7 +14,8 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
             Name = options.Name,
             Email = options.Email,
             AzureAdUserId = options.AzureAdUserId,
-            Role = options.Role
+            Role = options.Role,
+            TeamId = options.TeamId
         };
 
         dbContext.Users.Add(user);
@@ -40,10 +41,12 @@ public class UserService(TrsDbContext dbContext, IEventPublisher eventPublisher)
 
         user.Name = options.Name;
         user.Role = options.Role;
+        user.TeamId = options.TeamId;
 
         var changes = UserUpdatedEventChanges.None |
             (user.Name != oldUser.Name ? UserUpdatedEventChanges.Name : 0) |
-            (user.Role != oldUser.Role ? UserUpdatedEventChanges.Roles : 0);
+            (user.Role != oldUser.Role ? UserUpdatedEventChanges.Roles : 0) |
+            (user.TeamId != oldUser.TeamId ? UserUpdatedEventChanges.Team : 0);
 
         if (changes == UserUpdatedEventChanges.None)
         {

@@ -10,6 +10,7 @@ public record User
     public string[]? Roles { get; init; }
     // Make required when existing users have been migrated to new user roles.
     public string? Role { get; init; }
+    public Guid? TeamId { get; init; }
 
     public static User FromModel(DataStore.Postgres.Models.User user) => new()
     {
@@ -17,6 +18,7 @@ public record User
         Name = user.Name,
         Email = user.Email,
         AzureAdUserId = user.AzureAdUserId,
-        Role = user.Role
+        Role = user.Role,
+        TeamId = user.TeamId
     };
 }

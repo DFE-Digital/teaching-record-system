@@ -31,6 +31,15 @@
                 <label>Name</label>
             </govuk-input>
 
+            <govuk-select for="TeamId" select-class="govuk-!-width-two-thirds">
+                <label class="govuk-label--m">Team</label>
+                <select-item value="">Not assigned</select-item>
+                @foreach (var team in Model.TeamOptions)
+                {
+                    <select-item value="@team.TeamId">@team.Name</select-item>
+                }
+            </govuk-select>
+
             <govuk-radios for="@Model.Role" radios-class="trs-user-roles">
                 <legend class="govuk-fieldset__legend--m">
                     Role

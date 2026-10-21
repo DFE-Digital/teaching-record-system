@@ -589,7 +589,7 @@ Edit / close / reopen alert.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
-| `UserUpdatedEvent` | Sometimes | Only when the name or roles change. |
+| `UserUpdatedEvent` | Sometimes | Only when the name, roles or team change. |
 
 ### `UserActivating` (48)
 

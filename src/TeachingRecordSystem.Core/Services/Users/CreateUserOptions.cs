@@ -6,4 +6,5 @@ public record CreateUserOptions
     public required string? Email { get; init; }
     public required string? AzureAdUserId { get; init; }
     public required string? Role { get; init; }
+    public required Guid? TeamId { get; init; }
 }

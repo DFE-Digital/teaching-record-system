@@ -84,6 +84,43 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_ValidRequest_RendersTitleAndTeamOptionsSortedByNameWithCurrentTeamSelected()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var prefix = Guid.NewGuid().ToString("N");
+        var teamB = await TestData.CreateTeamAsync($"{prefix} B");
+        var teamA = await TestData.CreateTeamAsync($"{prefix} A");
+
+        var existingUser = await TestData.CreateUserAsync(teamId: teamB.TeamId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(existingUser.UserId));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var html = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal($"Change {existingUser.Name}\u2019s details", html.QuerySelector("h1")!.TextContent.Trim());
+
+        var teamOptions = html.QuerySelectorAll("select[name=TeamId] option").ToArray();
+
+        Assert.Equal("", teamOptions.First().Attributes["value"]!.Value);
+        Assert.Equal(
+            [teamA.TeamId.ToString(), teamB.TeamId.ToString()],
+            teamOptions
+                .Select(e => e.Attributes["value"]!.Value)
+                .Where(v => v == teamA.TeamId.ToString() || v == teamB.TeamId.ToString()));
+
+        var selectedOption = Assert.Single(teamOptions, e => e.HasAttribute("selected"));
+        Assert.Equal(teamB.TeamId.ToString(), selectedOption.Attributes["value"]!.Value);
+    }
+
+    [Fact]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -233,6 +270,32 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_NonExistentTeam_ReturnsBadRequest()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", existingUser.Name },
+                { "Role", existingUser.Role! },
+                { "TeamId", Guid.NewGuid() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_UserWithAdministratorRole_UpdatingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -258,13 +321,15 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(true, false, true, UserUpdatedEventChanges.Name, "has been updated.")]
-    [InlineData(false, true, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
-    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
-    [InlineData(false, false, false, UserUpdatedEventChanges.None, "has been updated.")]
+    [InlineData(true, false, false, true, UserUpdatedEventChanges.Name, "has been updated.")]
+    [InlineData(false, true, false, true, UserUpdatedEventChanges.Roles, "has been changed to an alerts manager (TRA decisions)")]
+    [InlineData(false, false, true, true, UserUpdatedEventChanges.Team, "has been updated.")]
+    [InlineData(true, true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles | UserUpdatedEventChanges.Team, "has been changed to an alerts manager (TRA decisions)")]
+    [InlineData(false, false, false, false, UserUpdatedEventChanges.None, "has been updated.")]
     public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage(
         bool changeName,
         bool changeRole,
+        bool changeTeam,
         bool expectedEvent,
         UserUpdatedEventChanges expectedChanges,
         string expectedFlashMessage)
@@ -273,16 +338,19 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         SetCurrentUser(user);
 
         // Arrange
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
+        var existingTeam = await TestData.CreateTeamAsync();
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager, teamId: existingTeam.TeamId);
         var newName = changeName ? TestData.GenerateChangedName(existingUser.Name) : existingUser.Name;
         var newRole = changeRole ? UserRoles.AlertsManagerTra : existingUser.Role;
+        var newTeamId = changeTeam ? (await TestData.CreateTeamAsync()).TeamId : existingTeam.TeamId;
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
             Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
-                { "Role", newRole! }
+                { "Role", newRole! },
+                { "TeamId", newTeamId }
             }
         };
 
@@ -301,6 +369,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(existingUser.AzureAdUserId, updatedUser.AzureAdUserId);
         Assert.Equal(newName, updatedUser.Name);
         Assert.Equal(newRole, updatedUser.Role);
+        Assert.Equal(newTeamId, updatedUser.TeamId);
 
         if (expectedEvent)
         {
@@ -316,6 +385,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Assert.Equal(updatedUser.AzureAdUserId, userUpdatedEvent.User.AzureAdUserId);
                     Assert.Equal(expectedChanges, userUpdatedEvent.Changes);
                     Assert.Equal(newRole, userUpdatedEvent.User.Role);
+                    Assert.Equal(newTeamId, userUpdatedEvent.User.TeamId);
                 });
             });
         }

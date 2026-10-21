@@ -37,15 +37,21 @@ public class IndexModel(
     [BindProperty]
     public string? Role { get; set; }
 
+    [BindProperty]
+    public Guid? TeamId { get; set; }
+
     public bool IsActiveUser { get; set; }
 
     public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
+
+    public IReadOnlyCollection<Core.DataStore.Postgres.Models.Team> TeamOptions { get; set; } = [];
 
     public Task OnGetAsync()
     {
         Name = _user!.Name;
         IsActiveUser = _user.Active;
         Role = _user.Role;
+        TeamId = _user.TeamId;
 
         return Task.CompletedTask;
     }
@@ -64,6 +70,12 @@ public class IndexModel(
             return BadRequest();
         }
 
+        // Ensure submitted team is valid
+        if (TeamId is Guid teamId && TeamOptions.All(t => t.TeamId != teamId))
+        {
+            return BadRequest();
+        }
+
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.UserUpdating, timeProvider.UtcNow, User.GetUserId());
@@ -73,7 +85,8 @@ public class IndexModel(
             {
                 UserId = UserId,
                 Name = Name!,
-                Role = Role
+                Role = Role,
+                TeamId = TeamId
             },
             processContext,
             cancellationToken);
@@ -144,6 +157,10 @@ public class IndexModel(
             })
 
         });
+
+        TeamOptions = await dbContext.Teams
+            .OrderBy(t => t.Name)
+            .ToArrayAsync(cancellationToken);
 
         await next();
     }

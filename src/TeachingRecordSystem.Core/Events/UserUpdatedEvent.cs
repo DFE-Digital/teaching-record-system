@@ -15,5 +15,6 @@ public enum UserUpdatedEventChanges
 {
     None = 0,
     Name = 1 << 0,
-    Roles = 1 << 1
+    Roles = 1 << 1,
+    Team = 1 << 2
 }

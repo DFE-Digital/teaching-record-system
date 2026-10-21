@@ -10,12 +10,15 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
     public async Task CreateUserAsync_AddsUserToDbAndPublishesEvent()
     {
         // Arrange
+        var team = await TestData.CreateTeamAsync();
+
         var options = new CreateUserOptions
         {
             Name = TestData.GenerateName(),
             Email = TestData.GenerateUniqueEmail(),
             AzureAdUserId = Guid.NewGuid().ToString(),
-            Role = "record_manager"
+            Role = "record_manager",
+            TeamId = team.TeamId
         };
 
         var processContext = new ProcessContext(ProcessType.UserAdding, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -33,6 +36,7 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
             Assert.Equal(options.Email, dbUser.Email);
             Assert.Equal(options.AzureAdUserId, dbUser.AzureAdUserId);
             Assert.Equal(options.Role, dbUser.Role);
+            Assert.Equal(options.TeamId, dbUser.TeamId);
         });
 
         Events.AssertProcessesCreated(p =>
@@ -42,6 +46,7 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
             {
                 Assert.Equal(user.UserId, e.User.UserId);
                 Assert.Equal(options.Name, e.User.Name);
+                Assert.Equal(options.TeamId, e.User.TeamId);
             });
         });
     }
@@ -52,12 +57,14 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
         // Arrange
         var user = await TestData.CreateUserAsync(role: "record_manager");
         var newName = TestData.GenerateChangedName(user.Name);
+        var team = await TestData.CreateTeamAsync();
 
         var options = new UpdateUserOptions
         {
             UserId = user.UserId,
             Name = newName,
-            Role = "alerts_manager_tra"
+            Role = "alerts_manager_tra",
+            TeamId = team.TeamId
         };
 
         var processContext = new ProcessContext(ProcessType.UserUpdating, TimeProvider.UtcNow, SystemUser.SystemUserId);
@@ -66,13 +73,14 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
         var changes = await WithServiceAsync<UserService, UserUpdatedEventChanges>(service => service.UpdateUserAsync(options, processContext));
 
         // Assert
-        Assert.Equal(UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, changes);
+        Assert.Equal(UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles | UserUpdatedEventChanges.Team, changes);
 
         await WithDbContextAsync(async dbContext =>
         {
             var dbUser = await dbContext.Users.FindAsync(user.UserId);
             Assert.Equal(newName, dbUser!.Name);
             Assert.Equal("alerts_manager_tra", dbUser.Role);
+            Assert.Equal(team.TeamId, dbUser.TeamId);
         });
 
         Events.AssertProcessesCreated(p =>
@@ -80,8 +88,9 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
             Assert.Equal(ProcessType.UserUpdating, p.ProcessContext.ProcessType);
             p.AssertProcessHasEvents<UserUpdatedEvent>(e =>
             {
-                Assert.Equal(UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles, e.Changes);
+                Assert.Equal(UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles | UserUpdatedEventChanges.Team, e.Changes);
                 Assert.Equal(newName, e.User.Name);
+                Assert.Equal(team.TeamId, e.User.TeamId);
             });
         });
     }
@@ -96,7 +105,8 @@ public class UserServiceTests(ServiceFixture fixture) : ServiceTestBase(fixture)
         {
             UserId = user.UserId,
             Name = user.Name,
-            Role = user.Role
+            Role = user.Role,
+            TeamId = user.TeamId
         };
 
         var processContext = new ProcessContext(ProcessType.UserUpdating, TimeProvider.UtcNow, SystemUser.SystemUserId);
