@@ -5,10 +5,12 @@
 
     <dl class="trs-description-list trs-description-list--search-result">
         <dt class="trs-description-list__label">Email address</dt>
-        <dd>@Model.EmailAddress</dd>
+        <dd use-empty-fallback="No email address">@Model.EmailAddress</dd>
         <dt class="trs-description-list__label">Role</dt>
-        <dd>@Model.Role</dd>
+        <dd use-empty-fallback="No role assigned">@Model.Role</dd>
         <dt class="trs-description-list__label">Status</dt>
         <dd>@Model.Status</dd>
+        <dt class="trs-description-list__label">Team</dt>
+        <dd use-empty-fallback="Not assigned">@Model.Team</dd>
     </dl>
 </li>

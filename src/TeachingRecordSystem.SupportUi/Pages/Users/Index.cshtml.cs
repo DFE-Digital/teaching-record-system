@@ -26,6 +26,9 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     [BindProperty(SupportsGet = true)]
     public string? Role { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public string? Team { get; set; }
+
     public bool HasUsers { get; private set; }
 
     public IEnumerable<UserViewModel> CurrentPageUsers { get; private set; } = [];
@@ -38,6 +41,11 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
     {
         var showAdminRole = User.IsInRole(UserRoles.Administrator);
         var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);
+
+        var teams = await dbContext.Teams
+            .OrderBy(t => t.Name)
+            .Select(t => new { t.TeamId, t.Name })
+            .ToArrayAsync(cancellationToken);
 
         var filters = new FilterCollection<User>([
             new SingleValueFilter<User>(nameof(Keywords), "Search", Request.Query,
@@ -54,6 +62,15 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             new MultiValueFilter<User>(nameof(Role), "Role", Request.Query,
                 u => u.Role,
                 [.. userRoles.Select(r => new MultiValueFilterValue(r, UserRoles.GetDisplayNameForRole(r)))]),
+
+            .. teams.Length > 0
+                ? new Filter<User>[]
+                {
+                    new MultiValueFilter<User>(nameof(Team), "Teams", Request.Query,
+                        u => u.TeamId.HasValue ? u.TeamId.Value.ToString() : null,
+                        [.. teams.Select(t => new MultiValueFilterValue(t.TeamId.ToString(), t.Name))])
+                }
+                : [],
 
             new MultiValueFilter<User>(nameof(Status), "Status", Request.Query,
                 u => u.Active ? "active" : "deactivated",
@@ -72,6 +89,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
         var totalUserCount = await filters.CalculateFilterCountsAsync(filteredQuery, cancellationToken);
 
         var paginatedUsers = await filteredQuery
+            .Include(u => u.Team)
             .OrderBy(u => u.Name)
             .GetPageAsync(PageNumber, UsersPerPage, totalUserCount, cancellationToken);
 
@@ -81,7 +99,7 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
 
         Pagination = PaginationViewModel.Create(
             paginatedUsers,
-            pageNumber => linkGenerator.Users.Index(Keywords, Status, Role, pageNumber));
+            pageNumber => linkGenerator.Users.Index(Keywords, Status, Role, Team, pageNumber));
     }
 
     private UserViewModel CreateViewModel(User user)
@@ -91,9 +109,10 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
             Id = user.UserId.ToString(),
             Name = user.Name,
             EditUrl = linkGenerator.Users.EditUser.Index(user.UserId),
-            EmailAddress = user.Email ?? "No email address",
-            Role = user.Role == null ? "No role assigned" : UserRoles.GetDisplayNameForRole(user.Role),
-            Status = user.Active ? "Active" : "Deactivated"
+            EmailAddress = user.Email,
+            Role = user.Role is null ? null : UserRoles.GetDisplayNameForRole(user.Role),
+            Status = user.Active ? "Active" : "Deactivated",
+            Team = user.Team?.Name
         };
     }
 }

@@ -58,6 +58,73 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(user.Email!, element);
     }
 
+    [Fact]
+    public async Task Get_ValidRequestAndUsersFound_RendersTeamNameOrNotAssigned()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync();
+        var users = await TestData.CreateMultipleUsersAsync(
+            new TestData.CreateUserSpec { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.AccessManager, TeamId = team.TeamId },
+            new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.AccessManager });
+        var userWithTeam = users.Single(u => u.TeamId == team.TeamId);
+        var userWithoutTeam = users.Single(u => u.TeamId is null);
+        SetCurrentUser(userWithTeam);
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(team.Name, GetTeamValue(doc.GetElementByTestId($"user-{userWithTeam.UserId}")!));
+        Assert.Equal("Not assigned", GetTeamValue(doc.GetElementByTestId($"user-{userWithoutTeam.UserId}")!));
+
+        static string GetTeamValue(IElement userElement) =>
+            userElement.QuerySelectorAll("dt").Single(dt => dt.TextContent.Trim() == "Team").NextElementSibling!.TextContent.Trim();
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithTeamFilter_FiltersUsersAndShowsTeamsSortedByName()
+    {
+        // Arrange
+        var teamB = await TestData.CreateTeamAsync("B team");
+        var teamA = await TestData.CreateTeamAsync("A team");
+        var users = await TestData.CreateMultipleUsersAsync(
+            new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.AccessManager, TeamId = teamA.TeamId },
+            new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.AccessManager, TeamId = teamB.TeamId },
+            new() { Name = $"Cuser {Faker.Name.Last()}", Role = UserRoles.AccessManager, TeamId = teamB.TeamId },
+            new() { Name = $"Duser {Faker.Name.Last()}", Role = UserRoles.AccessManager });
+        SetCurrentUser(users.Single(u => u.Name.StartsWith("Duser")));
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}?team={teamB.TeamId}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var html = await AssertEx.HtmlResponseAsync(response);
+        AssertElementsInnerTextContains(html.GetElementsByClassName("trs-user"), ["Buser", "Cuser"]);
+        AssertElementsInnerTextContains(
+            html.QuerySelectorAll(@".moj-filter input[name=""Team""] + label"),
+            ["A team (0)", "B team (2)"]);
+    }
+
+    [Fact]
+    public async Task Get_NoTeams_DoesNotShowTeamsFilter()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var html = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotEmpty(html.QuerySelectorAll(@".moj-filter input[name=""Role""]"));
+        Assert.Empty(html.QuerySelectorAll(@".moj-filter input[name=""Team""]"));
+    }
+
     [Theory]
     [InlineData("?pageNumber=1", 10, "Auser", "Juser")]
     [InlineData("?pageNumber=2", 10, "Kuser", "Tuser")]
