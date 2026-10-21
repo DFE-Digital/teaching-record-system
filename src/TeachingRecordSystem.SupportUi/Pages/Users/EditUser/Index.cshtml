@@ -31,7 +31,7 @@
             </govuk-input>
 
             <govuk-select for="TeamId" select-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)">
-                <label class="govuk-label--m">Team</label>
+                <label>Team</label>
                 <select-item value=""></select-item>
                 @foreach (var team in Model.AllTeams)
                 {
