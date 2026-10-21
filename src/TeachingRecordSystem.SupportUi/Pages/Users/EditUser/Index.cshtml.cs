@@ -37,15 +37,20 @@ public class IndexModel(
     [BindProperty]
     public string? Role { get; set; }
 
+    [BindProperty]
+    public Guid? TeamId { get; set; }
+
     public bool IsActiveUser { get; set; }
 
-    public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
+    public IReadOnlyCollection<UserRoleViewModel> RoleOptions { get; set; } = [];
+
+    public IReadOnlyCollection<TeamInfo> AllTeams { get; set; } = [];
 
     public Task OnGetAsync()
     {
         Name = _user!.Name;
-        IsActiveUser = _user.Active;
         Role = _user.Role;
+        TeamId = _user.TeamId;
 
         return Task.CompletedTask;
     }
@@ -64,6 +69,12 @@ public class IndexModel(
             return BadRequest();
         }
 
+        // Ensure submitted team is valid
+        if (TeamId is Guid teamId && AllTeams.All(t => t.TeamId != teamId))
+        {
+            return BadRequest();
+        }
+
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.UserUpdating, timeProvider.UtcNow, User.GetUserId());
@@ -73,7 +84,8 @@ public class IndexModel(
             {
                 UserId = UserId,
                 Name = Name!,
-                Role = Role
+                Role = Role,
+                TeamId = TeamId
             },
             processContext,
             cancellationToken);
@@ -129,6 +141,7 @@ public class IndexModel(
         }
 
         Email = _user.Email;
+        IsActiveUser = _user.Active;
 
         var showAdminRole = User.IsInRole(UserRoles.Administrator);
         var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);
@@ -142,9 +155,15 @@ public class IndexModel(
                 Type = UserPermissionTypes.GetDisplayNameForPermissionType(p.Type),
                 Level = p.Level
             })
+        }).ToArray();
 
-        });
+        AllTeams = await dbContext.Teams
+            .OrderBy(t => t.Name)
+            .Select(t => new TeamInfo(t.TeamId, t.Name))
+            .ToArrayAsync(cancellationToken);
 
         await next();
     }
+
+    public record TeamInfo(Guid TeamId, string Name);
 }

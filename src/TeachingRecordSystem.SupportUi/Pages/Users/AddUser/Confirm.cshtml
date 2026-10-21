@@ -1,6 +1,4 @@
 @page "/users/add/confirm"
-@using TeachingRecordSystem.Core
-@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.ConfirmModel
 @{
     ViewBag.Title = "Add a user";
@@ -10,17 +8,18 @@
     <govuk-back-link href="@LinkGenerator.Users.AddUser.Index()" />
 }
 
-@section Styles {
-    <style asp-add-nonce="true">
-        .govuk-radios.trs-user-roles {
-            --trs-user-permission-columns: UserPermissionTypes.All.Count;
-        }
-    </style>
-}
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <form method="post">
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                // The role options are rendered without a tag helper so the error summary needs listing explicitly
+                <govuk-error-summary>
+                    <error-summary-item for="Name" />
+                    <error-summary-item for="Role" />
+                </govuk-error-summary>
+            }
+
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true">
@@ -31,53 +30,16 @@
                 <label>Name</label>
             </govuk-input>
 
-            <govuk-radios for="@Model.Role" radios-class="trs-user-roles">
-                <legend class="govuk-fieldset__legend--m">
-                    Role
-                </legend>
-
-                @foreach (var role in Model.RoleOptions)
+            <govuk-select for="TeamId" select-class="govuk-!-width-two-thirds">
+                <label>Team</label>
+                <select-item value=""></select-item>
+                @foreach (var team in Model.AllTeams)
                 {
-                    <radios-item value="@role.Name">@role.DisplayName</radios-item>
-                    <divider>
-                        <govuk-table>
-                            <table-caption class="govuk-table__caption--s">Permissions</table-caption>
-
-                            <table-head>
-                                @foreach (var permission in role.Permissions)
-                                {
-                                    <table-head-cell>@permission.Type</table-head-cell>
-                                }
-                            </table-head>
-                            <table-row>
-                                @foreach (var permission in role.Permissions)
-                                {
-                                    switch (permission.Level)
-                                    {
-                                        case UserPermissionLevel.Edit:
-                                            <table-cell>
-                                                <tag color="TagColor.Green">Edit</tag>
-                                            </table-cell>
-                                            break;
-
-                                        case UserPermissionLevel.View:
-                                            <table-cell>
-                                                <tag color="TagColor.LightBlue">View</tag>
-                                            </table-cell>
-                                            break;
-
-                                        default:
-                                            <table-cell>
-                                                <tag color="TagColor.Grey">No</tag>
-                                            </table-cell>
-                                            break;
-                                    }
-                                }
-                            </table-row>
-                        </govuk-table>
-                    </divider>
+                    <select-item value="@team.TeamId">@team.Name</select-item>
                 }
-            </govuk-radios>
+            </govuk-select>
+
+            <partial name="_UserRoleOptions" model="@(new UserRoleOptionsViewModel { FieldName = nameof(Model.Role), Roles = Model.RoleOptions, SelectedRole = Model.Role, Disabled = false })" />
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Add user</govuk-button>

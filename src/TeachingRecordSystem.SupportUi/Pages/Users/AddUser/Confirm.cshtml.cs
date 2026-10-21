@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -10,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class ConfirmModel(
+    TrsDbContext dbContext,
     IAadUserService aadUserService,
     TimeProvider timeProvider,
     UserService userService,
@@ -37,9 +39,14 @@ public class ConfirmModel(
     [BindProperty]
     public string? Role { get; set; }
 
+    [BindProperty]
+    public Guid? TeamId { get; set; }
+
     public string? AzureAdUserId { get; set; }
 
-    public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
+    public IReadOnlyCollection<UserRoleViewModel> RoleOptions { get; set; } = [];
+
+    public IReadOnlyCollection<TeamInfo> AllTeams { get; set; } = [];
 
     public IActionResult OnGet()
     {
@@ -62,6 +69,12 @@ public class ConfirmModel(
             return BadRequest();
         }
 
+        // Ensure submitted team is valid
+        if (TeamId is Guid teamId && AllTeams.All(t => t.TeamId != teamId))
+        {
+            return BadRequest();
+        }
+
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
         var processContext = new ProcessContext(ProcessType.UserAdding, timeProvider.UtcNow, User.GetUserId());
@@ -72,7 +85,8 @@ public class ConfirmModel(
                 Name = Name!,
                 Email = _user!.Email,
                 AzureAdUserId = AzureAdUserId,
-                Role = Role
+                Role = Role,
+                TeamId = TeamId
             },
             processContext,
             cancellationToken);
@@ -112,9 +126,15 @@ public class ConfirmModel(
                 Type = UserPermissionTypes.GetDisplayNameForPermissionType(p.Type),
                 Level = p.Level
             })
+        }).ToArray();
 
-        });
+        AllTeams = await dbContext.Teams
+            .OrderBy(t => t.Name)
+            .Select(t => new TeamInfo(t.TeamId, t.Name))
+            .ToArrayAsync(cancellationToken);
 
         await next();
     }
+
+    public record TeamInfo(Guid TeamId, string Name);
 }

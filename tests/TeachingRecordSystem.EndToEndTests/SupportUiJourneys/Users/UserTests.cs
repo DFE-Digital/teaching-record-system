@@ -1,3 +1,5 @@
+using Microsoft.Playwright;
+
 namespace TeachingRecordSystem.EndToEndTests.SupportUiJourneys.Users;
 
 public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -6,6 +8,7 @@ public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task AddUser()
     {
         var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
+        var team = await TestData.CreateTeamAsync();
 
         await using var context = await HostFixture.CreateSupportUiBrowserContext();
         var page = await context.NewPageAsync();
@@ -20,9 +23,11 @@ public class UserTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.FillEmailInputAsync(testAzAdUser.Email);
 
-        await page.ClickGovUkButtonAsync("Add user");
+        await page.ClickGovUkButtonAsync("Continue");
 
         await page.AssertOnAddUserConfirmPageAsync();
+
+        await page.SelectOptionAsync("select[name=TeamId]", new SelectOptionValue { Label = team.Name });
 
         await page.SetCheckedAsync("label:has-text('Record manager')", true);
 

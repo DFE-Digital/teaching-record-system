@@ -1,0 +1,65 @@
+@using TeachingRecordSystem.Core
+@model TeachingRecordSystem.SupportUi.Pages.Users.UserRoleOptionsViewModel
+@{
+    var errorMessage = ViewData.ModelState[Model.FieldName]?.Errors.FirstOrDefault()?.ErrorMessage;
+    var errorId = $"{Model.FieldName}-error";
+    var permissionTypes = UserPermissionTypes.All.Select(UserPermissionTypes.GetDisplayNameForPermissionType);
+}
+
+<div class="govuk-form-group @(errorMessage is not null ? "govuk-form-group--error" : "")">
+    <govuk-fieldset described-by="@(errorMessage is not null ? errorId : null)">
+        <legend class="govuk-fieldset__legend--m">Role and permissions</legend>
+
+        @if (errorMessage is not null)
+        {
+            <govuk-error-message id="@errorId">@errorMessage</govuk-error-message>
+        }
+
+        <govuk-table class="trs-user-roles">
+            <table-head>
+                <table-head-cell>Role</table-head-cell>
+                @foreach (var permissionType in permissionTypes)
+                {
+                    <table-head-cell>@permissionType</table-head-cell>
+                }
+            </table-head>
+            @foreach (var (role, index) in Model.Roles.Select((r, i) => (r, i)))
+            {
+                <table-row>
+                    <table-cell>
+                        @* Each row has its own radios component sharing the same name, so the item IDs are set explicitly to keep them unique *@
+                        <govuk-radios name="@Model.FieldName">
+                            <radios-item id="@(index == 0 ? Model.FieldName : $"{Model.FieldName}-{index + 1}")"
+                                         value="@role.Name"
+                                         checked="@(role.Name == Model.SelectedRole)"
+                                         disabled="@Model.Disabled">@role.DisplayName</radios-item>
+                        </govuk-radios>
+                    </table-cell>
+                    @foreach (var permission in role.Permissions)
+                    {
+                        switch (permission.Level)
+                        {
+                            case UserPermissionLevel.Edit:
+                                <table-cell>
+                                    <tag color="TagColor.Green">Edit</tag>
+                                </table-cell>
+                                break;
+
+                            case UserPermissionLevel.View:
+                                <table-cell>
+                                    <tag color="TagColor.LightBlue">View</tag>
+                                </table-cell>
+                                break;
+
+                            default:
+                                <table-cell>
+                                    <tag color="TagColor.Grey">No</tag>
+                                </table-cell>
+                                break;
+                        }
+                    }
+                </table-row>
+            }
+        </govuk-table>
+    </govuk-fieldset>
+</div>

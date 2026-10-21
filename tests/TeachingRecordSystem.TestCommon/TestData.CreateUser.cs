@@ -9,7 +9,8 @@ public partial class TestData
         string? name = null,
         string? email = null,
         string? role = null,
-        Guid? azureAdUserId = null)
+        Guid? azureAdUserId = null,
+        Guid? teamId = null)
     {
         var user = await WithDbContextAsync(async dbContext =>
         {
@@ -24,7 +25,8 @@ public partial class TestData
                 Email = email,
                 Role = role,
                 UserId = Guid.NewGuid(),
-                AzureAdUserId = azureAdUserId?.ToString()
+                AzureAdUserId = azureAdUserId?.ToString(),
+                TeamId = teamId
             };
 
             dbContext.Users.Add(user);

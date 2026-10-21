@@ -114,6 +114,45 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_ValidRequest_RendersTeamOptionsSortedByName()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var userId = Guid.NewGuid().ToString();
+
+        ConfigureUserServiceMock(userId, new User
+        {
+            Email = Faker.Internet.Email(),
+            Name = TestData.GenerateName(),
+            UserId = userId
+        });
+
+        var prefix = Guid.NewGuid().ToString("N");
+        var teamB = await TestData.CreateTeamAsync($"{prefix} B");
+        var teamA = await TestData.CreateTeamAsync($"{prefix} A");
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/users/add/confirm?userId={userId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var teamOptions = html.QuerySelectorAll("select[name=TeamId] option").ToArray();
+
+        Assert.Equal("", teamOptions.First().Attributes["value"]!.Value);
+        Assert.Equal("", teamOptions.First().TextContent.Trim());
+        Assert.Equal(
+            [teamA.TeamId.ToString(), teamB.TeamId.ToString()],
+            teamOptions
+                .Select(e => e.Attributes["value"]!.Value)
+                .Where(v => v == teamA.TeamId.ToString() || v == teamB.TeamId.ToString()));
+    }
+
+    [Fact]
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
@@ -316,6 +355,40 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_NonExistentTeam_ReturnsBadRequest()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var name = TestData.GenerateName();
+        var userId = Guid.NewGuid().ToString();
+
+        ConfigureUserServiceMock(userId, new User
+        {
+            Email = Faker.Internet.Email(),
+            Name = name,
+            UserId = userId
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", name },
+                { "Role", UserRoles.RecordManager },
+                { "TeamId", Guid.NewGuid() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_UserWithAdministratorRole_AddingUserWithAdministratorRole_ReturnsFound()
     {
         // Arrange
@@ -361,6 +434,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var userId = Guid.NewGuid().ToString();
         var newName = TestData.GenerateName();
         var role = UserRoles.RecordManager;
+        var team = await TestData.CreateTeamAsync();
 
         ConfigureUserServiceMock(userId, new User
         {
@@ -374,7 +448,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContentBuilder
             {
                 { "Name", newName },
-                { "Role", role }
+                { "Role", role },
+                { "TeamId", team.TeamId }
             }
         };
 
@@ -392,6 +467,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(email, newUser.Email);
         Assert.Equal(userId, newUser.AzureAdUserId);
         Assert.Equal(role, newUser.Role);
+        Assert.Equal(team.TeamId, newUser.TeamId);
 
         Events.AssertProcessesCreated(p =>
         {
@@ -404,6 +480,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(email, userAddedEvent.User.Email);
                 Assert.Equal(userId, userAddedEvent.User.AzureAdUserId);
                 Assert.Equal(role, userAddedEvent.User.Role);
+                Assert.Equal(team.TeamId, userAddedEvent.User.TeamId);
             });
         });
 
