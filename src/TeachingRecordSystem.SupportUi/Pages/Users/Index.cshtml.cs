@@ -63,9 +63,14 @@ public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGener
                 u => u.Role,
                 [.. userRoles.Select(r => new MultiValueFilterValue(r, UserRoles.GetDisplayNameForRole(r)))]),
 
-            new MultiValueFilter<User>(nameof(Team), "Teams", Request.Query,
-                u => u.TeamId.HasValue ? u.TeamId.Value.ToString() : null,
-                [.. teams.Select(t => new MultiValueFilterValue(t.TeamId.ToString(), t.Name))]),
+            .. teams.Length > 0
+                ? new Filter<User>[]
+                {
+                    new MultiValueFilter<User>(nameof(Team), "Teams", Request.Query,
+                        u => u.TeamId.HasValue ? u.TeamId.Value.ToString() : null,
+                        [.. teams.Select(t => new MultiValueFilterValue(t.TeamId.ToString(), t.Name))])
+                }
+                : [],
 
             new MultiValueFilter<User>(nameof(Status), "Status", Request.Query,
                 u => u.Active ? "active" : "deactivated",

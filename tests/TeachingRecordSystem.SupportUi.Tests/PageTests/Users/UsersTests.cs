@@ -108,6 +108,23 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
             ["A team (0)", "B team (2)"]);
     }
 
+    [Fact]
+    public async Task Get_NoTeams_DoesNotShowTeamsFilter()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var html = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotEmpty(html.QuerySelectorAll(@".moj-filter input[name=""Role""]"));
+        Assert.Empty(html.QuerySelectorAll(@".moj-filter input[name=""Team""]"));
+    }
+
     [Theory]
     [InlineData("?pageNumber=1", 10, "Auser", "Juser")]
     [InlineData("?pageNumber=2", 10, "Kuser", "Tuser")]
