@@ -44,7 +44,7 @@ public class IndexModel(
 
     public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
 
-    public IReadOnlyCollection<TeamViewModel> AllTeams { get; set; } = [];
+    public IReadOnlyCollection<TeamInfo> AllTeams { get; set; } = [];
 
     public Task OnGetAsync()
     {
@@ -160,9 +160,11 @@ public class IndexModel(
 
         AllTeams = await dbContext.Teams
             .OrderBy(t => t.Name)
-            .Select(t => new TeamViewModel(t.TeamId, t.Name))
+            .Select(t => new TeamInfo(t.TeamId, t.Name))
             .ToArrayAsync(cancellationToken);
 
         await next();
     }
+
+    public record TeamInfo(Guid TeamId, string Name);
 }
