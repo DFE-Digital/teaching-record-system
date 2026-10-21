@@ -1,11 +1,43 @@
 @page "/teams/{teamId:guid}/delete"
 @model TeachingRecordSystem.SupportUi.Pages.Teams.DeleteModel
 @{
-    ViewBag.Title = "Delete team";
+    ViewBag.Title = "Delete a team";
 }
 
 @section BeforeContent {
     <govuk-back-link href="@LinkGenerator.Teams.Index()" />
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+        <h2 class="govuk-heading-m">Are you sure you want to delete the team @Model.TeamName?</h2>
+        <p class="govuk-body">Doing this will mean team members will be automatically unassigned from this team. You will still be able to assign them to a team when changing their users details</p>
+
+        <govuk-details>
+            <summary>Members on this team</summary>
+            <text>
+                @if (Model.MemberNames.Length == 0)
+                {
+                    <p class="govuk-body">There are no members on this team.</p>
+                }
+                else
+                {
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var name in Model.MemberNames)
+                        {
+                            <li>@name</li>
+                        }
+                    </ul>
+                }
+            </text>
+        </govuk-details>
+
+        <form method="post">
+            <div class="govuk-button-group">
+                <govuk-button class="govuk-button--warning" type="submit">Yes, delete this team</govuk-button>
+                <govuk-button-link class="govuk-button--secondary" href="@LinkGenerator.Teams.Index()">Cancel and return to teams</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

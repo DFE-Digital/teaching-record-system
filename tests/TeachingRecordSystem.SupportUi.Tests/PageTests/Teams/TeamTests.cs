@@ -136,4 +136,129 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a team name");
     }
+
+    [Fact]
+    public async Task Get_DeleteTeam_ShowsTeamMembersInNameOrder()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync("Example team");
+        var otherTeam = await TestData.CreateTeamAsync();
+        var users = await TestData.CreateMultipleUsersAsync(
+            new() { Name = "Anna Zebra", TeamId = team.TeamId },
+            new() { Name = "Zoe Adams", TeamId = team.TeamId },
+            new() { Name = "Una Other", TeamId = otherTeam.TeamId });
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AccessManager));
+
+        // Act
+        var response = await HttpClient.GetAsync($"/teams/{team.TeamId}/delete");
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal("Delete a team", doc.QuerySelector("h1")?.TextContent.Trim());
+        Assert.Contains("Are you sure you want to delete the team Example team?", doc.Body!.TextContent);
+        Assert.Contains("Doing this will mean team members will be automatically unassigned from this team.", doc.Body.TextContent);
+        Assert.Contains("Members on this team", doc.QuerySelector("details summary")?.TextContent);
+        Assert.Equal(new[] { "Anna Zebra", "Zoe Adams" }, doc.QuerySelectorAll("details li").Select(li => li.TextContent.Trim()).ToArray());
+        Assert.DoesNotContain(users.Single(u => u.TeamId == otherTeam.TeamId).Name, doc.Body.TextContent);
+        Assert.Contains("Yes, delete this team", doc.QuerySelector("button.govuk-button--warning")?.TextContent);
+        Assert.Equal("/teams", doc.QuerySelector("a.govuk-button--secondary")?.GetAttribute("href"));
+
+        var cancelResponse = await HttpClient.GetAsync(doc.QuerySelector("a.govuk-button--secondary")!.GetAttribute("href"));
+        var teamList = await AssertEx.HtmlResponseAsync(cancelResponse);
+        Assert.Contains(team.Name, teamList.Body!.TextContent);
+        Assert.Null(await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.DeletedOn).SingleAsync()));
+    }
+
+    [Theory]
+    [InlineData(UserRoles.AccessManager)]
+    [InlineData(UserRoles.Administrator)]
+    public async Task Post_DeleteTeam_UnassignsMembersAndHidesTeam(string role)
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync("Example team");
+        var otherTeam = await TestData.CreateTeamAsync("Other team");
+        var users = await TestData.CreateMultipleUsersAsync(
+            new() { Name = "Anna Zebra", TeamId = team.TeamId },
+            new() { Name = "Zoe Adams", TeamId = team.TeamId },
+            new() { Name = "Una Other", TeamId = otherTeam.TeamId });
+        var memberIds = users.Where(u => u.TeamId == team.TeamId).Select(u => u.UserId).ToArray();
+        var otherUserId = users.Single(u => u.TeamId == otherTeam.TeamId).UserId;
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+
+        // Act
+        var response = await HttpClient.PostAsync($"/teams/{team.TeamId}/delete", new FormUrlEncodedContent([]));
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/teams", response.Headers.Location?.OriginalString);
+        var deletedTeam = await WithDbContextAsync(dbContext => dbContext.Teams.IgnoreQueryFilters().SingleAsync(t => t.TeamId == team.TeamId));
+        Assert.Equal(TimeProvider.UtcNow, deletedTeam.DeletedOn);
+        var savedMembers = await WithDbContextAsync(dbContext => dbContext.Users.Where(u => memberIds.Contains(u.UserId)).ToArrayAsync());
+        Assert.Equal(2, savedMembers.Length);
+        Assert.All(savedMembers, u => Assert.Null(u.TeamId));
+        Assert.Equal(otherTeam.TeamId, await WithDbContextAsync(dbContext => dbContext.Users.Where(u => u.UserId == otherUserId).Select(u => u.TeamId).SingleAsync()));
+
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.TeamDeleting, p.ProcessContext.ProcessType);
+            Assert.Equal(3, p.Events.Count);
+            var deletedEvent = Assert.Single(p.Events.OfType<TeamDeletedEvent>());
+            Assert.Equal(team.TeamId, deletedEvent.Team.TeamId);
+            Assert.Equal(team.Name, deletedEvent.Team.Name);
+
+            var userEvents = p.Events.OfType<UserUpdatedEvent>().ToArray();
+            Assert.Equal(memberIds.Order(), userEvents.Select(e => e.User.UserId).Order());
+            Assert.All(userEvents, e =>
+            {
+                Assert.Null(e.User.TeamId);
+                Assert.Equal(UserUpdatedEventChanges.Team, e.Changes);
+            });
+        });
+
+        var listResponse = await response.FollowRedirectAsync(HttpClient);
+        var doc = await AssertEx.HtmlResponseAsync(listResponse);
+        Assert.Contains("Example team team deleted", doc.Body!.TextContent);
+        Assert.DoesNotContain($"/teams/{team.TeamId}/delete", doc.Body.InnerHtml);
+    }
+
+    [Fact]
+    public async Task Post_DeleteMissingTeam_ReturnsNotFound()
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.PostAsync($"/teams/{Guid.NewGuid()}/delete", new FormUrlEncodedContent([]));
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_DeleteMissingTeam_ReturnsNotFound()
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.GetAsync($"/teams/{Guid.NewGuid()}/delete");
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_DeleteTeamWithoutPermission_ReturnsForbidden()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync();
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Viewer));
+
+        // Act
+        var response = await HttpClient.PostAsync($"/teams/{team.TeamId}/delete", new FormUrlEncodedContent([]));
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+        Assert.Null(await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.DeletedOn).SingleAsync()));
+    }
 }
