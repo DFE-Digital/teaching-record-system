@@ -57,7 +57,8 @@ public partial class TestData
                     Name = name,
                     Email = email,
                     Role = role,
-                    UserId = Guid.NewGuid()
+                    UserId = Guid.NewGuid(),
+                    TeamId = spec.TeamId
                 };
 
                 dbContext.Users.Add(user);
@@ -88,7 +89,8 @@ public partial class TestData
                     Name = name,
                     Email = email,
                     Role = role,
-                    UserId = Guid.NewGuid()
+                    UserId = Guid.NewGuid(),
+                    TeamId = spec.TeamId
                 };
 
                 dbContext.Users.Add(user);
@@ -108,5 +110,6 @@ public partial class TestData
         public string? Name { get; set; }
         public string? Email { get; set; }
         public string? Role { get; set; }
+        public Guid? TeamId { get; set; }
     }
 }

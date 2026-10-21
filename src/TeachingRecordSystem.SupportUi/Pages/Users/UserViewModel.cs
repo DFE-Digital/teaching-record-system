@@ -7,5 +7,6 @@ public class UserViewModel
     public required string EditUrl { get; init; }
     public required string EmailAddress { get; init; }
     public required string Role { get; init; }
+    public required string Team { get; init; }
     public required string Status { get; init; }
 }
