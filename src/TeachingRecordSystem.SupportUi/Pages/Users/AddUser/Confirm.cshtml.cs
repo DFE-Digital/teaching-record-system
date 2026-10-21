@@ -44,7 +44,7 @@ public class ConfirmModel(
 
     public string? AzureAdUserId { get; set; }
 
-    public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
+    public IReadOnlyCollection<UserRoleViewModel> RoleOptions { get; set; } = [];
 
     public IReadOnlyCollection<TeamInfo> AllTeams { get; set; } = [];
 
@@ -126,8 +126,7 @@ public class ConfirmModel(
                 Type = UserPermissionTypes.GetDisplayNameForPermissionType(p.Type),
                 Level = p.Level
             })
-
-        });
+        }).ToArray();
 
         AllTeams = await dbContext.Teams
             .OrderBy(t => t.Name)
