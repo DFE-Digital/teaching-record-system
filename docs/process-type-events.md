@@ -577,6 +577,13 @@ Edit / close / reopen alert.
 | --- | --- | --- |
 | `TeamCreatedEvent` | Always | A team is added. The `Team` snapshot contains its ID and name. |
 
+### `TeamDeleting` (106)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TeamDeletedEvent` | Always | A team is deleted and its members are unassigned. The `Team` snapshot contains its ID and name. |
+| `UserUpdatedEvent` | Sometimes | One per member unassigned from the deleted team, with `TeamId` set to null in the user snapshot and the `Team` change flag set. |
+
 ## Users, application users and API keys
 
 ### `UserAdding` (46)
