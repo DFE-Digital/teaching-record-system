@@ -5,3 +5,8 @@
 *.pdf binary
 *.nupkg binary
 *.jpg binary
+
+packages.lock.json linguist-generated=true
+
+**/Migrations/*.Designer.cs linguist-generated=true
+**/Migrations/*ModelSnapshot.cs linguist-generated=true
