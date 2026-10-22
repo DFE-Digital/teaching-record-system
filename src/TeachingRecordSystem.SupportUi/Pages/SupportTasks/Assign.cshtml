@@ -14,54 +14,51 @@
 <span class="govuk-caption-m">Bulk assignment</span>
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-<table class="govuk-table trs-table-layout-fixed">
-    <caption class="govuk-table__caption govuk-table__caption--m">Selected tasks</caption>
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Task</th>
-            <th scope="col" class="govuk-table__header trs-!-width-150">Requested on</th>
-            <th scope="col" class="govuk-table__header trs-!-width-180">Type</th>
-            <th scope="col" class="govuk-table__header trs-!-width-120">Status</th>
-            <th scope="col" class="govuk-table__header trs-!-width-150">Assigned to</th>
-            <th scope="col" class="govuk-table__header trs-!-width-90">Source</th>
-            <th scope="col" class="govuk-table__header trs-!-width-90">Action</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        @foreach (var task in Model.Tasks!)
-        {
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__cell">
-                    <a href="@LinkGenerator.SupportTaskResolve(task.SupportTaskReference, task.Type, returnUrl: returnUrl)" class="govuk-link trs-task-link">
-                        <span class="trs-task-link__name" data-testid="task-name">@task.Subject</span>
-                        <span class="trs-task-link__reference" data-testid="task-reference">@task.SupportTaskReference</span>
-                    </a>
-                </th>
-                <td class="govuk-table__cell">@task.CreatedOn.ToGmt().ToString(DateShortDisplayFormat)</td>
-                <td class="govuk-table__cell">@task.Type.GetTitle()</td>
-                <td class="govuk-table__cell">
-                    <support-task-status-tag status="@task.Status"/>
-                </td>
-                <td class="govuk-table__cell">
-                    @if (task.SourceApplicationName is not null)
-                    {
-                        <tag>@task.SourceApplicationName</tag>
-                    }
-                    else
-                    {
-                        <span use-empty-fallback="Not applicable"></span>
-                    }
-                </td>
-                <td class="govuk-table__cell" use-empty-fallback="Unassigned">@task.AssignedTo</td><td class="govuk-table__cell">
-                    <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(@task.SupportTaskReference, returnUrl: returnUrl)"
-                       class="govuk-link">
-                        Manage
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<govuk-table class="trs-table-layout-fixed">
+    <table-caption class="govuk-table__caption--m">Selected tasks</table-caption>
+    <table-head>
+        <table-head-cell>Task</table-head-cell>
+        <table-head-cell class="trs-!-width-150">Requested on</table-head-cell>
+        <table-head-cell class="trs-!-width-180">Type</table-head-cell>
+        <table-head-cell class="trs-!-width-120">Status</table-head-cell>
+        <table-head-cell class="trs-!-width-150">Assigned to</table-head-cell>
+        <table-head-cell class="trs-!-width-90">Source</table-head-cell>
+        <table-head-cell class="trs-!-width-90">Action</table-head-cell>
+    </table-head>
+    @foreach (var task in Model.Tasks!)
+    {
+        <table-row>
+            <table-cell>
+                <a href="@LinkGenerator.SupportTaskResolve(task.SupportTaskReference, task.Type, returnUrl: returnUrl)" class="govuk-link trs-task-link">
+                    <span class="trs-task-link__name" data-testid="task-name">@task.Subject</span>
+                    <span class="trs-task-link__reference" data-testid="task-reference">@task.SupportTaskReference</span>
+                </a>
+            </table-cell>
+            <table-cell>@task.CreatedOn.ToGmt().ToString(DateShortDisplayFormat)</table-cell>
+            <table-cell>@task.Type.GetTitle()</table-cell>
+            <table-cell>
+                <support-task-status-tag status="@task.Status"/>
+            </table-cell>
+            <table-cell use-empty-fallback="Unassigned">@task.AssignedTo</table-cell>
+            <table-cell>
+                @if (task.SourceApplicationName is not null)
+                {
+                    <tag>@task.SourceApplicationName</tag>
+                }
+                else
+                {
+                    <span use-empty-fallback="Not applicable"></span>
+                }
+            </table-cell>
+            <table-cell>
+                <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(@task.SupportTaskReference, returnUrl: returnUrl)"
+                   class="govuk-link">
+                    Manage
+                </a>
+            </table-cell>
+        </table-row>
+    }
+</govuk-table>
 
 <form method="post">
     <govuk-select for="AssignToUserId" select-class="govuk-!-width-one-third">
@@ -78,8 +75,88 @@
         }
     </govuk-select>
 
+    @if (Model.ShowTeamMembersFilter)
+    {
+        <govuk-checkboxes for="ShowMyTeamMembersOnly" class="govuk-checkboxes--small govuk-!-margin-top-4">
+            <checkboxes-item value="true"
+                             checked="@Model.ShowMyTeamMembersOnly"
+                             input-hx-get="@Model.ToggleShowMyTeamMembersOnlyUrl"
+                             input-hx-trigger="change"
+                             input-hx-select="main"
+                             input-hx-target="main"
+                             input-hx-swap="outerHTML"
+                             input-hx-push-url="true">
+                Show my team members only
+            </checkboxes-item>
+        </govuk-checkboxes>
+
+        <noscript>
+            <govuk-button type="submit" formmethod="get" class="govuk-button--secondary">Apply filter</govuk-button>
+        </noscript>
+    }
+
     <div class="govuk-button-group">
         <govuk-button type="submit">Assign tasks</govuk-button>
         <govuk-button-link href="@Model.BackLink" class="govuk-button--secondary">Cancel</govuk-button-link>
     </div>
 </form>
+
+@if (Model.ShowTeamWorkload)
+{
+    <govuk-details class="govuk-!-margin-top-6 govuk-!-width-two-thirds" id="team-workload" data-testid="team-workload" open="@Model.ExpandTeamWorkload">
+        <summary>Your team workload</summary>
+        <text>
+            <govuk-table class="trs-table-layout-fixed" sortable>
+                <table-head>
+                    <table-head-cell
+                        class="trs-!-width-200"
+                        sort-direction="@(Model.IsSortedBy(Assign.TeamWorkloadSortByOption.TeamMember) ? (Model.IsTeamWorkloadSortedAscending() ? SortDirection.Ascending : SortDirection.Descending) : null)"
+                        link-template="@(direction => Model.GetTeamWorkloadSortUrl(Assign.TeamWorkloadSortByOption.TeamMember, direction))"
+                        use-htmx="true"
+                        hx-select="#team-workload"
+                        hx-target="#team-workload"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Team member
+                    </table-head-cell>
+                    <table-head-cell
+                        sort-direction="@(Model.IsSortedBy(Assign.TeamWorkloadSortByOption.Tasks) ? (Model.IsTeamWorkloadSortedAscending() ? SortDirection.Ascending : SortDirection.Descending) : null)"
+                        link-template="@(direction => Model.GetTeamWorkloadSortUrl(Assign.TeamWorkloadSortByOption.Tasks, direction))"
+                        use-htmx="true"
+                        hx-select="#team-workload"
+                        hx-target="#team-workload"
+                        hx-swap="outerHTML"
+                        hx-push-url="true">
+                        Tasks
+                    </table-head-cell>
+                </table-head>
+                @foreach (var member in Model.TeamWorkloadMembers)
+                {
+                    <table-row data-testid="team-workload-member:@member.UserId">
+                        <table-cell>@member.UserName</table-cell>
+                        <table-cell>
+                            @if (member.TaskBreakdown.Count == 0)
+                            {
+                                <span class="govuk-body"><strong>0</strong> tasks assigned</span>
+                            }
+                            else
+                            {
+                                <govuk-details class="govuk-!-margin-bottom-0">
+                                    <summary>@member.TaskCount task@(member.TaskCount == 1 ? "" : "s")</summary>
+                                    <text>
+                                        <div class="govuk-hint govuk-!-margin-bottom-0">
+                                            @foreach (var taskType in member.TaskBreakdown)
+                                            {
+                                                <p class="govuk-body govuk-!-margin-bottom-0"><strong>@taskType.TaskCount</strong> @taskType.TaskType.GetTitle()</p>
+                                            }
+                                        </div>
+                                    </text>
+                                </govuk-details>
+                            }
+                        </table-cell>
+                    </table-row>
+                }
+            </govuk-table>
+        </text>
+    </govuk-details>
+}
