@@ -171,7 +171,7 @@ Employment records changed before the extract processor moved onto processes wer
 ## TRN requests
 
 ### `TrnRequestCreating` (14)
-API `CreateTrnRequest`.
+API `CreateTrnRequest`, and the CLI's `copy-trn-request` command (which only ever emits `TrnRequestCreatedEvent`).
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
