@@ -90,7 +90,11 @@ public class SignInJourneyCoordinator(
         if (trn is null && State.RecordMatchingPolicy == RecordMatchingPolicy.Deferred)
         {
             var existingTrnRequest = await dbContext.TrnRequestMetadata
-                .Where(tr => tr.OneLoginUserSubject == sub && tr.IdentityVerified == true)
+                .Where(tr =>
+                    tr.ApplicationUserId == State.ClientApplicationUserId &&
+                    tr.OneLoginUserSubject == sub &&
+                    tr.IdentityVerified == true &&
+                    (tr.Status == TrnRequestStatus.Dormant || tr.Status == TrnRequestStatus.Pending))
                 .OrderByDescending(tr => tr.CreatedOn)
                 .FirstOrDefaultAsync(cancellationToken);
 
