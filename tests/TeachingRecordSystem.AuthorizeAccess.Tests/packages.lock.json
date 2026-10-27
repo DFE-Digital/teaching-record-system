@@ -981,7 +981,7 @@
       "teachingrecordsystem.authorizeaccess": {
         "type": "Project",
         "dependencies": {
-          "AspNetCore.SassCompiler": "[1.105.1, )",
+          "AspNetCore.SassCompiler": "[1.106.0, )",
           "DfeAnalytics.AspNetCore": "[0.6.4, )",
           "GovUk.Frontend.AspNetCore": "[5.0.1, )",
           "GovUk.OneLogin.AspNetCore": "[0.4.3, )",
@@ -1114,9 +1114,9 @@
       },
       "AspNetCore.SassCompiler": {
         "type": "CentralTransitive",
-        "requested": "[1.105.1, )",
-        "resolved": "1.105.1",
-        "contentHash": "li1LYujV26cWQymL7fqxSA9HoW1TGgYEe9fdinNzYZSeiljgkiTLqY1sPURR6eM+8RCsSPbo4RYheVimPWJq8g=="
+        "requested": "[1.106.0, )",
+        "resolved": "1.106.0",
+        "contentHash": "erqL7QvB8XJsOoQjzMX/bNxg9kOUEA8+d5iL7N+dPwaB2AROo8r3H9ZVXNEb2Kl38Foi88dSteVPobE9srxEfg=="
       },
       "Azure.Extensions.AspNetCore.DataProtection.Blobs": {
         "type": "CentralTransitive",
