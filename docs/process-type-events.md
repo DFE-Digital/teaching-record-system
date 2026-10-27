@@ -366,7 +366,7 @@ see [what that job covers](#what-the-notification-back-fill-covers) below.
 
 ### `NotifyingQtlsAwardee` (95)
 
-The QTLS post-launch email, which goes to people who gained QTS through the QTLS and SET membership route.
+The QTLS post-launch email, which goes to people who gained QTS through the QTLS and ETF membership route.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
