@@ -45,10 +45,10 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var doc = await AssertEx.HtmlResponseAsync(response);
                 Assert.Equal("Enter your QTS details (optional)", doc.QuerySelector("h1")?.TextContent.Trim());
                 Assert.Equal(existingYear, doc.GetElementById("YearQtsReceived")?.GetAttribute("value"));
-                Assert.Equal(existingTrainingProviderId?.ToString(), doc.QuerySelector("#TrainingProviderId option:checked")?.GetAttribute("value"));
-                Assert.Equal(existingSubjectId?.ToString(), doc.QuerySelector("#SubjectId option:checked")?.GetAttribute("value"));
-                Assert.Equal(existingTrainingProviderText, doc.QuerySelector("#TrainingProviderId option:checked")?.TextContent);
-                Assert.Equal(existingSubjectText, doc.QuerySelector("#SubjectId option:checked")?.TextContent);
+                Assert.Equal(existingTrainingProviderId?.ToString(), doc.QuerySelector("#TrainingProviderId option[selected]")?.GetAttribute("value"));
+                Assert.Equal(existingSubjectId?.ToString(), doc.QuerySelector("#SubjectId option[selected]")?.GetAttribute("value"));
+                Assert.Equal(existingTrainingProviderText, doc.QuerySelector("#TrainingProviderId option[selected]")?.TextContent);
+                Assert.Equal(existingSubjectText, doc.QuerySelector("#SubjectId option[selected]")?.TextContent);
                 Assert.Equal("Why are we asking this?", doc.QuerySelector(".govuk-details__summary-text")?.TextContent.Trim());
             });
 
