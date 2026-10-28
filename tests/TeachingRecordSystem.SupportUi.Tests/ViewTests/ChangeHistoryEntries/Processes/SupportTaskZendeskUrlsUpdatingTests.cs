@@ -72,7 +72,7 @@ public class SupportTaskZendeskUrlsUpdatingTests(HostFixture hostFixture) : Chan
     }
 
     [Fact]
-    public async Task ReorderedUrls_DoesNotRenderEntry()
+    public async Task ReorderedUrls_RendersDisplayOrderChanged()
     {
         // Arrange
         const string firstUrl = "https://example.zendesk.com/agent/tickets/123";
@@ -80,12 +80,12 @@ public class SupportTaskZendeskUrlsUpdatingTests(HostFixture hostFixture) : Chan
         var process = await CreateProcessAsync([firstUrl, secondUrl], [secondUrl, firstUrl]);
 
         // Act
-        var response = await HttpClient.GetAsync($"_change-history-entry/{process.ProcessId}?contextType=supportTask&supportTaskReference=TEST-ST-1");
-        response.EnsureSuccessStatusCode();
-        var doc = await response.GetDocumentAsync();
+        var entry = await GetEntryHtmlAsync(process.ProcessId, contextType: "supportTask", supportTaskReference: "TEST-ST-1");
 
         // Assert
-        Assert.Null(doc.QuerySelector(".moj-timeline__item"));
+        AssertTitle(entry, "Zendesk tickets changed");
+        var message = entry.GetElementsByClassName("govuk-body").Single();
+        Assert.Equal("Display order changed", message.TrimmedText());
     }
 
     private Task<Core.DataStore.Postgres.Models.Process> CreateProcessAsync(string[] oldZendeskUrls, string[] zendeskUrls)
