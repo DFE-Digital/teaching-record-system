@@ -12,9 +12,9 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Arrange
         var publishApiClient = new Mock<IPublishApiClient>();
         var provider1Name = "Test Training Provider 1";
-        var provider1Ukprn = "12345678";
+        var provider1Ukprn = await TestData.GenerateUniqueUkprnAsync();
         var provider2Name = "Test Training Provider 2";
-        var provider2Ukprn = "87654321";
+        var provider2Ukprn = await TestData.GenerateUniqueUkprnAsync();
         var providersExpected = new List<ProviderResource>
         {
             new ProviderResource
@@ -47,7 +47,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == provider1Ukprn || p.Ukprn == provider2Ukprn).OrderBy(p => p.Ukprn).ToListAsync();
+            var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == provider1Ukprn || p.Ukprn == provider2Ukprn).OrderBy(p => p.Ukprn == provider2Ukprn).ToListAsync();
             Assert.Collection(trainingProvidersActual,
                 p =>
                 {
@@ -72,7 +72,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         var existingProvider = new TrainingProvider
         {
             TrainingProviderId = Guid.NewGuid(),
-            Ukprn = "12345679",
+            Ukprn = await TestData.GenerateUniqueUkprnAsync(),
             Name = "Test Training Provider 1",
             IsActive = false
         };
@@ -121,12 +121,12 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Arrange
         var publishApiClient = new Mock<IPublishApiClient>();
         var newProviderName = "New Training Provider";
-        var newProviderUkprn = "76543210";
+        var newProviderUkprn = await TestData.GenerateUniqueUkprnAsync();
 
         var existingProvider = new TrainingProvider
         {
             TrainingProviderId = Guid.NewGuid(),
-            Ukprn = "12345670",
+            Ukprn = await TestData.GenerateUniqueUkprnAsync(),
             Name = "Test Training Provider 1",
             IsActive = true
         };
@@ -161,7 +161,7 @@ public class RefreshTrainingProvidersJobTests(JobFixture fixture) : JobTestBase(
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == existingProvider.Ukprn || p.Ukprn == newProviderUkprn).OrderBy(p => p.Ukprn).ToListAsync();
+            var trainingProvidersActual = await dbContext.TrainingProviders.Where(p => p.Ukprn == existingProvider.Ukprn || p.Ukprn == newProviderUkprn).OrderBy(p => p.Ukprn == newProviderUkprn).ToListAsync();
             Assert.Collection(trainingProvidersActual,
                 p =>
                 {
