@@ -577,6 +577,12 @@ Edit / close / reopen alert.
 | --- | --- | --- |
 | `TeamCreatedEvent` | Always | A team is added. The `Team` snapshot contains its ID and name. |
 
+### `TeamUpdating` (107)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TeamUpdatedEvent` | When the name changes | A team is renamed. The `Team` and `OldTeam` snapshots contain its ID and the new and previous names. |
+
 ### `TeamDeleting` (106)
 
 | Event | Emitted | Scenario |

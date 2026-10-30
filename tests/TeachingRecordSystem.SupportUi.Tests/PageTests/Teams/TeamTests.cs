@@ -138,6 +138,117 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_EditTeam_ShowsNameMembersAndCancelLink()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync("Original team");
+        var otherTeam = await TestData.CreateTeamAsync("Other team");
+        await TestData.CreateMultipleUsersAsync(
+            new() { Name = "Anna Zebra", TeamId = team.TeamId },
+            new() { Name = "Zoe Adams", TeamId = team.TeamId },
+            new() { Name = "Una Other", TeamId = otherTeam.TeamId });
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.AccessManager));
+
+        // Act
+        var response = await HttpClient.GetAsync($"/teams/{team.TeamId}");
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal("Change a team", doc.QuerySelector("h1")?.TextContent.Trim());
+        Assert.Equal("Original team", doc.QuerySelector("input[name='Name']")?.GetAttribute("value"));
+        Assert.Contains("Team name", doc.Body!.TextContent);
+        Assert.Contains("Members on this team", doc.QuerySelector("details summary")?.TextContent);
+        Assert.Equal(new[] { "Anna Zebra", "Zoe Adams" }, doc.QuerySelectorAll("details li").Select(li => li.TextContent.Trim()).ToArray());
+        Assert.Contains("Confirm and update team", doc.QuerySelector("button[type='submit']")?.TextContent);
+        Assert.Equal("/teams", doc.QuerySelector("a.govuk-button--secondary")?.GetAttribute("href"));
+
+        var cancelResponse = await HttpClient.GetAsync(doc.QuerySelector("a.govuk-button--secondary")!.GetAttribute("href"));
+        var teamList = await AssertEx.HtmlResponseAsync(cancelResponse);
+        Assert.Contains("Original team", teamList.Body!.TextContent);
+        Assert.Equal("Original team", await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.Name).SingleAsync()));
+    }
+
+    [Theory]
+    [InlineData(UserRoles.AccessManager)]
+    [InlineData(UserRoles.Administrator)]
+    public async Task Post_EditTeam_UpdatesNameAndPublishesEvent(string role)
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync("Original team");
+        SetCurrentUser(await TestData.CreateUserAsync(role: role));
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/teams/{team.TeamId}")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Name", " Updated team " } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/teams", response.Headers.Location?.OriginalString);
+        var savedTeam = await WithDbContextAsync(dbContext => dbContext.Teams.SingleAsync(t => t.TeamId == team.TeamId));
+        Assert.Equal("Updated team", savedTeam.Name);
+        Assert.Equal(TimeProvider.UtcNow, savedTeam.UpdatedOn);
+        Events.AssertProcessesCreated(p =>
+        {
+            Assert.Equal(ProcessType.TeamUpdating, p.ProcessContext.ProcessType);
+            p.AssertProcessHasEvents<TeamUpdatedEvent>(e =>
+            {
+                Assert.Equal(team.TeamId, e.Team.TeamId);
+                Assert.Equal("Updated team", e.Team.Name);
+                Assert.Equal("Original team", e.OldTeam.Name);
+            });
+        });
+        var listResponse = await response.FollowRedirectAsync(HttpClient);
+        var doc = await AssertEx.HtmlResponseAsync(listResponse);
+        Assert.Contains("Team updated to Updated team", doc.Body!.TextContent);
+    }
+
+    [Fact]
+    public async Task Post_EditTeam_RejectsDuplicateName()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync("Original team");
+        await TestData.CreateTeamAsync("Existing team");
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.PostAsync($"/teams/{team.TeamId}", new FormUrlEncodedContentBuilder { { "Name", "Existing team" } });
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique.");
+        Assert.Equal("Original team", await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.Name).SingleAsync()));
+    }
+
+    [Fact]
+    public async Task Post_EditTeam_RejectsEmptyName()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync("Original team");
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.PostAsync($"/teams/{team.TeamId}", new FormUrlEncodedContentBuilder { { "Name", "" } });
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a team name");
+    }
+
+    [Fact]
+    public async Task Post_EditMissingTeam_ReturnsNotFound()
+    {
+        // Arrange
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+
+        // Act
+        var response = await HttpClient.PostAsync($"/teams/{Guid.NewGuid()}", new FormUrlEncodedContentBuilder { { "Name", "New name" } });
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_DeleteTeam_ShowsTeamMembersInNameOrder()
     {
         // Arrange

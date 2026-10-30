@@ -29,6 +29,24 @@ public class TeamService(TrsDbContext dbContext, IEventPublisher eventPublisher)
         return team;
     }
 
+    public async Task UpdateTeamAsync(Team team, string name, ProcessContext processContext, CancellationToken cancellationToken = default)
+    {
+        var oldTeam = EventModels.Team.FromModel(team);
+        team.Name = name;
+        team.UpdatedOn = processContext.Now;
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        await eventPublisher.PublishSingleEventAsync(
+            new TeamUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                Team = EventModels.Team.FromModel(team),
+                OldTeam = oldTeam
+            },
+            processContext,
+            cancellationToken);
+    }
+
     public async Task DeleteTeamAsync(Team team, ProcessContext processContext, CancellationToken cancellationToken = default)
     {
         var members = await dbContext.Users.Where(u => u.TeamId == team.TeamId).ToArrayAsync(cancellationToken);

@@ -105,5 +105,6 @@ public enum ProcessType
     TpsEmploymentCreating = 103,
     TpsEmploymentUpdating = 104,
     TeamCreating = 105,
-    TeamDeleting = 106
+    TeamDeleting = 106,
+    TeamUpdating = 107
 }
