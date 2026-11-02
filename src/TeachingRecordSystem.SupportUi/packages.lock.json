@@ -664,8 +664,8 @@
       },
       "NSign.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.2.5",
-        "contentHash": "NAjUnMYxKBR/Bj3m5WfcA6DQXWBnoVlKpmEuSyY44+kFXxLnw20ZrLZXNGavLs7eG4DuhTl8On8Gd6VYIOSg1g==",
+        "resolved": "1.2.7",
+        "contentHash": "XsuSfEdpoe3dRUCrhFKXDXOtechYlc3aHKuvOQZdERwzdc/INPLrENKhTveACmhQSG9PJrrMS1wtCYJiwL3rAQ==",
         "dependencies": {
           "StructuredFieldValues": "0.7.7"
         }
@@ -861,8 +861,8 @@
           "Microsoft.EntityFrameworkCore.InMemory": "[10.0.14, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.14, )",
           "Microsoft.Extensions.Azure": "[1.14.1, )",
-          "NSign.Client": "[1.2.5, )",
-          "NSign.SignatureProviders": "[1.2.5, )",
+          "NSign.Client": "[1.2.7, )",
+          "NSign.SignatureProviders": "[1.2.7, )",
           "Npgsql.DependencyInjection": "[10.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
           "OneOf": "[3.0.271, )",
@@ -895,8 +895,8 @@
           "Microsoft.Extensions.Azure": "[1.14.1, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
           "Mime-Detective": "[25.8.1, )",
-          "NSign.Client": "[1.2.5, )",
-          "NSign.SignatureProviders": "[1.2.5, )",
+          "NSign.Client": "[1.2.7, )",
+          "NSign.SignatureProviders": "[1.2.7, )",
           "OpenIddict.EntityFrameworkCore": "[7.7.2, )",
           "Sentry.AspNetCore": "[6.12.1, )",
           "Serilog.AspNetCore": "[10.0.0, )",
@@ -1200,21 +1200,21 @@
       },
       "NSign.Client": {
         "type": "CentralTransitive",
-        "requested": "[1.2.5, )",
-        "resolved": "1.2.5",
-        "contentHash": "d2iB3v7iLPgbWV9YnBBIjHYNrMTuIJO3A83wqOvTRPNKv8iCNJQOExiGcx23I1H7dOLD8F7ZeMpsfJdK0jULwg==",
+        "requested": "[1.2.7, )",
+        "resolved": "1.2.7",
+        "contentHash": "VYwsHBZr0+mm3TxX7ZhGJpc49M5t1HfQRvfZZqzFu4WWP9u0vE9znjG0zykuOgva0xNdEcGT2gpID3trs5iX5g==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.5",
+          "NSign.Abstractions": "1.2.7",
           "StructuredFieldValues": "0.7.7"
         }
       },
       "NSign.SignatureProviders": {
         "type": "CentralTransitive",
-        "requested": "[1.2.5, )",
-        "resolved": "1.2.5",
-        "contentHash": "E4Y5rv3ARtkEmIkgNVxEjet46EMZkALIVieSK7qJShRTYu99WC32UVHW8gonnTGFFkAK5XQ0nYhFX/5mD/iSuA==",
+        "requested": "[1.2.7, )",
+        "resolved": "1.2.7",
+        "contentHash": "jR8Im7CnD51ADEajikc5hEZVJPMNGXZleFDrQhTKVLNf4TlHSYdKlJsw3mRRTl+NtscBFHC4Pt1gbQgyRUMU+w==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.5"
+          "NSign.Abstractions": "1.2.7"
         }
       },
       "OneOf": {
