@@ -70,14 +70,6 @@ jobs:
           terraform validate -no-color
         working-directory: terraform/aks
 
-      - name: Lint
-        uses: reviewdog/action-tflint@2c3945df0a1eca41825ede1ba6b7f1b3fc95acd8 # Pinned at v1.27.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tflint_rulesets: azurerm
-          working_directory: terraform/aks
-        continue-on-error: true # temporary- we're getting sporadic 503 errors here in action setup
-
   get_affected_projects:
     name: Get affected projects
     runs-on: ubuntu-latest
