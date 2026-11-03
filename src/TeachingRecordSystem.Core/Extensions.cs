@@ -5,6 +5,7 @@ using Hangfire.PostgreSql;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
@@ -219,7 +220,8 @@ public static class Extensions
     {
         services
             .AddTransient<WebhookMessageFactory>()
-            .AddSingleton<EventMapperRegistry>();
+            .AddSingleton<EventMapperRegistry>()
+            .TryAddSingleton<PersonInfoCache>();
 
         return services;
     }
