@@ -78,9 +78,9 @@
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
     <PackageVersion Include="Npgsql.DependencyInjection" Version="10.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
-    <PackageVersion Include="NSign.AspNetCore" Version="1.2.5" />
-    <PackageVersion Include="NSign.Client" Version="1.2.5" />
-    <PackageVersion Include="NSign.SignatureProviders" Version="1.2.5" />
+    <PackageVersion Include="NSign.AspNetCore" Version="1.2.7" />
+    <PackageVersion Include="NSign.Client" Version="1.2.7" />
+    <PackageVersion Include="NSign.SignatureProviders" Version="1.2.7" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.7.2" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.7.2" />
