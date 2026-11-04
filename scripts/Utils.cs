@@ -21,10 +21,11 @@ public static class Utils
             })
             .ExecuteBufferedAsync();
 
-        var currentDirectory = Directory.GetCurrentDirectory();
-        var projectList = new HashSet<string>(File.ReadAllLines(projectListFile).Select(p => Path.GetFileNameWithoutExtension(p)));
-
-        projectList.RemoveWhere(project => !project.EndsWith("Tests"));
+        var projectList = new HashSet<string>(
+            File.ReadAllLines(projectListFile)
+                .Select(Path.GetFileNameWithoutExtension)
+                .Where(project => project.StartsWith("TeachingRecordSystem.", StringComparison.Ordinal)
+                    && project.EndsWith("Tests", StringComparison.Ordinal)));
 
         // Check projects with Razor views individually as incrementalist doesn't currently know about them
         var changedFiles = Utils.GetChangedFiles(targetBranch);
