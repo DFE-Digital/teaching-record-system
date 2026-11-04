@@ -100,7 +100,8 @@ jobs:
           TARGET_BRANCH=main
           git fetch origin $TARGET_BRANCH --quiet
 
-          projects=$(dotnet run scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | sed 's/^TeachingRecordSystem.//')
+          dotnet build scripts/GetTestProjectsToRun.cs
+          projects=$(dotnet run --no-build scripts/GetTestProjectsToRun.cs -- origin/$TARGET_BRANCH | sed 's/^TeachingRecordSystem.//')
 
           # Split long-running projects over several jobs, so the slowest project doesn't decide how long a
           # PR takes to go green. The shard count comes from how many tests a project has, so suites that
