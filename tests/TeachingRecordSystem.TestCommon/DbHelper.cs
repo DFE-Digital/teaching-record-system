@@ -162,7 +162,7 @@ public sealed class DbHelper : IAsyncDisposable
     }
 
     private async Task EnsureRespawnerAsync(DbConnection connection) =>
-        _respawner = await Respawner.CreateAsync(
+        _respawner ??= await Respawner.CreateAsync(
             connection,
             new RespawnerOptions()
             {
