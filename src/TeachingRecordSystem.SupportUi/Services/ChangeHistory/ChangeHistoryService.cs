@@ -39,6 +39,7 @@ public class ChangeHistoryService(
             ProcessType.PersonCreating,
             ProcessType.PersonCreatingInDqt,
             ProcessType.PersonImportingIntoDqt,
+            ProcessType.PersonMigratingFromDqt,
             ProcessType.PersonUpdatingInDqt,
             ProcessType.PersonDeactivatingInDqt,
             ProcessType.PersonReactivatingInDqt,
