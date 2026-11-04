@@ -1,6 +1,24 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Services.ChangeHistory
+@inject SupportUiLinkGenerator LinkGenerator
 @model ChangeHistoryEntryViewModel
+@{
+    var hasEvent = Model.TryGetEvent<SupportTaskUpdatedEvent>(out var supportTaskUpdatedEvent);
+    var statusChanged = hasEvent && supportTaskUpdatedEvent!.Changes.HasFlag(SupportTaskUpdatedEventChanges.Status);
+}
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
-
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="GOV.UK One Login ID verification task saved" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (hasEvent && Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
+    {
+        <p class="govuk-body" data-testid="task-saved-message">
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskUpdatedEvent!.SupportTaskReference)" data-testid="support-task-link">
+                Task<span class="govuk-visually-hidden"> @supportTaskUpdatedEvent.SupportTaskReference</span>
+            </a>
+            <text> has been saved.</text>
+        </p>
+    }
+    @if (statusChanged)
+    {
+        <p class="govuk-body" data-testid="status-changed">Status changed from @supportTaskUpdatedEvent!.OldSupportTask.Status.GetDisplayName() to @supportTaskUpdatedEvent.SupportTask.Status.GetDisplayName()</p>
+    }
 </timeline-entry>
