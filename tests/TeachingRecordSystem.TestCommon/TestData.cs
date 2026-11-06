@@ -40,7 +40,7 @@ public partial class TestData(
         return Convert.ToBase64String(buffer);
     }
 
-    public string GenerateApplicationUserName() => Faker.Company.Name();
+    public string GenerateApplicationUserName() => $"{Faker.Company.Name()} {Interlocked.Increment(ref _applicationUserNumber)}";
 
     public string GenerateApplicationUserShortName() => $"app-{Interlocked.Increment(ref _applicationUserNumber)}";
 
