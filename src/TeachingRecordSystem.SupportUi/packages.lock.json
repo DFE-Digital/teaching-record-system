@@ -8,6 +8,12 @@
         "resolved": "1.107.1",
         "contentHash": "Iy5pdeQpQqrY8Ny+sfCBLlpaZ9jyIW9sfgLtJaiS1sG7AF8PiQoR0qqGL0zodQBW/9aA+EFbVEyo/yUsgCl6YA=="
       },
+      "CsvHelper": {
+        "type": "Direct",
+        "requested": "[34.0.0, )",
+        "resolved": "34.0.0",
+        "contentHash": "yiFG6lPSgNFhraURmM/e4ROhbnNzMOZI1HxMvjNzn5lkc9dx3aN/sm/N4UM+rV6CPpZBQfrJfwEKUxkndeRKUQ=="
+      },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
         "requested": "[5.0.1, )",
@@ -974,12 +980,6 @@
         "dependencies": {
           "CloudNative.CloudEvents": "2.9.0"
         }
-      },
-      "CsvHelper": {
-        "type": "CentralTransitive",
-        "requested": "[34.0.0, )",
-        "resolved": "34.0.0",
-        "contentHash": "yiFG6lPSgNFhraURmM/e4ROhbnNzMOZI1HxMvjNzn5lkc9dx3aN/sm/N4UM+rV6CPpZBQfrJfwEKUxkndeRKUQ=="
       },
       "DfeAnalytics.EFCore": {
         "type": "CentralTransitive",
