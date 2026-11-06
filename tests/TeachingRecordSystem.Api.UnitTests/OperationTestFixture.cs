@@ -10,7 +10,7 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
-public class OperationTestFixture : ServiceProviderFixture
+public class OperationTestFixture : ServiceProviderFixture, IAsyncLifetime
 {
     private readonly Mock<ICurrentUserProvider> _currentUserProviderMock = new();
 
@@ -33,11 +33,13 @@ public class OperationTestFixture : ServiceProviderFixture
         TestScopedServices.ConfigureServices(services);
     }
 
-    public override async ValueTask InitializeAsync()
-    {
-        await base.InitializeAsync();
+#pragma warning disable CA1816
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+#pragma warning restore CA1816
 
-        // An existing local test DB may have data from other test projects; we need a blank slate
+    public async ValueTask InitializeAsync()
+    {
+        // The template's seeded rows include some that these tests need gone
         await DbHelper.ClearDataAsync();
 
         TestScopedServices.Reset(Services);

@@ -11,7 +11,7 @@ using Xunit.v3;
 
 namespace TeachingRecordSystem.Cli.Tests;
 
-public class CompositionRoot : IAsyncLifetime
+public class CompositionRoot
 {
     static CompositionRoot()
     {
@@ -38,10 +38,6 @@ public class CompositionRoot : IAsyncLifetime
 
         return services.BuildServiceProvider();
     }
-
-    async ValueTask IAsyncLifetime.InitializeAsync() => await Services.GetRequiredService<DbHelper>().InitializeAsync();
-
-    ValueTask IAsyncDisposable.DisposeAsync() => ValueTask.CompletedTask;
 
     private class TypeActivator(IServiceProvider serviceProvider) : ITypeActivator
     {

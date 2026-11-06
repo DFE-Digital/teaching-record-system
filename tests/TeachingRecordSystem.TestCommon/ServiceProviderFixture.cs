@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class ServiceProviderFixture : InitializeDbFixture
+public class ServiceProviderFixture
 {
     public ServiceProviderFixture()
     {
@@ -20,6 +20,8 @@ public class ServiceProviderFixture : InitializeDbFixture
     }
 
     public IServiceProvider Services { get; set; }
+
+    public DbHelper DbHelper => DbHelper.Instance;
 
     public void WithService<TService>(Action<TService> action, params object[] arguments)
         where TService : notnull
