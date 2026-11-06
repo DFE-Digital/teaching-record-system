@@ -33,7 +33,8 @@ public class InductionImporter
         var csvOptions = new CsvReaderOptions
         {
             Separator = ',',
-            TrimWhitespace = true
+            TrimWhitespace = true,
+            MalformedData = CsvMalformedDataHandling.Throw
         };
         using (var csv = CsvReader.Create(csvReaderStream, csvOptions))
         {

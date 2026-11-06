@@ -167,7 +167,8 @@ public static partial class Commands
         var csvOptions = new CsvReaderOptions
         {
             Separator = ',',
-            TrimWhitespace = true
+            TrimWhitespace = true,
+            MalformedData = CsvMalformedDataHandling.Throw
         };
 
         using var reader = new StreamReader(fileName);

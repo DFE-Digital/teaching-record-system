@@ -72,7 +72,7 @@ public class TpsCsvExtractFileImporter(
 
         using var stream = await tpsExtractStorageService.GetFileAsync(fileName, cancellationToken);
         using var streamReader = new StreamReader(stream);
-        using var csvReader = CsvReader.Create(streamReader, new CsvReaderOptions { Separator = ',', HasHeader = true });
+        using var csvReader = CsvReader.Create(streamReader, new CsvReaderOptions { Separator = ',', HasHeader = true, MalformedData = CsvMalformedDataHandling.Throw });
 
         var validGenderValues = new List<string>() { "Male", "Female" };
         var validFullOrPartTimeIndicatorValues = new List<string>() { "FT", "PTI", "PTR", "PT" };

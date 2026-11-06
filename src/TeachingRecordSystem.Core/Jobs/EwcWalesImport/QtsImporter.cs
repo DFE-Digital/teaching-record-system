@@ -46,7 +46,8 @@ public class QtsImporter
         {
             Separator = ',',
             TrimWhitespace = true,
-            HasHeader = true
+            HasHeader = true,
+            MalformedData = CsvMalformedDataHandling.Throw
         };
         using var csv = CsvReader.Create(csvReaderStream, csvOptions);
         var records = csv.GetRecords<EwcWalesQtsFileImportData>().ToList();

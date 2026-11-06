@@ -82,7 +82,8 @@ public class CapitaImportJob(
             Separator = ';',
             TrimWhitespace = true,
             HasHeader = false,
-            SkipEmptyLines = true
+            SkipEmptyLines = true,
+            MalformedData = CsvMalformedDataHandling.Throw
         };
         using var csv = CsvReader.Create(reader, csvOptions);
         var records = csv.GetRecords<CapitaImportRecord>().ToList();
