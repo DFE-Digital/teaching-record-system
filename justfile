@@ -39,6 +39,15 @@ test:
 test-changed *ARGS:
   @dotnet run scripts/TestChanged.cs -- {{ARGS}}
 
+# Test a project across several processes e.g. `just test-project Core.Tests`
+test-project project *ARGS:
+  @dotnet build {{"tests" / "TeachingRecordSystem." + project}}
+  @dotnet run scripts/RunTests.cs -- {{project}} {{ARGS}}
+
+# Update the test timings used to split tests across processes, from the results of a CI run
+update-test-timings run-id:
+  @dotnet run scripts/UpdateTestTimings.cs -- {{run-id}}
+
 # Format the .NET solution and Terraform code
 format:
   @dotnet format --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
