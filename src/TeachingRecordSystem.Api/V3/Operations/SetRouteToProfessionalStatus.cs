@@ -44,6 +44,7 @@ public class SetRouteToProfessionalStatusHandler(
         RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId,
         RouteToProfessionalStatusType.NiRId,
         RouteToProfessionalStatusType.ScotlandRId,
+        RouteToProfessionalStatusType.TeachLearnChangeId,
         new("6987240E-966E-485F-B300-23B54937FB3A"),
         new("57B86CEF-98E2-4962-A74A-D47C7A34B838"),
         new("4163C2FB-6163-409F-85FD-56E7C70A54DD"),
