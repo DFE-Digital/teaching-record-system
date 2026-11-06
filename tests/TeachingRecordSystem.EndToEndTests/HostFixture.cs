@@ -29,7 +29,7 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.EndToEndTests;
 
-public sealed class HostFixture : InitializeDbFixture
+public sealed class HostFixture : IAsyncLifetime
 {
     public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
     public const string DeferredFakeOneLoginAuthenticationScheme = "DeferredFakeOneLogin";
@@ -84,19 +84,17 @@ public sealed class HostFixture : InitializeDbFixture
 
     public SigningCredentials JwtSigningCredentials { get; }
 
-    public IDbContextFactory<TrsDbContext> DbContextFactory => DbHelper.DbContextFactory;
+    public IDbContextFactory<TrsDbContext> DbContextFactory => DbHelper.Instance.DbContextFactory;
     public TimeProvider TimeProvider { get; }
     public TestData TestData { get; }
     public WebhookMessageRecorder WebhookMessageRecorder { get; }
     public Guid WebhookEndpointId { get; private set; }
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        // The database has to be ready before any of the hosts start; the SupportUi host's startup
-        // tasks write to it and would otherwise have their data wiped by ClearDataAsync.
-        var dbHelper = DbHelper.Instance;
-        await dbHelper.InitializeAsync();
-        await dbHelper.ClearDataAsync();
+        // This has to happen before any of the hosts start; the SupportUi host's startup
+        // tasks write to the database and would otherwise have their data wiped by ClearDataAsync.
+        await DbHelper.Instance.ClearDataAsync();
         await AddTestAppToApplicationUsers();
         await AddWebhookReceiverEndpoint();
 
@@ -122,7 +120,7 @@ public sealed class HostFixture : InitializeDbFixture
         _browser = await browserType.LaunchAsync(browserOptions);
     }
 
-    public override async ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _browser.DisposeAsync();
         _playwright.Dispose();
@@ -132,8 +130,6 @@ public sealed class HostFixture : InitializeDbFixture
         await _supportUiWebApplicationFactory.DisposeAsync();
 
         _webhookReceiver.Dispose();
-
-        await base.DisposeAsync();
     }
 
     public Task<IBrowserContext> CreateBrowserContext(bool javascriptEnabled = true) =>

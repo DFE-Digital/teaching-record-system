@@ -16,7 +16,7 @@ using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public class HostFixture : InitializeDbFixture
+public class HostFixture : IAsyncLifetime
 {
     private readonly SupportUiApplicationFactory _webApplicationFactory;
 
@@ -33,10 +33,8 @@ public class HostFixture : InitializeDbFixture
 
     public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
 
-    public override async ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await InitializeDbAsync();
-
         _ = Services;  // Start the host
 
         AdminUser = await CreateUser();
@@ -62,6 +60,10 @@ public class HostFixture : InitializeDbFixture
             return user;
         }
     }
+
+#pragma warning disable CA1816
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+#pragma warning restore CA1816
 
     private class SupportUiApplicationFactory : WebApplicationFactory<Program>
     {
