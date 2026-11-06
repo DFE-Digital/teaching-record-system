@@ -815,13 +815,14 @@ public class SetProfessionalStatusTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var requestId = Guid.NewGuid().ToString();
+        var unknownUkprn = await TestData.GenerateUniqueUkprnAsync();
 
         var request = CreateJsonContent(
             CreateRequest() with
             {
                 RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
-                TrainingProviderUkprn = "12345678"
+                TrainingProviderUkprn = unknownUkprn
             });
 
         // Act
