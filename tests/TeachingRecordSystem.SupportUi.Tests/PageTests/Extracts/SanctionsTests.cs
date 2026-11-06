@@ -1,4 +1,3 @@
-using System.Globalization;
 using CsvHelper;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Alerts;
@@ -66,8 +65,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -78,7 +76,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "Alert start date",
                 "Alert end date"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -119,8 +117,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -133,7 +130,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "alert_created",
                 "alert_updated"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -217,8 +214,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -230,7 +226,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "Alert end date",
                 "Alert created on"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -266,8 +262,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -286,7 +281,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "DOBS",
                 "NINOS"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -312,8 +307,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -329,7 +323,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "alert_addedtodqt",
                 "details"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -358,8 +352,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -374,7 +367,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "alert_addedtodqt",
                 "details"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -401,8 +394,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -413,7 +405,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "induction_start_date",
                 "induction_completed_date"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -452,8 +444,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -468,7 +459,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "alert_deleted",
                 "alert_updated"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -496,8 +487,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -509,7 +499,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "Alert end",
                 "Alert added to TRS"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -537,8 +527,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         using var csv = await CreateCsvReaderAsync(response);
-        await csv.ReadAsync();
-        csv.ReadHeader();
+        await csv.ReadHeaderAsync();
 
         Assert.Equal(
             [
@@ -551,7 +540,7 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 "Alert added to TRS",
                 "Alert modified on TRS"
             ],
-            csv.HeaderRecord!);
+            csv.Headers);
     }
 
     [Fact]
@@ -1044,20 +1033,19 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
         (await ReferenceDataCache.GetAlertTypesAsync())
             .Single(t => t.DqtSanctionCode == sanctionCode);
 
-    private static async Task<IReadOnlyList<IDictionary<string, object>>> GetCsvRowsAsync(
+    private static async Task<IReadOnlyList<IDictionary<string, string?>>> GetCsvRowsAsync(
         HttpResponseMessage response)
     {
         var csvContent = await response.Content.ReadAsStringAsync();
 
-        using var reader = new StringReader(csvContent);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        using var csv = CsvReader.FromText(csvContent, new CsvReaderOptions { Separator = ',' });
 
-        return csv.GetRecords<dynamic>()
-            .Cast<IDictionary<string, object>>()
+        return csv.GetRecords<CsvDynamicRecord>()
+            .Select(r => (IDictionary<string, string?>)r.ToDictionary())
             .ToList();
     }
 
-    private static async Task<IDictionary<string, object>> GetCsvRowAsync(
+    private static async Task<IDictionary<string, string?>> GetCsvRowAsync(
         HttpResponseMessage response,
         string headerName,
         string value)
@@ -1076,7 +1064,6 @@ public class SanctionsTests(HostFixture hostFixture) : TestBase(hostFixture)
     private static async Task<CsvReader> CreateCsvReaderAsync(HttpResponseMessage response)
     {
         var csvContent = await response.Content.ReadAsStringAsync();
-        var reader = new StringReader(csvContent);
-        return new CsvReader(reader, CultureInfo.InvariantCulture);
+        return CsvReader.FromText(csvContent, new CsvReaderOptions { Separator = ',' });
     }
 }

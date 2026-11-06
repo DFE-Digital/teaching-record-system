@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text;
 using Azure.Storage.Files.DataLake;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -50,7 +49,7 @@ public class CapitaExportMissingTrnJob([FromKeyedServices("sftpstorage")] DataLa
         // process file
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true);
-        using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)))
+        using (var csvWriter = CsvWriter.Create(streamWriter, new CsvWriterOptions { Quoting = CsvQuoting.WhenNeededOrWhitespace }, leaveOpen: true))
         {
             //write rows
             foreach (var personToExport in new[] { person })
@@ -69,13 +68,13 @@ public class CapitaExportMissingTrnJob([FromKeyedServices("sftpstorage")] DataLa
                     // write current name row
                     row = GetNewPersonAsStringRow(personToExport, hasPreviousLastName);
                     csvWriter.WriteField(row);
-                    csvWriter.NextRecord();
+                    csvWriter.EndRecord();
 
                     // write a previous name row if one is present
                     if (!string.IsNullOrEmpty(previousNameRow))
                     {
                         csvWriter.WriteField(previousNameRow);
-                        csvWriter.NextRecord();
+                        csvWriter.EndRecord();
                     }
                 }
                 catch (Exception e)
@@ -111,7 +110,7 @@ public class CapitaExportMissingTrnJob([FromKeyedServices("sftpstorage")] DataLa
                 if (!string.IsNullOrEmpty(previousNameRow))
                 {
                     csvWriter.WriteField(previousNameRow);
-                    csvWriter.NextRecord();
+                    csvWriter.EndRecord();
 
                     // write person previous name exported row to integrationtransactionrecord
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
@@ -137,6 +136,7 @@ public class CapitaExportMissingTrnJob([FromKeyedServices("sftpstorage")] DataLa
                 await dbContext.SaveChangesAsync(cancellationToken);
 
             }
+            await csvWriter.FlushAsync(cancellationToken);
             await streamWriter.FlushAsync(cancellationToken);
 
             // upload file contents to storage container

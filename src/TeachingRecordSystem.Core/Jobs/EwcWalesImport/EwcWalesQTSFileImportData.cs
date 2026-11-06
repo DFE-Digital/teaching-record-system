@@ -1,97 +1,98 @@
-using CsvHelper.Configuration.Attributes;
+using CsvHelper;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
-public class EwcWalesQtsFileImportData
+[CsvRecord]
+public partial class EwcWalesQtsFileImportData
 {
-    [Name("QTS_REF_NO")]
+    [CsvColumn(Index = 0, Optional = true)]
     public required string QtsRefNo { get; set; }
 
-    [Name("FORENAME")]
+    [CsvColumn(Index = 1, Optional = true)]
     public required string Forename { get; set; }
 
-    [Name("SURNAME")]
+    [CsvColumn(Index = 2, Optional = true)]
     public required string Surname { get; set; }
 
-    [Name("DATE_OF_BIRTH")]
+    [CsvColumn(Index = 3, Optional = true)]
     public required string DateOfBirth { get; set; }
 
-    [Name("QTS_STATUS")]
+    [CsvColumn(Index = 4, Optional = true)]
     public required string QtsStatus { get; set; }
 
-    [Name("QTS_DATE")]
+    [CsvColumn(Index = 5, Optional = true)]
     public required string QtsDate { get; set; }
 
-    [Name("ITT StartMONTH")]
+    [CsvColumn(Index = 6, Optional = true)]
     public required string IttStartMonth { get; set; }
 
-    [Name("ITT START YY")]
+    [CsvColumn(Index = 7, Optional = true)]
     public required string IttStartYear { get; set; }
 
-    [Name("ITT End Date")]
+    [CsvColumn(Index = 8, Optional = true)]
     public required string IttEndDate { get; set; }
 
-    [Name("ITT Course Length")]
+    [CsvColumn(Index = 9, Optional = true)]
     public required string ITTCourseLength { get; set; }
 
-    [Name("ITT Estab LEA code")]
+    [CsvColumn(Index = 10, Optional = true)]
     public required string IttEstabLeaCode { get; set; }
 
-    [Name("ITT Estab Code")]
+    [CsvColumn(Index = 11, Optional = true)]
     public required string IttEstabCode { get; set; }
 
-    [Name("ITT Qual Code")]
+    [CsvColumn(Index = 12, Optional = true)]
     public required string IttQualCode { get; set; }
 
-    [Name("ITT Class Code")]
+    [CsvColumn(Index = 13, Optional = true)]
     public required string IttClassCode { get; set; }
 
-    [Name("ITT Subject Code 1")]
+    [CsvColumn(Index = 14, Optional = true)]
     public required string IttSubjectCode1 { get; set; }
 
-    [Name("ITT Subject Code 2")]
+    [CsvColumn(Index = 15, Optional = true)]
     public required string IttSubjectCode2 { get; set; }
 
-    [Name("ITT Min Age Range")]
+    [CsvColumn(Index = 16, Optional = true)]
     public required string IttMinAgeRange { get; set; }
 
-    [Name("ITT Max Age Range")]
+    [CsvColumn(Index = 17, Optional = true)]
     public required string IttMaxAgeRange { get; set; }
 
-    [Name("ITT Min Sp Age Range")]
+    [CsvColumn(Index = 18, Optional = true)]
     public required string IttMinSpAgeRange { get; set; }
 
-    [Name("ITT Max Sp Age Range")]
+    [CsvColumn(Index = 19, Optional = true)]
     public required string IttMaxSpAgeRange { get; set; }
 
-    [Name("ITT Course Length")]
+    [CsvColumn(Index = 20, Optional = true)]
     public required string PqCourseLength { get; set; }
 
-    [Name("PQ Year of Award")]
+    [CsvColumn(Index = 21, Optional = true)]
     public required string PqYearOfAward { get; set; }
 
-    [Name("COUNTRY")]
+    [CsvColumn(Index = 22, Optional = true)]
     public required string Country { get; set; }
 
-    [Name("PQ Estab Code")]
+    [CsvColumn(Index = 23, Optional = true)]
     public required string PqEstabCode { get; set; }
 
-    [Name("PQ Qual Code")]
+    [CsvColumn(Index = 24, Optional = true)]
     public required string PqQualCode { get; set; }
 
-    [Name("HONOURS")]
+    [CsvColumn(Index = 25, Optional = true)]
     public required string Honours { get; set; }
 
-    [Name("PQ Class Code")]
+    [CsvColumn(Index = 26, Optional = true)]
     public required string PqClassCode { get; set; }
 
-    [Name("PQ Subject Code 1")]
+    [CsvColumn(Index = 27, Optional = true)]
     public required string PqSubjectCode1 { get; set; }
 
-    [Name("PQ Subject Code 2")]
+    [CsvColumn(Index = 28, Optional = true)]
     public required string PqSubjectCode2 { get; set; }
 
-    [Name("PQ Subject Code 3")]
+    [CsvColumn(Index = 29, Optional = true)]
     public required string PqSubjectCode3 { get; set; }
 }
 

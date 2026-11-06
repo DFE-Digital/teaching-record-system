@@ -1,8 +1,6 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.Configuration.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -78,19 +76,17 @@ public static partial class Commands
             var results = new List<TrnCorrectionResult>();
             var updatedCount = 0;
 
-            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+            var csvOptions = new CsvReaderOptions
             {
-                MissingFieldFound = null,
-                HeaderValidated = null,
-                BadDataFound = null,
-                IgnoreBlankLines = true
+                Separator = ',',
+                SkipEmptyLines = true
             };
 
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
             using (var stream = File.OpenRead(inputFile))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
-            using (var csv = new CsvReader(reader, csvConfig))
+            using (var csv = CsvReader.Create(reader, csvOptions))
             {
                 var records = csv.GetRecordsAsync<CsvTrnStartDateRecord>();
 
@@ -196,13 +192,13 @@ public static partial class Commands
             await transaction.CommitAsync();
 
             using (var writer = new StreamWriter(outputFile))
-            using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            using (var csvWriter = CsvWriter.Create(writer))
             {
                 csvWriter.WriteField("TRN");
                 csvWriter.WriteField("PreviousStartDate");
                 csvWriter.WriteField("CurrentStartDate");
                 csvWriter.WriteField("QualificationId");
-                await csvWriter.NextRecordAsync();
+                await csvWriter.EndRecordAsync();
 
                 foreach (var r in results)
                 {
@@ -210,7 +206,7 @@ public static partial class Commands
                     csvWriter.WriteField(r.PreviousStartDate?.ToString("dd/MM/yyyy"));
                     csvWriter.WriteField(r.CurrentStartDate?.ToString("dd/MM/yyyy"));
                     csvWriter.WriteField(r.QualificationId);
-                    await csvWriter.NextRecordAsync();
+                    await csvWriter.EndRecordAsync();
                 }
             }
 
@@ -249,29 +245,30 @@ public static partial class Commands
     }
 }
 
-public class CsvTrnStartDateRecord
+[CsvRecord]
+public partial class CsvTrnStartDateRecord
 {
-    [Name("TRN")]
+    [CsvColumn("TRN", Optional = true)]
     public string? TRN { get; set; }
 
-    [Name("CurrentStartDate")]
+    [CsvColumn("CurrentStartDate", Optional = true)]
     public string? CurrentStartDate { get; set; }
 
-    [Name("CorrectStartDate")]
+    [CsvColumn("CorrectStartDate", Optional = true)]
     public string? CorrectStartDate { get; set; }
 }
 
 public class TrnCorrectionResult
 {
-    [Name("TRN")]
+    [CsvColumn("TRN")]
     public string TRN { get; set; } = null!;
 
-    [Name("PreviousStartDate")]
+    [CsvColumn("PreviousStartDate")]
     public DateOnly? PreviousStartDate { get; set; }
 
-    [Name("CurrentStartDate")]
+    [CsvColumn("CurrentStartDate")]
     public DateOnly? CurrentStartDate { get; set; }
 
-    [Name("QualificationId")]
+    [CsvColumn("QualificationId")]
     public Guid QualificationId { get; set; }
 }

@@ -16,7 +16,7 @@
     <PackageVersion Include="Castle.Core" Version="5.1.1" />
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.9.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.9.0" />
-    <PackageVersion Include="CsvHelper" Version="33.1.0" />
+    <PackageVersion Include="CsvHelper" Version="34.0.0" />
     <PackageVersion Include="DfeAnalytics.AspNetCore" Version="0.6.4" />
     <PackageVersion Include="DfeAnalytics.EFCore" Version="0.6.4" />
     <PackageVersion Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.1" />

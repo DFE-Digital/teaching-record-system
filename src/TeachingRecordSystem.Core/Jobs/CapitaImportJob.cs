@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -78,16 +77,15 @@ public class CapitaImportJob(
     public async Task<long> ImportAsync(StreamReader reader, string fileName)
     {
         await using var txn = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
-        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        var csvOptions = new CsvReaderOptions
         {
-            Delimiter = ";",
-            TrimOptions = TrimOptions.Trim,
-            HasHeaderRecord = false,
-            MissingFieldFound = null,
-            IgnoreBlankLines = true
+            Separator = ';',
+            TrimWhitespace = true,
+            HasHeader = false,
+            SkipEmptyLines = true,
+            MalformedData = CsvMalformedDataHandling.Throw
         };
-        using var csv = new CsvReader(reader, csvConfig);
-        csv.Context.RegisterClassMap<CapitaImportMap>();
+        using var csv = CsvReader.Create(reader, csvOptions);
         var records = csv.GetRecords<CapitaImportRecord>().ToList();
         var totalRowCount = 0;
         var successCount = 0;
@@ -430,32 +428,25 @@ public class CapitaImportJob(
     }
 }
 
-public class CapitaImportMap : ClassMap<CapitaImportRecord>
+[CsvRecord]
+public partial class CapitaImportRecord
 {
-    public CapitaImportMap()
-    {
-        Map(m => m.TRN).Index(0).Optional();
-        Map(m => m.Gender).Index(1).Optional();
-        Map(m => m.LastName).Index(2).Optional();
-        Map(m => m.FirstNameOrMiddleName).Index(3).Optional();
-        Map(m => m.PreviousLastName).Index(4).Optional();
-        Map(m => m.DateOfBirth).Index(5)
-            .TypeConverterOption.Format("yyyyMMdd")
-            .TypeConverterOption.NullValues(string.Empty);
-        Map(m => m.NINumber).Index(6).Optional();
-        Map(m => m.DateOfDeath).Index(7).Optional();
-    }
-}
-
-public class CapitaImportRecord
-{
+    [CsvColumn(Index = 0, Optional = true)]
     public required string? TRN { get; set; }
+    [CsvColumn(Index = 1, Optional = true)]
     public required int? Gender { get; set; }
+    [CsvColumn(Index = 2, Optional = true)]
     public required string? LastName { get; set; }
+    [CsvColumn(Index = 3, Optional = true)]
     public required string? FirstNameOrMiddleName { get; set; }
+    [CsvColumn(Index = 4, Optional = true)]
     public required string? PreviousLastName { get; set; }
+    [CsvColumn(Index = 5)]
+    [CsvNullValues("")]
     public required string? DateOfBirth { get; set; }
+    [CsvColumn(Index = 6, Optional = true)]
     public required string? NINumber { get; set; }
+    [CsvColumn(Index = 7, Optional = true)]
     public required string? DateOfDeath { get; set; }
 
     public string? GetFirstName()
