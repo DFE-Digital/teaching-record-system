@@ -32,6 +32,7 @@ Assume that dependencies for running tests (a local postgres database, Playwrigh
 
 Tests run against a Postgres container that's started automatically, so Docker must be running; no configuration is needed.
 Each test process gets its own database, so test projects and git worktrees can run at the same time.
+Use `just test-project Core.Tests` to run a whole project faster, across several processes.
 See [docs/test-databases.md](docs/test-databases.md).
 
 ### Boolean Expressions

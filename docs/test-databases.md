@@ -13,6 +13,22 @@ Because a process's database is exclusively its own, test projects and worktrees
 
 Tests inside a process still share that process's database. Most run in parallel, so they mustn't assume they're the only ones writing. Tests that need an empty database use `[ClearDbBeforeTest]` in a `DisableParallelization` collection.
 
+## Running serial tests side by side
+
+Tests in a `DisableParallelization` collection run one at a time within a process, so `scripts/RunTests.cs` splits a project's classes across several processes, each with its own database. CI does this for every project except `EndToEndTests`, whose hosts listen on fixed ports; that project gets more jobs instead. To do the same locally:
+
+```shell
+just test-project Core.Tests
+```
+
+Classes are balanced using `tests/test-timings.json`, which also decides how many jobs CI gives a project. A class with no timing yet is estimated from its number of tests, so the file only affects how even the split is. To refresh it from a CI run that tested every project:
+
+```shell
+just update-test-timings <run ID>
+```
+
+Be careful with this: tests run slower when processes share a runner, so timings from a run that used several processes per job are about 3–4 times higher for the larger projects, and CI would give those projects too many jobs. Lower the shard count calculation in `pr.yml` to match if you refresh them.
+
 ## Inspecting a database
 
 A slot's database stays in place until another process takes that slot, so it can be examined after a run:
