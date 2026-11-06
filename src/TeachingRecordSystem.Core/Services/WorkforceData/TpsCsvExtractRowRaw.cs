@@ -1,55 +1,56 @@
-using CsvHelper.Configuration.Attributes;
+using CsvHelper;
 
 namespace TeachingRecordSystem.Core.Services.WorkforceData;
 
-public class TpsCsvExtractRowRaw
+[CsvRecord]
+public partial class TpsCsvExtractRowRaw
 {
-    [Name("Teachers Pensions Reference Number (TRN)")]
-    [NullValues("")]
+    [CsvColumn("Teachers Pensions Reference Number (TRN)")]
+    [CsvNullValues("")]
     public required string? Trn { get; init; }
-    [Name("National Insurance Number (NINO)")]
-    [NullValues("")]
+    [CsvColumn("National Insurance Number (NINO)")]
+    [CsvNullValues("")]
     public required string? NationalInsuranceNumber { get; init; }
-    [Name("Date of Birth (DOB)")]
-    [NullValues("")]
+    [CsvColumn("Date of Birth (DOB)")]
+    [CsvNullValues("")]
     public required string? DateOfBirth { get; init; }
-    [Name("Date of Death")]
-    [NullValues("")]
+    [CsvColumn("Date of Death")]
+    [CsvNullValues("")]
     public required string? DateOfDeath { get; init; }
-    [Name("Postcode")]
-    [NullValues("")]
+    [CsvColumn("Postcode")]
+    [CsvNullValues("")]
     public required string? MemberPostcode { get; init; }
-    [Name("Email Address (Member)")]
-    [NullValues("")]
+    [CsvColumn("Email Address (Member)")]
+    [CsvNullValues("")]
     public required string? MemberEmailAddress { get; init; }
-    [Name("Local Authority Code")]
-    [NullValues("")]
+    [CsvColumn("Local Authority Code")]
+    [CsvNullValues("")]
     public required string? LocalAuthorityCode { get; init; }
-    [Name("Establishment Code")]
-    [NullValues("")]
+    [CsvColumn("Establishment Code")]
+    [CsvNullValues("")]
     public required string? EstablishmentCode { get; init; }
-    [Name("Postcode (Establishment)")]
-    [NullValues("")]
+    [CsvColumn("Postcode (Establishment)")]
+    [CsvNullValues("")]
     public required string? EstablishmentPostcode { get; init; }
-    [Name("Email Address (Establishment)")]
-    [NullValues("")]
+    [CsvColumn("Email Address (Establishment)")]
+    [CsvNullValues("")]
     public required string? EstablishmentEmailAddress { get; init; }
-    [Name("Start Date")]
-    [NullValues("")]
+    [CsvColumn("Start Date")]
+    [CsvNullValues("")]
     public required string? EmploymentStartDate { get; init; }
-    [Name("End Date")]
-    [NullValues("")]
+    [CsvColumn("End Date")]
+    [CsvNullValues("")]
     public required string? EmploymentEndDate { get; init; }
-    [Name("Full Time / Part Time Indicator")]
-    [NullValues("")]
+    [CsvColumn("Full Time / Part Time Indicator")]
+    [CsvNullValues("")]
     public required string? FullOrPartTimeIndicator { get; init; }
-    [Name("Withdrawal Indicator")]
-    [NullValues("")]
+    [CsvColumn("Withdrawal Indicator")]
+    [CsvNullValues("")]
     public required string? WithdrawlIndicator { get; init; }
-    [Name("Extract Date")]
-    [NullValues("")]
+    [CsvColumn("Extract Date")]
+    [CsvNullValues("")]
     public required string? ExtractDate { get; init; }
-    [Name("Gender")]
-    [NullValues("")]
+    [CsvColumn("Gender")]
+    [CsvNullValues("")]
     public required string? Gender { get; init; }
 }

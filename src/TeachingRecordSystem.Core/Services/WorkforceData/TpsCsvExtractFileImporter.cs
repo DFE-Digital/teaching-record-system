@@ -1,7 +1,5 @@
-using System.Globalization;
 using System.Text.RegularExpressions;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -74,7 +72,7 @@ public class TpsCsvExtractFileImporter(
 
         using var stream = await tpsExtractStorageService.GetFileAsync(fileName, cancellationToken);
         using var streamReader = new StreamReader(stream);
-        using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
+        using var csvReader = CsvReader.Create(streamReader, new CsvReaderOptions { Separator = ',', HasHeader = true });
 
         var validGenderValues = new List<string>() { "Male", "Female" };
         var validFullOrPartTimeIndicatorValues = new List<string>() { "FT", "PTI", "PTR", "PT" };

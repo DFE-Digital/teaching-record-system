@@ -997,6 +997,7 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.107.1, )",
+          "CsvHelper": "[34.0.0, )",
           "GovUk.Frontend.AspNetCore": "[5.0.1, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",

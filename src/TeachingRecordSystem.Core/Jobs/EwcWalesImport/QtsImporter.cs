@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -43,14 +42,13 @@ public class QtsImporter
         //       Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,
         //       PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,
         //       PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3
-        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        var csvOptions = new CsvReaderOptions
         {
-            TrimOptions = TrimOptions.Trim,
-            HasHeaderRecord = true,
-            MissingFieldFound = null
+            Separator = ',',
+            TrimWhitespace = true,
+            HasHeader = true
         };
-        using var csv = new CsvReader(csvReaderStream, csvConfig);
-        csv.Context.RegisterClassMap<EwcWalesQtsFileImportDataMapper>();
+        using var csv = CsvReader.Create(csvReaderStream, csvOptions);
         var records = csv.GetRecords<EwcWalesQtsFileImportData>().ToList();
         var totalRowCount = 0;
         var successCount = 0;
@@ -190,10 +188,12 @@ public class QtsImporter
     public string ConvertToCsvString(EwcWalesQtsFileImportData row)
     {
         using (var writer = new StringWriter())
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
-            csv.WriteRecord(row);
-            csv.Flush();
+            using (var csv = CsvWriter.Create(writer, new CsvWriterOptions { HasHeader = false }, leaveOpen: true))
+            {
+                csv.WriteRecord(row);
+            }
+
             return writer.ToString();
         }
     }
@@ -376,43 +376,6 @@ public class QtsImporter
         else
         {
             return (EwcWalesMatchStatus.NoAssociatedQts, person!);
-        }
-    }
-
-    public class EwcWalesQtsFileImportDataMapper : ClassMap<EwcWalesQtsFileImportData>
-    {
-        public EwcWalesQtsFileImportDataMapper()
-        {
-            Map(m => m.QtsRefNo).Index(0).Optional();
-            Map(m => m.Forename).Index(1).Optional();
-            Map(m => m.Surname).Index(2).Optional();
-            Map(m => m.DateOfBirth).Index(3).Optional();
-            Map(m => m.QtsStatus).Index(4).Optional();
-            Map(m => m.QtsDate).Index(5).Optional();
-            Map(m => m.IttStartMonth).Index(6).Optional();
-            Map(m => m.IttStartYear).Index(7).Optional();
-            Map(m => m.IttEndDate).Index(8).Optional();
-            Map(m => m.ITTCourseLength).Index(9).Optional();
-            Map(m => m.IttEstabLeaCode).Index(10).Optional();
-            Map(m => m.IttEstabCode).Index(11).Optional();
-            Map(m => m.IttQualCode).Index(12).Optional();
-            Map(m => m.IttClassCode).Index(13).Optional();
-            Map(m => m.IttSubjectCode1).Index(14).Optional();
-            Map(m => m.IttSubjectCode2).Index(15).Optional();
-            Map(m => m.IttMinAgeRange).Index(16).Optional();
-            Map(m => m.IttMaxAgeRange).Index(17).Optional();
-            Map(m => m.IttMinSpAgeRange).Index(18).Optional();
-            Map(m => m.IttMaxSpAgeRange).Index(19).Optional();
-            Map(m => m.PqCourseLength).Index(20).Optional();
-            Map(m => m.PqYearOfAward).Index(21).Optional();
-            Map(m => m.Country).Index(22).Optional();
-            Map(m => m.PqEstabCode).Index(23).Optional();
-            Map(m => m.PqQualCode).Index(24).Optional();
-            Map(m => m.Honours).Index(25).Optional();
-            Map(m => m.PqClassCode).Index(26).Optional();
-            Map(m => m.PqSubjectCode1).Index(27).Optional();
-            Map(m => m.PqSubjectCode2).Index(28).Optional();
-            Map(m => m.PqSubjectCode3).Index(29).Optional();
         }
     }
 

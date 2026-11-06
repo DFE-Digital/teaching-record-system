@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Text;
 using Azure.Storage.Files.DataLake;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -55,7 +54,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
         // process file
         using var memoryStream = new MemoryStream();
         using var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, leaveOpen: true);
-        using (var csvWriter = new CsvWriter(streamWriter, new CsvConfiguration(CultureInfo.InvariantCulture)))
+        using (var csvWriter = CsvWriter.Create(streamWriter, new CsvWriterOptions { Quoting = CsvQuoting.WhenNeededOrWhitespace }, leaveOpen: true))
         {
             try
             {
@@ -66,7 +65,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
 
                     // Existing name row
                     csvWriter.WriteField(amendedPersonRow);
-                    csvWriter.NextRecord();
+                    csvWriter.EndRecord();
 
                     // write current person exported row to integrationtransactionrecord
                     integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
@@ -92,6 +91,7 @@ public class CapitaExportAmendJob([FromKeyedServices("sftpstorage")] DataLakeSer
                     await dbContext.SaveChangesAsync(cancellationToken);
 
                 }
+                csvWriter.Flush();
                 streamWriter.Flush();
 
                 // upload file contents to storage container

@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -31,11 +30,12 @@ public class InductionImporter
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
-        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        var csvOptions = new CsvReaderOptions
         {
-            TrimOptions = TrimOptions.Trim
+            Separator = ',',
+            TrimWhitespace = true
         };
-        using (var csv = new CsvReader(csvReaderStream, csvConfig))
+        using (var csv = CsvReader.Create(csvReaderStream, csvOptions))
         {
             await using var txn = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
             var integrationJob = new IntegrationTransaction()
@@ -310,12 +310,13 @@ public class InductionImporter
     public string ConvertToCsvString(EwcWalesInductionImportData row)
     {
         using (var writer = new StringWriter())
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
-            csv.WriteHeader<EwcWalesInductionImportData>();
-            csv.NextRecord();
-            csv.WriteRecord(row);
-            csv.NextRecord();
+            using (var csv = CsvWriter.Create(writer, leaveOpen: true))
+            {
+                csv.WriteHeader<EwcWalesInductionImportData>();
+                csv.WriteRecord(row);
+            }
+
             return writer.ToString();
         }
     }
