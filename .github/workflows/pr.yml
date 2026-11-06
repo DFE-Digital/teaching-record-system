@@ -111,7 +111,7 @@ jobs:
           # doesn't work for EndToEndTests since its hosts listen on fixed ports.
           # TARGET_SHARD_SECONDS is deliberately well below the per-job build time - shards much shorter
           # than that spend more time building than testing.
-          TARGET_SHARD_SECONDS=45
+          TARGET_SHARD_SECONDS=40
           MAX_SHARDS=6
           PROCESSES_PER_JOB=4
 
