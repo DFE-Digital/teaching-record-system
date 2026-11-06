@@ -114,6 +114,11 @@ _deploy branch environment:
 remove-tests-schema-cache:
   @dotnet run scripts/RemoveTestsSchemaCache.cs
 
+# Removes stopped test containers and any unused anonymous volumes (asks before each step)
+prune-test-containers:
+  @docker container prune --filter label=org.testcontainers.session-id
+  @docker volume prune
+
 psql-dev: (make "install-konduit")
   kubectl config use-context s189t01-tsc-test-aks
   bin/konduit.sh -n tra-development -x -d trs -k s189t01-trs-dv-inf-kv trs-dev-worker -- psql
