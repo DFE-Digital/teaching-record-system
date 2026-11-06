@@ -27,6 +27,8 @@ Classes are balanced using `tests/test-timings.json`, which also decides how man
 just update-test-timings <run ID>
 ```
 
+Be careful with this: tests run slower when processes share a runner, so timings from a run that used several processes per job are about 3–4 times higher for the larger projects, and CI would give those projects too many jobs. Lower the shard count calculation in `pr.yml` to match if you refresh them.
+
 ## Inspecting a database
 
 A slot's database stays in place until another process takes that slot, so it can be examined after a run:
