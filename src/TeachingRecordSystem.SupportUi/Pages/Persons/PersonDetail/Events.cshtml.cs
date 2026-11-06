@@ -24,9 +24,10 @@ public class EventsModel(TrsDbContext dbContext) : PageModel
             .ToArrayAsync(cancellationToken);
 
         var processes = await dbContext.Processes
+            .AsSplitQuery()
             .Where(p => p.PersonIds.Contains(PersonId))
             .Include(p => p.User)
-            .Include(p => p.Events).AsSplitQuery()
+            .Include(p => p.Events)
             .ToArrayAsync(cancellationToken);
 
         EventPayloads = legacyEvents

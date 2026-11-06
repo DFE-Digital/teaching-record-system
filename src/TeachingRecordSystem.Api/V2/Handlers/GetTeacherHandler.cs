@@ -12,7 +12,8 @@ public class GetTeacherHandler(TrsDbContext dbContext) :
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
-            .Include(p => p.Alerts).AsSplitQuery()
+            .AsSplitQuery()
+            .Include(p => p.Alerts)
             .SingleOrDefaultAsync(p => p.Trn == request.Trn, cancellationToken: cancellationToken);
 
         var hasActiveAlert = person.Alerts!.Any(a => a.IsOpen);

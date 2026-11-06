@@ -20,9 +20,10 @@ public class Events(TrsDbContext dbContext) : PageModel
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var processesAndEvents = await dbContext.Processes
+            .AsSplitQuery()
             .Where(p => p.OneLoginUserSubjects.Contains(OneLoginUserSubject))
             .Include(p => p.User)
-            .Include(p => p.Events).AsSplitQuery()
+            .Include(p => p.Events)
             .ToArrayAsync(cancellationToken);
 
         Processes = processesAndEvents

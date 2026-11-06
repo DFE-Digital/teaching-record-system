@@ -119,9 +119,10 @@ public class ChangeHistoryService(
         };
 
         var processes = await dbContext.Processes
+            .AsSplitQuery()
             .Where(p => p.PersonIds.Contains(personId) && processTypesToQuery.Contains(p.ProcessType))
             .Include(p => p.User)
-            .Include(p => p.Events).AsSplitQuery()
+            .Include(p => p.Events)
             .OrderByDescending(p => p.CreatedOn)
             .ToListAsync(cancellationToken);
 
@@ -185,9 +186,10 @@ public class ChangeHistoryService(
         CancellationToken cancellationToken = default)
     {
         var results = await dbContext.Processes
+            .AsSplitQuery()
             .Where(p => p.SupportTaskReferences.Contains(supportTaskReference))
             .Include(p => p.User)
-            .Include(p => p.Events).AsSplitQuery()
+            .Include(p => p.Events)
             .OrderByDescending(p => p.CreatedOn)
             .Select(process =>
                 new Result(
@@ -210,9 +212,10 @@ public class ChangeHistoryService(
         CancellationToken cancellationToken = default)
     {
         var query = dbContext.Processes
+            .AsSplitQuery()
             .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject))
             .Include(p => p.User)
-            .Include(p => p.Events).AsSplitQuery()
+            .Include(p => p.Events)
             .OrderByDescending(p => p.CreatedOn);
 
         var totalCount = await query.CountAsync(cancellationToken);

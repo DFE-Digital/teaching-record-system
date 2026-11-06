@@ -78,8 +78,9 @@ public class SetRouteToProfessionalStatusHandler(
     public async Task<ApiResult<SetRouteToProfessionalStatusResult>> ExecuteAsync(SetRouteToProfessionalStatusCommand command, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
+            .AsSplitQuery()
             .Where(p => p.Trn == command.Trn)
-            .Include(p => p.Qualifications).AsSplitQuery()
+            .Include(p => p.Qualifications)
             .SingleOrDefaultAsync(cancellationToken);
 
         if (person is null)
