@@ -31,9 +31,10 @@ public abstract class FindPersonsHandlerBase(
     protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Guid> matchedPersonIds, CancellationToken cancellationToken = default)
     {
         var persons = await dbContext.Persons
-            .Include(p => p.Alerts!).AsSplitQuery()
-            .Include(p => p.Qualifications!).AsSplitQuery()
-            .Include(p => p.PreviousNames).AsSplitQuery()
+            .AsSplitQuery()
+            .Include(p => p.Alerts!)
+            .Include(p => p.Qualifications!)
+            .Include(p => p.PreviousNames)
             .Where(p => matchedPersonIds.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, p => p, cancellationToken);
 
