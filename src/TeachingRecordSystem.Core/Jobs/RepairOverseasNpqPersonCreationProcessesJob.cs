@@ -11,9 +11,9 @@ namespace TeachingRecordSystem.Core.Jobs;
 /// Teachers' Pensions" entry on their change history for a record that arrived by a different route.
 /// </summary>
 /// <remarks>
-/// The signature is one that cannot occur naturally. <see cref="CapitaImportJob"/> is the only thing that
-/// creates this process type, and it runs as the configured Capita Teachers' Pensions user, never as
-/// <see cref="SystemUser"/>; a person it creates is stamped <c>CreatedByTps</c>; and its processes hold a
+/// The signature is one that cannot occur naturally. The since-removed <c>CapitaImportJob</c> was the only thing
+/// that created this process type, and it ran as the configured Capita Teachers' Pensions user, never as
+/// <see cref="SystemUser"/>; a person it created was stamped <c>CreatedByTps</c>; and its processes held a
 /// <c>SupportTaskCreatedEvent</c> alongside the creation whenever the import flagged a duplicate. A process
 /// of this type raised by the system user, holding a single <see cref="PersonCreatedEvent"/> and no support
 /// task, for a person not marked as created by TPS, is from that bulk run.

@@ -51,7 +51,6 @@ public class PersonService(
             Gender = options.Gender,
             CreatedOn = processContext.Now,
             UpdatedOn = processContext.Now,
-            CreatedByTps = processContext.ProcessType is ProcessType.TeacherPensionsRecordImporting,
             SourceApplicationUserId = options.SourceTrnRequest?.ApplicationUserId,
             SourceTrnRequestId = options.SourceTrnRequest?.RequestId
         };

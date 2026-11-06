@@ -14,7 +14,6 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateAddTrnRangeCommand(configuration),
     Commands.CreateDeleteSupportTaskCommand(configuration),
     Commands.CreateResetTrnRequestCommand(configuration),
-    Commands.CreateImportCapitaFileCommand(configuration),
     Commands.CreateImportClaimTestDataCommand(configuration),
     Commands.CorrectQualificationStartDate(configuration),
     Commands.CreateAppContentCommand(configuration),
