@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Models.SupportTasks;
 
 public interface ISupportTaskData
 {
-    static JsonSerializerOptions SerializerOptions => new()
+    static JsonSerializerOptions SerializerOptions { get; } = new()
     {
         AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
         TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.SupportTaskData } }
