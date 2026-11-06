@@ -833,7 +833,6 @@
       "trscli": {
         "type": "Project",
         "dependencies": {
-          "CsvHelper": "[34.0.0, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "System.CommandLine": "[2.0.3, )",
           "TeachingRecordSystem.Core": "[1.0.0, )"

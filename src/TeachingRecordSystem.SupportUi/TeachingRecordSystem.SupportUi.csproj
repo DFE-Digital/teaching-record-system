@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" />
-    <PackageReference Include="CsvHelper" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="GovUk.Questions.AspNetCore" />
     <PackageReference Include="Htmx" />
