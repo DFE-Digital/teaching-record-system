@@ -9,10 +9,10 @@
       ],
       "rollForward": false
     },
-    "incrementalist.cmd": {
-      "version": "1.2.2",
+    "dotnet-affected": {
+      "version": "7.0.1",
       "commands": [
-        "incrementalist"
+        "dotnet-affected"
       ],
       "rollForward": false
     },
