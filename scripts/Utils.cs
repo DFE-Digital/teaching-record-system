@@ -3,6 +3,7 @@ using LibGit2Sharp;
 public static class Utils
 {
     private const string DefaultBranch = "main";
+    private const int NoProjectsAffectedExitCode = 166;
 
     public static async Task<IReadOnlyCollection<string>> GetAffectedTestProjectsAsync(string targetBranch = DefaultBranch)
     {
@@ -30,69 +31,44 @@ public static class Utils
 
     private static async Task<string[]> GetAffectedProjectFilesAsync(string targetBranch)
     {
-        // Incrementalist takes the repository root from the git directory, which for a git worktree is under
-        // .git/worktrees. It then finds no solution and exits successfully without reporting any projects.
-        if (!IsGitWorktree())
-        {
-            return await RunIncrementalistAsync(Environment.CurrentDirectory, targetBranch);
-        }
+        var outputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
-        var cloneDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-
-        try
-        {
-            await RunGitAsync(Environment.CurrentDirectory, "clone", "--quiet", "--shared", ".", cloneDirectory);
-            await RunGitAsync(cloneDirectory, "fetch", "--quiet", "--update-head-ok", "origin", $"{targetBranch}:{targetBranch}");
-
-            return await RunIncrementalistAsync(cloneDirectory, targetBranch);
-        }
-        finally
-        {
-            if (Directory.Exists(cloneDirectory))
-            {
-                Directory.Delete(cloneDirectory, recursive: true);
-            }
-        }
-    }
-
-    private static async Task<string[]> RunIncrementalistAsync(string workingDirectory, string targetBranch)
-    {
-        var projectListFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-
-        // TODO At some point we should use the Incrementalist library directly rather than shelling out to the CLI
-        await Cli.Wrap("dotnet")
+        var result = await Cli.Wrap("dotnet")
             .WithArguments(new[]
             {
-                "incrementalist",
+                "tool",
                 "run",
-                "--file",
-                projectListFile,
-                "--branch",
-                targetBranch
+                "dotnet-affected",
+                "--",
+                "--from",
+                targetBranch,
+                "--filter-file-path",
+                "TeachingRecordSystem.slnx",
+                "--format",
+                "text",
+                "--output-dir",
+                outputDirectory,
+                "--output-name",
+                "affected"
             })
-            .WithWorkingDirectory(workingDirectory)
+            .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync();
 
-        // Incrementalist writes an empty file when nothing is affected, so a missing file means it didn't run the analysis.
-        if (!File.Exists(projectListFile))
+        if (result.ExitCode == NoProjectsAffectedExitCode)
         {
-            throw new InvalidOperationException($"Incrementalist did not analyze the solution in '{workingDirectory}'.");
+            return [];
         }
 
-        var projectFiles = File.ReadAllLines(projectListFile);
-        File.Delete(projectListFile);
+        if (result.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"dotnet-affected failed with exit code {result.ExitCode}:\n{result.StandardOutput}{result.StandardError}");
+        }
+
+        var projectFiles = File.ReadAllLines(Path.Combine(outputDirectory, "affected.txt"));
+        Directory.Delete(outputDirectory, recursive: true);
 
         return projectFiles;
     }
-
-    private static async Task RunGitAsync(string workingDirectory, params string[] arguments) =>
-        await Cli.Wrap("git")
-            .WithArguments(arguments)
-            .WithWorkingDirectory(workingDirectory)
-            .ExecuteBufferedAsync();
-
-    // .git is a file rather than a directory in a git worktree
-    private static bool IsGitWorktree() => File.Exists(Path.Combine(Environment.CurrentDirectory, ".git"));
 
     public static IReadOnlyCollection<string> GetChangedFiles(string targetBranch = DefaultBranch)
     {
