@@ -473,11 +473,11 @@
       },
       "Microsoft.Identity.Web.GraphServiceClient": {
         "type": "Transitive",
-        "resolved": "4.12.2",
-        "contentHash": "P2tBftNYmRM3V+BYpsKYH6bX0Pzso6ju8crDgH4ieVtExC9saRZRF++odjxzmXMLljcqvKTw5LgPVq7DVvK/lg==",
+        "resolved": "4.16.1",
+        "contentHash": "ZVKcsaSSFQwm0d5qDjS+0CkO06f/PB3maY+GDpHrWgyLMskmSmymQGdGfxefD7/5YOpNefZNpWpvjjYAkkO5ag==",
         "dependencies": {
           "Microsoft.Graph": "5.51.0",
-          "Microsoft.Identity.Web.TokenAcquisition": "4.12.2",
+          "Microsoft.Identity.Web.TokenAcquisition": "4.16.1",
           "Microsoft.Kiota.Abstractions": "1.22.0"
         }
       },
@@ -1009,7 +1009,7 @@
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "[10.0.14, )",
           "Microsoft.Graph": "[6.8.0, )",
           "Microsoft.Identity.Web": "[4.16.1, )",
-          "Microsoft.Identity.Web.GraphServiceClientBeta": "[4.12.2, )",
+          "Microsoft.Identity.Web.GraphServiceClientBeta": "[4.16.1, )",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "[8.23.0, )",
           "Microsoft.Web.LibraryManager.Build": "[3.0.114, )",
           "System.Security.Cryptography.Pkcs": "[10.0.13, )",
@@ -1439,13 +1439,13 @@
       },
       "Microsoft.Identity.Web.GraphServiceClientBeta": {
         "type": "CentralTransitive",
-        "requested": "[4.12.2, )",
-        "resolved": "4.12.2",
-        "contentHash": "gO7KcBhfoFMKsKICyFGQ7tfXkQt4d8art7e1R5WjYNeqoo1LAWslAqHxVAfvLCR5mKZlxb4IjkfK9S8QcV3kkQ==",
+        "requested": "[4.16.1, )",
+        "resolved": "4.16.1",
+        "contentHash": "HrJGWKKXPckYHyehRa5j/ihQymF654U5s2o9ATdbDrUtZuckaP/pZRuo47I5e6Fp5urZvDpvKO9cR5MSjpHTvA==",
         "dependencies": {
           "Microsoft.Graph.Beta": "5.56.0-preview",
-          "Microsoft.Identity.Web.GraphServiceClient": "4.12.2",
-          "Microsoft.Identity.Web.TokenAcquisition": "4.12.2",
+          "Microsoft.Identity.Web.GraphServiceClient": "4.16.1",
+          "Microsoft.Identity.Web.TokenAcquisition": "4.16.1",
           "Microsoft.Kiota.Abstractions": "1.22.0"
         }
       },
