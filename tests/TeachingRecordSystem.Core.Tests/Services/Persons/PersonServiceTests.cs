@@ -141,7 +141,7 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
             NationalInsuranceNumber = null,
             Gender = null,
         };
-        var processContext = new ProcessContext(ProcessType.TeacherPensionsRecordImporting, TimeProvider.UtcNow, SystemUser.SystemUserId);
+        var processContext = new ProcessContext((ProcessType)0, TimeProvider.UtcNow, SystemUser.SystemUserId);
 
         // Act
         var person = await WithServiceAsync(s => s.CreatePersonAsync(options, processContext));
@@ -151,7 +151,6 @@ public class PersonServiceTests(ServiceFixture fixture) : ServiceTestBase(fixtur
         {
             var createdPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(trn, createdPersonRecord.Trn);
-            Assert.True(createdPersonRecord.CreatedByTps);
         });
     }
 

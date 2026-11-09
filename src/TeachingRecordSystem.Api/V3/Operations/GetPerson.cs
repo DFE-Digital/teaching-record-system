@@ -196,9 +196,10 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
         }
 
         var personQuery = dbContext.Persons
-            .Where(p => p.Trn == command.Trn)
-            .Include(p => p.Qualifications).AsSplitQuery()
-            .Include(p => p.PreviousNames).AsSplitQuery();
+            .AsSplitQuery()
+            .Include(p => p.Qualifications)
+            .Include(p => p.PreviousNames)
+            .Where(p => p.Trn == command.Trn);
 
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
@@ -220,7 +221,7 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
 
         if (command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts))
         {
-            personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
+            personQuery = personQuery.Include(p => p.Alerts);
         }
 
         var person = await personQuery.SingleOrDefaultAsync(cancellationToken);

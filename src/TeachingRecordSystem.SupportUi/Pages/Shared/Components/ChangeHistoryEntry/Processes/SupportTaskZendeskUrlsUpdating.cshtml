@@ -1,6 +1,25 @@
 @model ChangeHistoryEntryViewModel
 
-@* TODO: Replace this placeholder with the real change history entry content for this process. *@
+@{
+    var supportTaskUpdatedEvent = Model.GetEvent<SupportTaskUpdatedEvent>();
+    var oldZendeskUrls = supportTaskUpdatedEvent.OldSupportTask.ZendeskTickets;
+    var zendeskUrls = supportTaskUpdatedEvent.SupportTask.ZendeskTickets;
+    var removedZendeskUrls = oldZendeskUrls.Where(url => !zendeskUrls.Contains(url)).ToArray();
+    var addedZendeskUrls = zendeskUrls.Where(url => !oldZendeskUrls.Contains(url)).ToArray();
+}
 
-<timeline-entry title="TODO: @Model.ProcessType" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+<timeline-entry title="Zendesk tickets changed" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    @if (removedZendeskUrls.Length == 0 && addedZendeskUrls.Length == 0)
+    {
+        <p class="govuk-body">Display order changed</p>
+    }
+    @foreach (var removedZendeskUrl in removedZendeskUrls)
+    {
+        <p class="govuk-body">Zendesk ticket <a href="@removedZendeskUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@removedZendeskUrl <span class="govuk-visually-hidden">(opens in new tab)</span></a> removed</p>
+    }
+
+    @foreach (var addedZendeskUrl in addedZendeskUrls)
+    {
+        <p class="govuk-body">Zendesk ticket <a href="@addedZendeskUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@addedZendeskUrl <span class="govuk-visually-hidden">(opens in new tab)</span></a> added</p>
+    }
 </timeline-entry>

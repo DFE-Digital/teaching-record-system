@@ -1,0 +1,7 @@
+@model ChangeHistoryEntryViewModel
+
+<timeline-entry title="QTLS revoked" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="email-sent-message">
+        We’ve sent them an email confirming they no longer have QTLS.
+    </p>
+</timeline-entry>

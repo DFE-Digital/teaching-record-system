@@ -154,8 +154,9 @@ public class Matches(
             .ToArray();
 
         var matches = (await dbContext.Persons
-            .Include(p => p.PreviousNames).AsSplitQuery()
-            .Include(p => p.Qualifications).AsSplitQuery()
+            .AsSplitQuery()
+            .Include(p => p.PreviousNames)
+            .Include(p => p.Qualifications)
             .Where(p => matchedPersonIds.Contains(p.PersonId))
             .Select(p => new
             {
@@ -229,7 +230,7 @@ public class Matches(
 
         return await BuildProfessionalStatusDetailsAsync(
             route,
-            heading: "QTS - QTLS and SET Membership",
+            heading: "QTS - QTLS and ETF Membership",
             requestYearReceived,
             requestProvider: null,
             requestSubject,

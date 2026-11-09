@@ -67,7 +67,7 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
         var matchCardText = await page.Locator("[data-testid='match']").First.TextContentAsync();
 
         Assert.NotNull(matchCardText);
-        Assert.Contains("QTS - QTLS and SET Membership", matchCardText);
+        Assert.Contains("QTS - QTLS and ETF Membership", matchCardText);
         Assert.Contains("QTS - Primary and secondary postgraduate fee funded", matchCardText);
         Assert.Contains("QTS - Provider led Postgrad", matchCardText);
         Assert.Contains((currentYear - 1).ToString(), matchCardText);

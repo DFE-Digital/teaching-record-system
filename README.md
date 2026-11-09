@@ -117,17 +117,13 @@ Playwright is used for end-to-end testing. Install it with a `just` recipe:
 
 ### Database setup
 
-Install Postgres then set a connection string configuration entry in user secrets for running the apps and (optionally) another for running the tests.
-Note you should use a different database for tests as the test database will be cleared down whenever tests are run.
-If you don't set a connection string for the tests then a test container will be used instead (this requires Docker to be installed and running).
+Install Postgres then set a connection string configuration entry in user secrets for running the apps.
+The tests don't use this database; they start their own test container, which requires Docker to be installed and running.
 
 e.g.
 ```shell
 # local settings
 > just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
-
-# test settings
-> just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
 To set up the initial TRS database schema run:
@@ -168,18 +164,6 @@ To rollback a series of migrations, add an additional argument to the `ef databa
 
 ```shell
 > just ef database update <BeforeAddingUserRoleColumn>
-```
-
-#### Regenerating the test cache
-
-The trs_tests database for the tests should be migrated automatically, however sometimes it gets stuck and the tests may fail with the message:
-```
-Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving the entity changes. See the inner exception for details.
----- Npgsql.PostgresException : <some Postgres error, e.g. missing table or column>
-```
-If this happens, regenerating the test cache usually fixes this, there's a `just` recipe:
-```shell
-> just remove-tests-schema-cache
 ```
 
 

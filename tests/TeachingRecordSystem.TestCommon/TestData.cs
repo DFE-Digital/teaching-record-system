@@ -11,6 +11,7 @@ public partial class TestData(
     private static readonly Lock _gate = new();
     private static readonly HashSet<string> _emails = [];
     private static readonly HashSet<string> _mobileNumbers = [];
+    private static readonly HashSet<string> _ukprns = [];
     private static int _applicationUserNumber = 1;
 
     // https://stackoverflow.com/a/30290754
@@ -39,7 +40,7 @@ public partial class TestData(
         return Convert.ToBase64String(buffer);
     }
 
-    public string GenerateApplicationUserName() => Faker.Company.Name();
+    public string GenerateApplicationUserName() => $"{Faker.Company.Name()} {Interlocked.Increment(ref _applicationUserNumber)}";
 
     public string GenerateApplicationUserShortName() => $"app-{Interlocked.Increment(ref _applicationUserNumber)}";
 
@@ -262,6 +263,30 @@ public partial class TestData(
         }
 
         return mobileNumber;
+    }
+
+    // Checks the DB too since training providers persist across test runs and other test projects
+    public async Task<string> GenerateUniqueUkprnAsync()
+    {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        while (true)
+        {
+            var ukprn = Faker.RandomNumber.Next(10000000, 99999999).ToString();
+
+            lock (_gate)
+            {
+                if (!_ukprns.Add(ukprn))
+                {
+                    continue;
+                }
+            }
+
+            if (!await dbContext.TrainingProviders.AnyAsync(p => p.Ukprn == ukprn))
+            {
+                return ukprn;
+            }
+        }
     }
 
     public Gender GenerateGender() => Faker.Enum.Random<Gender>();

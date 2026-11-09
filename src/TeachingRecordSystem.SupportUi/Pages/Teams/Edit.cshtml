@@ -1,11 +1,45 @@
 @page "/teams/{teamId:guid}"
 @model TeachingRecordSystem.SupportUi.Pages.Teams.EditModel
 @{
-    ViewBag.Title = "Change team";
+    ViewBag.Title = "Change a team";
 }
 
 @section BeforeContent {
     <govuk-back-link href="@LinkGenerator.Teams.Index()" />
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input for="Name" label-class="govuk-label--m">
+                <label>Team name</label>
+            </govuk-input>
+
+            <govuk-details>
+                <summary>Members on this team</summary>
+                <text>
+                    @if (Model.MemberNames.Length == 0)
+                    {
+                        <p class="govuk-body">There are no members on this team.</p>
+                    }
+                    else
+                    {
+                        <ul class="govuk-list govuk-list--bullet">
+                            @foreach (var name in Model.MemberNames)
+                            {
+                                <li>@name</li>
+                            }
+                        </ul>
+                    }
+                </text>
+            </govuk-details>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Confirm and update team</govuk-button>
+                <govuk-button-link class="govuk-button--secondary" href="@LinkGenerator.Teams.Index()">Cancel and return to teams</govuk-button-link>
+            </div>
+        </form>
+    </div>
+</div>

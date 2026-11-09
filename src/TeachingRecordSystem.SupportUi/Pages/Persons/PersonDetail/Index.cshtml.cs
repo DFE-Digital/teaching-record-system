@@ -31,10 +31,11 @@ public class IndexModel(TrsDbContext dbContext, IAuthorizationService authorizat
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen, cancellationToken);
 
         var person = await dbContext.Persons
+            .AsSplitQuery()
             .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
-            .Include(p => p.PreviousNames).AsSplitQuery()
-            .Include(p => p.Alerts).AsSplitQuery()
-            .Include(p => p.OneLoginUsers).AsSplitQuery()
+            .Include(p => p.PreviousNames)
+            .Include(p => p.Alerts)
+            .Include(p => p.OneLoginUsers)
             .SingleAsync(p => p.PersonId == PersonId, cancellationToken);
 
         Person = GetPersonInfo(person);

@@ -11,7 +11,7 @@ public interface IEvent
     string[] OneLoginUserSubjects { get; }
     string[] SupportTaskReferences { get; }
 
-    public static JsonSerializerOptions SerializerOptions => new()
+    public static JsonSerializerOptions SerializerOptions { get; } = new()
     {
         AllowOutOfOrderMetadataProperties = true,  // jsonb columns may have properties in any order
         TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { Modifiers.Events, Modifiers.SupportTaskData, Modifiers.OptionProperties } }

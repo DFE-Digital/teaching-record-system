@@ -39,6 +39,15 @@ test:
 test-changed *ARGS:
   @dotnet run scripts/TestChanged.cs -- {{ARGS}}
 
+# Test a project across several processes e.g. `just test-project Core.Tests`
+test-project project *ARGS:
+  @dotnet build {{"tests" / "TeachingRecordSystem." + project}}
+  @dotnet run scripts/RunTests.cs -- {{project}} {{ARGS}}
+
+# Update the test timings used to split tests across processes, from the results of a CI run
+update-test-timings run-id:
+  @dotnet run scripts/UpdateTestTimings.cs -- {{run-id}}
+
 # Format the .NET solution and Terraform code
 format:
   @dotnet format --exclude src/TeachingRecordSystem.Core/DataStore/Postgres/Migrations
@@ -109,10 +118,6 @@ deploy-preprod branch=`git branch --show-current`: (_deploy branch 'pre-producti
 [private]
 _deploy branch environment:
   @gh workflow run deploy.yml --ref {{branch}} -f environment={{environment}}
-
-# Removes the cached DB schema version file for tests
-remove-tests-schema-cache:
-  @dotnet run scripts/RemoveTestsSchemaCache.cs
 
 psql-dev: (make "install-konduit")
   kubectl config use-context s189t01-tsc-test-aks

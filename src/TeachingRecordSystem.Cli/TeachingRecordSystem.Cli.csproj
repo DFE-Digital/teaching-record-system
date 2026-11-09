@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" />
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>
 

@@ -1,6 +1,5 @@
 using System.Globalization;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -80,25 +79,22 @@ public static partial class Commands
                 throw new FileNotFoundException($"Input file not found: {fileName}", fileName);
             }
 
-            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+            var csvOptions = new CsvReaderOptions
             {
-                MissingFieldFound = null,
-                HeaderValidated = null,
-                BadDataFound = null,
-                IgnoreBlankLines = true
+                Separator = ',',
+                SkipEmptyLines = true
             };
 
             using var reader = new StreamReader(fileName);
-            using var csv = new CsvReader(reader, csvConfig);
-            var records = csv.GetRecords<dynamic>().ToList();
+            using var csv = CsvReader.Create(reader, csvOptions);
+            var records = csv.GetRecords<CsvDynamicRecord>().Select(r => r.ToDictionary()).ToList();
             var outputRows = new List<IDictionary<string, object?>>();
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
             var subjects = dbContext.TrainingSubjects.ToArray();
             foreach (var rec in records)
             {
-                var dict = ((IDictionary<string, object?>)rec)
-                    .ToDictionary(k => k.Key?.ToString() ?? string.Empty, v => v.Value);
+                var dict = rec.ToDictionary(k => k.Key, v => (object?)v.Value);
                 var firstName = GetStringValue(dict, "FIRST_NAME") ?? GetStringValue(dict, "FORENAME") ?? "";
                 var middleName = GetStringValue(dict, "MIDDLE_NAME") ?? string.Empty;
                 var lastName = GetStringValue(dict, "LAST_NAME") ?? GetStringValue(dict, "SURNAME") ?? "";
@@ -209,7 +205,7 @@ public static partial class Commands
 
             // Write csv with trn
             using var writer = new StreamWriter(outputFile);
-            using var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            using var csvWriter = CsvWriter.Create(writer);
             if (outputRows.Count > 0)
             {
                 var header = outputRows[0].Keys.ToArray();
@@ -218,7 +214,7 @@ public static partial class Commands
                     csvWriter.WriteField(h);
                 }
 
-                await csvWriter.NextRecordAsync();
+                await csvWriter.EndRecordAsync();
 
                 foreach (var row in outputRows)
                 {
@@ -229,7 +225,7 @@ public static partial class Commands
                             : string.Empty);
                     }
 
-                    await csvWriter.NextRecordAsync();
+                    await csvWriter.EndRecordAsync();
                 }
             }
 

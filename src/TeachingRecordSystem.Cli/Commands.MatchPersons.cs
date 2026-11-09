@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Linq.Expressions;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -92,10 +91,10 @@ public static partial class Commands
                 var now = timeProvider.UtcNow;
 
                 await using var writer = new StreamWriter(outputFileName);
-                await using var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                await using var csvWriter = CsvWriter.Create(writer);
 
                 csvWriter.WriteField(TrnColumn);
-                await csvWriter.NextRecordAsync();
+                await csvWriter.EndRecordAsync();
 
                 var matchedRowCount = 0;
 
@@ -145,7 +144,7 @@ public static partial class Commands
                     }
 
                     csvWriter.WriteField(trn ?? "");
-                    await csvWriter.NextRecordAsync();
+                    await csvWriter.EndRecordAsync();
                 }
 
                 parseResult.InvocationConfiguration.Output.WriteLine(
@@ -165,23 +164,23 @@ public static partial class Commands
         const string dateOfBirthColumn = "DOB";
         const string dateOfBirthFormat = "d/M/yyyy";
 
-        var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
+        var csvOptions = new CsvReaderOptions
         {
-            MissingFieldFound = null,
-            HeaderValidated = null,
-            TrimOptions = TrimOptions.Trim,
-            PrepareHeaderForMatch = args => args.Header.Trim().ToLowerInvariant()
+            Separator = ',',
+            TrimWhitespace = true,
+            MalformedData = CsvMalformedDataHandling.Throw
         };
 
         using var reader = new StreamReader(fileName);
-        using var csv = new CsvReader(reader, csvConfiguration);
+        using var csv = CsvReader.Create(reader, csvOptions);
 
-        if (!csv.Read() || !csv.ReadHeader())
+        csv.ReadHeader();
+        var header = csv.Headers;
+
+        if (header.Count == 0)
         {
             return ([], ["The input file is empty."]);
         }
-
-        var header = csv.HeaderRecord!;
 
         var missingColumns = new[] { forenameColumn, surnameColumn, dateOfBirthColumn }
             .Where(c => !header.Any(h => h.Trim().Equals(c, StringComparison.OrdinalIgnoreCase)))
@@ -197,7 +196,7 @@ public static partial class Commands
 
         while (csv.Read())
         {
-            var rowNumber = csv.Parser.Row;
+            var rowNumber = csv.RowNumber + 1;
 
             var forename = GetField(forenameColumn);
             var surname = GetField(surnameColumn);
@@ -235,7 +234,12 @@ public static partial class Commands
 
             string? GetField(string name)
             {
-                var value = csv.GetField(name);
+                if (!csv.TryGetFieldIndex(name, out var index))
+                {
+                    return null;
+                }
+
+                var value = csv.GetString(index);
                 return string.IsNullOrWhiteSpace(value) ? null : value;
             }
         }

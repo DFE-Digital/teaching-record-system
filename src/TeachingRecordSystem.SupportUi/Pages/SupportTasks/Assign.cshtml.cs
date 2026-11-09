@@ -40,15 +40,40 @@ public class Assign(
     [FromQuery]
     public SortDirection? SortDirection { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    public bool ShowMyTeamMembersOnly { get; set; }
+
+    [FromQuery]
+    public TeamWorkloadSortByOption? TeamWorkloadSortBy { get; set; }
+
+    [FromQuery]
+    public SortDirection? TeamWorkloadSortDirection { get; set; }
+
+    [FromQuery]
+    public bool ExpandTeamWorkload { get; set; }
+
     public IReadOnlyCollection<TaskInfo>? Tasks { get; set; }
 
     public IReadOnlyCollection<AssignableUserInfo>? AssignToOptions { get; set; }
 
     public bool ShowMyselfOption { get; set; }
 
+    public Guid? CurrentUserTeamId { get; set; }
+
+    public bool HasAssignableUsersOutsideCurrentUsersTeam { get; set; }
+
+    public bool ShowTeamMembersFilter => CurrentUserTeamId.HasValue && HasAssignableUsersOutsideCurrentUsersTeam;
+
+    public bool ShowTeamWorkload => CurrentUserTeamId.HasValue;
+
+    public IReadOnlyCollection<TeamWorkloadMemberInfo> TeamWorkloadMembers { get; set; } = [];
+
     public Guid UnassignedUserId => SupportTaskSearchService.UnassignedUserId;
 
     public Guid CurrentUserId => User.GetUserId();
+
+    public string ToggleShowMyTeamMembersOnlyUrl =>
+        GetAssignPageUrl(showMyTeamMembersOnly: !ShowMyTeamMembersOnly);
 
     [BindProperty]
     public Guid? AssignToUserId { get; set; }
@@ -98,6 +123,19 @@ public class Assign(
         return Redirect(ReturnUrl!);
     }
 
+    public string GetTeamWorkloadSortUrl(TeamWorkloadSortByOption sortBy, SortDirection sortDirection) =>
+        GetAssignPageUrl(
+            showMyTeamMembersOnly: ShowMyTeamMembersOnly,
+            teamWorkloadSortBy: sortBy,
+            teamWorkloadSortDirection: sortDirection,
+            expandTeamWorkload: true);
+
+    public bool IsSortedBy(TeamWorkloadSortByOption sortBy) =>
+        (TeamWorkloadSortBy ?? TeamWorkloadSortByOption.TeamMember) == sortBy;
+
+    public bool IsTeamWorkloadSortedAscending() =>
+        (TeamWorkloadSortDirection ?? SupportUi.SortDirection.Ascending) == SupportUi.SortDirection.Ascending;
+
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var cancellationToken = context.HttpContext.RequestAborted;
@@ -141,9 +179,54 @@ public class Assign(
 
         ShowMyselfOption = assignableUsers.Any(u => u.UserId == CurrentUserId);
 
-        AssignToOptions = assignableUsers
+        CurrentUserTeamId = await dbContext.Users
+            .Where(u => u.UserId == CurrentUserId)
+            .Select(u => u.TeamId)
+            .SingleAsync(cancellationToken);
+
+        if (!CurrentUserTeamId.HasValue)
+        {
+            ShowMyTeamMembersOnly = false;
+        }
+
+        var assignableUserIds = assignableUsers.Select(u => u.UserId).ToArray();
+        var userTeams = await dbContext.Users
+            .Where(u => assignableUserIds.Contains(u.UserId))
+            .Select(u => new { u.UserId, u.TeamId })
+            .ToDictionaryAsync(u => u.UserId, u => u.TeamId, cancellationToken);
+
+        var assignableOptions = assignableUsers
             .Where(u => u.UserId != CurrentUserId)
+            .Select(u =>
+            {
+                var teamId = userTeams[u.UserId];
+                var isInCurrentUsersTeam = CurrentUserTeamId.HasValue && teamId == CurrentUserTeamId;
+
+                return new AssignableUserOption(u, isInCurrentUsersTeam);
+            })
+            .ToArray();
+
+        HasAssignableUsersOutsideCurrentUsersTeam =
+            CurrentUserTeamId.HasValue && assignableOptions.Any(o => !o.IsInCurrentUsersTeam);
+
+        if (ShowMyTeamMembersOnly)
+        {
+            assignableOptions = assignableOptions.Where(o => o.IsInCurrentUsersTeam).ToArray();
+        }
+
+        assignableOptions = [.. assignableOptions
+            .OrderByDescending(o => o.IsInCurrentUsersTeam)
+            .ThenBy(o => o.AssignableUser.UserName)];
+
+        AssignToOptions = assignableOptions
+            .Select(o => o.AssignableUser)
+            .ToArray()
             .AsReadOnly();
+
+        if (CurrentUserTeamId.HasValue)
+        {
+            await SetTeamWorkloadMembersAsync(cancellationToken);
+        }
 
         ReturnUrl = this.GetReturnUrlOrDefault(linkGenerator.SupportTasks.Active());
 
@@ -155,6 +238,128 @@ public class Assign(
             });
 
         await base.OnPageHandlerExecutionAsync(context, next);
+    }
+
+    private string GetAssignPageUrl(
+        bool? showMyTeamMembersOnly = null,
+        TeamWorkloadSortByOption? teamWorkloadSortBy = null,
+        SortDirection? teamWorkloadSortDirection = null,
+        bool? expandTeamWorkload = null)
+    {
+        var effectiveShowMyTeamMembersOnly = showMyTeamMembersOnly ?? ShowMyTeamMembersOnly;
+        var effectiveTeamWorkloadSortBy = teamWorkloadSortBy ?? TeamWorkloadSortBy;
+        var effectiveTeamWorkloadSortDirection = teamWorkloadSortDirection ?? TeamWorkloadSortDirection;
+        var effectiveExpandTeamWorkload = expandTeamWorkload ?? ExpandTeamWorkload;
+
+        var query = new Dictionary<string, StringValues>
+        {
+            { SupportTaskReferenceQueryParameterName, Tasks!.Select(t => t.SupportTaskReference).ToArray() }
+        };
+
+        if (SortBy is not null)
+        {
+            query.Add(nameof(SortBy), SortBy.ToString());
+        }
+
+        if (SortDirection is not null)
+        {
+            query.Add(nameof(SortDirection), SortDirection.ToString());
+        }
+
+        if (effectiveShowMyTeamMembersOnly)
+        {
+            query.Add(nameof(ShowMyTeamMembersOnly), bool.TrueString);
+        }
+
+        if (effectiveTeamWorkloadSortBy is not null)
+        {
+            query.Add(nameof(TeamWorkloadSortBy), effectiveTeamWorkloadSortBy.ToString());
+        }
+
+        if (effectiveTeamWorkloadSortDirection is not null)
+        {
+            query.Add(nameof(TeamWorkloadSortDirection), effectiveTeamWorkloadSortDirection.ToString());
+        }
+
+        if (effectiveExpandTeamWorkload)
+        {
+            query.Add(nameof(ExpandTeamWorkload), bool.TrueString);
+        }
+
+        if (Request.Query.TryGetValue("returnUrl", out var returnUrl) && !StringValues.IsNullOrEmpty(returnUrl))
+        {
+            query.Add("returnUrl", returnUrl);
+        }
+
+        return QueryHelpers.AddQueryString("/support-tasks/assign", query);
+    }
+
+    private async Task SetTeamWorkloadMembersAsync(CancellationToken cancellationToken)
+    {
+        var teamMembers = await dbContext.Users
+            .Where(u =>
+                u.TeamId == CurrentUserTeamId &&
+                u.Active &&
+                (u.Role == UserRoles.AccessManager ||
+                 u.Role == UserRoles.RecordManager ||
+                 (assignmentOptions.Value.IncludeAdministrators && u.Role == UserRoles.Administrator)))
+            .Select(u => new { u.UserId, u.Name })
+            .ToArrayAsync(cancellationToken);
+
+        if (teamMembers.Length == 0)
+        {
+            TeamWorkloadMembers = [];
+            return;
+        }
+
+        var teamMemberIds = teamMembers.Select(m => m.UserId).ToArray();
+
+        var supportTasksByTypeAndMember = await dbContext.SupportTasks
+            .Where(t => t.IsOutstanding && t.AssignedToUserId.HasValue && teamMemberIds.Contains(t.AssignedToUserId.Value))
+            .GroupBy(t => new { UserId = t.AssignedToUserId!.Value, t.SupportTaskType })
+            .Select(g => new
+            {
+                g.Key.UserId,
+                g.Key.SupportTaskType,
+                Count = g.Count()
+            })
+            .ToArrayAsync(cancellationToken);
+
+        var taskCountsByMember = supportTasksByTypeAndMember
+            .GroupBy(c => c.UserId)
+            .ToDictionary(g => g.Key, g => g
+                .OrderByDescending(c => c.Count)
+                .ThenBy(c => c.SupportTaskType.GetTitle())
+                .Select(c => new TeamWorkloadByTaskType(c.SupportTaskType, c.Count))
+                .ToArray());
+
+        var members = teamMembers
+            .Select(m =>
+            {
+                var taskBreakdown = taskCountsByMember.GetValueOrDefault(m.UserId, []);
+
+                return new TeamWorkloadMemberInfo(
+                    m.UserId,
+                    m.Name,
+                    taskBreakdown.Sum(t => t.TaskCount),
+                    taskBreakdown);
+            })
+            .ToArray();
+
+        var sortBy = TeamWorkloadSortBy ?? TeamWorkloadSortByOption.TeamMember;
+        var sortDirection = TeamWorkloadSortDirection ?? SupportUi.SortDirection.Ascending;
+
+        TeamWorkloadMembers = (sortBy, sortDirection) switch
+        {
+            (TeamWorkloadSortByOption.Tasks, SupportUi.SortDirection.Descending) =>
+                [.. members.OrderByDescending(m => m.TaskCount).ThenBy(m => m.UserName)],
+            (TeamWorkloadSortByOption.Tasks, _) =>
+                [.. members.OrderBy(m => m.TaskCount).ThenBy(m => m.UserName)],
+            (_, SupportUi.SortDirection.Descending) =>
+                [.. members.OrderByDescending(m => m.UserName)],
+            _ =>
+                [.. members.OrderBy(m => m.UserName)]
+        };
     }
 
     public record TaskInfo(
@@ -169,4 +374,20 @@ public class Assign(
     {
         public string Subject => (SubjectName ?? SubjectEmailAddress)!;
     }
+
+    public enum TeamWorkloadSortByOption
+    {
+        TeamMember,
+        Tasks
+    }
+
+    public record TeamWorkloadMemberInfo(
+        Guid UserId,
+        string UserName,
+        int TaskCount,
+        IReadOnlyCollection<TeamWorkloadByTaskType> TaskBreakdown);
+
+    public record TeamWorkloadByTaskType(SupportTaskType TaskType, int TaskCount);
+
+    private record AssignableUserOption(AssignableUserInfo AssignableUser, bool IsInCurrentUsersTeam);
 }

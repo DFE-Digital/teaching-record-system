@@ -28,27 +28,12 @@ Assert.IsType<ArgumentException>(exception);
 
 Assume that dependencies for running tests (a local postgres database, Playwright etc.) are already configured.
 
-### Running tests in a git worktree
+### Test databases
 
-Each worktree must use its own test database; sharing one with other worktrees will cause tests to interfere with each other.
-When working in a git worktree, set the following environment variables before running tests:
-
-- `UseTestContainers` to `true`, so the tests spin up their own postgres container.
-- `TestContainersPostgresPort` to a random free port, so the container doesn't clash with the ones other worktrees are using.
-
-These two are sufficient — when `UseTestContainers` is set the container's connection string (database `trs` on
-`TestContainersPostgresPort`) overrides any `ConnectionStrings:DefaultConnection` from user secrets or the environment, so don't
-set `ConnectionStrings__DefaultConnection` as well.
-
-### Resetting the database schema and data
-
-The test database schema is cached in a `.tests-schema-version.txt` file at the root of the repository (this file is git-ignored, so each
-worktree has its own). If the schema gets out of sync — tests fail with Postgres errors about missing tables or columns — remove the cache
-file to force the schema and data to be recreated on the next test run:
-
-```shell
-just remove-tests-schema-cache
-```
+Tests run against a Postgres container that's started automatically, so Docker must be running; no configuration is needed.
+Each test process gets its own database, so test projects and git worktrees can run at the same time.
+Use `just test-project Core.Tests` to run a whole project faster, across several processes.
+See [docs/test-databases.md](docs/test-databases.md).
 
 ### Boolean Expressions
 

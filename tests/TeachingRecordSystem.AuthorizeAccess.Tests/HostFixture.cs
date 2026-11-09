@@ -15,7 +15,7 @@ using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
-public class HostFixture : InitializeDbFixture
+public class HostFixture : IAsyncLifetime
 {
     private readonly AuthorizeAccessWebApplicationFactory _webApplicationFactory;
 
@@ -30,12 +30,16 @@ public class HostFixture : InitializeDbFixture
 
     public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => _webApplicationFactory.CreateClient(options);
 
-    public override async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
-
         _ = Services;  // Start the server
+
+        return ValueTask.CompletedTask;
     }
+
+#pragma warning disable CA1816
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+#pragma warning restore CA1816
 
     private class AuthorizeAccessWebApplicationFactory : WebApplicationFactory<Program>
     {

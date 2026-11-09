@@ -1,19 +1,20 @@
-using CsvHelper.Configuration.Attributes;
+using CsvHelper;
 
 namespace TeachingRecordSystem.Core.Services.Establishments.Tps;
 
-public class TpsEstablishmentCsvRow
+[CsvRecord]
+public partial class TpsEstablishmentCsvRow
 {
-    [Name("LA Code")]
+    [CsvColumn("LA Code")]
     public required string LaCode { get; set; }
-    [Name("Establishment Code")]
+    [CsvColumn("Establishment Code")]
     public required string EstablishmentCode { get; set; }
-    [Name("EMPS Name")]
+    [CsvColumn("EMPS Name")]
     public required string EmployersName { get; set; }
-    [Name("SCHL (GIAS) Name")]
-    [NullValues("")]
+    [CsvColumn("SCHL (GIAS) Name")]
+    [CsvNullValues("")]
     public required string? SchoolGiasName { get; set; }
-    [Name("School Closed Date")]
-    [NullValues("")]
+    [CsvColumn("School Closed Date")]
+    [CsvNullValues("")]
     public required string? SchoolClosedDate { get; set; }
 }

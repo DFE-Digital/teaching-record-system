@@ -104,6 +104,149 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_CurrentUserInTeam_ListsTeamUsersBeforeOtherUsers()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync();
+        var otherTeam = await TestData.CreateTeamAsync();
+
+        var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
+        await SetUserTeamAsync(currentUser.UserId, team.TeamId);
+
+        var teammate = await TestData.CreateUserAsync(name: "Teammate", role: UserRoles.RecordManager);
+        await SetUserTeamAsync(teammate.UserId, team.TeamId);
+
+        var otherTeamUser = await TestData.CreateUserAsync(name: "Other Team User", role: UserRoles.RecordManager);
+        await SetUserTeamAsync(otherTeamUser.UserId, otherTeam.TeamId);
+
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var request = new HttpRequestMessage(HttpMethod.Get, GetAssignUrl(supportTask.SupportTaskReference));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var options = doc.GetElementById("AssignToUserId")!
+            .QuerySelectorAll("option")
+            .Select(o => o.TrimmedText())
+            .ToArray();
+
+        var teammateIndex = Array.IndexOf(options, "Teammate");
+        var otherTeamUserIndex = Array.IndexOf(options, "Other Team User");
+
+        Assert.True(teammateIndex >= 0);
+        Assert.True(otherTeamUserIndex >= 0);
+        Assert.True(teammateIndex < otherTeamUserIndex);
+    }
+
+    [Fact]
+    public async Task Get_ShowMyTeamMembersOnly_OnlyDisplaysTeamMembers()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync();
+        var otherTeam = await TestData.CreateTeamAsync();
+
+        var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
+        await SetUserTeamAsync(currentUser.UserId, team.TeamId);
+
+        var teammate = await TestData.CreateUserAsync(name: "Teammate", role: UserRoles.RecordManager);
+        await SetUserTeamAsync(teammate.UserId, team.TeamId);
+
+        var otherTeamUser = await TestData.CreateUserAsync(name: "Other Team User", role: UserRoles.RecordManager);
+        await SetUserTeamAsync(otherTeamUser.UserId, otherTeam.TeamId);
+
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{GetAssignUrl(supportTask.SupportTaskReference)}&showMyTeamMembersOnly=true");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var options = doc.GetElementById("AssignToUserId")!
+            .QuerySelectorAll("option")
+            .Select(o => o.TrimmedText())
+            .ToArray();
+
+        Assert.Contains("Teammate", options);
+        Assert.DoesNotContain("Other Team User", options);
+    }
+
+    [Fact]
+    public async Task Get_CurrentUserInTeam_ShowsTeamWorkloadAndZeroTaskMembersAsAssigned()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync();
+
+        var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
+        await SetUserTeamAsync(currentUser.UserId, team.TeamId);
+
+        var teammateWithTasks = await TestData.CreateUserAsync(name: "Teammate With Tasks", role: UserRoles.RecordManager);
+        await SetUserTeamAsync(teammateWithTasks.UserId, team.TeamId);
+
+        var teammateWithoutTasks = await TestData.CreateUserAsync(name: "Teammate Without Tasks", role: UserRoles.RecordManager);
+        await SetUserTeamAsync(teammateWithoutTasks.UserId, team.TeamId);
+
+        var supportTaskForPage = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var task1 = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var task2 = await TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();
+        await AssignToUserAsync(task1.SupportTaskReference, teammateWithTasks.UserId);
+        await AssignToUserAsync(task2.SupportTaskReference, teammateWithTasks.UserId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetAssignUrl(supportTaskForPage.SupportTaskReference));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.NotNull(doc.GetElementByTestId("team-workload"));
+        Assert.Contains("1 Change name request", doc.DocumentElement!.TextContent);
+        Assert.Contains("1 Change date of birth request", doc.DocumentElement!.TextContent);
+        Assert.Contains("0 tasks assigned", doc.DocumentElement.TextContent);
+
+        var teammateWithoutTasksRow = doc.GetElementByTestId($"team-workload-member:{teammateWithoutTasks.UserId}");
+        Assert.NotNull(teammateWithoutTasksRow);
+        Assert.Null(teammateWithoutTasksRow.QuerySelector(".govuk-details"));
+    }
+
+    [Fact]
+    public async Task Get_TeamWorkloadSortLinks_AreHtmxEnabled()
+    {
+        // Arrange
+        var team = await TestData.CreateTeamAsync();
+        var currentUser = await CreateAndSetCurrentUserAsync(name: "Current User");
+        await SetUserTeamAsync(currentUser.UserId, team.TeamId);
+
+        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
+        var request = new HttpRequestMessage(HttpMethod.Get, GetAssignUrl(supportTask.SupportTaskReference));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var sortLinks = doc.GetElementByTestId("team-workload")!
+            .QuerySelectorAll("[hx-get]")
+            .ToArray();
+
+        Assert.Equal(2, sortLinks.Length);
+        Assert.All(sortLinks, link =>
+        {
+            Assert.NotNull(link.GetAttribute("hx-get"));
+            Assert.Equal("#team-workload", link.GetAttribute("hx-select"));
+            Assert.Equal("#team-workload", link.GetAttribute("hx-target"));
+            Assert.Equal("outerHTML", link.GetAttribute("hx-swap"));
+            Assert.Equal("true", link.GetAttribute("hx-push-url"));
+        });
+    }
+
+    [Fact]
     public async Task Get_ExcludesTasksThatAreNoLongerOutstanding()
     {
         // Arrange
@@ -506,6 +649,14 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var dbTask = await dbContext.SupportTasks.FindAsync(supportTaskReference);
             dbTask!.AssignedToUserId = userId;
+            await dbContext.SaveChangesAsync();
+        });
+
+    private Task SetUserTeamAsync(Guid userId, Guid? teamId) =>
+        WithDbContextAsync(async dbContext =>
+        {
+            var user = await dbContext.Users.FindAsync(userId);
+            user!.TeamId = teamId;
             await dbContext.SaveChangesAsync();
         });
 }

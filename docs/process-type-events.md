@@ -51,8 +51,8 @@ API `SetPii`; Support UI *Edit details*.
 | `PersonDetailsUpdatedEvent` | Sometimes | Only when at least one detail actually changes. |
 
 ### `PersonDeactivating` (26)
-Support UI *Set status → deactivate*; [`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs)
-when the imported Teachers' Pensions row carries a date of death.
+Support UI *Set status → deactivate*. Historically also the since-removed `CapitaImportJob`, when the imported
+Teachers' Pensions row carried a date of death.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
@@ -128,12 +128,12 @@ copied onto the retained record and any One Login users it re-pointed are delibe
 `PersonDetailsUpdatedEvent`, `RouteToProfessionalStatusDeletedEvent` or `OneLoginUserUpdatedEvent` is emitted.
 
 ### `TeacherPensionsRecordImporting` (28)
-[`CapitaImportJob`](../src/TeachingRecordSystem.Core/Jobs/CapitaImportJob.cs) (Teachers' Pensions import).
+No longer created. Historically the since-removed `CapitaImportJob` (Teachers' Pensions import).
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
-| `PersonCreatedEvent` | Sometimes | The imported TPS record does not already exist in TRS, so a new person is created. |
-| `SupportTaskCreatedEvent` | Sometimes | The newly created person potentially matches an existing record (a `TeacherPensionsPotentialDuplicate` task). |
+| `PersonCreatedEvent` | Sometimes | The imported TPS record did not already exist in TRS, so a new person was created. |
+| `SupportTaskCreatedEvent` | Sometimes | The newly created person potentially matched an existing record (a `TeacherPensionsPotentialDuplicate` task). |
 
 45 processes of this type were not Teachers' Pensions imports at all. They were created by the since-removed
 `AllocateTrnsToOverseasNpqApplicantsJob` on 2025-11-06, which allocated TRNs to overseas NPQ applicants and
@@ -366,7 +366,7 @@ see [what that job covers](#what-the-notification-back-fill-covers) below.
 
 ### `NotifyingQtlsAwardee` (95)
 
-The QTLS post-launch email, which goes to people who gained QTS through the QTLS and SET membership route.
+The QTLS post-launch email, which goes to people who gained QTS through the QTLS and ETF membership route.
 
 | Event | Emitted | Scenario |
 | --- | --- | --- |
@@ -576,6 +576,19 @@ Edit / close / reopen alert.
 | Event | Emitted | Scenario |
 | --- | --- | --- |
 | `TeamCreatedEvent` | Always | A team is added. The `Team` snapshot contains its ID and name. |
+
+### `TeamUpdating` (107)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TeamUpdatedEvent` | When the name changes | A team is renamed. The `Team` and `OldTeam` snapshots contain its ID and the new and previous names. |
+
+### `TeamDeleting` (106)
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `TeamDeletedEvent` | Always | A team is deleted and its members are unassigned. The `Team` snapshot contains its ID and name. |
+| `UserUpdatedEvent` | Sometimes | One per member unassigned from the deleted team, with `TeamId` set to null in the user snapshot and the `Team` change flag set. |
 
 ## Users, application users and API keys
 

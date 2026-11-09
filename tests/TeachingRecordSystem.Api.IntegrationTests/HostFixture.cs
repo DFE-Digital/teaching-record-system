@@ -17,7 +17,7 @@ using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
-public class HostFixture : InitializeDbFixture
+public class HostFixture : IAsyncLifetime
 {
     private readonly ApiWebApplicationFactory _webApplicationFactory;
 
@@ -69,15 +69,19 @@ public class HostFixture : InitializeDbFixture
         }
     }
 
-    public override async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        await InitializeDbAsync();
-
         using var dbContext = DbHelper.Instance.DbContextFactory.CreateDbContext();
         EnsureApplicationUsers(dbContext);
 
         _ = Services;  // Start the server
+
+        return ValueTask.CompletedTask;
     }
+
+#pragma warning disable CA1816
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+#pragma warning restore CA1816
 
     private class ApiWebApplicationFactory(HostFixture hostFixture) : WebApplicationFactory<Program>
     {

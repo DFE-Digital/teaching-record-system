@@ -1,83 +1,35 @@
 using System.Data.Common;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon.Infrastructure;
-using Testcontainers.PostgreSql;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public sealed class DbHelper : IAsyncDisposable
+public sealed class DbHelper
 {
-    private const int DefaultTestContainersPostgresPort = 43007;
-    private const string SchemaVersionFileName = ".tests-schema-version.txt";
-
     private readonly IServiceProvider _serviceProvider;
-    private readonly PostgreSqlContainer? _postgresContainer;
 
     private Respawner? _respawner;
-    private readonly SemaphoreSlim _schemaLock = new(1, 1);
-    private bool _haveResetSchema;
 
-    private DbHelper(IServiceProvider serviceProvider, PostgreSqlContainer? postgresContainer)
+    private DbHelper(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _postgresContainer = postgresContainer;
     }
 
     public static DbHelper Instance { get; } = CreateInstance();
 
     public IDbContextFactory<TrsDbContext> DbContextFactory => _serviceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
-    public static string GetTestContainersConnectionString(int port) =>
-        $"Host=localhost;Port={port};Database=trs;Username=postgres;Password=postgres;";
-
-    public static int GetTestContainersPostgresPort(IConfiguration configuration) =>
-        configuration.GetValue<int?>("TestContainersPostgresPort") ?? DefaultTestContainersPostgresPort;
-
     private static DbHelper CreateInstance()
     {
-        var configuration = TestConfiguration.GetConfiguration();
-
-        var connectionString = configuration.GetPostgresConnectionString();
-
-        PostgreSqlContainer? postgresContainer = null;
-        var useTestContainers = configuration.GetValue<bool>("UseTestContainers");
-        if (useTestContainers)
-        {
-            postgresContainer = new PostgreSqlBuilder("postgres:17")
-                .WithDatabase("trs")
-                .WithReuse(true)
-                .WithPortBinding(GetTestContainersPostgresPort(configuration), 5432)
-                .Build();
-        }
-
         var services = new ServiceCollection();
-        services.AddDatabase(connectionString);
+        services.AddDatabase(TestDatabase.ConnectionString);
         var serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
-        return new DbHelper(serviceProvider, postgresContainer);
-    }
-
-    public async Task InitializeAsync()
-    {
-        if (_postgresContainer != null)
-        {
-            await _postgresContainer.StartAsync();
-        }
-
-        var schemaUpdated = await EnsureSchemaAsync();
-
-        if (!schemaUpdated)
-        {
-            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-            await SeedDbAsync(dbContext);
-        }
+        return new DbHelper(serviceProvider);
     }
 
     public async Task ClearDataAsync()
@@ -90,79 +42,8 @@ public sealed class DbHelper : IAsyncDisposable
         await SeedDbAsync(dbContext);
     }
 
-    public async Task<bool> EnsureSchemaAsync()
-    {
-        await _schemaLock.WaitAsync();
-
-        try
-        {
-            if (!_haveResetSchema)
-            {
-                await ResetSchemaAsync();
-
-                await using var dbContext = await DbContextFactory.CreateDbContextAsync();
-                await SeedDbAsync(dbContext);
-
-                _haveResetSchema = true;
-                return true;
-            }
-        }
-        finally
-        {
-            _schemaLock.Release();
-        }
-
-        return false;
-    }
-
-    public async Task ResetSchemaAsync()
-    {
-        using var dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        var connection = dbContext.Database.GetDbConnection();
-
-        var cachedMigrationsVersionPath = Path.Combine(GetRepositoryRootPath(), SchemaVersionFileName);
-
-        var currentDbVersion = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(dbContext.Database.GenerateCreateScript())));
-
-        if (currentDbVersion == GetPreviousMigrationsVersion())
-        {
-            return;
-        }
-
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.MigrateAsync();
-
-        WriteMigrationsVersion();
-
-        await connection.OpenAsync();
-        await EnsureRespawnerAsync(connection);
-
-        string? GetPreviousMigrationsVersion() =>
-            File.Exists(cachedMigrationsVersionPath) ? File.ReadAllText(cachedMigrationsVersionPath) : null;
-
-        void WriteMigrationsVersion() => File.WriteAllText(cachedMigrationsVersionPath, currentDbVersion);
-    }
-
-    private static string GetRepositoryRootPath()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, "TeachingRecordSystem.slnx")))
-            {
-                return directory.FullName;
-            }
-
-            directory = directory.Parent;
-        }
-
-        throw new InvalidOperationException($"Could not find the repository root from '{AppContext.BaseDirectory}'.");
-    }
-
     private async Task EnsureRespawnerAsync(DbConnection connection) =>
-        _respawner = await Respawner.CreateAsync(
+        _respawner ??= await Respawner.CreateAsync(
             connection,
             new RespawnerOptions()
             {
@@ -185,7 +66,7 @@ public sealed class DbHelper : IAsyncDisposable
                 ]
             });
 
-    private async Task SeedDbAsync(TrsDbContext dbContext)
+    internal static async Task SeedDbAsync(TrsDbContext dbContext)
     {
         await SeedLookupData.EnsureTestTrainingProvidersAsync(dbContext);
 
@@ -214,16 +95,5 @@ public sealed class DbHelper : IAsyncDisposable
         }
 
         await dbContext.SaveChangesAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        _schemaLock.Dispose();
-        (_serviceProvider as IDisposable)?.Dispose();
-
-        if (_postgresContainer is not null)
-        {
-            await _postgresContainer.DisposeAsync();
-        }
     }
 }

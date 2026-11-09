@@ -326,44 +326,27 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                     vtr => Assert.Equal(AuthenticationAndIdentityVerification, vtr));
             });
 
-    [Fact]
-    public Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithExistingDormantTrnRequest_CompletesJourneyWithTrnRequestId() =>
-        WithJourneyCoordinatorAsync(
+    [Theory]
+    [InlineData(TrnRequestStatus.Dormant)]
+    [InlineData(TrnRequestStatus.Pending)]
+    public async Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithExistingTrnRequestForClient_CompletesJourneyWithTrnRequestId(TrnRequestStatus status)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
+        var trnRequestId = await CreateIdentityVerifiedTrnRequestAsync(applicationUser.UserId, oneLoginUser, status);
+
+        await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
                 processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default,
+                clientApplicationUserId: applicationUser.UserId,
                 recordMatchingPolicy: RecordMatchingPolicy.Deferred),
             async coordinator =>
             {
-                // Arrange
-                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-                var trnRequestId = Guid.NewGuid().ToString();
-                var trnRequestApplicationUser = await TestData.CreateApplicationUserAsync();
-
-                await WithDbContextAsync(async dbContext =>
-                {
-                    var trnRequest = new Core.DataStore.Postgres.Models.TrnRequestMetadata
-                    {
-                        RequestId = trnRequestId,
-                        ApplicationUserId = trnRequestApplicationUser.UserId,
-                        OneLoginUserSubject = oneLoginUser.Subject,
-                        CreatedOn = TimeProvider.UtcNow.AddDays(-1),
-                        EmailAddress = oneLoginUser.EmailAddress,
-                        FirstName = "Test",
-                        MiddleName = null,
-                        LastName = "User",
-                        Name = ["Test", "User"],
-                        DateOfBirth = new DateOnly(1990, 1, 1),
-                        IdentityVerified = true
-                    };
-                    dbContext.TrnRequestMetadata.Add(trnRequest);
-                    await dbContext.SaveChangesAsync();
-                });
-
                 var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: oneLoginUser.Subject, email: oneLoginUser.EmailAddress);
 
                 // Act
@@ -377,6 +360,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
             });
+    }
 
     [Fact]
     public async Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithVerifiedIdentityButNoTrnOrExistingRequest_CreatesDormantTrnRequestAndCompletesJourney()
@@ -388,26 +372,7 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
         var lastName = Faker.Name.Last();
         var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
-        var user = await TestData.CreateOneLoginUserAsync(
-            personId: null,
-            verifiedInfo: ([firstName, lastName], dateOfBirth));
-
-        // Create a closed IdVerification support task with a successful outcome
-        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
-            oneLoginUserSubject: user.Subject,
-            configure: builder => builder.WithStatus(SupportTaskStatus.Closed));
-
-        await WithDbContextAsync(async dbContext =>
-        {
-            var task = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
-            var data = (OneLoginUserIdVerificationData)task.Data;
-            task.Data = data with
-            {
-                Verified = true,
-                Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches
-            };
-            await dbContext.SaveChangesAsync();
-        });
+        var user = await CreateOneLoginUserWithClosedIdVerificationSupportTaskAsync(firstName, lastName, dateOfBirth);
 
         TimeProvider.Advance(TimeSpan.FromDays(1));
 
@@ -449,44 +414,49 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
     }
 
     [Fact]
-    public Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithExistingDormantTrnRequestFromDifferentApp_ReusesExistingTrnRequest() =>
-        WithJourneyCoordinatorAsync(
+    public Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithExistingDormantTrnRequestFromDifferentApp_CreatesDormantTrnRequestForClient() =>
+        OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithUnusableExistingTrnRequest_CreatesDormantTrnRequestForClientAsync(
+            existingTrnRequestIsForClient: false,
+            TrnRequestStatus.Dormant);
+
+    [Theory]
+    [InlineData(TrnRequestStatus.Completed)]
+    [InlineData(TrnRequestStatus.Rejected)]
+    public Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithExistingClosedTrnRequestForClient_CreatesDormantTrnRequestForClient(TrnRequestStatus status) =>
+        OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithUnusableExistingTrnRequest_CreatesDormantTrnRequestForClientAsync(
+            existingTrnRequestIsForClient: true,
+            status);
+
+    private async Task OnOneLoginCallback_AuthenticationOnly_DeferredPolicyWithUnusableExistingTrnRequest_CreatesDormantTrnRequestForClientAsync(
+        bool existingTrnRequestIsForClient,
+        TrnRequestStatus existingTrnRequestStatus)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var existingTrnRequestApplicationUser = existingTrnRequestIsForClient ? applicationUser : await TestData.CreateApplicationUserAsync();
+
+        var user = await CreateOneLoginUserWithClosedIdVerificationSupportTaskAsync(
+            Faker.Name.First(),
+            Faker.Name.Last(),
+            DateOnly.FromDateTime(Faker.Identification.DateOfBirth()));
+
+        var existingTrnRequestId = await CreateIdentityVerifiedTrnRequestAsync(existingTrnRequestApplicationUser.UserId, user, existingTrnRequestStatus);
+
+        TimeProvider.Advance(TimeSpan.FromDays(1));
+
+        await WithJourneyCoordinatorAsync(
             (instanceId, processId) => new SignInJourneyState(
                 processId,
                 redirectUri: instanceId.EnsureUrlHasKey("https://localhost/callback"),
                 serviceName: "Test Service",
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
-                clientApplicationUserId: default,
+                clientApplicationUserId: applicationUser.UserId,
                 recordMatchingPolicy: RecordMatchingPolicy.Deferred),
+            configureOneLoginServiceMock: null,
             async coordinator =>
             {
-                // Arrange
-                var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
-                var differentAppUser = await TestData.CreateApplicationUserAsync();
-                var trnRequestId = Guid.NewGuid().ToString();
-
-                await WithDbContextAsync(async dbContext =>
-                {
-                    var trnRequest = new Core.DataStore.Postgres.Models.TrnRequestMetadata
-                    {
-                        RequestId = trnRequestId,
-                        ApplicationUserId = differentAppUser.UserId,
-                        OneLoginUserSubject = oneLoginUser.Subject,
-                        CreatedOn = TimeProvider.UtcNow.AddDays(-7),
-                        EmailAddress = oneLoginUser.EmailAddress,
-                        FirstName = "Test",
-                        MiddleName = null,
-                        LastName = "User",
-                        Name = ["Test", "User"],
-                        DateOfBirth = new DateOnly(1990, 1, 1),
-                        IdentityVerified = true
-                    };
-                    dbContext.TrnRequestMetadata.Add(trnRequest);
-                    await dbContext.SaveChangesAsync();
-                });
-
-                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: oneLoginUser.Subject, email: oneLoginUser.EmailAddress);
+                var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: AuthenticationOnly, sub: user.Subject, email: user.EmailAddress);
 
                 // Act
                 var result = await coordinator.OnOneLoginCallbackAsync(authenticationTicket);
@@ -494,14 +464,19 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 // Assert
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
                 var trnRequestIdClaim = coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.TrnRequestId);
-                Assert.Equal(trnRequestId, trnRequestIdClaim);
-                var trnRequestCount = await WithDbContextAsync(dbContext =>
-                    dbContext.TrnRequestMetadata.CountAsync(tr => tr.OneLoginUserSubject == oneLoginUser.Subject));
-                Assert.Equal(1, trnRequestCount);
+                Assert.NotNull(trnRequestIdClaim);
+                Assert.NotEqual(existingTrnRequestId, trnRequestIdClaim);
+
+                var trnRequest = await WithDbContextAsync(dbContext =>
+                    dbContext.TrnRequestMetadata.SingleAsync(tr => tr.RequestId == trnRequestIdClaim));
+                Assert.Equal(applicationUser.UserId, trnRequest.ApplicationUserId);
+                Assert.Equal(user.Subject, trnRequest.OneLoginUserSubject);
+                Assert.Equal(TrnRequestStatus.Dormant, trnRequest.Status);
 
                 var redirectResult = Assert.IsType<RedirectHttpResult>(result);
                 Assert.Equal(coordinator.GetRedirectUri(), redirectResult.Url);
             });
+    }
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationFailed_RedirectsToErrorPage() =>
@@ -1004,6 +979,59 @@ public class SignInJourneyCoordinatorTests(HostFixture hostFixture) : TestBase(h
                 Assert.NotNull(coordinator.State.AuthenticationTicket);
                 Assert.Equal(person.Trn, coordinator.State.AuthenticationTicket.Principal.FindFirstValue(AuthorizeAccessClaimTypes.Trn));
             });
+    }
+
+    private async Task<OneLoginUser> CreateOneLoginUserWithClosedIdVerificationSupportTaskAsync(string firstName, string lastName, DateOnly dateOfBirth)
+    {
+        var user = await TestData.CreateOneLoginUserAsync(
+            personId: null,
+            verifiedInfo: ([firstName, lastName], dateOfBirth));
+
+        // Create a closed IdVerification support task with a successful outcome
+        var supportTask = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(
+            oneLoginUserSubject: user.Subject,
+            configure: builder => builder.WithStatus(SupportTaskStatus.Closed));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            var task = await dbContext.SupportTasks.SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference);
+            var data = (OneLoginUserIdVerificationData)task.Data;
+            task.Data = data with
+            {
+                Verified = true,
+                Outcome = OneLoginUserIdVerificationOutcome.VerifiedOnlyWithoutMatches
+            };
+            await dbContext.SaveChangesAsync();
+        });
+
+        return user;
+    }
+
+    private async Task<string> CreateIdentityVerifiedTrnRequestAsync(Guid applicationUserId, OneLoginUser oneLoginUser, TrnRequestStatus status)
+    {
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            dbContext.TrnRequestMetadata.Add(new TrnRequestMetadata
+            {
+                RequestId = trnRequestId,
+                ApplicationUserId = applicationUserId,
+                OneLoginUserSubject = oneLoginUser.Subject,
+                CreatedOn = TimeProvider.UtcNow.AddDays(-1),
+                EmailAddress = oneLoginUser.EmailAddress,
+                FirstName = "Test",
+                MiddleName = null,
+                LastName = "User",
+                Name = ["Test", "User"],
+                DateOfBirth = new DateOnly(1990, 1, 1),
+                IdentityVerified = true,
+                Status = status
+            });
+            await dbContext.SaveChangesAsync();
+        });
+
+        return trnRequestId;
     }
 
     private async Task WithJourneyCoordinatorAsync(

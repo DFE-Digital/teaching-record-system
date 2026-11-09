@@ -1,79 +1,80 @@
-using CsvHelper.Configuration.Attributes;
+using CsvHelper;
 
 namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 
-public class EstablishmentCsvRow
+[CsvRecord]
+public partial class EstablishmentCsvRow
 {
-    [Name("URN")]
+    [CsvColumn("URN")]
     public required int Urn { get; init; }
 
-    [Name("LA (code)")]
+    [CsvColumn("LA (code)")]
     public required string LaCode { get; init; }
 
-    [Name("LA (name)")]
+    [CsvColumn("LA (name)")]
     public required string LaName { get; init; }
 
-    [Name("EstablishmentNumber")]
-    [NullValues("")]
+    [CsvColumn("EstablishmentNumber")]
+    [CsvNullValues("")]
     public string? EstablishmentNumber { get; init; }
 
-    [Name("EstablishmentName")]
+    [CsvColumn("EstablishmentName")]
     public required string EstablishmentName { get; init; }
 
-    [Name("TypeOfEstablishment (code)")]
+    [CsvColumn("TypeOfEstablishment (code)")]
     public required string EstablishmentTypeCode { get; init; }
 
-    [Name("TypeOfEstablishment (name)")]
+    [CsvColumn("TypeOfEstablishment (name)")]
     public required string EstablishmentTypeName { get; init; }
 
-    [Name("EstablishmentTypeGroup (code)")]
+    [CsvColumn("EstablishmentTypeGroup (code)")]
     public required string EstablishmentGroupTypeCode { get; init; }
 
-    [Name("EstablishmentTypeGroup (name)")]
+    [CsvColumn("EstablishmentTypeGroup (name)")]
     public required string EstablishmentGroupTypeName { get; init; }
 
-    [Name("EstablishmentStatus (code)")]
+    [CsvColumn("EstablishmentStatus (code)")]
     public required string EstablishmentStatusCode { get; init; }
 
-    [Name("EstablishmentStatus (name)")]
+    [CsvColumn("EstablishmentStatus (name)")]
     public required string EstablishmentStatusName { get; init; }
 
-    [Name("PhaseOfEducation (code)")]
+    [CsvColumn("PhaseOfEducation (code)")]
     public string? PhaseOfEducationCode { get; init; }
 
-    [Name("PhaseOfEducation (name)")]
+    [CsvColumn("PhaseOfEducation (name)")]
     public string? PhaseOfEducationName { get; init; }
 
-    [Name("NumberOfPupils")]
-    [NullValues("")]
+    [CsvColumn("NumberOfPupils")]
+    [CsvNullValues("")]
     public string? NumberOfPupils { get; init; }
 
-    [Name("PercentageFSM")]
-    [NullValues("")]
+    [CsvColumn("PercentageFSM")]
+    [CsvNullValues("")]
     public string? FreeSchoolMealsPercentage { get; init; }
 
-    [Name("Street")]
-    [NullValues("")]
+    [CsvColumn("Street")]
+    [CsvNullValues("")]
     public string? Street { get; init; }
 
-    [Name("Locality")]
-    [NullValues("")]
+    [CsvColumn("Locality")]
+    [CsvNullValues("")]
     public string? Locality { get; init; }
 
-    [Name("Address3")]
-    [NullValues("")]
+    [CsvColumn("Address3")]
+    [CsvNullValues("")]
     public string? Address3 { get; init; }
 
-    [Name("Town")]
-    [NullValues("")]
+    [CsvColumn("Town")]
+    [CsvNullValues("")]
     public string? Town { get; init; }
 
-    [Name("County (name)")]
-    [NullValues("")]
+    [CsvColumn("County (name)")]
+    [CsvNullValues("")]
     public string? County { get; init; }
 
-    [Name("Postcode")]
-    [NullValues("")]
+    [CsvColumn("Postcode")]
+    [CsvNullValues("")]
     public string? Postcode { get; init; }
 
 
