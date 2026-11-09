@@ -75,8 +75,15 @@ public class SetMissingHasEypsOnPersonsJob(
 
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream);
-        using var csv = new CsvHelper.CsvWriter(writer, System.Globalization.CultureInfo.InvariantCulture);
-        await csv.WriteRecordsAsync(updatedPersons.Select(p => new { PersonId = p }), cancellationToken);
+        using var csv = CsvHelper.CsvWriter.Create(writer);
+        csv.WriteField("PersonId");
+        csv.EndRecord();
+        foreach (var personId in updatedPersons)
+        {
+            csv.WriteField(personId);
+            csv.EndRecord();
+        }
+        await csv.FlushAsync(cancellationToken);
         await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
 

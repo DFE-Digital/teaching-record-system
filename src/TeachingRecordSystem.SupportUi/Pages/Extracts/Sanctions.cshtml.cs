@@ -1,7 +1,5 @@
-using System.Globalization;
 using System.Text;
 using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,7 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.SupportUi.Pages.Extracts;
 
 [Authorize(Roles = UserRoles.Administrator)]
-public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageModel
+public partial class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageModel
 {
     public void OnGet()
     {
@@ -51,7 +49,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             )
             .ToListAsync(cancellationToken);
 
-        return CreateCsv(rows, new SanctionExtractRowMap(), $"new-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
+        return CreateCsv(rows, $"new-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
     public async Task<IActionResult> OnGetSpentSanctionsAsync(CancellationToken cancellationToken)
@@ -88,7 +86,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             )
             .ToListAsync(cancellationToken);
 
-        return CreateCsv(rows, new SanctionExtractRowMap(), $"spent-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
+        return CreateCsv(rows, $"spent-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
     public async Task<IActionResult> OnGetAuditAlertsAsync(CancellationToken cancellationToken)
@@ -129,7 +127,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             )
             .ToListAsync(cancellationToken);
 
-        return CreateCsv(rows, new AuditingAlertExtractRowMap(), $"auditing-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
+        return CreateCsv(rows, $"auditing-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
     public async Task<IActionResult> OnGetDupSanctionsAsync(CancellationToken cancellationToken)
@@ -180,7 +178,7 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             )
             .ToListAsync(cancellationToken);
 
-        return CreateCsv(rows, new DuplicateSanctionExtractRowMap(), $"dup-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
+        return CreateCsv(rows, $"dup-sanctions-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
     public async Task<IActionResult> OnGetDqS07DuplicationRecordsWithAlertsAsync(CancellationToken cancellationToken)
@@ -254,7 +252,6 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new DqS07DuplicationRecordsWithAlertsExtractRowMap(),
             $"dq-s07-duplication-records-with-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
@@ -294,7 +291,6 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new DqS08IpoWithAlertDetailsExtractRowMap(),
             $"dq-s08-ipo-with-alert-details-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
@@ -338,7 +334,6 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new DqS10SoSNoProhibitionsActivePast2YearDateExtractRowMap(),
             $"dq-s10-sos-no-prohibitions-active-past-2-year-date-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
@@ -386,7 +381,6 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new DqS11FailedInductionNoAlertsExtractRowMap(),
             $"dq-s11-failed-induction-no-alerts-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
@@ -428,7 +422,6 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new DqS12DeletedAlertMonthlyExtractRowMap(),
             $"dq-s12-deleted-alert-monthly-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
@@ -466,7 +459,6 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new MonthlyTmuAlertReconciliationExtractRowMap(),
             $"monthly-tmu-alert-reconciliation-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
@@ -506,21 +498,18 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
 
         return CreateCsv(
             rows,
-            new MonthlyTmuAlertReconciliationKpiProcessExtractRowMap(),
             $"monthly-tmu-alert-reconciliation-kpi-process-{timeProvider.UtcNow:yyyyMMdd}.csv");
     }
 
     private FileStreamResult CreateCsv<T>(
         IEnumerable<T> rows,
-        ClassMap<T> classMap,
         string fileName)
         where T : class
     {
         var stream = new MemoryStream();
         using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        using (var csv = CsvWriter.Create(writer))
         {
-            csv.Context.RegisterClassMap(classMap);
             csv.WriteRecords(rows);
         }
 
@@ -532,267 +521,120 @@ public class Sanctions(TrsDbContext context, TimeProvider timeProvider) : PageMo
             fileName);
     }
 
-    public record SanctionExtractRow(
-        string? Trn,
-        DateOnly? DateOfBirth,
-        string? FullName,
-        string? SanctionName,
-        DateOnly? AlertStartDate,
-        DateOnly? AlertEndDate);
+    [CsvRecord]
+    public partial record SanctionExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("Date of birth")][CsvFormat("MM/dd/yyyy")] DateOnly? DateOfBirth,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("Sanction name")] string? SanctionName,
+        [CsvColumn("Alert start date")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStartDate,
+        [CsvColumn("Alert end date")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEndDate);
 
-    public record AuditingAlertExtractRow(
-        DateTime? DateOfChange,
-        string? EventType,
-        string? TeacherTrn,
-        string? Alert,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertCreated,
-        DateTime? AlertUpdated);
+    [CsvRecord]
+    public partial record AuditingAlertExtractRow(
+        [CsvColumn("Date of change")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? DateOfChange,
+        [CsvColumn("EventType")] string? EventType,
+        [CsvColumn("Teacher TRN")] string? TeacherTrn,
+        [CsvColumn("alert")] string? Alert,
+        [CsvColumn("alert_start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("alert_end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("alert_created")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertCreated,
+        [CsvColumn("alert_updated")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertUpdated);
 
-    public record DuplicateSanctionExtractRow(
-        string? Trn,
-        string? FullName,
-        DateOnly? DateOfBirth,
-        string? AlertName,
-        DateOnly? AlertStartDate,
-        DateOnly? AlertEndDate,
-        DateTime? AlertCreatedOn);
+    [CsvRecord]
+    public partial record DuplicateSanctionExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("Date of birth")][CsvFormat("MM/dd/yyyy")] DateOnly? DateOfBirth,
+        [CsvColumn("Alert name")] string? AlertName,
+        [CsvColumn("Alert start date")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStartDate,
+        [CsvColumn("Alert end date")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEndDate,
+        [CsvColumn("Alert created on")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertCreatedOn);
 
-    public record DqS07DuplicationRecordsWithAlertsExtractRow(
-        string? Trn,
-        string? FirstName,
-        string? LastName,
-        DateOnly? DateOfBirth,
-        string? NationalInsuranceNumber,
-        string? Alert,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertAddedToDqt,
-        string? Trns,
-        string? Firstnames,
-        string? Surnames,
-        DateOnly? Dobs,
-        string? Ninos);
+    [CsvRecord]
+    public partial record DqS07DuplicationRecordsWithAlertsExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("First name")] string? FirstName,
+        [CsvColumn("Last name")] string? LastName,
+        [CsvColumn("Date of birth")][CsvFormat("MM/dd/yyyy")] DateOnly? DateOfBirth,
+        [CsvColumn("National insurance number")] string? NationalInsuranceNumber,
+        [CsvColumn("alert")] string? Alert,
+        [CsvColumn("alert_start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("alert_end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("alert_addedtodqt")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertAddedToDqt,
+        [CsvColumn("TRNS")] string? Trns,
+        [CsvColumn("firstnames")] string? Firstnames,
+        [CsvColumn("surnames")] string? Surnames,
+        [CsvColumn("DOBS")][CsvFormat("MM/dd/yyyy")] DateOnly? Dobs,
+        [CsvColumn("NINOS")] string? Ninos);
 
-    public record DqS08IpoWithAlertDetailsExtractRow(
-        string? Trn,
-        string? FirstName,
-        string? MiddleName,
-        string? LastName,
-        DateOnly? DateOfBirth,
-        string? FullName,
-        string? Alert,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertAddedToDqt,
-        string? Details);
+    [CsvRecord]
+    public partial record DqS08IpoWithAlertDetailsExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("First name")] string? FirstName,
+        [CsvColumn("Middle name")] string? MiddleName,
+        [CsvColumn("Last name")] string? LastName,
+        [CsvColumn("Date of birth")][CsvFormat("MM/dd/yyyy")] DateOnly? DateOfBirth,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("alert")] string? Alert,
+        [CsvColumn("alert_start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("alert_end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("alert_addedtodqt")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertAddedToDqt,
+        [CsvColumn("details")] string? Details);
 
-    public record DqS10SoSNoProhibitionsActivePast2YearDateExtractRow(
-        string? Trn,
-        string? FirstName,
-        string? MiddleName,
-        string? LastName,
-        string? FullName,
-        string? Alert,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertAddedToDqt,
-        string? Details);
+    [CsvRecord]
+    public partial record DqS10SoSNoProhibitionsActivePast2YearDateExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("First name")] string? FirstName,
+        [CsvColumn("Middle name")] string? MiddleName,
+        [CsvColumn("Last name")] string? LastName,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("alert")] string? Alert,
+        [CsvColumn("alert_start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("alert_end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("alert_addedtodqt")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertAddedToDqt,
+        [CsvColumn("details")] string? Details);
 
-    public record DqS11FailedInductionNoAlertsExtractRow(
-        string? Trn,
-        string? FirstName,
-        string? LastName,
-        string? InductionStatus,
-        DateOnly? InductionStartDate,
-        DateOnly? InductionCompletedDate);
+    [CsvRecord]
+    public partial record DqS11FailedInductionNoAlertsExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("First name")] string? FirstName,
+        [CsvColumn("Last name")] string? LastName,
+        [CsvColumn("induction_status")] string? InductionStatus,
+        [CsvColumn("induction_start_date")][CsvFormat("MM/dd/yyyy")] DateOnly? InductionStartDate,
+        [CsvColumn("induction_completed_date")][CsvFormat("MM/dd/yyyy")] DateOnly? InductionCompletedDate);
 
-    public record DqS12DeletedAlertMonthlyExtractRow(
-        string? Trn,
-        string? FirstName,
-        string? MiddleName,
-        string? LastName,
-        string? FullName,
-        string? Alert,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertDeleted,
-        DateTime? AlertUpdated);
+    [CsvRecord]
+    public partial record DqS12DeletedAlertMonthlyExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("First name")] string? FirstName,
+        [CsvColumn("Middle name")] string? MiddleName,
+        [CsvColumn("Last name")] string? LastName,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("alert")] string? Alert,
+        [CsvColumn("alert_start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("alert_end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("alert_deleted")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertDeleted,
+        [CsvColumn("alert_updated")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertUpdated);
 
-    public record MonthlyTmuAlertReconciliationExtractRow(
-        string? Trn,
-        string? FullName,
-        DateOnly? Dob,
-        string? AlertType,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertAddedToTrs);
+    [CsvRecord]
+    public partial record MonthlyTmuAlertReconciliationExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("DOB")][CsvFormat("MM/dd/yyyy")] DateOnly? Dob,
+        [CsvColumn("Alert type")] string? AlertType,
+        [CsvColumn("Alert start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("Alert end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("Alert added to TRS")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertAddedToTrs);
 
-    public record MonthlyTmuAlertReconciliationKpiProcessExtractRow(
-        string? Trn,
-        string? FullName,
-        DateOnly? Dob,
-        string? AlertType,
-        DateOnly? AlertStart,
-        DateOnly? AlertEnd,
-        DateTime? AlertAddedToTrs,
-        DateTime? AlertModifiedOnTrs);
-
-    public sealed class SanctionExtractRowMap : ClassMap<SanctionExtractRow>
-    {
-        public SanctionExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.DateOfBirth).Name("Date of birth").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.SanctionName).Name("Sanction name").Optional();
-            Map(m => m.AlertStartDate).Name("Alert start date").Optional();
-            Map(m => m.AlertEndDate).Name("Alert end date").Optional();
-        }
-    }
-
-    public sealed class AuditingAlertExtractRowMap : ClassMap<AuditingAlertExtractRow>
-    {
-        public AuditingAlertExtractRowMap()
-        {
-            Map(m => m.DateOfChange).Name("Date of change").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.EventType).Name("EventType").Optional();
-            Map(m => m.TeacherTrn).Name("Teacher TRN").Optional();
-            Map(m => m.Alert).Name("alert").Optional();
-            Map(m => m.AlertStart).Name("alert_start").Optional();
-            Map(m => m.AlertEnd).Name("alert_end").Optional();
-            Map(m => m.AlertCreated).Name("alert_created").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.AlertUpdated).Name("alert_updated").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-        }
-    }
-
-    public sealed class DuplicateSanctionExtractRowMap : ClassMap<DuplicateSanctionExtractRow>
-    {
-        public DuplicateSanctionExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.DateOfBirth).Name("Date of birth").Optional();
-            Map(m => m.AlertName).Name("Alert name").Optional();
-            Map(m => m.AlertStartDate).Name("Alert start date").Optional();
-            Map(m => m.AlertEndDate).Name("Alert end date").Optional();
-            Map(m => m.AlertCreatedOn).Name("Alert created on").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-        }
-    }
-
-    public sealed class DqS07DuplicationRecordsWithAlertsExtractRowMap : ClassMap<DqS07DuplicationRecordsWithAlertsExtractRow>
-    {
-        public DqS07DuplicationRecordsWithAlertsExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FirstName).Name("First name").Optional();
-            Map(m => m.LastName).Name("Last name").Optional();
-            Map(m => m.DateOfBirth).Name("Date of birth").Optional();
-            Map(m => m.NationalInsuranceNumber).Name("National insurance number").Optional();
-            Map(m => m.Alert).Name("alert").Optional();
-            Map(m => m.AlertStart).Name("alert_start").Optional();
-            Map(m => m.AlertEnd).Name("alert_end").Optional();
-            Map(m => m.AlertAddedToDqt).Name("alert_addedtodqt").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.Trns).Name("TRNS").Optional();
-            Map(m => m.Firstnames).Name("firstnames").Optional();
-            Map(m => m.Surnames).Name("surnames").Optional();
-            Map(m => m.Dobs).Name("DOBS").Optional();
-            Map(m => m.Ninos).Name("NINOS").Optional();
-        }
-    }
-
-    public sealed class DqS08IpoWithAlertDetailsExtractRowMap : ClassMap<DqS08IpoWithAlertDetailsExtractRow>
-    {
-        public DqS08IpoWithAlertDetailsExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FirstName).Name("First name").Optional();
-            Map(m => m.MiddleName).Name("Middle name").Optional();
-            Map(m => m.LastName).Name("Last name").Optional();
-            Map(m => m.DateOfBirth).Name("Date of birth").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.Alert).Name("alert").Optional();
-            Map(m => m.AlertStart).Name("alert_start").Optional();
-            Map(m => m.AlertEnd).Name("alert_end").Optional();
-            Map(m => m.AlertAddedToDqt).Name("alert_addedtodqt").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.Details).Name("details").Optional();
-        }
-    }
-
-    public sealed class DqS10SoSNoProhibitionsActivePast2YearDateExtractRowMap : ClassMap<DqS10SoSNoProhibitionsActivePast2YearDateExtractRow>
-    {
-        public DqS10SoSNoProhibitionsActivePast2YearDateExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FirstName).Name("First name").Optional();
-            Map(m => m.MiddleName).Name("Middle name").Optional();
-            Map(m => m.LastName).Name("Last name").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.Alert).Name("alert").Optional();
-            Map(m => m.AlertStart).Name("alert_start").Optional();
-            Map(m => m.AlertEnd).Name("alert_end").Optional();
-            Map(m => m.AlertAddedToDqt).Name("alert_addedtodqt").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.Details).Name("details").Optional();
-        }
-    }
-
-    public sealed class DqS11FailedInductionNoAlertsExtractRowMap : ClassMap<DqS11FailedInductionNoAlertsExtractRow>
-    {
-        public DqS11FailedInductionNoAlertsExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FirstName).Name("First name").Optional();
-            Map(m => m.LastName).Name("Last name").Optional();
-            Map(m => m.InductionStatus).Name("induction_status").Optional();
-            Map(m => m.InductionStartDate).Name("induction_start_date").Optional();
-            Map(m => m.InductionCompletedDate).Name("induction_completed_date").Optional();
-        }
-    }
-
-    public sealed class DqS12DeletedAlertMonthlyExtractRowMap : ClassMap<DqS12DeletedAlertMonthlyExtractRow>
-    {
-        public DqS12DeletedAlertMonthlyExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FirstName).Name("First name").Optional();
-            Map(m => m.MiddleName).Name("Middle name").Optional();
-            Map(m => m.LastName).Name("Last name").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.Alert).Name("alert").Optional();
-            Map(m => m.AlertStart).Name("alert_start").Optional();
-            Map(m => m.AlertEnd).Name("alert_end").Optional();
-            Map(m => m.AlertDeleted).Name("alert_deleted").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.AlertUpdated).Name("alert_updated").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-        }
-    }
-
-    public sealed class MonthlyTmuAlertReconciliationExtractRowMap : ClassMap<MonthlyTmuAlertReconciliationExtractRow>
-    {
-        public MonthlyTmuAlertReconciliationExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.Dob).Name("DOB").Optional();
-            Map(m => m.AlertType).Name("Alert type").Optional();
-            Map(m => m.AlertStart).Name("Alert start").Optional();
-            Map(m => m.AlertEnd).Name("Alert end").Optional();
-            Map(m => m.AlertAddedToTrs).Name("Alert added to TRS").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-        }
-    }
-
-    public sealed class MonthlyTmuAlertReconciliationKpiProcessExtractRowMap : ClassMap<MonthlyTmuAlertReconciliationKpiProcessExtractRow>
-    {
-        public MonthlyTmuAlertReconciliationKpiProcessExtractRowMap()
-        {
-            Map(m => m.Trn).Name("TRN").Optional();
-            Map(m => m.FullName).Name("Full name").Optional();
-            Map(m => m.Dob).Name("DOB").Optional();
-            Map(m => m.AlertType).Name("Alert type").Optional();
-            Map(m => m.AlertStart).Name("Alert start").Optional();
-            Map(m => m.AlertEnd).Name("Alert end").Optional();
-            Map(m => m.AlertAddedToTrs).Name("Alert added to TRS").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-            Map(m => m.AlertModifiedOnTrs).Name("Alert modified on TRS").TypeConverterOption.Format("MM/dd/yyyy HH:mm:ss").Optional();
-        }
-    }
+    [CsvRecord]
+    public partial record MonthlyTmuAlertReconciliationKpiProcessExtractRow(
+        [CsvColumn("TRN")] string? Trn,
+        [CsvColumn("Full name")] string? FullName,
+        [CsvColumn("DOB")][CsvFormat("MM/dd/yyyy")] DateOnly? Dob,
+        [CsvColumn("Alert type")] string? AlertType,
+        [CsvColumn("Alert start")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertStart,
+        [CsvColumn("Alert end")][CsvFormat("MM/dd/yyyy")] DateOnly? AlertEnd,
+        [CsvColumn("Alert added to TRS")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertAddedToTrs,
+        [CsvColumn("Alert modified on TRS")][CsvFormat("MM/dd/yyyy HH:mm:ss")] DateTime? AlertModifiedOnTrs);
 }

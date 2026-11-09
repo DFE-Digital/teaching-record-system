@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.Globalization;
+using CsvHelper;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
 
@@ -291,8 +292,16 @@ public class MatchPersonsTests(IServiceProvider services) : CommandTestBase(serv
     // The output file's header is dropped; what's returned is the TRN for each input row, in order.
     private static async Task<string[]> ReadOutputFileAsync(string fileName)
     {
-        var lines = await File.ReadAllLinesAsync(fileName);
-        Assert.Equal("TRN", lines[0]);
-        return lines[1..];
+        using var csv = CsvReader.FromFile(fileName, new CsvReaderOptions { Separator = ',' });
+        await csv.ReadHeaderAsync();
+        Assert.Equal(["TRN"], csv.Headers);
+
+        var trns = new List<string>();
+        while (await csv.ReadAsync())
+        {
+            trns.Add(csv.GetString(0));
+        }
+
+        return trns.ToArray();
     }
 }

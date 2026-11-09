@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
 using CsvHelper;
@@ -97,7 +96,7 @@ public class DetailModel(TrsDbContext context) : PageModel
     public async Task<IActionResult> OnGetDownloadFailuresAsync(CancellationToken cancellationToken)
     {
         using var writer = new StringWriter();
-        using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+        using var csv = CsvWriter.Create(writer, new CsvWriterOptions { Quoting = CsvQuoting.WhenNeededOrWhitespace }, leaveOpen: true);
 
         var integrationTransaction = await context.IntegrationTransactions
             .Include(x => x.IntegrationTransactionRecords!)
@@ -120,9 +119,10 @@ public class DetailModel(TrsDbContext context) : PageModel
         {
             csv.WriteField(record.RowData);
             csv.WriteField(record.FailureMessage);
-            csv.NextRecord();
+            csv.EndRecord();
         }
 
+        csv.Flush();
         var csvContent = writer.ToString();
         var bytes = Encoding.UTF8.GetBytes(csvContent);
 

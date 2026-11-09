@@ -110,10 +110,6 @@ deploy-preprod branch=`git branch --show-current`: (_deploy branch 'pre-producti
 _deploy branch environment:
   @gh workflow run deploy.yml --ref {{branch}} -f environment={{environment}}
 
-# Removes the cached DB schema version file for tests
-remove-tests-schema-cache:
-  @dotnet run scripts/RemoveTestsSchemaCache.cs
-
 psql-dev: (make "install-konduit")
   kubectl config use-context s189t01-tsc-test-aks
   bin/konduit.sh -n tra-development -x -d trs -k s189t01-trs-dv-inf-kv trs-dev-worker -- psql

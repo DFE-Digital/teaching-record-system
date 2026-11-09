@@ -3,26 +3,11 @@ using LibGit2Sharp;
 public static class Utils
 {
     private const string DefaultBranch = "main";
+    private const int NoProjectsAffectedExitCode = 166;
 
     public static async Task<IReadOnlyCollection<string>> GetAffectedTestProjectsAsync(string targetBranch = DefaultBranch)
     {
-        var projectListFile = Path.GetTempFileName();
-
-        // TODO At some point we should use the Incrementalist library directly rather than shelling out to the CLI
-        var incrementalistResult = await Cli.Wrap("dotnet")
-            .WithArguments(new[]
-            {
-                "incrementalist",
-                "run",
-                "--file",
-                projectListFile,
-                "--branch",
-                targetBranch
-            })
-            .ExecuteBufferedAsync();
-
-        var currentDirectory = Directory.GetCurrentDirectory();
-        var projectList = new HashSet<string>(File.ReadAllLines(projectListFile).Select(p => Path.GetFileNameWithoutExtension(p)));
+        var projectList = new HashSet<string>((await GetAffectedProjectFilesAsync(targetBranch)).Select(p => Path.GetFileNameWithoutExtension(p)));
 
         projectList.RemoveWhere(project => !project.EndsWith("Tests"));
 
@@ -42,6 +27,47 @@ public static class Utils
         }
 
         return projectList;
+    }
+
+    private static async Task<string[]> GetAffectedProjectFilesAsync(string targetBranch)
+    {
+        var outputDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+        var result = await Cli.Wrap("dotnet")
+            .WithArguments(new[]
+            {
+                "tool",
+                "run",
+                "dotnet-affected",
+                "--",
+                "--from",
+                targetBranch,
+                "--filter-file-path",
+                "TeachingRecordSystem.slnx",
+                "--format",
+                "text",
+                "--output-dir",
+                outputDirectory,
+                "--output-name",
+                "affected"
+            })
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteBufferedAsync();
+
+        if (result.ExitCode == NoProjectsAffectedExitCode)
+        {
+            return [];
+        }
+
+        if (result.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"dotnet-affected failed with exit code {result.ExitCode}:\n{result.StandardOutput}{result.StandardError}");
+        }
+
+        var projectFiles = File.ReadAllLines(Path.Combine(outputDirectory, "affected.txt"));
+        Directory.Delete(outputDirectory, recursive: true);
+
+        return projectFiles;
     }
 
     public static IReadOnlyCollection<string> GetChangedFiles(string targetBranch = DefaultBranch)
