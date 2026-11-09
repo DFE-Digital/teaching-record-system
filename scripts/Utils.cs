@@ -26,6 +26,12 @@ public static class Utils
             projectList.Add("TeachingRecordSystem.EndToEndTests");
         }
 
+        // A change to how tests are run can break any of them, without changing any project
+        if (changedFiles.Any(f => f.EndsWith(".github/workflows/pr.yml") || f.EndsWith("scripts/RunTests.cs")))
+        {
+            projectList.UnionWith(Directory.GetDirectories("tests", "*Tests").Select(Path.GetFileName)!);
+        }
+
         return projectList;
     }
 
