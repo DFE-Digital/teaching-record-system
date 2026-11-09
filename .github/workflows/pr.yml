@@ -187,7 +187,7 @@ jobs:
         working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
 
       - name: Cache Playwright browsers
-        if: endsWith(matrix.project_short_name, 'EndToEndTests')
+        if: endsWith(matrix.entry.project, 'EndToEndTests')
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
