@@ -71,22 +71,24 @@ async Task<int> RunProcessAsync(int number, IReadOnlyCollection<TestClass> proce
 
     // A [Theory] expands to at least one test, so the method count is a valid lower bound. Passing it turns "the filter
     // matched nothing" into a failure rather than a green run of zero tests.
+    // --test-modules runs the built test assembly without evaluating the project, which would need the restored
+    // packages; the CI jobs that run tests only have the build output.
     string[] arguments =
     [
         "test",
-        "--configuration", configuration,
-        "--no-build",
+        "--test-modules", $"TeachingRecordSystem.{project}.dll",
+        "--root-directory", outputDirectory,
         "--hangdump",
         "--hangdump-timeout", "10m",
         "--report-xunit-trx",
-        "--results-directory", Path.Combine("TestResults", $"process-{number}"),
+        "--results-directory", Path.GetFullPath(Path.Combine(projectDirectory, "TestResults", $"process-{number}")),
         "--minimum-expected-tests", processClasses.Sum(c => c.Methods).ToString(),
         "--filter-class", .. processClasses.Select(c => c.Name)
     ];
 
     var result = await Cli.Wrap("dotnet")
         .WithArguments(arguments)
-        .WithWorkingDirectory(projectDirectory)
+        .WithWorkingDirectory(outputDirectory)
         .WithStandardOutputPipe(output)
         .WithStandardErrorPipe(output)
         .WithValidation(CommandResultValidation.None)

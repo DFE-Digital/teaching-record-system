@@ -109,9 +109,8 @@ jobs:
           #
           # Each job also runs its tests across several processes, as many as the runner has cores. That
           # doesn't work for EndToEndTests since its hosts listen on fixed ports.
-          # TARGET_SHARD_SECONDS is deliberately well below the per-job build time - shards much shorter
-          # than that spend more time building than testing.
-          TARGET_SHARD_SECONDS=40
+          # Jobs share one build, so another shard only costs its setup, which is about 20 seconds.
+          TARGET_SHARD_SECONDS=30
           MAX_SHARDS=6
           PROCESSES_PER_JOB=4
 
@@ -138,31 +137,18 @@ jobs:
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
           echo "projects=$(jq -c 'map(.project) | unique' <<<"$matrix")" >> $GITHUB_OUTPUT
 
-  tests:
-    name: Tests (${{ matrix.entry.project }}${{ matrix.entry.shards > 1 && format(' {0}/{1}', matrix.entry.shard, matrix.entry.shards) || '' }})
+  # Runs alongside get_affected_projects, so this builds everything rather than what a change affects. Every test job
+  # shares the output. Analyzers are half of the build, so they're left to the analyze job, which runs alongside the tests.
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    needs: [get_affected_projects]
-    if: needs.get_affected_projects.outputs.matrix != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        entry: ${{ fromJson(needs.get_affected_projects.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v7
 
-      # Runs in the background while the project builds; if it's still going, the tests wait for the same pull
-      - name: Start pulling the Postgres image
-        run: nohup docker pull postgres:17 > /dev/null 2>&1 &
-
-      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
-
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
-
-      - name: Install tools
-        run: just install-tools
 
       - name: Restore cached packages
         id: cache-packages-restore
@@ -176,10 +162,9 @@ jobs:
             nuget-${{ runner.os }}-
 
       - name: Restore
-        run: just restore
+        run: dotnet restore --locked-mode
 
       - name: Cache restored packages
-        id: cache-packages-save
         uses: actions/cache/save@v6
         with:
           path: |
@@ -188,9 +173,95 @@ jobs:
           key: ${{ steps.cache-packages-restore.outputs.cache-primary-key }}
         if: steps.cache-packages-restore.outputs.cache-hit != 'true'
 
-      - name: Build project
+      - name: Build
+        run: dotnet build -c Release --no-restore -p:RunAnalyzers=false
+
+      # The job doesn't finish for another 50 seconds or so if these are left for the runner to clean up
+      - name: Stop build servers
+        run: dotnet build-server shutdown
+
+      - name: Build test runner
+        run: dotnet build scripts/RunTests.cs -c Release -o .run-tests
+
+      # Everything the build generated other than what's already in the test projects' output, since tests also read
+      # generated assets from src. Paths in the output are absolute, which is fine as every job uses the same workspace.
+      #
+      # All the test jobs download this at once, and the slowest of them holds up the run, so its size matters. The test
+      # projects mostly contain the same files; ordering by file name puts the copies within zstd's window.
+      - name: Pack build output
+        run: |
+          git ls-files --others --ignored --exclude-standard -- src tests \
+            | grep -vE '^src/[^/]+/bin/|^tests/[^/]+/obj/' \
+            | awk -F/ '{ print $NF "/" $0 }' | sort | cut -d/ -f2- > build-output-files
+          tar -I 'zstd -T0 --long=27' -cf build-output.tar.zst -T build-output-files .run-tests
+          ls -l build-output.tar.zst
+
+      - name: Keep the build output for the test jobs
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: build-output.tar.zst
+          compression-level: 0
+          retention-days: 3
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore cached packages
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/.librarymanager/cache
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json', '**/libman.json') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore --locked-mode
+
+      - name: Build
         run: dotnet build -c Release --no-restore
-        working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
+
+      - name: Stop build servers
+        run: dotnet build-server shutdown
+
+  tests:
+    name: Tests (${{ matrix.entry.project }}${{ matrix.entry.shards > 1 && format(' {0}/{1}', matrix.entry.shard, matrix.entry.shards) || '' }})
+    runs-on: ubuntu-latest
+    needs: [get_affected_projects, build]
+    if: needs.get_affected_projects.outputs.matrix != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        entry: ${{ fromJson(needs.get_affected_projects.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Runs in the background during setup; if it's still going, the tests wait for the same pull
+      - name: Start pulling the Postgres image
+        run: nohup docker pull postgres:17 > /dev/null 2>&1 &
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Download build output
+        uses: actions/download-artifact@v8
+        with:
+          name: build-output
+
+      - name: Unpack build output
+        run: tar -I zstd -xf build-output.tar.zst && rm build-output.tar.zst
 
       - name: Cache Playwright browsers
         if: endsWith(matrix.entry.project, 'EndToEndTests')
@@ -208,9 +279,13 @@ jobs:
         env:
           PROJECT_NAME: ${{ matrix.entry.project }}
 
+      # The CLI's first-run setup fails if several processes try to do it at once
+      - name: Run the .NET CLI's first-run setup
+        run: dotnet tool list
+
       - name: Run tests
         run: >-
-          dotnet run scripts/RunTests.cs --
+          .run-tests/RunTests
           ${{ matrix.entry.project }}
           --configuration Release
           --shard ${{ matrix.entry.shard }}
@@ -265,15 +340,14 @@ jobs:
   check_test_results:
     name: Check test results
     runs-on: ubuntu-latest
-    needs: [tests]
+    needs: [build, analyze, tests]
     if: always()
     steps:
       - uses: actions/github-script@v9
         with:
           script: |
-            const testsStepResult = '${{ needs.tests.result }}';
-
-            if (testsStepResult === 'failure') {
+            // The tests are skipped, not failed, when the build fails
+            if (${{ contains(needs.*.result, 'failure') }}) {
               core.setFailed('Required tests failed.');
             }
 
