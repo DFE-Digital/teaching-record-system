@@ -13,28 +13,6 @@ public class TeacherPensionsSupportTaskService(
     PersonService personService,
     TrnRequestService trnRequestService)
 {
-    public Task<SupportTask> CreatePotentialDuplicateAsync(
-        CreateTeacherPensionsPotentialDuplicateOptions options,
-        ProcessContext processContext,
-        CancellationToken cancellationToken = default) =>
-        supportTaskService.CreateSupportTaskAsync(
-            new CreateSupportTaskOptions
-            {
-                SupportTaskType = SupportTaskType.TeacherPensionsPotentialDuplicate,
-                Data = new TeacherPensionsPotentialDuplicateData
-                {
-                    FileName = options.FileName,
-                    IntegrationTransactionId = options.IntegrationTransactionId
-                },
-                PersonId = options.PersonId,
-                OneLoginUserSubject = null,
-                TrnRequest = (options.TrnRequest.ApplicationUserId, options.TrnRequest.RequestId),
-                Subject = SupportTask.Subject.FromTrnRequest(options.TrnRequest),
-                SourceApplicationUserId = options.TrnRequest.ApplicationUserId
-            },
-            processContext,
-            cancellationToken);
-
     /// Merges the task's record into the record in <paramref name="options"/>, resolves the request to it and closes
     /// the task.
     public async Task ResolveWithMergeAsync(

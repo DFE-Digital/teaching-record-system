@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 /// <summary>
 /// Back-fills <see cref="ProcessEvent"/> records for the TPS potential duplicate support tasks raised by
-/// <see cref="CapitaImportJob"/>. Historically the job wrote the legacy <c>SupportTaskCreatedEvent</c> straight
+/// the since-removed <c>CapitaImportJob</c>. Historically the job wrote the legacy <c>SupportTaskCreatedEvent</c> straight
 /// to the <c>events</c> table rather than going through the event pipeline, so the task's creation was never
 /// recorded against a process.
 ///

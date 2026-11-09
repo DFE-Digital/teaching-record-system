@@ -36,11 +36,6 @@ public static class Extensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddOptions<CapitaTpsUserOption>()
-            .BindConfiguration("RecurringJobs:CapitaTpsImport")
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
         services.AddOptions<DeleteOldEvidenceFilesJobOptions>()
             .Bind(configuration.GetSection("DeleteOldEvidenceFilesJob"))
             .ValidateDataAnnotations()
@@ -122,29 +117,17 @@ public static class Extensions
                 job => job.ExecuteAsync(CancellationToken.None),
                 Cron.Never);
 
-            recurringJobManager.AddOrUpdate<CapitaExportNewJob>(
-                nameof(CapitaExportNewJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                GetRecurringJobSchedule(CapitaExportNewJob.JobSchedule));
+            recurringJobManager.RemoveIfExists("CapitaExportNewJob");
 
-            recurringJobManager.AddOrUpdate<CapitaExportMissingTrnJob>(
-                nameof(CapitaExportMissingTrnJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                Cron.Never);
+            recurringJobManager.RemoveIfExists("CapitaExportMissingTrnJob");
 
-            recurringJobManager.AddOrUpdate<CapitaExportAmendJob>(
-                nameof(CapitaExportAmendJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                GetRecurringJobSchedule(CapitaExportAmendJob.JobSchedule));
+            recurringJobManager.RemoveIfExists("CapitaExportAmendJob");
 
             recurringJobManager.RemoveIfExists("AllocateTrnToPersonJob (dry-run)");
 
             recurringJobManager.RemoveIfExists("AllocateTrnToPersonJob");
 
-            recurringJobManager.AddOrUpdate<CapitaImportJob>(
-                nameof(CapitaImportJob),
-                job => job.ExecuteAsync(CancellationToken.None),
-                GetRecurringJobSchedule(CapitaImportJob.JobSchedule));
+            recurringJobManager.RemoveIfExists("CapitaImportJob");
 
             recurringJobManager.RemoveIfExists("DeletePersonAndChildRecordsWithoutATrnJob (dry-run)");
             recurringJobManager.RemoveIfExists("DeletePersonAndChildRecordsWithoutATrnJob");
