@@ -806,7 +806,7 @@
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
-          "AngleSharp": "[1.9.1, )",
+          "AngleSharp": "[1.10.0, )",
           "Azure.Storage.Blobs": "[12.30.1, )",
           "Azure.Storage.Files.DataLake": "[12.28.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
@@ -869,9 +869,9 @@
       },
       "AngleSharp": {
         "type": "CentralTransitive",
-        "requested": "[1.9.1, )",
-        "resolved": "1.9.1",
-        "contentHash": "QgOLaoPvDofo66KBOHlI9WLH+L/3xGDDd1joM4CrsFsxm0knRu/6ZoiWU0DUOhBZzSCa13zYKAeVPS/CxnF12Q=="
+        "requested": "[1.10.0, )",
+        "resolved": "1.10.0",
+        "contentHash": "jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA=="
       },
       "Azure.Storage.Blobs": {
         "type": "CentralTransitive",
