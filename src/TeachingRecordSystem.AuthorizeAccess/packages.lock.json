@@ -19,9 +19,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[5.0.1, )",
-        "resolved": "5.0.1",
-        "contentHash": "GtizNEpQmgaFCKlfayrwwcu7JdXyoOTvIpY6HjnHg9S1kG1YFeA74h2cqMWlrpTy0KBmohJfK5TB8QMLSxkouA=="
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "qnTl5NKMJFziTehnsm3Khw1imn5yfNeKWB7m4wD+KOZc32JeyQw31Da7A1hJvfLkvxTi28ppi4muWGzAupZd4A=="
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "Direct",
