@@ -1,8 +1,6 @@
 #nullable disable
 using System.ComponentModel;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Requests;
 
@@ -12,7 +10,7 @@ public enum FindTeachersMatchPolicy
     Strict = 1
 }
 
-public class FindTeachersRequest : IRequest<FindTeachersResponse>
+public class FindTeachersRequest
 {
     [FromQuery(Name = "matchPolicy")]
     public FindTeachersMatchPolicy? MatchPolicy { get; set; }

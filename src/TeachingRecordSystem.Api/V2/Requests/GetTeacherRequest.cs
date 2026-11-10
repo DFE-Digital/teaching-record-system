@@ -1,11 +1,9 @@
 #nullable disable
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Requests;
 
-public class GetTeacherRequest : IRequest<GetTeacherResponse>
+public class GetTeacherRequest
 {
     [FromRoute(Name = "trn")]
     public string Trn { get; set; }

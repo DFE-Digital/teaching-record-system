@@ -1,12 +1,10 @@
-using MediatR;
-using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
-public class GetIttProvidersHandler(ReferenceDataCache referenceDataCache) : IRequestHandler<GetIttProvidersRequest, GetIttProvidersResponse>
+public class GetIttProvidersHandler(ReferenceDataCache referenceDataCache)
 {
-    public async Task<GetIttProvidersResponse> Handle(GetIttProvidersRequest request, CancellationToken cancellationToken)
+    public async Task<GetIttProvidersResponse> HandleAsync()
     {
         var ittProviders = (await referenceDataCache.GetTrainingProvidersAsync(activeOnly: false))
             .Where(p => p.Ukprn != null)
