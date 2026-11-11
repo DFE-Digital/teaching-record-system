@@ -1,4 +1,3 @@
-using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240101;
@@ -24,7 +23,7 @@ public record GetPersonResponse
     public required GetPersonResponseQts? Qts { get; init; }
     public required GetPersonResponseEyts? Eyts { get; init; }
     public required Option<InductionInfo> Induction { get; init; }
-    public required Option<OneOf<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingForAppropriateBody>>> InitialTeacherTraining { get; init; }
+    public required Option<GetPersonResponseInitialTeacherTrainings> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
@@ -47,11 +46,13 @@ public record GetPersonResponse
         Qts = source.Qts is { } qts ? GetPersonResponseQts.Create(qts) : null,
         Eyts = source.Eyts is { } eyts ? GetPersonResponseEyts.Create(eyts) : null,
         Induction = source.Induction.Map(i => InductionInfo.Create(i)),
-        InitialTeacherTraining = source.InitialTeacherTraining.Map(itt => itt.Match(
-            training => OneOf<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingForAppropriateBody>>.FromT0(
-                training.Select(i => GetPersonResponseInitialTeacherTraining.Create(i)).AsReadOnly()),
-            forAppropriateBody => OneOf<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingForAppropriateBody>>.FromT1(
-                forAppropriateBody.Select(i => GetPersonResponseInitialTeacherTrainingForAppropriateBody.Create(i)).AsReadOnly()))),
+        InitialTeacherTraining = source.InitialTeacherTraining.Map<GetPersonResponseInitialTeacherTrainings>(itt => itt switch
+        {
+            IReadOnlyCollection<GetPersonResultInitialTeacherTraining> training =>
+                training.Select(i => GetPersonResponseInitialTeacherTraining.Create(i)).AsReadOnly(),
+            IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody> forAppropriateBody =>
+                forAppropriateBody.Select(i => GetPersonResponseInitialTeacherTrainingForAppropriateBody.Create(i)).AsReadOnly()
+        }),
         NpqQualifications = default,
         MandatoryQualifications = source.MandatoryQualifications.Map(mqs =>
             mqs.Select(mq => GetPersonResponseMandatoryQualification.Create(mq)).AsReadOnly()),
@@ -120,6 +121,10 @@ public record GetPersonResponseInitialTeacherTraining
         Subjects = source.Subjects.Select(s => GetPersonResponseInitialTeacherTrainingSubject.Create(s)).AsReadOnly()
     };
 }
+
+public union GetPersonResponseInitialTeacherTrainings(
+    IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>,
+    IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingForAppropriateBody>);
 
 public record GetPersonResponseInitialTeacherTrainingForAppropriateBody
 {

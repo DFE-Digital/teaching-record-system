@@ -130,7 +130,6 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="NSign.Client" />
     <PackageReference Include="NSign.SignatureProviders" />
-    <PackageReference Include="OneOf" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <PackageReference Include="Optional" />
     <PackageReference Include="Polly.Core" />
