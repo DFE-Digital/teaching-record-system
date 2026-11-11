@@ -659,7 +659,6 @@
           "NSign.SignatureProviders": "[1.2.7, )",
           "Npgsql.DependencyInjection": "[10.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
-          "OneOf": "[3.0.271, )",
           "OpenIddict.EntityFrameworkCore": "[7.8.0, )",
           "Optional": "[4.0.0, )",
           "Polly.Core": "[8.7.0, )",
@@ -1012,12 +1011,6 @@
         "dependencies": {
           "NSign.Abstractions": "1.2.7"
         }
-      },
-      "OneOf": {
-        "type": "CentralTransitive",
-        "requested": "[3.0.271, )",
-        "resolved": "3.0.271",
-        "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
       },
       "OpenIddict.EntityFrameworkCore": {
         "type": "CentralTransitive",
