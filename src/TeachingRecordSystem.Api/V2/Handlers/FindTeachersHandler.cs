@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using MediatR;
 using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -8,9 +7,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
-public class FindTeachersHandler(TrsDbContext dbContext) : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
+public class FindTeachersHandler(TrsDbContext dbContext)
 {
-    public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
+    public async Task<FindTeachersResponse> HandleAsync(FindTeachersRequest request, CancellationToken cancellationToken)
     {
         var result = request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default ?
             await HandleDefaultRequestAsync() :

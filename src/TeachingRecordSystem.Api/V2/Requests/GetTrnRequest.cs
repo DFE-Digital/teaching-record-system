@@ -1,12 +1,10 @@
 #nullable disable
 using System.ComponentModel;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Requests;
 
-public class GetTrnRequest : IRequest<TrnRequestInfo>
+public class GetTrnRequest
 {
     [FromRoute(Name = "requestId")]
     [Description("The unique ID the TRN request was created with.")]
