@@ -726,7 +726,7 @@ public class TrnRequestService(
             {
                 var match = (await GetMatchesFromTrnRequestAsync(request, person.PersonId, cancellationToken))[0];
                 var matchedAttributes = GetMatchedAttributes(match);
-                return MatchPersonsResult.DefiniteMatch(person.PersonId, person.Trn, matchedAttributes);
+                return new MatchPersonsResult.DefiniteMatch(person.PersonId, person.Trn, matchedAttributes);
             }
         }
 
@@ -735,7 +735,7 @@ public class TrnRequestService(
 
         if (results.Count == 0)
         {
-            return MatchPersonsResult.NoMatches();
+            return new MatchPersonsResult.NoMatches();
         }
 
         var matchedOnDobAndNino = results.Where(r => r is { DateOfBirthMatches: true, NationalInsuranceNumberMatches: true }).ToArray();
@@ -743,7 +743,7 @@ public class TrnRequestService(
         if (matchedOnDobAndNino is [var singleDobAndNinoMatch])
         {
             var matchedAttributes = GetMatchedAttributes(singleDobAndNinoMatch);
-            return MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.PersonId, singleDobAndNinoMatch.Trn, matchedAttributes);
+            return new MatchPersonsResult.DefiniteMatch(singleDobAndNinoMatch.PersonId, singleDobAndNinoMatch.Trn, matchedAttributes);
         }
 
         var matchedOnNameDateOfBirthEmailAndGender = results
@@ -760,12 +760,12 @@ public class TrnRequestService(
         if (matchedOnNameDateOfBirthEmailAndGender is [var singleNameDobEmailGenderMatch] && string.IsNullOrEmpty(request.NationalInsuranceNumber))
         {
             var matchedAttributes = GetMatchedAttributes(singleNameDobEmailGenderMatch);
-            return MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.PersonId, singleNameDobEmailGenderMatch.Trn, matchedAttributes);
+            return new MatchPersonsResult.DefiniteMatch(singleNameDobEmailGenderMatch.PersonId, singleNameDobEmailGenderMatch.Trn, matchedAttributes);
         }
 
         request.PotentialDuplicate = true;
 
-        return MatchPersonsResult.PotentialMatches(
+        return new MatchPersonsResult.PotentialMatches(
             results
                 .Select(r =>
                 {
@@ -783,7 +783,8 @@ public class TrnRequestService(
                 .OrderByDescending(r => r.score)
                 // Tie-break on PersonId so equally-scored matches have a deterministic order
                 .ThenBy(r => r.potentialMatch.PersonId)
-                .Select(r => r.potentialMatch));
+                .Select(r => r.potentialMatch)
+                .ToArray());
     }
 
     public async Task<TrnRequestInfo> ActivateTrnRequestAsync(Guid applicationUserId, string requestId, ProcessContext processContext, CancellationToken cancellationToken = default)
@@ -950,19 +951,19 @@ public class TrnRequestService(
         string? trn = null;
         var matchResult = await MatchPersonsAsync(trnRequest, cancellationToken: cancellationToken);
 
-        if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
+        if (matchResult is MatchPersonsResult.DefiniteMatch definiteMatch)
         {
-            trn = matchResult.Trn;
-            var person = (await dbContext.Persons.FindAsync(new object?[] { matchResult.PersonId }, cancellationToken))!;
+            trn = definiteMatch.Trn;
+            var person = (await dbContext.Persons.FindAsync(new object?[] { definiteMatch.PersonId }, cancellationToken))!;
             await ResolveTrnRequestWithMatchedPersonAsync(trnRequest, person, publishTrnRequestUpdatedEvent: false, processContext, cancellationToken);
         }
-        else if (matchResult.Outcome is MatchPersonsResultOutcome.NoMatches)
+        else if (matchResult is MatchPersonsResult.NoMatches)
         {
             trn = await ResolveTrnRequestWithNewRecordAsync(trnRequest, publishTrnRequestUpdatedEvent: false, processContext, cancellationToken);
         }
         else
         {
-            Debug.Assert(matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches);
+            Debug.Assert(matchResult is MatchPersonsResult.PotentialMatches);
 
             await CreateTrnRequestSupportTaskAsync(
                 new CreateTrnRequestSupportTaskOptions
