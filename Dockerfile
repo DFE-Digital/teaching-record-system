@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0.302-alpine3.23@sha256:d8ee39817ca03a3757288e83c37ed73cc969a286c603b827c7cbe33add1c2d1c AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0.100-alpine3.24@sha256:52556c0fb9d0f609ae9aeab9efeeba96f4acc2f7038f7696f2235ccbdbb8e290 AS build
 WORKDIR /source
 
 # Install pre-reqs for SASS compilation
@@ -10,14 +10,14 @@ RUN dotnet restore
 RUN dotnet publish --no-restore --configuration Release
 RUN dotnet ef migrations bundle -p src/TeachingRecordSystem.Core/ --configuration Release --context TrsDbContext --output efbundle
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.23@sha256:1201dde897ab436b7c6b386f6dbd4f9a3ca0245f9c5a8aac8f8bcdccb4c7d484
+FROM mcr.microsoft.com/dotnet/aspnet:11.0-alpine3.24@sha256:d39b72ad1534fa0faf52b488bffb0762df7ba269d120f0338713d4dda2a41bf5
 ARG GIT_SHA
 WORKDIR /Apps
-COPY --from=build /source/src/TeachingRecordSystem.Api/bin/Release/net10.0/publish/ ./Api/
-COPY --from=build /source/src/TeachingRecordSystem.Cli/bin/Release/net10.0/publish/ ./TrsCli/
-COPY --from=build /source/src/TeachingRecordSystem.SupportUi/bin/Release/net10.0/publish/ ./SupportUi/
-COPY --from=build /source/src/TeachingRecordSystem.Worker/bin/Release/net10.0/publish/ ./Worker/
-COPY --from=build /source/src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net10.0/publish/ ./AuthorizeAccess/
+COPY --from=build /source/src/TeachingRecordSystem.Api/bin/Release/net11.0/publish/ ./Api/
+COPY --from=build /source/src/TeachingRecordSystem.Cli/bin/Release/net11.0/publish/ ./TrsCli/
+COPY --from=build /source/src/TeachingRecordSystem.SupportUi/bin/Release/net11.0/publish/ ./SupportUi/
+COPY --from=build /source/src/TeachingRecordSystem.Worker/bin/Release/net11.0/publish/ ./Worker/
+COPY --from=build /source/src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net11.0/publish/ ./AuthorizeAccess/
 COPY --from=build /source/efbundle ./efbundle
 
 # Ensure culture data is available

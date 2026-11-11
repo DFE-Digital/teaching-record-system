@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.Identity.Web.GraphServiceClientBeta" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" />
   </ItemGroup>
 
   <ItemGroup>
