@@ -121,16 +121,16 @@ public static partial class Commands
 
                     string? trn = null;
 
-                    if (matchResult.Outcome is MatchPersonsResultOutcome.DefiniteMatch)
+                    if (matchResult is MatchPersonsResult.DefiniteMatch definiteMatch)
                     {
-                        trn = matchResult.Trn;
+                        trn = definiteMatch.Trn;
                     }
-                    else if (matchResult.Outcome is MatchPersonsResultOutcome.PotentialMatches && matchResult.Matches.Count == 1)
+                    else if (matchResult is MatchPersonsResult.PotentialMatches { Matches.Count: 1 } potentialMatches)
                     {
                         // A definite match needs a national insurance number, or an email address and gender, to match on
                         // and the input file has none of those; a single potential match on names and date of birth is the
                         // strongest signal available here. Rows that match more than one record are left blank for review.
-                        var matchedPersonId = matchResult.Matches.Single().PersonId;
+                        var matchedPersonId = potentialMatches.Matches.Single().PersonId;
 
                         trn = await dbContext.Persons
                             .Where(p => p.PersonId == matchedPersonId)
