@@ -64,7 +64,7 @@ See the [changelog](CHANGELOG.md) for the details of what has changed between ve
 ### Software requirements
 
 The API is an ASP.NET Core 8 web application. To develop locally you will need the following installed:
-- Visual Studio 2022 (or the .NET 10 SDK and an alternative IDE/editor);
+- Visual Studio 2026 (or the .NET 11 SDK and an alternative IDE/editor);
 - a local Postgres 17+ instance.
 
 A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH`.
