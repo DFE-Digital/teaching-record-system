@@ -13,16 +13,16 @@
     <p class="govuk-body">
         @if (Model.Context.ContextType == ChangeHistoryContextType.Person)
         {
-            @:Record disconnected from GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginUser.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            @:Record disconnected from GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginUser.EmailAddress<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
         }
         else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
         {
-            <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a> @:disconnected from GOV.UK One Login.
+            <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a> @:disconnected from GOV.UK One Login.
         }
         else
         {
             @* SupportTask context - link to both *@
-            <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a> @:disconnected from GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginUser.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a> @:disconnected from GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginUser.EmailAddress<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
         }
     </p>
 

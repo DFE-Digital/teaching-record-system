@@ -13,16 +13,16 @@
     <p class="govuk-body">
         @if (Model.Context.ContextType == ChangeHistoryContextType.Person)
         {
-            @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oldOneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oldOneLoginUser.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a> disconnected from record.
+            @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oldOneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oldOneLoginUser.EmailAddress<span class="govuk-visually-hidden"> (opens in new tab)</span></a> disconnected from record.
         }
         else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
         {
-            @:GOV.UK One Login disconnected from <a href="@LinkGenerator.Persons.PersonDetail.Index(oldOneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            @:GOV.UK One Login disconnected from <a href="@LinkGenerator.Persons.PersonDetail.Index(oldOneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
         }
         else
         {
             @* SupportTask context - link to both *@
-            @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oldOneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oldOneLoginUser.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a> disconnected from <a href="@LinkGenerator.Persons.PersonDetail.Index(oldOneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+            @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oldOneLoginUser.Subject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oldOneLoginUser.EmailAddress<span class="govuk-visually-hidden"> (opens in new tab)</span></a> disconnected from <a href="@LinkGenerator.Persons.PersonDetail.Index(oldOneLoginUser.PersonId!.Value)" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
         }
     </p>
 

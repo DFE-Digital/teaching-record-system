@@ -52,7 +52,7 @@
             }
             else
             {
-                <text>GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> could not be connected to a record.</text>
+                <text>GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> could not be connected to a record.</text>
             }
         </p>
     }
@@ -65,7 +65,7 @@
             }
             else
             {
-                <text>No matches were found for GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a>.</text>
+                <text>No matches were found for GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.</text>
             }
         </p>
     }
@@ -73,9 +73,7 @@
     <p class="govuk-body" data-testid="task-closed-message">
         @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
         {
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
-                Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
-            </a>
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> @supportTaskReference</span></a>
             <text> closed for @oneLoginEmail.</text>
         }
         else
@@ -93,15 +91,15 @@
         <p class="govuk-body" data-testid="one-login-matched-message">
             @if (Model.Context.ContextType == ChangeHistoryContextType.SupportTask)
             {
-                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
             else if (Model.Context.ContextType == ChangeHistoryContextType.Person)
             {
-                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to a record.
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> matched to a record.
             }
             else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
             {
-                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
         </p>
     }
@@ -136,7 +134,7 @@
         <p class="govuk-body" data-testid="person-created-message">
             @if (Model.Context.ContextType != ChangeHistoryContextType.Person)
             {
-                @:Record created for <a href="@LinkGenerator.Persons.PersonDetail.Index(createdPersonId)" class="govuk-link" target="_blank" data-testid="created-person-link">@createdPersonName <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:Record created for <a href="@LinkGenerator.Persons.PersonDetail.Index(createdPersonId)" class="govuk-link" target="_blank" data-testid="created-person-link">@createdPersonName<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
             else
             {
@@ -156,7 +154,7 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
             {
-                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference <span class="govuk-visually-hidden">(opens in new tab)</span></a> was created.</text>
+                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
             }
             else
             {

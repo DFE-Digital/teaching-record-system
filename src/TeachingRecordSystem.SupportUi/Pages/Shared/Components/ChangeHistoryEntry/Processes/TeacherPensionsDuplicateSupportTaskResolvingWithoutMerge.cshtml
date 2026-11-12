@@ -23,16 +23,14 @@
         }
         else
         {
-            @:TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(personId)" class="govuk-link" target="_blank" data-testid="person-link">@personTrn <span class="govuk-visually-hidden">(opens in new tab)</span></a> kept as a separate record.
+            @:TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(personId)" class="govuk-link" target="_blank" data-testid="person-link">@personTrn<span class="govuk-visually-hidden"> (opens in new tab)</span></a> kept as a separate record.
         }
     </p>
 
     <p class="govuk-body" data-testid="task-closed-message">
         @if (!isSupportTaskContext)
         {
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">
-                Task<span class="govuk-visually-hidden"> @supportTaskReference</span>
-            </a>
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> @supportTaskReference</span></a>
             <text> closed.</text>
         }
         else
@@ -50,15 +48,15 @@
         <p class="govuk-body" data-testid="one-login-matched-message">
             @if (isOneLoginContext)
             {
-                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="matched-person-link">@personTrn <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="matched-person-link">@personTrn<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
             else if (isPersonContext)
             {
-                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to record.
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> matched to record.
             }
             else
             {
-                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="matched-person-link">@personTrn <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId)" class="govuk-link" target="_blank" data-testid="matched-person-link">@personTrn<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
         </p>
     }
@@ -70,7 +68,7 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (!isSupportTaskContext)
             {
-                <text>TRN request manual checks needed support task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference <span class="govuk-visually-hidden">(opens in new tab)</span></a> was created.</text>
+                <text>TRN request manual checks needed support task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
             }
             else
             {

@@ -59,7 +59,7 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
             {
-                @:Task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="support-task-link">@createdTaskReference<span class="govuk-visually-hidden">(opens in new tab)</span></a> created as
+                @:Task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="support-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> created as
             }
             else
             {
@@ -74,7 +74,7 @@
                 }
                 else
                 {
-                    @:user ID <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(supportTaskOneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@supportTaskOneLoginEmail<span class="govuk-visually-hidden">(opens in new tab)</span></a> could not be verified through GOV.UK One Login.
+                    @:user ID <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(supportTaskOneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@supportTaskOneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> could not be verified through GOV.UK One Login.
                 }
             }
             else if (createdTaskType == SupportTaskType.OneLoginUserRecordMatching)
@@ -85,7 +85,7 @@
                 }
                 else
                 {
-                    @:user <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(supportTaskOneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@supportTaskOneLoginEmail<span class="govuk-visually-hidden">(opens in new tab)</span></a> could not be matched to a teaching record.
+                    @:user <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(supportTaskOneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@supportTaskOneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> could not be matched to a teaching record.
                 }
             }
         </p>
@@ -165,11 +165,11 @@
             }
             else if (Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
             {
-                @:User authenticated with GOV.UK One Login @oneLoginEmail and matched to <a href="@personLink" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:User authenticated with GOV.UK One Login @oneLoginEmail and matched to <a href="@personLink" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
             else
             {
-                @:User authenticated with GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden">(opens in new tab)</span></a> and matched to <a href="@personLink" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:User authenticated with GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> and matched to <a href="@personLink" class="govuk-link" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
         </p>
     }

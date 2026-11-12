@@ -22,9 +22,7 @@
     <p class="govuk-body" data-testid="task-assigned-message">
         @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
         {
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">
-                Task<span class="govuk-visually-hidden"> @supportTaskReference (opens in new tab)</span>
-            </a>
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> @supportTaskReference (opens in new tab)</span></a>
         }
         else
         {
@@ -49,7 +47,7 @@
             }
             else
             {
-                <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" target="_blank" data-testid="person-link">@personLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personInfo.PersonId)" target="_blank" data-testid="person-link">@personLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
             }
         }
         @if (oneLoginUserInfo is not null)
@@ -62,9 +60,8 @@
             }
             else
             {
-                <a class="govuk-link" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserInfo.OneLoginUserSubject)" target="_blank" data-testid="one-login-link">@oneLoginUserInfo.EmailAddress <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                <a class="govuk-link" href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginUserInfo.OneLoginUserSubject)" target="_blank" data-testid="one-login-link">@oneLoginUserInfo.EmailAddress<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
             }
-        }
-        <text>.</text>
+        }<text>.</text>
     </p>
 </timeline-entry>
