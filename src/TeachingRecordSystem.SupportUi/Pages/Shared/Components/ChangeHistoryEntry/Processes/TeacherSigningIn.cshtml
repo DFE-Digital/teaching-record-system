@@ -5,21 +5,28 @@
 @model ChangeHistoryEntryViewModel
 @{
     Model.TryGetEvent<OneLoginUserSignedInEvent>(out var oneLoginSignedInEvent);
-    var hasOneLoginUpdatedEvent = Model.TryGetEvent<OneLoginUserUpdatedEvent>(out var oneLoginUpdatedEvent);
+    // Events carry no timestamp, so order the updates by the stage of the sign-in journey they represent:
+    // email/name change, then verification, then match.
+    var oneLoginUpdatedEvents = Model.Events
+        .OfType<OneLoginUserUpdatedEvent>()
+        .OrderBy(e =>
+            (e.Changes & OneLoginUserUpdatedEventChanges.MatchedOn) != 0 ? 2 :
+            (e.Changes & OneLoginUserUpdatedEventChanges.VerifiedOn) != 0 ? 1 : 0)
+        .ToArray();
+    var hasOneLoginUpdatedEvent = oneLoginUpdatedEvents.Length > 0;
     var hasSupportTaskCreatedEvent = Model.TryGetEvent<SupportTaskCreatedEvent>(out var supportTaskCreatedEvent);
     var hasTrnRequestCreatedEvent = Model.TryGetEvent<TrnRequestCreatedEvent>(out _);
     var hasTrnRequestUpdatedEvent = Model.TryGetEvent<TrnRequestUpdatedEvent>(out _);
     var hasTrnRequestEvent = hasTrnRequestCreatedEvent || hasTrnRequestUpdatedEvent;
     var hasAuthorizeAccessRequestCompletedEvent = Model.ContainsEvent<AuthorizeAccessRequestCompletedEvent>();
 
-    var oneLoginUser = hasOneLoginUpdatedEvent ? oneLoginUpdatedEvent!.OneLoginUser : oneLoginSignedInEvent?.OneLoginUser;
+    var oneLoginUser = hasOneLoginUpdatedEvent ? oneLoginUpdatedEvents[^1].OneLoginUser : oneLoginSignedInEvent?.OneLoginUser;
     var oneLoginSubject = oneLoginUser?.Subject;
     var oneLoginEmail = oneLoginUser?.EmailAddress ?? "GOV.UK One Login";
     var personId = oneLoginUser?.PersonId;
     var personInfo = personId is not null ? Model.Context.TryGetPersonInfo(personId.Value) : null;
     var firstPersonMatch = hasAuthorizeAccessRequestCompletedEvent
-                           && hasOneLoginUpdatedEvent
-                           && oneLoginUpdatedEvent!.OldOneLoginUser.PersonId is null
+                           && oneLoginUpdatedEvents.Any(e => e.OldOneLoginUser.PersonId is null)
                            && personInfo is not null;
 
     var title = hasSupportTaskCreatedEvent
@@ -35,22 +42,6 @@
                 ? "TRN request created"
                 : "GOV.UK One Login user attempted to login";
 
-    var oldEmail = hasOneLoginUpdatedEvent ? oneLoginUpdatedEvent!.OldOneLoginUser.EmailAddress : null;
-    var newEmail = hasOneLoginUpdatedEvent ? oneLoginUpdatedEvent!.OneLoginUser.EmailAddress : null;
-    var oldName = hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OldOneLoginUser.VerifiedNames is { Length: > 0 } oldNames
-        ? string.Join(" ", oldNames[0])
-        : null;
-    var newName = hasOneLoginUpdatedEvent && oneLoginUpdatedEvent!.OneLoginUser.VerifiedNames is { Length: > 0 } newNames
-        ? string.Join(" ", newNames[0])
-        : null;
-    var verificationChanged = hasOneLoginUpdatedEvent && (oneLoginUpdatedEvent!.Changes & OneLoginUserUpdatedEventChanges.VerifiedOn) != 0;
-    var matchChanged = hasOneLoginUpdatedEvent && (oneLoginUpdatedEvent!.Changes & OneLoginUserUpdatedEventChanges.MatchedOn) != 0;
-    var routeText = hasOneLoginUpdatedEvent ? oneLoginUpdatedEvent!.OneLoginUser.MatchRoute switch
-    {
-        OneLoginUserMatchRoute.TrnToken => "via magic link",
-        OneLoginUserMatchRoute.TrnRequest => "via TRN request",
-        _ => "via a matching route"
-    } : null;
 
     var supportTaskOneLoginSubject = hasSupportTaskCreatedEvent ? supportTaskCreatedEvent!.SupportTask.OneLoginUserSubject : null;
     var supportTaskOneLoginEmail = supportTaskOneLoginSubject is not null
@@ -102,32 +93,50 @@
 
     @if (hasOneLoginUpdatedEvent)
     {
-        if (!string.IsNullOrEmpty(oldEmail) && !string.IsNullOrEmpty(newEmail) && !string.Equals(oldEmail, newEmail, StringComparison.Ordinal))
+        foreach (var updated in oneLoginUpdatedEvents)
         {
-            <p class="govuk-body" data-testid="one-login-email-changed-message">
-                Email changed from @oldEmail to @newEmail.
-            </p>
-        }
+            var changes = updated.Changes;
 
-        if (!string.IsNullOrEmpty(oldName) && !string.IsNullOrEmpty(newName) && !string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
-        {
-            <p class="govuk-body" data-testid="one-login-name-changed-message">
-                Name changed from @oldName to @newName.
-            </p>
-        }
+            if ((changes & OneLoginUserUpdatedEventChanges.EmailAddress) != 0)
+            {
+                <p class="govuk-body" data-testid="one-login-email-changed-message">
+                    Email changed from @updated.OldOneLoginUser.EmailAddress to @updated.OneLoginUser.EmailAddress.
+                </p>
+            }
 
-        if (verificationChanged)
-        {
-            <p class="govuk-body" data-testid="one-login-verified-message">
-                User verified via GOV.UK One Login.
-            </p>
-        }
+            if ((changes & OneLoginUserUpdatedEventChanges.VerifiedNames) != 0)
+            {
+                var oldName = updated.OldOneLoginUser.VerifiedNames is { Length: > 0 } oldNames ? string.Join(" ", oldNames[0]) : null;
+                var newName = updated.OneLoginUser.VerifiedNames is { Length: > 0 } newNames ? string.Join(" ", newNames[0]) : null;
 
-        if (matchChanged && routeText is not null)
-        {
-            <p class="govuk-body" data-testid="one-login-match-route-message">
-                User matched @routeText.
-            </p>
+                if (oldName is not null && newName is not null)
+                {
+                    <p class="govuk-body" data-testid="one-login-name-changed-message">
+                        Name changed from @oldName to @newName.
+                    </p>
+                }
+            }
+
+            if ((changes & OneLoginUserUpdatedEventChanges.VerifiedOn) != 0)
+            {
+                <p class="govuk-body" data-testid="one-login-verified-message">
+                    User verified via GOV.UK One Login.
+                </p>
+            }
+
+            if ((changes & OneLoginUserUpdatedEventChanges.MatchedOn) != 0)
+            {
+                var routeText = updated.OneLoginUser.MatchRoute switch
+                {
+                    OneLoginUserMatchRoute.TrnToken => "via magic link",
+                    OneLoginUserMatchRoute.TrnRequest => "via TRN request",
+                    _ => "via a matching route"
+                };
+
+                <p class="govuk-body" data-testid="one-login-match-route-message">
+                    User matched @routeText.
+                </p>
+            }
         }
     }
 
