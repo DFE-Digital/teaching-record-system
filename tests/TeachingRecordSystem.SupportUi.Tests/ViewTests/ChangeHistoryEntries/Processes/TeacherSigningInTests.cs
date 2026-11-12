@@ -374,4 +374,118 @@ public class TeacherSigningInTests(HostFixture hostFixture) : ChangeHistoryEntry
         Assert.Null(entry.QuerySelector("[data-testid='trn-request-not-matched-message']"));
         Assert.NotNull(entry.QuerySelector("[data-testid='trn-request-created-message']"));
     }
+
+    [Fact]
+    public async Task MultipleOneLoginUserUpdatedEvents_RendersAllMessagesInJourneyOrder()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("new@example.com"));
+        var baseline = EventModels.OneLoginUser.FromModel(oneLoginUser) with
+        {
+            EmailAddress = "old@example.com",
+            PersonId = null,
+            VerifiedOn = null,
+            VerificationRoute = null,
+            VerifiedNames = null,
+            VerifiedDatesOfBirth = null,
+            MatchedOn = null,
+            MatchRoute = null,
+            MatchedAttributes = null
+        };
+        var afterEmailChange = baseline with { EmailAddress = "new@example.com" };
+        var afterVerification = afterEmailChange with
+        {
+            VerifiedOn = DateTime.UtcNow,
+            VerificationRoute = OneLoginUserVerificationRoute.OneLogin,
+            VerifiedNames = [[person.FirstName, person.LastName]],
+            VerifiedDatesOfBirth = [person.DateOfBirth!.Value]
+        };
+        var afterMatch = afterVerification with
+        {
+            PersonId = person.PersonId,
+            MatchedOn = DateTime.UtcNow,
+            MatchRoute = OneLoginUserMatchRoute.TrnToken
+        };
+
+        // Deliberately supplied out of order
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.TeacherSigningIn,
+            userId: null,
+            events:
+            [
+                new OneLoginUserUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OldOneLoginUser = afterVerification,
+                    OneLoginUser = afterMatch,
+                    Changes = OneLoginUserUpdatedEventChanges.PersonId | OneLoginUserUpdatedEventChanges.MatchedOn | OneLoginUserUpdatedEventChanges.MatchRoute
+                },
+                new OneLoginUserUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OldOneLoginUser = baseline,
+                    OneLoginUser = afterEmailChange,
+                    Changes = OneLoginUserUpdatedEventChanges.EmailAddress
+                },
+                new OneLoginUserUpdatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OldOneLoginUser = afterEmailChange,
+                    OneLoginUser = afterVerification,
+                    Changes = OneLoginUserUpdatedEventChanges.VerifiedOn | OneLoginUserUpdatedEventChanges.VerificationRoute | OneLoginUserUpdatedEventChanges.VerifiedNames | OneLoginUserUpdatedEventChanges.VerifiedDatesOfBirth
+                }
+            ]);
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
+
+        // Assert
+        var emailMessage = entry.QuerySelector("[data-testid='one-login-email-changed-message']");
+        var verifiedMessage = entry.QuerySelector("[data-testid='one-login-verified-message']");
+        var matchMessage = entry.QuerySelector("[data-testid='one-login-match-route-message']");
+        Assert.NotNull(emailMessage);
+        Assert.NotNull(verifiedMessage);
+        Assert.NotNull(matchMessage);
+        Assert.Contains("old@example.com", emailMessage!.TextContent);
+        Assert.Contains("new@example.com", emailMessage.TextContent);
+        Assert.Contains("via magic link", matchMessage!.TextContent);
+
+        var testIds = entry.QuerySelectorAll("[data-testid]").Select(e => e.GetAttribute("data-testid")).ToArray();
+        var emailIndex = Array.IndexOf(testIds, "one-login-email-changed-message");
+        var verifiedIndex = Array.IndexOf(testIds, "one-login-verified-message");
+        var matchIndex = Array.IndexOf(testIds, "one-login-match-route-message");
+        Assert.True(emailIndex < verifiedIndex);
+        Assert.True(verifiedIndex < matchIndex);
+    }
+
+    [Fact]
+    public async Task OneLoginUserUpdatedEvent_NameChange_RendersNameChangedMessage()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
+        var oldUser = EventModels.OneLoginUser.FromModel(oneLoginUser) with { VerifiedNames = [["Old", "Name"]] };
+        var newUser = oldUser with { VerifiedNames = [["New", "Name"]] };
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.TeacherSigningIn,
+            userId: null,
+            events: new OneLoginUserUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                OldOneLoginUser = oldUser,
+                OneLoginUser = newUser,
+                Changes = OneLoginUserUpdatedEventChanges.VerifiedNames
+            });
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId);
+
+        // Assert
+        var message = entry.QuerySelector("[data-testid='one-login-name-changed-message']");
+        Assert.NotNull(message);
+        Assert.Contains("Old Name", message!.TextContent);
+        Assert.Contains("New Name", message.TextContent);
+    }
 }
