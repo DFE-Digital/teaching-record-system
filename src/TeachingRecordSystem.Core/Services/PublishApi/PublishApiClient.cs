@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using Polly;
 
 namespace TeachingRecordSystem.Core.Services.PublishApi;

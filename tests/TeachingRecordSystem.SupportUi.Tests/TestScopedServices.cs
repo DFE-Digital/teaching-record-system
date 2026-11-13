@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -51,8 +52,8 @@ public class TestScopedServices
             .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
             .AddTestScoped(tss => tss.BlobStorageFileServiceMock.Object)
             .AddTestScoped(tss => tss.BlobStorageSafeFileServiceMock.Object)
-            .AddTestScoped(tss => Options.Create(tss.TrnRequestOptions))
-            .AddTestScoped(tss => Options.Create(tss.SupportTaskAssignmentOptions))
+            .AddTestScopedOptions(tss => tss.TrnRequestOptions)
+            .AddTestScopedOptions(tss => tss.SupportTaskAssignmentOptions)
             .AddTestScoped<IBackgroundJobScheduler>(tss => tss.BackgroundJobScheduler)
             .AddTestScoped(tss => tss.CurrentUserProvider)
             .AddTestScoped(tss => tss.Events)
@@ -110,5 +111,22 @@ file static class ServiceCollectionExtensions
         where T : class
     {
         return services.AddTransient(_ => resolveService(TestScopedServices.GetCurrent()));
+    }
+
+    public static IServiceCollection AddTestScopedOptions<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveOptions)
+        where T : class
+    {
+        // ValidateOnStart resolves IOptions<T> when the host starts, before any test has set the current instance,
+        // and its async validation (used by ValidateDataAnnotations) requires the built-in IOptions<T> implementation.
+        // The options are supplied by each test, so the validators for the configured options aren't needed.
+        services.RemoveAll<IValidateOptions<T>>();
+
+        return services.AddSingleton<IOptions<T>>(new ForwardToTestScopedOptions<T>(resolveOptions));
+    }
+
+    private sealed class ForwardToTestScopedOptions<T>(Func<TestScopedServices, T> resolveOptions) : IOptions<T>
+        where T : class
+    {
+        public T Value => resolveOptions(TestScopedServices.GetCurrent());
     }
 }

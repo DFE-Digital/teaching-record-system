@@ -7,14 +7,14 @@
       "commands": [
         "dotnet-ef"
       ],
-      "rollForward": false
+      "rollForward": true
     },
     "dotnet-affected": {
       "version": "7.0.1",
       "commands": [
         "dotnet-affected"
       ],
-      "rollForward": false
+      "rollForward": true
     },
     "powershell": {
       "version": "7.6.7",

@@ -96,7 +96,7 @@ public partial class Commands
                 var matchResult = await trnRequestService.MatchPersonsAsync(request);
 
                 // We only handle PotentialMatches for now
-                if (matchResult.Outcome is not MatchPersonsResultOutcome.PotentialMatches)
+                if (matchResult is not MatchPersonsResult.PotentialMatches)
                 {
                     throw new NotImplementedException();
                 }

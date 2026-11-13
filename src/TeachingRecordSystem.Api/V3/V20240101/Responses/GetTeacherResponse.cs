@@ -42,8 +42,12 @@ public record GetTeacherResponse
         Qts = source.Qts is { } qts ? GetTeacherResponseQts.Create(qts) : null,
         Eyts = source.Eyts is { } eyts ? GetTeacherResponseEyts.Create(eyts) : null,
         Induction = source.DqtInduction.Map(d => d is { } dqtInduction ? GetTeacherResponseInduction.Create(dqtInduction) : null),
-        InitialTeacherTraining = source.InitialTeacherTraining.Map(itt =>
-            itt.AsT0.Select(i => GetTeacherResponseInitialTeacherTraining.Create(i)).AsReadOnly()),
+        InitialTeacherTraining = source.InitialTeacherTraining.Map(itt => itt switch
+        {
+            IReadOnlyCollection<GetPersonResultInitialTeacherTraining> training =>
+                training.Select(i => GetTeacherResponseInitialTeacherTraining.Create(i)).AsReadOnly(),
+            _ => throw new InvalidOperationException("Appropriate body restrictions are not supported by this version.")
+        }),
         NpqQualifications = default,
         MandatoryQualifications = source.MandatoryQualifications.Map(mqs =>
             mqs.Select(mq => GetTeacherResponseMandatoryQualification.Create(mq)).AsReadOnly()),

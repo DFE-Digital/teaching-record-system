@@ -1,4 +1,3 @@
-using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Operations.Common;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -11,9 +10,6 @@ using TrainingAgeSpecialism = TeachingRecordSystem.Core.Models.TrainingAgeSpecia
 using TrainingCountry = TeachingRecordSystem.Core.DataStore.Postgres.Models.Country;
 
 namespace TeachingRecordSystem.Api.V3.Operations;
-
-using IttResult = OneOf<IReadOnlyCollection<GetPersonResultInitialTeacherTraining>, IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>>;
-using RoutesResult = OneOf<IReadOnlyCollection<GetPersonResultRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResultRouteToProfessionalStatusForAppropriateBody>>;
 
 public record GetPersonCommand(
     string Trn,
@@ -59,8 +55,8 @@ public record GetPersonResult
     public required EytsInfo? Eyts { get; init; }
     public required Option<GetPersonResultInduction> Induction { get; init; }
     public required Option<GetPersonResultDqtInduction?> DqtInduction { get; init; }
-    public required Option<IttResult> InitialTeacherTraining { get; init; }
-    public required Option<RoutesResult> RoutesToProfessionalStatuses { get; init; }
+    public required Option<GetPersonResultInitialTeacherTrainings> InitialTeacherTraining { get; init; }
+    public required Option<GetPersonResultRoutesToProfessionalStatuses> RoutesToProfessionalStatuses { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
     public required Option<IReadOnlyCollection<PostgresModels.Alert>> Alerts { get; init; }
@@ -101,6 +97,10 @@ public record GetPersonResultInductionPeriodAppropriateBody
 /// The subset of <see cref="GetPersonResultInitialTeacherTraining"/> that contains only the information
 /// AppropriateBody users are permitted to see.
 /// </summary>
+public union GetPersonResultInitialTeacherTrainings(
+    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>);
+
 public record GetPersonResultInitialTeacherTrainingForAppropriateBody
 {
     public required GetPersonResultInitialTeacherTrainingProvider Provider { get; init; }
@@ -162,6 +162,10 @@ public record GetPersonResultRouteToProfessionalStatus
     public required PostgresModels.DegreeType? DegreeType { get; init; }
     public required GetPersonResultRouteToProfessionalStatusInductionExemption InductionExemption { get; init; }
 }
+
+public union GetPersonResultRoutesToProfessionalStatuses(
+    IReadOnlyCollection<GetPersonResultRouteToProfessionalStatus>,
+    IReadOnlyCollection<GetPersonResultRouteToProfessionalStatusForAppropriateBody>);
 
 public record GetPersonResultRouteToProfessionalStatusForAppropriateBody
 {
@@ -229,12 +233,12 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
         if (person is null)
         {
             var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn, cancellationToken);
-            if (getPersonResult.TryPickT0(out var error, out var resolvedPerson))
-            {
-                return error;
-            }
 
-            return await ExecuteAsync(command with { Trn = resolvedPerson.Trn }, cancellationToken);
+            return getPersonResult switch
+            {
+                ApiError error => error,
+                GetPersonByTrnResult.ResolvedPerson resolvedPerson => await ExecuteAsync(command with { Trn = resolvedPerson.Trn }, cancellationToken)
+            };
         }
 
         // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
@@ -407,31 +411,31 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
         return (dqtInduction, inductionInfo);
     }
 
-    private static IttResult ApplyRoleBasedResponseFilters(
+    private static GetPersonResultInitialTeacherTrainings ApplyRoleBasedResponseFilters(
         IEnumerable<GetPersonResultInitialTeacherTraining> itt,
         bool userIsAppropriateBody) =>
         userIsAppropriateBody
-            ? IttResult.FromT1(itt
+            ? itt
                 .Where(i => i.Provider is not null)
                 .Select(i => new GetPersonResultInitialTeacherTrainingForAppropriateBody()
                 {
                     Provider = new GetPersonResultInitialTeacherTrainingProvider() { Name = i.Provider!.Name, Ukprn = i.Provider.Ukprn }
                 })
-                .AsReadOnly())
-            : IttResult.FromT0(itt.AsReadOnly());
+                .AsReadOnly()
+            : itt.AsReadOnly();
 
-    private static RoutesResult ApplyRoleBasedResponseFilters(
+    private static GetPersonResultRoutesToProfessionalStatuses ApplyRoleBasedResponseFilters(
         IEnumerable<GetPersonResultRouteToProfessionalStatus> routes,
         bool userIsAppropriateBody) =>
         userIsAppropriateBody
-            ? RoutesResult.FromT1(routes
+            ? routes
                 .Where(i => i.TrainingProvider is not null)
                 .Select(i => new GetPersonResultRouteToProfessionalStatusForAppropriateBody()
                 {
                     TrainingProvider = i.TrainingProvider!
                 })
-                .AsReadOnly())
-            : RoutesResult.FromT0(routes.AsReadOnly());
+                .AsReadOnly()
+            : routes.AsReadOnly();
 
     private async Task<IEnumerable<GetPersonResultRouteToProfessionalStatus>> MapRoutesToProfessionalStatusesAsync(
         IEnumerable<PostgresModels.RouteToProfessionalStatus> routes,

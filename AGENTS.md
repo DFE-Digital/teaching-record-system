@@ -26,7 +26,7 @@ Assert.NotNull(exception);
 Assert.IsType<ArgumentException>(exception);
 ```
 
-Assume that dependencies for running tests (a local postgres database, Playwright etc.) are already configured.
+Assume that other test dependencies, such as Playwright, are already installed.
 
 ### Test databases
 
@@ -48,7 +48,6 @@ See [docs/test-databases.md](docs/test-databases.md).
 ### Code Formatting
 
 - Follow the rules defined in the `.editorconfig` file.
-- Follow the existing patterns in the codebase.
 - C# files use 4-space indentation.
 - File-scoped namespaces are required.
 - Prefer braces for all code blocks.
@@ -61,5 +60,3 @@ Before completing any work:
 2. All tests affected by changes must pass using `just test-changed`.
 3. All code changes must be formatted using `just format-changed`.
 4. If there are any changes to emitted events, update docs/process-type-events.md accordingly.
-
-These requirements ensure code quality and consistency across the codebase.
