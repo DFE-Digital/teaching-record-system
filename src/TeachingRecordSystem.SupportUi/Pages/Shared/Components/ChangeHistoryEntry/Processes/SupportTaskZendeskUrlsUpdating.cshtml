@@ -15,11 +15,11 @@
     }
     @foreach (var removedZendeskUrl in removedZendeskUrls)
     {
-        <p class="govuk-body">Zendesk ticket <a href="@removedZendeskUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@removedZendeskUrl <span class="govuk-visually-hidden">(opens in new tab)</span></a> removed</p>
+        <p class="govuk-body">Zendesk ticket <a href="@removedZendeskUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@removedZendeskUrl<span class="govuk-visually-hidden"> (opens in new tab)</span></a> removed</p>
     }
 
     @foreach (var addedZendeskUrl in addedZendeskUrls)
     {
-        <p class="govuk-body">Zendesk ticket <a href="@addedZendeskUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@addedZendeskUrl <span class="govuk-visually-hidden">(opens in new tab)</span></a> added</p>
+        <p class="govuk-body">Zendesk ticket <a href="@addedZendeskUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@addedZendeskUrl<span class="govuk-visually-hidden"> (opens in new tab)</span></a> added</p>
     }
 </timeline-entry>

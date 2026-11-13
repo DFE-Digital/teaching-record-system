@@ -11,9 +11,7 @@
     @if (hasEvent && Model.Context.ContextType == ChangeHistoryContextType.OneLogin)
     {
         <p class="govuk-body" data-testid="task-saved-message">
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskUpdatedEvent!.SupportTaskReference)" data-testid="support-task-link">
-                Task<span class="govuk-visually-hidden"> @supportTaskUpdatedEvent.SupportTaskReference</span>
-            </a>
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskUpdatedEvent!.SupportTaskReference)" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> @supportTaskUpdatedEvent.SupportTaskReference</span></a>
             <text> has been saved.</text>
         </p>
     }
