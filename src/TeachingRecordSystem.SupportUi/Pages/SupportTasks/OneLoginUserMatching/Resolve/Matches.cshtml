@@ -174,7 +174,7 @@
                                     {
                                         <row>
                                             <key>Provider</key>
-                                            <value use-empty-fallback highlight="@(qtsDetails.Provider != Model.QtsProvider)">@qtsDetails.Provider</value>
+                                            <value use-empty-fallback highlight="@(!string.Equals(qtsDetails.Provider, Model.QtsProvider, StringComparison.OrdinalIgnoreCase))">@qtsDetails.Provider</value>
                                         </row>
                                     }
                                     @if (qtsDetails.Subjects.Count > 0)
@@ -184,7 +184,7 @@
                                             <value>
                                                 @if (qtsDetails.Subjects.Count == 1)
                                                 {
-                                                    <span use-empty-fallback highlight="@(qtsDetails.Subjects.Contains(Model.QtsSubject))">@qtsDetails.Subjects.Single()</span>
+                                                    <span use-empty-fallback highlight="@(!string.Equals(qtsDetails.Subjects.Single(), Model.QtsSubject, StringComparison.OrdinalIgnoreCase))">@qtsDetails.Subjects.Single()</span>
                                                 }
                                                 else
                                                 {
@@ -192,7 +192,7 @@
                                                         @foreach (var subject in qtsDetails.Subjects)
                                                         {
                                                             <li>
-                                                                <span highlight="@(subject == Model.QtsSubject)">@subject</span>
+                                                                <span highlight="@(!string.Equals(subject, Model.QtsSubject, StringComparison.OrdinalIgnoreCase))">@subject</span>
                                                             </li>
                                                         }
                                                     </ul>
