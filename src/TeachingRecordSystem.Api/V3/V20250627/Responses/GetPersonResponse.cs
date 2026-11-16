@@ -1,4 +1,3 @@
-using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Operations;
 using TeachingRecordSystem.Api.V3.V20240101;
@@ -28,7 +27,7 @@ public record GetPersonResponse
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
     public required Option<InductionInfo> Induction { get; init; }
-    public required Option<OneOf<IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>>> RoutesToProfessionalStatuses { get; init; }
+    public required Option<GetPersonResponseRoutesToProfessionalStatuses> RoutesToProfessionalStatuses { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
@@ -49,11 +48,13 @@ public record GetPersonResponse
         Qts = source.Qts is { } qts ? QtsInfo.Create(qts) : null,
         Eyts = source.Eyts is { } eyts ? EytsInfo.Create(eyts) : null,
         Induction = source.Induction.Map(i => InductionInfo.Create(i)),
-        RoutesToProfessionalStatuses = source.RoutesToProfessionalStatuses.Map(routes => routes.Match(
-            holds => OneOf<IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>>.FromT0(
-                holds.Select(r => GetPersonResponseRouteToProfessionalStatus.Create(r)).AsReadOnly()),
-            forAppropriateBody => OneOf<IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>>.FromT1(
-                forAppropriateBody.Select(r => GetPersonResponseRouteToProfessionalStatusForAppropriateBody.Create(r)).AsReadOnly()))),
+        RoutesToProfessionalStatuses = source.RoutesToProfessionalStatuses.Map<GetPersonResponseRoutesToProfessionalStatuses>(routes => routes switch
+        {
+            IReadOnlyCollection<GetPersonResultRouteToProfessionalStatus> holds =>
+                holds.Select(r => GetPersonResponseRouteToProfessionalStatus.Create(r)).AsReadOnly(),
+            IReadOnlyCollection<GetPersonResultRouteToProfessionalStatusForAppropriateBody> forAppropriateBody =>
+                forAppropriateBody.Select(r => GetPersonResponseRouteToProfessionalStatusForAppropriateBody.Create(r)).AsReadOnly()
+        }),
         MandatoryQualifications = source.MandatoryQualifications.Map(mqs =>
             mqs.Select(mq => GetPersonResponseMandatoryQualification.Create(mq)).AsReadOnly()),
         Alerts = source.Alerts.Map(alerts => alerts.Select(a => Alert.Create(a)).AsReadOnly()),
@@ -110,6 +111,10 @@ public record GetPersonResponseRouteToProfessionalStatus
         InductionExemption = GetPersonResponseProfessionalStatusInductionExemption.Create(source.InductionExemption)
     };
 }
+
+public union GetPersonResponseRoutesToProfessionalStatuses(
+    IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatus>,
+    IReadOnlyCollection<GetPersonResponseRouteToProfessionalStatusForAppropriateBody>);
 
 public record GetPersonResponseRouteToProfessionalStatusForAppropriateBody
 {

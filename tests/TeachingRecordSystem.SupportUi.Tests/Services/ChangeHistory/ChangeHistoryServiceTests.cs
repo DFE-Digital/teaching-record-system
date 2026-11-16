@@ -539,6 +539,60 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
     }
 
     [Fact]
+    public async Task GetChangeHistoryByOneLoginUserAsync_DeadEndTeacherSigningInProcess_IsIncluded()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.TeacherSigningIn,
+            userId: null,
+            events: new OneLoginUserSignedInEvent
+            {
+                EventId = Guid.NewGuid(),
+                OneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser)
+            });
+
+        // Act
+        var result = await GetChangeHistoryByOneLoginUserAsync(oneLoginUser.Subject, new());
+
+        // Assert
+        var entry = Assert.Single(result);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+    }
+
+    [Fact]
+    public async Task GetChangeHistoryByOneLoginUserAsync_CompletedTeacherSigningInProcess_IsExcluded()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
+
+        await TestData.CreateProcessAsync(
+            ProcessType.TeacherSigningIn,
+            userId: null,
+            events:
+            [
+                new OneLoginUserSignedInEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    OneLoginUser = EventModels.OneLoginUser.FromModel(oneLoginUser)
+                },
+                new AuthorizeAccessRequestCompletedEvent
+                {
+                    EventId = Guid.NewGuid()
+                }
+            ]);
+
+        // Act
+        var result = await GetChangeHistoryByOneLoginUserAsync(oneLoginUser.Subject, new());
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
     public async Task GetChangeHistoryBySupportTaskAsync_SupportTaskHasNoProcesses_ReturnsEmptyCollection()
     {
         // Arrange
@@ -673,6 +727,11 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
     private Task<IReadOnlyCollection<ProcessChangeHistoryEntry>> GetChangeHistoryBySupportTaskAsync(string supportTaskReference) =>
         WithServiceAsync<ChangeHistoryService, IReadOnlyCollection<ProcessChangeHistoryEntry>>(service =>
             service.GetChangeHistoryBySupportTaskAsync(supportTaskReference));
+
+    private Task<ResultPage<ProcessChangeHistoryEntry>> GetChangeHistoryByOneLoginUserAsync(string oneLoginUserSubject, PaginationOptions paginationOptions) =>
+        WithServiceAsync<ChangeHistoryService, ResultPage<ProcessChangeHistoryEntry>>(service =>
+            service.GetChangeHistoryByOneLoginUserAsync(oneLoginUserSubject, paginationOptions));
+
 
     private Task<SupportTask> CreateSupportTaskAsync() =>
         TestData.CreateChangeDateOfBirthRequestSupportTaskAsync();

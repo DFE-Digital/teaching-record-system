@@ -22,7 +22,7 @@ var shards = int.Parse(options.GetValueOrDefault("--shards", "1"));
 var maxProcesses = int.Parse(options.GetValueOrDefault("--processes", "4"));
 
 var projectDirectory = Path.Combine("tests", $"TeachingRecordSystem.{project}");
-var outputDirectory = Path.GetFullPath(Path.Combine(projectDirectory, "bin", configuration, "net10.0"));
+var outputDirectory = Path.GetFullPath(Path.Combine(projectDirectory, "bin", configuration, "net11.0"));
 var testHost = Path.Combine(outputDirectory, $"TeachingRecordSystem.{project}{(OperatingSystem.IsWindows() ? ".exe" : "")}");
 
 var listing = await Cli.Wrap(testHost)

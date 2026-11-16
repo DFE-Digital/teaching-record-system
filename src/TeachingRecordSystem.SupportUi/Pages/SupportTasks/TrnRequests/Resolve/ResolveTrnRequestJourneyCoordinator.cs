@@ -29,11 +29,11 @@ public class ResolveTrnRequestJourneyCoordinator(
         var requestData = supportTask.TrnRequestMetadata!;
 
         var matchResult = await trnRequestService.MatchPersonsAsync(requestData, cancellationToken: cancellationToken);
-        var matchedPersons = matchResult.Outcome switch
+        var matchedPersons = matchResult switch
         {
-            MatchPersonsResultOutcome.DefiniteMatch => [new MatchPersonsResultPerson(matchResult.PersonId, matchResult.MatchedAttributes)],
-            MatchPersonsResultOutcome.PotentialMatches => matchResult.Matches.ToArray(),
-            _ => []
+            MatchPersonsResult.DefiniteMatch definiteMatch => [new MatchPersonsResultPerson(definiteMatch.PersonId, definiteMatch.MatchedAttributes)],
+            MatchPersonsResult.PotentialMatches potentialMatches => potentialMatches.Matches.ToArray(),
+            MatchPersonsResult.NoMatches => []
         };
 
         return supportTask.ResolveJourneySavedState?.GetState<ResolveTrnRequestState>() is { } existingState ?

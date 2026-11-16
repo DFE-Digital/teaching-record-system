@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <LangVersion>14.0</LangVersion>
+    <TargetFramework>net11.0</TargetFramework>
+    <LangVersion>15.0</LangVersion>
     <!-- MSBuildRestoreSessionId is only set during restore; without it NuGet's NU* warnings are never escalated,
          since CI and the Dockerfile restore before switching to the Release configuration. -->
     <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release' or '$(MSBuildRestoreSessionId)' != ''">true</TreatWarningsAsErrors>
@@ -15,6 +15,8 @@
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
     <IsPublishable Condition="'$(IsTestProject)' == 'true'">false</IsPublishable>
     <PublishIISAssets Condition="'$(IsTestProject)' == 'true'">false</PublishIISAssets>
+    <!-- The .NET 11 Hot Reload browser tools assets of referenced web projects have no endpoints in test projects. -->
+    <EnableHotReloadInRuntimeConfigDevFile Condition="'$(IsTestProject)' == 'true'">false</EnableHotReloadInRuntimeConfigDevFile>
 
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>

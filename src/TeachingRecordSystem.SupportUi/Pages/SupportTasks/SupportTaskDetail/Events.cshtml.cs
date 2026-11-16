@@ -37,7 +37,6 @@ public class Events(TrsDbContext dbContext) : PageModel
     }
 
     public record ProcessEventPayload(string ProcessType, IReadOnlyCollection<ProcessEventPayloadEvent> Events, IChangeReasonInfo? ChangeReason, DateTime Timestamp)
-        : EventsModel.IEventEntry
     {
         public string? GetFormattedChangeReasonJsonPayload()
         {
@@ -47,7 +46,7 @@ public class Events(TrsDbContext dbContext) : PageModel
             }
 
             var jsonElement = JsonSerializer.SerializeToElement(ChangeReason, IChangeReasonInfo.SerializerOptions);
-            return JsonSerializer.Serialize(jsonElement, EventsModel.IEventEntry.SerializerOptions);
+            return JsonSerializer.Serialize(jsonElement, EventsModel.SerializerOptions);
         }
     }
 
@@ -56,7 +55,7 @@ public class Events(TrsDbContext dbContext) : PageModel
         public string GetFormattedJsonPayload()
         {
             var jsonElement = JsonSerializer.SerializeToElement(Payload, IEvent.SerializerOptions);
-            return JsonSerializer.Serialize(jsonElement, EventsModel.IEventEntry.SerializerOptions);
+            return JsonSerializer.Serialize(jsonElement, EventsModel.SerializerOptions);
         }
     }
 }

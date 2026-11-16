@@ -66,7 +66,6 @@ public static class Extensions
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new OneOfJsonConverterFactory());
 
                 options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
                 {

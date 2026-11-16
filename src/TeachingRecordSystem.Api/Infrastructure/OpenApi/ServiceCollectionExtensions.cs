@@ -80,8 +80,9 @@ public static class ServiceCollectionExtensions
             }
         });
 
+        // Each decorator wraps the previous one; the union resolver must be innermost so it sees the types the Option resolver unwraps
+        services.Decorate<ISerializerDataContractResolver, UnionSerializerDataContractResolver>();
         services.Decorate<ISerializerDataContractResolver, UnwrapOptionSerializerDataContractResolver>();
-        services.Decorate<ISerializerDataContractResolver, OneOfSerializerDataContractResolver>();
 
         services.AddSingleton<IStartupFilter, OpenApiEndpointsStartupFilter>();
 

@@ -23,6 +23,10 @@ jobs:
 
       - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # Pinned at v4.0.0
 
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
       - name: Get Docker image tag
         id: image_tags
         run: |

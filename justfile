@@ -21,11 +21,11 @@ restore:
 # Install Playwright
 [working-directory: 'tests/TeachingRecordSystem.EndToEndTests']
 install-playwright *ARGS:
-  @pwsh -nop -c bin/Debug/net10.0/playwright.ps1 install
+  @pwsh -nop -c bin/Debug/net11.0/playwright.ps1 install
 
 # Run the trscli
 cli *ARGS:
-  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net10.0" / "trscli.dll"}} {{ARGS}}
+  @dotnet {{"src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net11.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:
@@ -106,7 +106,7 @@ set-tests-secret key value:
 
 [working-directory: 'src/TeachingRecordSystem.Cli']
 create-admin email name:
-  @dotnet {{"bin" / "Debug" / "net10.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
+  @dotnet {{"bin" / "Debug" / "net11.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
 make *ARGS:
   @make {{ARGS}}

@@ -115,12 +115,12 @@ public class ChangeHistoryService(
             ProcessType.SupportTaskAllocating,
             ProcessType.SupportTasksAssigning,
             ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithMerge,
-            ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge
+            ProcessType.TeacherPensionsDuplicateSupportTaskResolvingWithoutMerge,
+            ProcessType.TeacherSigningIn
         };
 
-        var processes = await dbContext.Processes
-            .AsSplitQuery()
-            .Where(p => p.PersonIds.Contains(personId) && processTypesToQuery.Contains(p.ProcessType))
+        var processes = await FilterRelevantTeacherSigningInProcesses(
+                dbContext.Processes.AsSplitQuery().Where(p => p.PersonIds.Contains(personId) && processTypesToQuery.Contains(p.ProcessType)))
             .Include(p => p.User)
             .Include(p => p.Events)
             .OrderByDescending(p => p.CreatedOn)
@@ -137,7 +137,7 @@ public class ChangeHistoryService(
             ProcessType.AlertReactivatingInDqt,
             ProcessType.AlertMigratingFromDqt
         };
-        var filteredProcesses = processes.Where(p =>
+        var alertFilteredProcesses = processes.Where(p =>
         {
             if (!alertProcessTypes.Contains(p.ProcessType))
             {
@@ -163,10 +163,10 @@ public class ChangeHistoryService(
                 || (dqtSanctionCode is not null && dqtSanctionCodesWithReadPermission.Contains(dqtSanctionCode.Value));
         }).ToList();
 
-        var totalItemCount = filteredProcesses.Count;
+        var totalItemCount = alertFilteredProcesses.Count;
         var pageNumber = ResultPage.ResolveCurrentPage(paginationOptions.PageNumber, paginationOptions.PageSize, totalItemCount);
 
-        var pageOfProcesses = filteredProcesses
+        var pageOfProcesses = alertFilteredProcesses
             .Skip((pageNumber - 1) * paginationOptions.PageSize)
             .Take(paginationOptions.PageSize)
             .ToArray();
@@ -185,9 +185,8 @@ public class ChangeHistoryService(
         string supportTaskReference,
         CancellationToken cancellationToken = default)
     {
-        var results = await dbContext.Processes
-            .AsSplitQuery()
-            .Where(p => p.SupportTaskReferences.Contains(supportTaskReference))
+        var results = await FilterRelevantTeacherSigningInProcesses(
+                dbContext.Processes.AsSplitQuery().Where(p => p.SupportTaskReferences.Contains(supportTaskReference)))
             .Include(p => p.User)
             .Include(p => p.Events)
             .OrderByDescending(p => p.CreatedOn)
@@ -211,26 +210,37 @@ public class ChangeHistoryService(
         PaginationOptions paginationOptions,
         CancellationToken cancellationToken = default)
     {
-        var query = dbContext.Processes
-            .AsSplitQuery()
-            .Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject))
+        var query = FilterRelevantTeacherSigningInProcesses(
+                dbContext.Processes.AsSplitQuery().Where(p => p.OneLoginUserSubjects.Contains(oneLoginUserSubject)))
             .Include(p => p.User)
             .Include(p => p.Events)
             .OrderByDescending(p => p.CreatedOn);
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        var allProcesses = await query.ToListAsync(cancellationToken);
 
-        var results = await query
+        var totalCount = allProcesses.Count;
+        var pageNumber = ResultPage.ResolveCurrentPage(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount);
+
+        var pageOfProcesses = allProcesses
+            .Skip((pageNumber - 1) * paginationOptions.PageSize)
+            .Take(paginationOptions.PageSize)
+            .ToArray();
+
+        var results = pageOfProcesses
             .Select(process =>
                 new Result(
                     process,
                     new RaisedByUserInfo { Name = process.User != null ? process.User.Name : process.DqtUserName! }))
-            .GetPageAsync(paginationOptions.PageNumber, paginationOptions.PageSize, totalCount, cancellationToken);
+            .ToArray();
 
-        var contextData = await GetContextDataAsync(results.Select(r => r.Process), cancellationToken);
+        var contextData = await GetContextDataAsync(results.Select(r => r.Process).AsReadOnly(), cancellationToken);
         var context = ChangeHistoryContext.ForOneLoginUser(oneLoginUserSubject, contextData);
 
-        return results.Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context));
+        var items = results
+            .Select(r => new ProcessChangeHistoryEntry(r.Process, r.RaisedByUser, context))
+            .ToArray();
+
+        return new ResultPage<ProcessChangeHistoryEntry>(items, pageNumber, paginationOptions.PageSize, totalCount);
     }
 
     public async Task<ContextData> GetContextDataAsync(IReadOnlyCollection<Process> allResults, CancellationToken cancellationToken = default)
@@ -302,11 +312,26 @@ public class ChangeHistoryService(
             allApplicationUsers);
     }
 
-    private record Result(Process Process, RaisedByUserInfo RaisedByUser);
-
     public record ContextData(
         IReadOnlyDictionary<Guid, ChangeHistoryContext.PersonInfo> AllPersons,
         IReadOnlyDictionary<string, ChangeHistoryContext.OneLoginUserInfo> AllOneLoginUsers,
         IReadOnlyDictionary<Guid, string> AllUserNames,
         IReadOnlyDictionary<Guid, ChangeHistoryContext.ApplicationUserInfo> AllApplicationUsers);
+
+
+    private record Result(Process Process, RaisedByUserInfo RaisedByUser);
+
+
+    private static IQueryable<Process> FilterRelevantTeacherSigningInProcesses(IQueryable<Process> query)
+    {
+        return query.Where(p =>
+            p.ProcessType != ProcessType.TeacherSigningIn ||
+            p.Events!.Any(e =>
+                e.EventName == nameof(OneLoginUserCreatedEvent) ||
+                e.EventName == nameof(OneLoginUserUpdatedEvent) ||
+                e.EventName == nameof(TrnRequestCreatedEvent) ||
+                e.EventName == nameof(SupportTaskCreatedEvent)) ||
+            (p.Events!.Any(e => e.EventName == nameof(OneLoginUserSignedInEvent)) &&
+             !p.Events!.Any(e => e.EventName == nameof(AuthorizeAccessRequestCompletedEvent))));
+    }
 }

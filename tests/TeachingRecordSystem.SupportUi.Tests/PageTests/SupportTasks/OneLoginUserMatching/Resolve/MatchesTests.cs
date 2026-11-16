@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTasks;
 using TeachingRecordSystem.Core.Services.OneLogin;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.OneLoginUserMatching.Resolve;
@@ -119,6 +120,61 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         Assert.Equal(yearQtsReceived, requestDetails.GetSummaryListValueByKey("Year received"));
         Assert.Equal(trainingProvider.Name, requestDetails.GetSummaryListValueByKey("Provider"));
         Assert.Equal(subject.Name, requestDetails.GetSummaryListValueByKey("Subject"));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_MatchingQtsDetails_DoesNotHighlightProviderOrSubject(bool multipleSubjects)
+    {
+        // Arrange
+        var provider = (await ReferenceDataCache.GetTrainingProvidersAsync()).SingleRandom();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(2).ToArray();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .First(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
+                r.RouteToProfessionalStatusTypeId != RouteToProfessionalStatusType.QtlsAndSetMembershipId);
+        var matchedPerson = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(new DateOnly(2024, 1, 1))
+                .WithTrainingProviderId(provider.TrainingProviderId)
+                .WithTrainingSubjectIds(multipleSubjects ? subjects.Select(s => s.TrainingSubjectId).ToArray() : [subjects[0].TrainingSubjectId])));
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: false);
+        var supportTask = await TestData.CreateOneLoginUserRecordMatchingSupportTaskAsync(
+            oneLoginUser.Subject, t => t
+                .WithTrainingProviderId(null)
+                .WithTrainingProviderName(provider.Name.ToLowerInvariant())
+                .WithSubjectId(null)
+                .WithSubjectName(subjects[0].Name.ToLowerInvariant()));
+        var journeyInstance = await CreateJourneyInstanceWithMatchedPersonsAsync(
+            supportTask,
+            state => state.Verified = true,
+            new MatchPersonResult(matchedPerson.PersonId, matchedPerson.Trn, []));
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var matchDetails = doc.GetAllElementsByTestId("match").Single();
+        AssertMatchRowNotHighlighted(matchDetails, "Provider");
+        var subjectValue = matchDetails.GetSummaryListValueElementByKey("Subject");
+        Assert.NotNull(subjectValue);
+        var firstSubject = multipleSubjects ? subjectValue.QuerySelector("li") : subjectValue;
+        Assert.NotNull(firstSubject);
+        Assert.Empty(firstSubject.GetElementsByClassName("hods-highlight"));
+        if (multipleSubjects)
+        {
+            Assert.Single(subjectValue.GetElementsByClassName("hods-highlight"));
+        }
+        else
+        {
+            AssertMatchRowNotHighlighted(matchDetails, "Subject");
+        }
     }
 
     [Theory]

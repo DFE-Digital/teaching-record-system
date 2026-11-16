@@ -1,86 +1,18 @@
 namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
-public sealed record MatchPersonsResult
+public union MatchPersonsResult(MatchPersonsResult.NoMatches, MatchPersonsResult.PotentialMatches, MatchPersonsResult.DefiniteMatch)
 {
-    private readonly Guid _personId;
-    private readonly string? _trn;
-    private readonly PersonMatchedAttribute[] _matchedAttributes;
-    private readonly MatchPersonsResultPerson[] _potentialMatches;
-
-    private MatchPersonsResult(
-        MatchPersonsResultOutcome outcome,
-        Guid personId,
-        string? trn,
-        IEnumerable<PersonMatchedAttribute> matchedAttributes,
-        IEnumerable<MatchPersonsResultPerson> potentialMatches)
+    public MatchPersonsResultOutcome Outcome => this switch
     {
-        Outcome = outcome;
-        _personId = personId;
-        _trn = trn;
-        _matchedAttributes = matchedAttributes.ToArray();
-        _potentialMatches = potentialMatches.ToArray();
-    }
+        NoMatches => MatchPersonsResultOutcome.NoMatches,
+        PotentialMatches => MatchPersonsResultOutcome.PotentialMatches,
+        DefiniteMatch => MatchPersonsResultOutcome.DefiniteMatch,
+        null => throw new InvalidOperationException($"{nameof(MatchPersonsResult)} has no value.")
+    };
 
-    public static MatchPersonsResult NoMatches() =>
-        new(MatchPersonsResultOutcome.NoMatches, Guid.Empty, null, Array.Empty<PersonMatchedAttribute>(), Array.Empty<MatchPersonsResultPerson>());
+    public sealed record NoMatches;
 
-    public static MatchPersonsResult PotentialMatches(IEnumerable<MatchPersonsResultPerson> potentialMatches) =>
-        new(MatchPersonsResultOutcome.PotentialMatches, Guid.Empty, null, Array.Empty<PersonMatchedAttribute>(), potentialMatches);
+    public sealed record PotentialMatches(IReadOnlyCollection<MatchPersonsResultPerson> Matches);
 
-    public static MatchPersonsResult DefiniteMatch(Guid personId, string trn, IEnumerable<PersonMatchedAttribute> matchedAttributes) =>
-        new(MatchPersonsResultOutcome.DefiniteMatch, personId, trn, matchedAttributes, Array.Empty<MatchPersonsResultPerson>());
-
-    public MatchPersonsResultOutcome Outcome { get; }
-
-    public IReadOnlyCollection<MatchPersonsResultPerson> Matches
-    {
-        get
-        {
-            if (Outcome != MatchPersonsResultOutcome.PotentialMatches)
-            {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.PotentialMatches)} outcome has {nameof(Matches)}.");
-            }
-
-            return _potentialMatches;
-        }
-    }
-
-    public Guid PersonId
-    {
-        get
-        {
-            if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
-            {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} outcome has a {nameof(PersonId)}.");
-            }
-
-            return _personId;
-        }
-    }
-
-    public string Trn
-    {
-        get
-        {
-            if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
-            {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has a {nameof(Trn)}.");
-            }
-
-            return _trn!;
-        }
-    }
-
-    public IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes
-    {
-        get
-        {
-            if (Outcome != MatchPersonsResultOutcome.DefiniteMatch)
-            {
-                throw new InvalidOperationException($"Only a {nameof(MatchPersonsResultOutcome.DefiniteMatch)} has {nameof(MatchedAttributes)}.");
-            }
-
-            return _matchedAttributes;
-        }
-    }
+    public sealed record DefiniteMatch(Guid PersonId, string Trn, IReadOnlyCollection<PersonMatchedAttribute> MatchedAttributes);
 }

@@ -274,7 +274,7 @@ jobs:
 
       - name: Install Playwright if required
         if: endsWith(matrix.entry.project, 'EndToEndTests')
-        run: pwsh ./bin/Release/net10.0/playwright.ps1 install chromium
+        run: pwsh ./bin/Release/net11.0/playwright.ps1 install chromium
         working-directory: tests/TeachingRecordSystem.${{ matrix.entry.project }}
         env:
           PROJECT_NAME: ${{ matrix.entry.project }}

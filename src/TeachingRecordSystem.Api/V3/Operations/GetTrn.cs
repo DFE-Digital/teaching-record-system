@@ -10,9 +10,10 @@ public class GetTrnHandler(GetPersonHelper getPersonHelper) : ICommandHandler<Ge
     {
         var getPersonResult = await getPersonHelper.GetPersonByTrnAsync(command.Trn, cancellationToken);
 
-        return getPersonResult.Match<ApiResult<GetTrnResult>>(
-            error => error,
-            _ => new GetTrnResult());
+        return getPersonResult switch
+        {
+            ApiError error => error,
+            GetPersonByTrnResult.ResolvedPerson => new GetTrnResult()
+        };
     }
 }
-

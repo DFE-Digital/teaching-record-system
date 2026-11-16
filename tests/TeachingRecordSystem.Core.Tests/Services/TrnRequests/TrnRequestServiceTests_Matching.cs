@@ -47,7 +47,8 @@ public partial class TrnRequestServiceTests
         var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
         // Assert
-        Assert.Contains(person.PersonId, result.Matches.Select(p => p.PersonId));
+        var potentialMatches = Assert.IsType<MatchPersonsResult.PotentialMatches>(result.Value);
+        Assert.Contains(person.PersonId, potentialMatches.Matches.Select(p => p.PersonId));
     }
 
     [Fact]
@@ -98,8 +99,8 @@ public partial class TrnRequestServiceTests
         var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
         // Assert
-        Assert.Equal(MatchPersonsResultOutcome.DefiniteMatch, result.Outcome);
-        Assert.Equal(person1.PersonId, result.PersonId);
+        var definiteMatch = Assert.IsType<MatchPersonsResult.DefiniteMatch>(result.Value);
+        Assert.Equal(person1.PersonId, definiteMatch.PersonId);
     }
 
     [Fact]
@@ -154,8 +155,8 @@ public partial class TrnRequestServiceTests
         var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
         // Assert
-        Assert.Equal(MatchPersonsResultOutcome.DefiniteMatch, result.Outcome);
-        Assert.Equal(person2.PersonId, result.PersonId);
+        var definiteMatch = Assert.IsType<MatchPersonsResult.DefiniteMatch>(result.Value);
+        Assert.Equal(person2.PersonId, definiteMatch.PersonId);
     }
 
     [Fact]
@@ -205,8 +206,8 @@ public partial class TrnRequestServiceTests
         var result = await WithServiceAsync(s => s.MatchPersonsAsync(requestData));
 
         // Assert
-        Assert.Equal(MatchPersonsResultOutcome.PotentialMatches, result.Outcome);
-        Assert.Equal(person1.PersonId, result.Matches.Single().PersonId);
+        var potentialMatches = Assert.IsType<MatchPersonsResult.PotentialMatches>(result.Value);
+        Assert.Equal(person1.PersonId, potentialMatches.Matches.Single().PersonId);
     }
 
     [Theory]
@@ -336,9 +337,9 @@ public partial class TrnRequestServiceTests
 
         Assert.Equal(expectedOutcome, result.Outcome);
 
-        if (expectedOutcome == MatchPersonsResultOutcome.DefiniteMatch)
+        if (result is MatchPersonsResult.DefiniteMatch definiteMatch)
         {
-            Assert.Equal(person.PersonId, result.PersonId);
+            Assert.Equal(person.PersonId, definiteMatch.PersonId);
         }
     }
 
