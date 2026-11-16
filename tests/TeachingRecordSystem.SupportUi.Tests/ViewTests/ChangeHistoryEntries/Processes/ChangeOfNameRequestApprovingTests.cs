@@ -97,9 +97,9 @@ public class ChangeOfNameRequestApprovingTests(HostFixture hostFixture) : Change
         var supportTaskLink = entry.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
         Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink?.GetAttribute("href"));
-        Assert.Equal("Task", supportTaskLink?.TrimmedText());
+        Assert.Equal("Task (opens in new tab)", supportTaskLink?.TrimmedText());
         Assert.Equal(
-            "Task closed.",
+            "Task (opens in new tab) closed.",
             string.Join(
                 " ",
                 entry.GetElementByTestId("support-task-closed-message")?.TextContent.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries) ?? []));

@@ -127,7 +127,6 @@ public class TeacherSigningInTests(HostFixture hostFixture) : ChangeHistoryEntry
         var supportTaskLink = entry.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
         Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink!.GetAttribute("href"));
-        Assert.Contains(supportTask.SupportTaskReference, supportTaskLink.TextContent, StringComparison.OrdinalIgnoreCase);
     }
 
     [Theory]
@@ -166,7 +165,6 @@ public class TeacherSigningInTests(HostFixture hostFixture) : ChangeHistoryEntry
         {
             Assert.NotNull(supportTaskLink);
             Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink!.GetAttribute("href"));
-            Assert.Contains(supportTask.SupportTaskReference, supportTaskLink.TextContent, StringComparison.OrdinalIgnoreCase);
         }
         else
         {

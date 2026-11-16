@@ -36,12 +36,12 @@ public class ChangeOfDateOfBirthRequestCreatingTests(HostFixture hostFixture) : 
         AssertTitle(entry, "Change of date of birth request submitted");
         var requestedDateOfBirthText = requestedDateOfBirth.ToString(WebConstants.DateDisplayFormat);
         Assert.Equal(
-            $"Change of date of birth request submitted to change to {requestedDateOfBirthText}.",
+            $"Change of date of birth request (opens in new tab) submitted to change to {requestedDateOfBirthText}.",
             entry.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var supportTaskLink = entry.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
-        Assert.Equal("Change of date of birth request", supportTaskLink?.TrimmedText());
+        Assert.Equal("Change of date of birth request (opens in new tab)", supportTaskLink?.TrimmedText());
         Assert.Equal($"/support-tasks/{dbSupportTask.SupportTaskReference}", supportTaskLink?.GetAttribute("href"));
 
         Assert.Null(entry.GetElementByTestId("person-link"));
@@ -85,12 +85,12 @@ public class ChangeOfDateOfBirthRequestCreatingTests(HostFixture hostFixture) : 
         AssertTitle(entry, "Change of date of birth request submitted");
         var requestedDateOfBirthText = requestedDateOfBirth.ToString(WebConstants.DateDisplayFormat);
         Assert.Equal(
-            $"Change of date of birth request submitted to change to {requestedDateOfBirthText} for TRN {person.Trn}.",
+            $"Change of date of birth request submitted to change to {requestedDateOfBirthText} for TRN {person.Trn} (opens in new tab).",
             entry.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var personLink = entry.GetElementByTestId("person-link");
         Assert.NotNull(personLink);
-        Assert.Equal(person.Trn, personLink?.TrimmedText());
+        Assert.Equal($"{person.Trn} (opens in new tab)", personLink?.TrimmedText());
         Assert.Equal($"/persons/{person.PersonId}", personLink?.GetAttribute("href"));
 
         Assert.Null(entry.GetElementByTestId("support-task-link"));

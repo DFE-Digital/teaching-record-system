@@ -73,7 +73,7 @@
     <p class="govuk-body" data-testid="task-closed-message">
         @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
         {
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> @supportTaskReference</span></a>
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
             <text> closed for @oneLoginEmail.</text>
         }
         else
@@ -154,7 +154,7 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
             {
-                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
+                <text><a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@taskTypeDescription<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
             }
             else
             {

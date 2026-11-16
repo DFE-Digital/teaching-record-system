@@ -59,11 +59,11 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
             {
-                @:Task <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="support-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> created as
+                @:<a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> (opens in new tab)</span></a> created as
             }
             else
             {
-                @:Task @createdTaskReference created as
+                @:Task created as
             }
 
             @if (createdTaskType == SupportTaskType.OneLoginUserIdVerification)

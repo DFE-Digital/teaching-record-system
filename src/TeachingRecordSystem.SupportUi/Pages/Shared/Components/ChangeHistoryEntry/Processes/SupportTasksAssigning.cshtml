@@ -33,7 +33,7 @@
         <p class="govuk-body" data-testid="task-assigned-message">
             @if (Model.Context.ContextType != ChangeHistoryContextType.SupportTask)
             {
-                <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> @supportTaskReference (opens in new tab)</span></a>
+                <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
             }
             else
             {

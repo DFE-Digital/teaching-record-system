@@ -207,7 +207,6 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
         var supportTaskCreatedMessage = entry.GetElementByTestId("support-task-created-message");
         Assert.NotNull(supportTaskCreatedMessage);
         Assert.Contains("TRN request support task", supportTaskCreatedMessage!.TextContent);
-        Assert.Contains(createdTrnRequestResult.SupportTask.SupportTaskReference, supportTaskCreatedMessage.TextContent);
     }
 
     [Fact]
@@ -228,7 +227,6 @@ public class OneLoginUserRecordMatchingSupportTaskCompletingTests(HostFixture ho
         var supportTaskCreatedMessage = entry.GetElementByTestId("support-task-created-message");
         Assert.NotNull(supportTaskCreatedMessage);
         Assert.Contains("TRN request manual checks needed support task", supportTaskCreatedMessage!.TextContent);
-        Assert.Contains(createdSupportTask.SupportTaskReference, supportTaskCreatedMessage.TextContent);
     }
 
     [Fact]

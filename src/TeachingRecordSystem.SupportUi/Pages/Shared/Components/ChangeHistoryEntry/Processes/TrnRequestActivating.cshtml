@@ -58,11 +58,11 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (!isSupportTaskContext)
             {
-                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
+                <text><a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@taskTypeDescription<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
             }
             else
             {
-                <text>@taskTypeDescription @createdTaskReference was created.</text>
+                <text>@taskTypeDescription was created.</text>
             }
         </p>
     }

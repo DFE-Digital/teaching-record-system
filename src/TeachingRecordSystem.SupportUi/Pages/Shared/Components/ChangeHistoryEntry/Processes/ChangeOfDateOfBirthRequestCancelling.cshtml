@@ -16,7 +16,7 @@
     @if (Model.Context.ContextType is ChangeHistoryContextType.Person)
     {
         <p class="govuk-body" data-testid="support-task-closed-message">
-            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Task</a>
+            <a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">Task<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
             <text> closed.</text>
         </p>
     }
