@@ -20,7 +20,7 @@
     <p class="govuk-body">
         @if (otherPersonInfo is not null)
         {
-            <text>Record merged with TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(otherPersonInfo.PersonId)" class="govuk-link" target="_blank" data-testid="merged-with-person-link">@otherPersonInfo.Trn <span class="govuk-visually-hidden">(opens in new tab)</span></a>@(thisRecordWasDeactivated ? " and deactivated" : "")</text>
+            <text>Record merged with TRN <a href="@LinkGenerator.Persons.PersonDetail.Index(otherPersonInfo.PersonId)" class="govuk-link" target="_blank" data-testid="merged-with-person-link">@otherPersonInfo.Trn<span class="govuk-visually-hidden"> (opens in new tab)</span></a>@(thisRecordWasDeactivated ? " and deactivated" : "")</text>
         }
         else
         {

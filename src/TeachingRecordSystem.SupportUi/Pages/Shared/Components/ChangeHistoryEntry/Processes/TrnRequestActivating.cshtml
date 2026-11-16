@@ -33,7 +33,7 @@
             }
             else if (!isPersonContext)
             {
-                @:Dormant TRN request was activated and matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId!.Value)" class="govuk-link" target="_blank" data-testid="matched-person-link">@(matchedPersonLinkText ?? "a record") <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:Dormant TRN request was activated and matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(matchedPersonId!.Value)" class="govuk-link" target="_blank" data-testid="matched-person-link">@(matchedPersonLinkText ?? "a record")<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
             else
             {
@@ -58,7 +58,7 @@
         <p class="govuk-body" data-testid="support-task-created-message">
             @if (!isSupportTaskContext)
             {
-                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference <span class="govuk-visually-hidden">(opens in new tab)</span></a> was created.</text>
+                <text>@taskTypeDescription <a href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(createdTaskReference)" class="govuk-link" target="_blank" data-testid="created-task-link">@createdTaskReference<span class="govuk-visually-hidden"> (opens in new tab)</span></a> was created.</text>
             }
             else
             {
@@ -74,15 +74,15 @@
         <p class="govuk-body" data-testid="one-login-matched-message">
             @if (isSupportTaskContext)
             {
-                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUpdatedEvent.OneLoginUser.PersonId.Value)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUpdatedEvent.OneLoginUser.PersonId.Value)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
             else if (isPersonContext)
             {
-                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail <span class="govuk-visually-hidden">(opens in new tab)</span></a> matched to a record.
+                @:GOV.UK One Login <a href="@LinkGenerator.OneLogins.OneLoginDetail.Index(oneLoginSubject!)" class="govuk-link" target="_blank" data-testid="one-login-link">@oneLoginEmail<span class="govuk-visually-hidden"> (opens in new tab)</span></a> matched to a record.
             }
             else if (isOneLoginContext)
             {
-                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUpdatedEvent.OneLoginUser.PersonId.Value)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText <span class="govuk-visually-hidden">(opens in new tab)</span></a>.
+                @:GOV.UK One Login @oneLoginEmail matched to <a href="@LinkGenerator.Persons.PersonDetail.Index(oneLoginUpdatedEvent.OneLoginUser.PersonId.Value)" class="govuk-link" target="_blank" data-testid="person-link">@matchedPersonLinkText<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
             }
         </p>
     }
