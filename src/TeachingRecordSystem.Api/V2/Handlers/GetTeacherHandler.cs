@@ -1,15 +1,13 @@
 #nullable disable
-using MediatR;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
-public class GetTeacherHandler(TrsDbContext dbContext) :
-    IRequestHandler<GetTeacherRequest, GetTeacherResponse>
+public class GetTeacherHandler(TrsDbContext dbContext)
 {
-    public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
+    public async Task<GetTeacherResponse> HandleAsync(GetTeacherRequest request, CancellationToken cancellationToken)
     {
         var person = await dbContext.Persons
             .AsSplitQuery()

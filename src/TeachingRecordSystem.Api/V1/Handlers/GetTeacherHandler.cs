@@ -1,14 +1,13 @@
 #nullable disable
-using MediatR;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V1.Handlers;
 
-public class GetTeacherHandler(TrsDbContext dbContext) : IRequestHandler<GetTeacherRequest, GetTeacherResponse>
+public class GetTeacherHandler(TrsDbContext dbContext)
 {
-    public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
+    public async Task<GetTeacherResponse> HandleAsync(GetTeacherRequest request, CancellationToken cancellationToken)
     {
         if (request.BirthDate is null)
         {
