@@ -40,12 +40,12 @@ public class ChangeOfNameRequestCreatingTests(HostFixture hostFixture) : ChangeH
         AssertTitle(entry, "Change of name request submitted");
         var requestedName = string.JoinNonEmpty(' ', requestedFirstName, requestedMiddleName, requestedLastName);
         Assert.Equal(
-            $"Change of name request submitted to change to {requestedName}.",
+            $"Change of name request (opens in new tab) submitted to change to {requestedName}.",
             entry.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var supportTaskLink = entry.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
-        Assert.Equal("Change of name request", supportTaskLink?.TrimmedText());
+        Assert.Equal("Change of name request (opens in new tab)", supportTaskLink?.TrimmedText());
         Assert.Equal($"/support-tasks/{dbSupportTask.SupportTaskReference}", supportTaskLink?.GetAttribute("href"));
 
         Assert.Null(entry.GetElementByTestId("person-link"));
@@ -93,12 +93,12 @@ public class ChangeOfNameRequestCreatingTests(HostFixture hostFixture) : ChangeH
         AssertTitle(entry, "Change of name request submitted");
         var requestedName = string.JoinNonEmpty(' ', requestedFirstName, requestedMiddleName, requestedLastName);
         Assert.Equal(
-            $"Change of name request submitted to change to {requestedName} for TRN {person.Trn}.",
+            $"Change of name request submitted to change to {requestedName} for TRN {person.Trn} (opens in new tab).",
             entry.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var personLink = entry.GetElementByTestId("person-link");
         Assert.NotNull(personLink);
-        Assert.Equal(person.Trn, personLink?.TrimmedText());
+        Assert.Equal($"{person.Trn} (opens in new tab)", personLink?.TrimmedText());
         Assert.Equal($"/persons/{person.PersonId}", personLink?.GetAttribute("href"));
 
         Assert.Null(entry.GetElementByTestId("support-task-link"));

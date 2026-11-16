@@ -53,6 +53,6 @@ public class ChangeOfNameRequestRejectingTests(HostFixture hostFixture) : Change
         var supportTaskLink = entry.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
         Assert.Equal($"/support-tasks/{supportTask.SupportTaskReference}", supportTaskLink?.GetAttribute("href"));
-        Assert.Equal("Task", supportTaskLink?.TrimmedText());
+        Assert.Equal("Task (opens in new tab)", supportTaskLink?.TrimmedText());
     }
 }

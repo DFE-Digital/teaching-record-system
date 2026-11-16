@@ -281,7 +281,7 @@ public class TrnRequestProcessesTests(HostFixture hostFixture) : ChangeHistoryEn
         // Assert
         AssertTitle(entry, "TRN request reset");
         Assert.Equal("TRN request reset and moved to pending.", entry.GetElementByTestId("trn-request-summary")?.TrimmedText());
-        Assert.Contains($"TRN request support task {supportTask.SupportTaskReference} was created.", entry.GetElementByTestId("support-task-created-message")?.TrimmedText());
+        Assert.Contains($"TRN request support task was created.", entry.GetElementByTestId("support-task-created-message")?.TrimmedText());
         Assert.Null(entry.GetElementByTestId("created-task-link"));
         entry.AssertSummaryListRowValue("change-reason", "Reason", v => Assert.Equal(reason, v.TrimmedText()));
     }

@@ -20,11 +20,11 @@
             var personId = supportTaskCreatedEvent.SupportTask.PersonId!.Value;
             var trn = Model.Context.GetPersonInfo(personId).Trn;
 
-            @:Change of name request submitted to change to <strong>@requestedName</strong> for TRN <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personId)" data-testid="person-link">@trn</a>.
+            @:Change of name request submitted to change to <strong>@requestedName</strong> for TRN <a class="govuk-link" href="@LinkGenerator.Persons.PersonDetail.Index(personId)" target="_blank" data-testid="person-link">@trn<span class="govuk-visually-hidden"> (opens in new tab)</span></a>.
         }
         else
         {
-            @:<a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" data-testid="support-task-link">Change of name request</a> submitted to change to <strong>@requestedName</strong>.
+            @:<a class="govuk-link" href="@LinkGenerator.SupportTasks.SupportTaskDetail.Index(supportTaskReference)" target="_blank" data-testid="support-task-link">Change of name request<span class="govuk-visually-hidden"> (opens in new tab)</span></a> submitted to change to <strong>@requestedName</strong>.
         }
     </p>
 

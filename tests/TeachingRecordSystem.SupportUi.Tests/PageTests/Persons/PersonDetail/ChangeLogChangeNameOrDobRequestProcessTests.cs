@@ -46,7 +46,7 @@ public class ChangeLogChangeNameOrDobRequestProcessTests(HostFixture hostFixture
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
-        Assert.Equal($"Change of name request submitted to change to {requestedName}.", item.GetElementByTestId("change-request-context")?.TrimmedText());
+        Assert.Equal($"Change of name request (opens in new tab) submitted to change to {requestedName}.", item.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var supportTaskLink = item.GetElementByTestId("support-task-link");
         Assert.NotNull(supportTaskLink);
@@ -307,7 +307,7 @@ public class ChangeLogChangeNameOrDobRequestProcessTests(HostFixture hostFixture
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
         Assert.Equal(
-            $"Change of date of birth request submitted to change to {newDateOfBirth.ToString(WebConstants.DateDisplayFormat)}.",
+            $"Change of date of birth request (opens in new tab) submitted to change to {newDateOfBirth.ToString(WebConstants.DateDisplayFormat)}.",
             item.GetElementByTestId("change-request-context")?.TrimmedText());
 
         var supportTaskLink = item.GetElementByTestId("support-task-link");

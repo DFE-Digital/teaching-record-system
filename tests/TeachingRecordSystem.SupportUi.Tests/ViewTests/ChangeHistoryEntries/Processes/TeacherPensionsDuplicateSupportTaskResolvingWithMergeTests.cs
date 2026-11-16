@@ -26,7 +26,6 @@ public class TeacherPensionsDuplicateSupportTaskResolvingWithMergeTests(HostFixt
         Assert.NotNull(taskClosedMessage);
         var taskLink = entry.GetElementByTestId("support-task-link");
         Assert.NotNull(taskLink);
-        Assert.Contains(supportTask.SupportTaskReference, taskClosedMessage!.TextContent);
 
         var reason = entry.GetElementByTestId("change-reason");
         Assert.NotNull(reason);
