@@ -150,6 +150,13 @@ variable "pg_airbyte_enabled" { default = false }
 
 variable "airbyte_enabled" { default = false }
 
+# wal_threshold is read by the database-replication-monitor workflow, not by terraform
+variable "wal_threshold" {
+  type        = number
+  default     = null
+  description = "WAL size in bytes above which the monitor workflow drops the Airbyte replication slot"
+}
+
 variable "airbyte_connection_status" {
   type        = string
   default     = "inactive"
