@@ -2,8 +2,9 @@
 @using TeachingRecordSystem.SupportUi.Services.ChangeHistory
 @model ChangeHistoryEntryViewModel
 @{
-    var trnRequestCreatedEvent = Model.GetEvent<TrnRequestCreatedEvent>();
-    var trnRequest = trnRequestCreatedEvent.TrnRequest;
+    // Processes back-filled from legacy events hold only a SupportTaskCreatedEvent, so this event may be absent.
+    Model.TryGetEvent<TrnRequestCreatedEvent>(out var trnRequestCreatedEvent);
+    var trnRequest = trnRequestCreatedEvent?.TrnRequest;
 
     var hasPersonCreatedEvent = Model.TryGetEvent<PersonCreatedEvent>(out var personCreatedEvent);
     var hasSupportTaskCreatedEvent = Model.TryGetEvent<SupportTaskCreatedEvent>(out var supportTaskCreatedEvent);
@@ -15,7 +16,7 @@
 
     var matchedPersonId = hasPersonCreatedEvent
         ? personCreatedEvent!.PersonId
-        : trnRequest.ResolvedPersonId ?? oneLoginUpdatedEvent?.OneLoginUser.PersonId ?? supportTaskCreatedEvent?.SupportTask.PersonId;
+        : trnRequest?.ResolvedPersonId ?? oneLoginUpdatedEvent?.OneLoginUser.PersonId ?? supportTaskCreatedEvent?.SupportTask.PersonId;
     var matchedPersonInfo = matchedPersonId is not null ? Model.Context.TryGetPersonInfo(matchedPersonId.Value) : null;
     var matchedPersonLinkText = matchedPersonInfo is not null ? $"{matchedPersonInfo.FirstName} {matchedPersonInfo.LastName}" : null;
 
