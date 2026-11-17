@@ -166,6 +166,13 @@ Employment records changed before the extract processor moved onto processes wer
 `TpsEmploymentCreatedEvent`s and `TpsEmploymentUpdatedEvent`s by
 [`BackfillTpsEmploymentProcessesJob`](../src/TeachingRecordSystem.Core/Jobs/BackfillTpsEmploymentProcessesJob.cs).
 
+### `PersonImportingFromEwcWales` (108)
+CLI `person import-ewc-wales` command; one process wraps the import of a whole CSV file.
+
+| Event | Emitted | Scenario |
+| --- | --- | --- |
+| `PersonCreatedEvent` | Always | One per imported person. |
+
 ---
 
 ## TRN requests

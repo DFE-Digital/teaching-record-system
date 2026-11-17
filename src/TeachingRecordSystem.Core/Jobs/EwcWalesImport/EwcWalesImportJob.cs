@@ -8,8 +8,8 @@ namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, InductionImporter inductionImporter, QtsImporter qtsImporter, ILogger<EwcWalesImportJob> logger)
 {
     private const string ProcessedFolder = "ewc/processed";
-    private const string PickupFolder = "pickup";
-    private const string StorageContainer = "ewc-integrations";
+    public const string PickupFolder = "pickup";
+    public const string StorageContainer = "ewc-integrations";
     public const string JobSchedule = "0 8 * * *";
     public const string ArchivedContainer = "archived-integration-transactions";
 

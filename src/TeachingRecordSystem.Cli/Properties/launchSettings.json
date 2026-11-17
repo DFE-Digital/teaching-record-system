@@ -23,6 +23,14 @@
     "app-content import": {
       "commandName": "Project",
       "commandLineArgs": "app-content import --user-id 0f18f1ec-a102-4023-843f-1cadef3e6e14 --file app-content.json"
+    },
+    "files download-ewc-wales": {
+      "commandName": "Project",
+      "commandLineArgs": "files download-ewc-wales --output-directory . --file ewc-trns.csv"
+    },
+    "person import-ewc-wales": {
+      "commandName": "Project",
+      "commandLineArgs": "person import-ewc-wales --file ewc-trns.csv"
     }
   }
 }
