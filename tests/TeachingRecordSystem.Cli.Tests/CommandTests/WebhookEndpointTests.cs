@@ -121,13 +121,13 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
     }
 
     [Fact]
-    public async Task Ping_QueuesPingMessageForDelivery()
+    public async Task Ping_WithNoWait_QueuesPingMessageForDelivery()
     {
         // Arrange
         var endpoint = await CreateWebhookEndpointAsync();
 
         var command = GetSubcommand("ping");
-        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId}");
+        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId} --no-wait");
 
         // Act
         var result = await parseResult.InvokeAsync();
@@ -147,10 +147,78 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
         Assert.Empty(message.DeliveryErrors);
     }
 
+    [Fact]
+    public async Task Ping_FirstDeliveryAttemptSucceeds_ReturnsZero()
+    {
+        // Arrange
+        var endpoint = await CreateWebhookEndpointAsync();
+
+        var command = GetSubcommand("ping");
+        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId} --timeout 30");
+
+        // Act
+        var invokeTask = parseResult.InvokeAsync();
+        await SimulateDeliveryAttemptAsync(endpoint.WebhookEndpointId, error: null);
+        var result = await invokeTask;
+
+        // Assert
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public async Task Ping_FirstDeliveryAttemptFails_ReturnsNonZero()
+    {
+        // Arrange
+        var endpoint = await CreateWebhookEndpointAsync();
+
+        var command = GetSubcommand("ping");
+        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId} --timeout 30");
+
+        // Act
+        var invokeTask = parseResult.InvokeAsync();
+        await SimulateDeliveryAttemptAsync(endpoint.WebhookEndpointId, error: "Endpoint returned 500.");
+        var result = await invokeTask;
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public async Task Ping_NoDeliveryAttemptBeforeTimeout_ReturnsNonZero()
+    {
+        // Arrange
+        var endpoint = await CreateWebhookEndpointAsync();
+
+        var command = GetSubcommand("ping");
+        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId} --timeout 1");
+
+        // Act
+        var result = await parseResult.InvokeAsync();
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public async Task Ping_EndpointDisabled_ReturnsNonZeroWithoutWaiting()
+    {
+        // Arrange
+        var endpoint = await CreateWebhookEndpointAsync(enabled: false);
+
+        var command = GetSubcommand("ping");
+        var parseResult = command.Parse($"--id {endpoint.WebhookEndpointId}");
+
+        // Act
+        var result = await parseResult.InvokeAsync();
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
     private Command GetSubcommand(string name) =>
         Commands.CreateWebhookEndpointCommand(Configuration).Subcommands.Single(c => c.Name == name);
 
-    private async Task<WebhookEndpoint> CreateWebhookEndpointAsync()
+    private async Task<WebhookEndpoint> CreateWebhookEndpointAsync(bool enabled = true)
     {
         var applicationUser = await TestData.CreateApplicationUserAsync();
         var now = DateTime.UtcNow;
@@ -162,7 +230,7 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
             Address = $"https://webhooks.example.com/{Guid.NewGuid()}",
             ApiVersion = "20240920",
             CloudEventTypes = ["Alert.Created"],
-            Enabled = true,
+            Enabled = enabled,
             CreatedOn = now,
             UpdatedOn = now
         };
@@ -174,6 +242,38 @@ public class WebhookEndpointTests(IServiceProvider services) : CommandTestBase(s
         });
 
         return endpoint;
+    }
+
+    // Waits for the ping command to queue its message then records a delivery attempt against it,
+    // standing in for WebhookDeliveryService.
+    private async Task SimulateDeliveryAttemptAsync(Guid webhookEndpointId, string? error)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+        await WithDbContextAsync(async dbContext =>
+        {
+            WebhookMessage? message;
+            while ((message = await dbContext.WebhookMessages.SingleOrDefaultAsync(m => m.WebhookEndpointId == webhookEndpointId, cts.Token)) is null)
+            {
+                await Task.Delay(100, cts.Token);
+            }
+
+            var now = DateTime.UtcNow;
+            message.DeliveryAttempts.Add(now);
+
+            if (error is null)
+            {
+                message.Delivered = now;
+                message.NextDeliveryAttempt = null;
+            }
+            else
+            {
+                message.DeliveryErrors.Add(error);
+                message.NextDeliveryAttempt = now.AddSeconds(5);
+            }
+
+            await dbContext.SaveChangesAsync(cts.Token);
+        });
     }
 
     // Finds the single process event raised for the given endpoint, along with the process it belongs to.

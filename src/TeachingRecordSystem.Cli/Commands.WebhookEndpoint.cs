@@ -12,6 +12,8 @@ namespace TeachingRecordSystem.Cli;
 
 public partial class Commands
 {
+    private static readonly TimeSpan _pingPollInterval = TimeSpan.FromMilliseconds(500);
+
     public static Command CreateWebhookEndpointCommand(IConfiguration configuration)
     {
         var jsonSerializerOptions = new JsonSerializerOptions { WriteIndented = true };
@@ -383,7 +385,26 @@ public partial class Commands
         Command CreatePingCommand()
         {
             var webhookEndpointIdOption = new Option<Guid>("--webhook-endpoint-id", "--id") { Required = true };
+            var noWaitOption = new Option<bool>("--no-wait")
+            {
+                Required = false,
+                Description = "Exit as soon as the ping message is queued instead of waiting for the first delivery attempt."
+            };
+            var timeoutOption = new Option<int>("--timeout")
+            {
+                Required = false,
+                Description = "The maximum number of seconds to wait for the first delivery attempt.",
+                DefaultValueFactory = _ => 120
+            };
             var connectionStringOption = new Option<string>("--connection-string") { Required = true };
+
+            timeoutOption.Validators.Add(result =>
+            {
+                if (result.GetValueOrDefault<int>() <= 0)
+                {
+                    result.AddError("--timeout must be greater than zero.");
+                }
+            });
 
             var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (configuredConnectionString is not null)
@@ -393,16 +414,20 @@ public partial class Commands
 
             var command = new Command(
                 "ping",
-                "Queues a ping message to be sent to a webhook endpoint, allowing integrators to test their signature verification without triggering a 'real' event. The message is delivered by the webhook delivery background service.")
+                "Queues a ping message to be sent to a webhook endpoint, allowing integrators to test their signature verification without triggering a 'real' event. The message is delivered by the webhook delivery background service; by default this command waits for the first delivery attempt and reports its outcome.")
             {
                 webhookEndpointIdOption,
+                noWaitOption,
+                timeoutOption,
                 connectionStringOption
             };
 
             command.SetAction(
-                async parseResult =>
+                async (parseResult, cancellationToken) =>
                 {
                     var webhookEndpointId = parseResult.GetRequiredValue(webhookEndpointIdOption);
+                    var noWait = parseResult.GetValue(noWaitOption);
+                    var timeout = TimeSpan.FromSeconds(parseResult.GetValue(timeoutOption));
                     var connectionString = parseResult.GetRequiredValue(connectionStringOption);
 
                     await using var services = new ServiceCollection()
@@ -416,8 +441,73 @@ public partial class Commands
                     var webhookMessageFactory = scope.ServiceProvider.GetRequiredService<WebhookMessageFactory>();
 
                     var message = await webhookMessageFactory.CreatePingMessageAsync(webhookEndpointId);
+                    var endpoint = message.WebhookEndpoint!;
 
                     Console.WriteLine($"Ping message '{message.WebhookMessageId}' was queued for delivery to endpoint '{webhookEndpointId}'.");
+
+                    if (!endpoint.Enabled)
+                    {
+                        Console.Error.WriteLine("Endpoint is disabled; the message will not be delivered until it is enabled.");
+                        return noWait ? 0 : 1;
+                    }
+
+                    if (noWait)
+                    {
+                        return 0;
+                    }
+
+                    using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    timeoutCts.CancelAfter(timeout);
+
+                    var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+                    WebhookMessage? attemptedMessage = null;
+
+                    await using (ConsoleSpinner.Start($"Waiting for first delivery attempt to {endpoint.Address}"))
+                    {
+                        try
+                        {
+                            while (true)
+                            {
+                                var current = await dbContext.WebhookMessages
+                                    .AsNoTracking()
+                                    .SingleAsync(m => m.WebhookMessageId == message.WebhookMessageId, timeoutCts.Token);
+
+                                if (current.DeliveryAttempts.Count > 0)
+                                {
+                                    attemptedMessage = current;
+                                    break;
+                                }
+
+                                await Task.Delay(_pingPollInterval, timeoutCts.Token);
+                            }
+                        }
+                        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                        {
+                        }
+                    }
+
+                    if (attemptedMessage is null)
+                    {
+                        Console.Error.WriteLine(
+                            $"✗ Timed out after {timeout.TotalSeconds:N0}s waiting for a delivery attempt. Is the webhook delivery service running? " +
+                            "The message remains queued and may still be delivered.");
+                        return 1;
+                    }
+
+                    if (attemptedMessage.Delivered is not null)
+                    {
+                        Console.WriteLine($"✓ Ping delivered successfully to {endpoint.Address}.");
+                        return 0;
+                    }
+
+                    Console.Error.WriteLine($"✗ Delivery to {endpoint.Address} failed: {attemptedMessage.DeliveryErrors.LastOrDefault() ?? "Unknown error"}");
+
+                    if (attemptedMessage.NextDeliveryAttempt is { } nextDeliveryAttempt)
+                    {
+                        Console.Error.WriteLine($"  The next delivery attempt is scheduled for {nextDeliveryAttempt:u}.");
+                    }
+
+                    return 1;
                 });
 
             return command;
