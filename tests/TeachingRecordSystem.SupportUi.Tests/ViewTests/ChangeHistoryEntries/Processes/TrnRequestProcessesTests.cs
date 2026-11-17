@@ -85,6 +85,34 @@ public class TrnRequestProcessesTests(HostFixture hostFixture) : ChangeHistoryEn
     }
 
     [Fact]
+    public async Task BackfilledTrnRequestCreatingProcessWithOnlySupportTaskCreatedEvent_Renders()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync();
+        var (supportTask, _, _) = await TestData.CreateTrnRequestSupportTaskAsync();
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.TrnRequestCreating,
+            user.UserId,
+            changeReason: null,
+            new SupportTaskCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                SupportTask = EventModels.SupportTask.FromModel(supportTask)
+            });
+
+        // Act
+        var entry = await GetEntryHtmlAsync(
+            process.ProcessId,
+            contextType: "supportTask",
+            supportTaskReference: supportTask.SupportTaskReference);
+
+        // Assert
+        AssertTitle(entry, "TRN request received");
+        Assert.Contains("TRN request support task", entry.GetElementByTestId("support-task-created-message")?.TextContent);
+    }
+
+    [Fact]
     public async Task TrnRequestCreatingProcessInSupportTaskContextWithResolvedPerson_RendersPersonLink()
     {
         // Arrange
