@@ -36,7 +36,7 @@ public sealed class ConsoleSpinner : IAsyncDisposable
     {
         if (Console.IsErrorRedirected)
         {
-            await Console.Error.WriteLineAsync(_message);
+            Console.Error.WriteLine(_message);
             return;
         }
 
@@ -50,7 +50,7 @@ public sealed class ConsoleSpinner : IAsyncDisposable
             do
             {
                 var line = $"{_frames[frame++ % _frames.Length]} {_message} ({(int)stopwatch.Elapsed.TotalSeconds}s)";
-                await Console.Error.WriteAsync($"\r{line.PadRight(lastLineLength)}");
+                Console.Error.Write($"\r{line.PadRight(lastLineLength)}");
                 lastLineLength = line.Length;
             }
             while (await timer.WaitForNextTickAsync(cancellationToken));
@@ -59,6 +59,6 @@ public sealed class ConsoleSpinner : IAsyncDisposable
         {
         }
 
-        await Console.Error.WriteAsync($"\r{new string(' ', lastLineLength)}\r");
+        Console.Error.Write($"\r{new string(' ', lastLineLength)}\r");
     }
 }
