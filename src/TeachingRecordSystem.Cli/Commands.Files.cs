@@ -12,8 +12,71 @@ public partial class Commands
     {
         return new Command("files", "Commands for working with files.")
         {
-            CreateDownloadEwcWalesCommand()
+            CreateDownloadEwcWalesCommand(),
+            CreateArchiveEwcWalesCommand()
         };
+
+        Command CreateArchiveEwcWalesCommand()
+        {
+            var fileOption = new Option<string>("--file")
+            {
+                Required = true,
+                Description = "Name of the file in the pickup folder to archive."
+            };
+            var accountNameOption = new Option<string>("--storage-account-name") { Required = true };
+            var accessKeyOption = new Option<string>("--storage-access-key") { Required = true };
+
+            var configuredAccountName = configuration.GetValue<string>("SftpStorageName");
+            if (!string.IsNullOrEmpty(configuredAccountName))
+            {
+                accountNameOption.DefaultValueFactory = _ => configuredAccountName;
+            }
+
+            var configuredAccessKey = configuration.GetValue<string>("SftpStorageAccessKey");
+            if (!string.IsNullOrEmpty(configuredAccessKey))
+            {
+                accessKeyOption.DefaultValueFactory = _ => configuredAccessKey;
+            }
+
+            var command = new Command(
+                "archive-ewc-wales",
+                $"Archives a single EWC Wales file from the '{EwcWalesImportJob.StorageContainer}/{EwcWalesImportJob.PickupFolder}' folder to the '{EwcWalesImportJob.ArchivedContainer}/{EwcWalesImportJob.ProcessedFolder}' folder.")
+            {
+                fileOption,
+                accountNameOption,
+                accessKeyOption
+            };
+
+            command.SetAction(
+                async (parseResult, cancellationToken) =>
+                {
+                    var fileName = parseResult.GetRequiredValue(fileOption);
+                    var accountName = parseResult.GetRequiredValue(accountNameOption);
+                    var accessKey = parseResult.GetRequiredValue(accessKeyOption);
+
+                    var dataLakeServiceClient = new DataLakeServiceClient(
+                        new Uri($"https://{accountName}.dfs.core.windows.net"),
+                        new StorageSharedKeyCredential(accountName, accessKey));
+
+                    var path = $"{EwcWalesImportJob.PickupFolder}/{Path.GetFileName(fileName)}";
+                    var sourceFile = dataLakeServiceClient
+                        .GetFileSystemClient(EwcWalesImportJob.StorageContainer)
+                        .GetFileClient(path);
+
+                    if (!(await sourceFile.ExistsAsync(cancellationToken)).Value)
+                    {
+                        parseResult.InvocationConfiguration.Error.WriteLine($"File not found in storage: {path}");
+                        return 1;
+                    }
+
+                    await EwcWalesImportJob.ArchiveFileAsync(dataLakeServiceClient, path, cancellationToken);
+
+                    parseResult.InvocationConfiguration.Output.WriteLine($"Archived {path}");
+                    return 0;
+                });
+
+            return command;
+        }
 
         Command CreateDownloadEwcWalesCommand()
         {
