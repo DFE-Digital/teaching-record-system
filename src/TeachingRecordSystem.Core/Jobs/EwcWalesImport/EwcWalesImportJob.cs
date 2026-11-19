@@ -7,36 +7,30 @@ namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, InductionImporter inductionImporter, QtsImporter qtsImporter, ILogger<EwcWalesImportJob> logger)
 {
-    private const string ProcessedFolder = "ewc/processed";
+    public const string ProcessedFolder = "ewc/processed";
     public const string PickupFolder = "pickup";
     public const string StorageContainer = "ewc-integrations";
     public const string JobSchedule = "0 8 * * *";
     public const string ArchivedContainer = "archived-integration-transactions";
 
-    private async Task<string[]> GetImportFilesAsync(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
-        var fileNames = new List<string>();
-
-        await foreach (var pathItem in fileSystemClient.GetPathsAsync(new DataLakeGetPathsOptions { Path = $"{PickupFolder}/", Recursive = false }, cancellationToken))
+        foreach (var file in await GetImportFilesAsync(cancellationToken))
         {
-            // Only add files, skip directories
-            if (pathItem.IsDirectory == false)
+            // Files that aren't Induction or QTS imports are left in the pickup folder (e.g. for processing via the CLI).
+            if (!TryGetImportFileType(file.Split('/').Last(), out var fileType) || fileType is null)
             {
-                fileNames.Add(pathItem.Name);
+                logger.LogWarning("Skipping file '{FileName}': import filename must begin with IND or QTS", file);
+                continue;
+            }
+
+            using (var downloadStream = await GetDownloadStreamAsync(file))
+            using (var reader = new StreamReader(downloadStream))
+            {
+                await ImportAsync(file, fileType.Value, reader);
+                await ArchiveFileAsync(dataLakeServiceClient, file, cancellationToken);
             }
         }
-
-        return fileNames.ToArray();
-    }
-
-    public async Task<Stream> GetDownloadStreamAsync(string fileName)
-    {
-        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
-        var fileClient = fileSystemClient.GetFileClient(fileName);
-
-        var readResponse = await fileClient.ReadAsync();
-        return readResponse.Value.Content;
     }
 
     public async Task<long?> ImportAsync(string fileName, EwcWalesImportFileType fileType, StreamReader reader)
@@ -55,27 +49,19 @@ public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServic
         }
     }
 
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    public bool TryGetImportFileType(string fileName, out EwcWalesImportFileType? fileType)
     {
-        foreach (var file in await GetImportFilesAsync(cancellationToken))
+        fileType = fileName switch
         {
-            // Files that aren't Induction or QTS imports are left in the pickup folder (e.g. for processing via the CLI).
-            if (!TryGetImportFileType(file.Split('/').Last(), out var fileType) || fileType is null)
-            {
-                logger.LogWarning("Skipping file '{FileName}': import filename must begin with IND or QTS", file);
-                continue;
-            }
+            var f when f.StartsWith("Ind", StringComparison.OrdinalIgnoreCase) => EwcWalesImportFileType.Induction,
+            var f when f.StartsWith("QTS", StringComparison.OrdinalIgnoreCase) => EwcWalesImportFileType.Qualification,
+            _ => null
+        };
 
-            using (var downloadStream = await GetDownloadStreamAsync(file))
-            using (var reader = new StreamReader(downloadStream))
-            {
-                await ImportAsync(file, fileType.Value, reader);
-                await ArchiveFileAsync(file, cancellationToken);
-            }
-        }
+        return fileType is not null;
     }
 
-    public async Task ArchiveFileAsync(string fileName, CancellationToken cancellationToken)
+    public static async Task ArchiveFileAsync(DataLakeServiceClient dataLakeServiceClient, string fileName, CancellationToken cancellationToken)
     {
         var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
         var arhivedFileSystemClient = dataLakeServiceClient.GetFileSystemClient(ArchivedContainer);
@@ -103,15 +89,29 @@ public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServic
         await sourceFile.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
-    public bool TryGetImportFileType(string fileName, out EwcWalesImportFileType? fileType)
+    private async Task<string[]> GetImportFilesAsync(CancellationToken cancellationToken)
     {
-        fileType = fileName switch
-        {
-            var f when f.StartsWith("Ind", StringComparison.OrdinalIgnoreCase) => EwcWalesImportFileType.Induction,
-            var f when f.StartsWith("QTS", StringComparison.OrdinalIgnoreCase) => EwcWalesImportFileType.Qualification,
-            _ => null
-        };
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        var fileNames = new List<string>();
 
-        return fileType is not null;
+        await foreach (var pathItem in fileSystemClient.GetPathsAsync(new DataLakeGetPathsOptions { Path = $"{PickupFolder}/", Recursive = false }, cancellationToken))
+        {
+            // Only add files, skip directories
+            if (pathItem.IsDirectory == false)
+            {
+                fileNames.Add(pathItem.Name);
+            }
+        }
+
+        return fileNames.ToArray();
+    }
+
+    private async Task<Stream> GetDownloadStreamAsync(string fileName)
+    {
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(StorageContainer);
+        var fileClient = fileSystemClient.GetFileClient(fileName);
+
+        var readResponse = await fileClient.ReadAsync();
+        return readResponse.Value.Content;
     }
 }
