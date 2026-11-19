@@ -1,0 +1,12 @@
+@model ChangeHistoryEntryViewModel
+@{
+    var createdEvent = Model.GetEvent<PersonCreatedEvent>();
+    var details = createdEvent.Details;
+}
+
+<timeline-entry title="Record imported from EWC Wales" by="@Model.UserName" timestamp="@Model.Timestamp" data-process-id="@Model.ProcessId">
+    <p class="govuk-body" data-testid="import-summary">Record created from the EWC Wales import.</p>
+
+    <partial name="~/Pages/Shared/Components/ChangeHistoryEntry/_PersonDetailsSummary.cshtml" model="@details" />
+</timeline-entry>
+
