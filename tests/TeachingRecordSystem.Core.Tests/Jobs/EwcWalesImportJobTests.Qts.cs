@@ -26,7 +26,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -69,7 +69,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -118,7 +118,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -167,7 +167,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -215,7 +215,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -263,7 +263,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -312,7 +312,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync(fileName, reader),
+            job => job.ImportAsync(fileName, EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -361,7 +361,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("QTS", reader),
+            job => job.ImportAsync("QTS", EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -427,7 +427,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("QTS", reader),
+            job => job.ImportAsync("QTS", EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -496,7 +496,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("QTS", reader),
+            job => job.ImportAsync("QTS", EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -538,7 +538,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("QTS", reader),
+            job => job.ImportAsync("QTS", EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
@@ -583,7 +583,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("QTS", reader),
+            job => job.ImportAsync("QTS", EwcWalesImportFileType.Qualification, reader),
             Logger.Object);
 
         // Assert
