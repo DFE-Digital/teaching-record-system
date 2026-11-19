@@ -1,5 +1,4 @@
 using System.CommandLine;
-using Microsoft.Extensions.Configuration;
 
 namespace TeachingRecordSystem.Cli.Tests.CommandTests;
 
