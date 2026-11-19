@@ -268,6 +268,33 @@ public class ChangeHistoryServiceTests(ServiceFixture fixture) : ServiceTestBase
     }
 
     [Fact]
+    public async Task GetChangeHistoryByPersonAsync_IncludesPersonImportingFromEwcWalesProcess()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.PersonImportingFromEwcWales,
+            SystemUser.Instance.UserId,
+            changeReason: null,
+            new PersonCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Details = EventModels.PersonDetails.FromModel(person),
+                TrnRequestMetadata = null
+            });
+
+        // Act
+        var result = await GetChangeHistoryByPersonAsync(person.PersonId, await CreatePrincipalAsync(), new());
+
+        // Assert
+        var entry = Assert.Single(result);
+        Assert.Equal(process.ProcessId, entry.Process.ProcessId);
+        Assert.Equal(ProcessType.PersonImportingFromEwcWales, entry.Process.ProcessType);
+    }
+
+    [Fact]
     public async Task GetChangeHistoryByPersonAsync_IncludesPersonDetailsUpdatingProcess()
     {
         // Arrange

@@ -105,6 +105,7 @@ public class ChangeHistoryService(
             ProcessType.NotifyingLapsedQtlsHolder,
             ProcessType.NotifyingTrnRecipient,
             ProcessType.TeacherPensionsRecordImporting,
+            ProcessType.PersonImportingFromEwcWales,
             ProcessType.TrnAllocating,
             ProcessType.TrnRequestCreating,
             ProcessType.TrnRequestResolving,
