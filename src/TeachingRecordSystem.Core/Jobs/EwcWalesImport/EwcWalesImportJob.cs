@@ -8,8 +8,8 @@ namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServiceClient dataLakeServiceClient, InductionImporter inductionImporter, QtsImporter qtsImporter, ILogger<EwcWalesImportJob> logger)
 {
     private const string ProcessedFolder = "ewc/processed";
-    private const string PickupFolder = "pickup";
-    private const string StorageContainer = "ewc-integrations";
+    public const string PickupFolder = "pickup";
+    public const string StorageContainer = "ewc-integrations";
     public const string JobSchedule = "0 8 * * *";
     public const string ArchivedContainer = "archived-integration-transactions";
 
@@ -39,31 +39,19 @@ public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServic
         return readResponse.Value.Content;
     }
 
-    public async Task<long?> ImportAsync(string fileName, StreamReader reader)
+    public async Task<long?> ImportAsync(string fileName, EwcWalesImportFileType fileType, StreamReader reader)
     {
-        var fileNameParts = fileName.Split("/");
-        var fileNameWithoutFolder = fileNameParts.Last();
+        var fileNameWithoutFolder = fileName.Split("/").Last();
 
-        if (TryGetImportFileType(fileNameWithoutFolder, out var importType))
+        if (fileType == EwcWalesImportFileType.Induction)
         {
-
-            if (importType == EwcWalesImportFileType.Induction)
-            {
-                var result = await inductionImporter.ImportAsync(reader, fileNameWithoutFolder);
-                return result.IntegrationTransactionId;
-            }
-            else
-            {
-                var result = await qtsImporter.ImportAsync(reader, fileNameWithoutFolder);
-                return result.IntegrationTransactionId;
-            }
+            var result = await inductionImporter.ImportAsync(reader, fileNameWithoutFolder);
+            return result.IntegrationTransactionId;
         }
         else
         {
-            //file not recognised
-            logger.LogError("Import filename must begin with IND or QTS");
-
-            return null;
+            var result = await qtsImporter.ImportAsync(reader, fileNameWithoutFolder);
+            return result.IntegrationTransactionId;
         }
     }
 
@@ -71,10 +59,17 @@ public class EwcWalesImportJob([FromKeyedServices("sftpstorage")] DataLakeServic
     {
         foreach (var file in await GetImportFilesAsync(cancellationToken))
         {
+            // Files that aren't Induction or QTS imports are left in the pickup folder (e.g. for processing via the CLI).
+            if (!TryGetImportFileType(file.Split('/').Last(), out var fileType) || fileType is null)
+            {
+                logger.LogWarning("Skipping file '{FileName}': import filename must begin with IND or QTS", file);
+                continue;
+            }
+
             using (var downloadStream = await GetDownloadStreamAsync(file))
             using (var reader = new StreamReader(downloadStream))
             {
-                await ImportAsync(file, reader);
+                await ImportAsync(file, fileType.Value, reader);
                 await ArchiveFileAsync(file, cancellationToken);
             }
         }

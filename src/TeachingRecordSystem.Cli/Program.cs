@@ -18,7 +18,8 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CorrectQualificationStartDate(configuration),
     Commands.CreateAppContentCommand(configuration),
     Commands.CreatePersonCommand(configuration),
-    Commands.CreateMatchPersonsCommand(configuration)
+    Commands.CreateMatchPersonsCommand(configuration),
+    Commands.CreateFilesCommand(configuration)
 };
 
 var parseResult = rootCommand.Parse(args);

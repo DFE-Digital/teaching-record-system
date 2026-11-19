@@ -31,7 +31,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
@@ -86,7 +86,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
@@ -137,7 +137,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
@@ -189,7 +189,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
@@ -239,7 +239,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
@@ -284,7 +284,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
@@ -333,7 +333,7 @@ public partial class EwcWalesImportJobTests
 
         // Act
         var integrationTransactionId = await WithServiceAsync<EwcWalesImportJob, long?>(
-            job => job.ImportAsync("IND", reader),
+            job => job.ImportAsync("IND", EwcWalesImportFileType.Induction, reader),
             Logger.Object);
 
         // Assert
