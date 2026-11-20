@@ -158,7 +158,7 @@ public class ImportEwcWalesTests(IServiceProvider services) : CommandTestBase(se
     }
 
     [Fact]
-    public async Task PersonWithTrnAlreadyExists_ReturnsErrorAndCreatesNoPersons()
+    public async Task PersonWithTrnAlreadyExists_OutputsExistingTrnAndImportsRemainingRows()
     {
         // Arrange
         var existingPerson = await TestData.CreatePersonAsync();
@@ -171,12 +171,13 @@ public class ImportEwcWalesTests(IServiceProvider services) : CommandTestBase(se
             $"{existingPerson.Trn},Jones,Bob,15/01/1970,");
 
         // Act
-        var (exitCode, _, error) = await InvokeWithCsvAsync(csv);
+        var (exitCode, output, _) = await InvokeWithCsvAsync(csv);
 
         // Assert
-        Assert.Equal(1, exitCode);
-        Assert.Contains(existingPerson.Trn!, error);
-        await AssertPersonExistsAsync(newTrn, exists: false);
+        Assert.Equal(0, exitCode);
+        Assert.Contains("TRN\tIdentical", output);
+        Assert.Contains($"{existingPerson.Trn}\tNo", output);
+        await AssertPersonExistsAsync(newTrn, exists: true);
     }
 
     private Command GetSubcommand() =>
