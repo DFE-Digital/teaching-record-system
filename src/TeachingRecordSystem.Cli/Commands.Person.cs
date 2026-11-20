@@ -158,14 +158,31 @@ public partial class Commands
                     var existingTrns = await dbContext.Persons
                         .IgnoreQueryFilters([QueryFilterNames.Person.Deactivated])
                         .Where(p => allTrns.Contains(p.Trn!))
-                        .Select(p => p.Trn)
+                        .Select(p => new { p.Trn, p.FirstName, p.LastName, p.DateOfBirth, p.NationalInsuranceNumber })
                         .ToListAsync();
 
                     if (existingTrns.Count > 0)
                     {
-                        parseResult.InvocationConfiguration.Error.WriteLine(
-                            $"Persons already exist with TRN(s): {string.Join(", ", existingTrns)}");
-                        return 1;
+                        var output = parseResult.InvocationConfiguration.Output;
+                        var rowsByTrn = rows.ToDictionary(r => r.Trn);
+
+                        output.WriteLine($"{existingTrns.Count} person(s) already exist in TRS and will be skipped:");
+                        output.WriteLine("TRN\tIdentical");
+                        foreach (var existing in existingTrns.OrderBy(e => e.Trn, StringComparer.Ordinal))
+                        {
+                            var row = rowsByTrn[existing.Trn];
+                            var identical =
+                                string.Equals(existing.FirstName.Trim(), row.FirstName, StringComparison.OrdinalIgnoreCase) &&
+                                string.Equals(existing.LastName.Trim(), row.LastName, StringComparison.OrdinalIgnoreCase) &&
+                                existing.DateOfBirth == row.DateOfBirth &&
+                                NationalInsuranceNumber.Normalize(existing.NationalInsuranceNumber) == row.NationalInsuranceNumber?.ToString();
+                            output.WriteLine($"{existing.Trn}\t{(identical ? "Yes" : "No")}");
+                        }
+
+                        output.WriteLine();
+
+                        var existingTrnSet = existingTrns.Select(e => e.Trn).ToHashSet();
+                        rows = rows.Where(r => !existingTrnSet.Contains(r.Trn)).ToList();
                     }
 
                     var processContext = new ProcessContext(ProcessType.PersonImportingFromEwcWales, timeProvider.UtcNow, SystemUser.SystemUserId);
