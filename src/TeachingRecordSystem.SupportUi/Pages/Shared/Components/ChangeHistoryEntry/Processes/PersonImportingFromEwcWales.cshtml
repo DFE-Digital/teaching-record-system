@@ -1,6 +1,6 @@
 @model ChangeHistoryEntryViewModel
 @{
-    var createdEvent = Model.GetEvent<PersonCreatedEvent>();
+    var createdEvent = Model.Events.OfType<PersonCreatedEvent>().Single(e => e.PersonId == Model.Context.PersonId);
     var details = createdEvent.Details;
 }
 
