@@ -23,7 +23,7 @@ public class PersonImportingFromEwcWalesTests(HostFixture hostFixture) : ChangeH
             });
 
         // Act
-        var entry = await GetEntryHtmlAsync(process.ProcessId);
+        var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
 
         // Assert
         AssertTitle(entry, "Record imported from EWC Wales");
@@ -36,6 +36,40 @@ public class PersonImportingFromEwcWalesTests(HostFixture hostFixture) : ChangeH
             Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
         entry.AssertSummaryListRowValue("details", "Date of birth", v =>
             Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
+    }
+
+    [Fact]
+    public async Task ImportThatCreatedMultiplePeople_RendersDetailsForTheCurrentPersonOnly()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var otherPerson = await TestData.CreatePersonAsync();
+
+        var process = await TestData.CreateProcessAsync(
+            ProcessType.PersonImportingFromEwcWales,
+            SystemUser.Instance.UserId,
+            changeReason: null,
+            new PersonCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = otherPerson.PersonId,
+                Details = EventModels.PersonDetails.FromModel(otherPerson),
+                TrnRequestMetadata = null
+            },
+            new PersonCreatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = person.PersonId,
+                Details = EventModels.PersonDetails.FromModel(person),
+                TrnRequestMetadata = null
+            });
+
+        // Act
+        var entry = await GetEntryHtmlAsync(process.ProcessId, personId: person.PersonId);
+
+        // Assert
+        entry.AssertSummaryListRowValue("details", "Name", v =>
+            Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
     }
 }
 
