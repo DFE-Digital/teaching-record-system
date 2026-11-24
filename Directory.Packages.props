@@ -17,9 +17,9 @@
     <PackageVersion Include="CloudNative.CloudEvents" Version="2.9.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.9.0" />
     <PackageVersion Include="CsvHelper" Version="34.0.0" />
-    <PackageVersion Include="DfeAnalytics.AspNetCore" Version="0.7.0" />
-    <PackageVersion Include="DfeAnalytics.EFCore" Version="0.7.0" />
-    <PackageVersion Include="EFCore.NamingConventions" Version="10.0.0" />
+    <PackageVersion Include="DfeAnalytics.AspNetCore" Version="0.7.1" />
+    <PackageVersion Include="DfeAnalytics.EFCore" Version="0.7.1" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="11.0.0" />
     <PackageVersion Include="EntityFrameworkCore.Projectables" Version="6.0.6" />
     <PackageVersion Include="Faker.Net" Version="2.0.163" />
     <PackageVersion Include="FluentValidation" Version="12.2.0" />
@@ -46,11 +46,11 @@
     <PackageVersion Include="LinqKit" Version="1.2.5" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="11.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="11.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="11.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="11.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.14" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="11.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Azure" Version="1.14.1" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Postgres" Version="1.2.2" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="11.0.0" />
@@ -72,8 +72,7 @@
     <PackageVersion Include="Mime-Detective" Version="25.8.1" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
-    <PackageVersion Include="Npgsql.DependencyInjection" Version="10.0.3" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0" />
     <PackageVersion Include="NSign.AspNetCore" Version="1.2.7" />
     <PackageVersion Include="NSign.Client" Version="1.2.7" />
     <PackageVersion Include="NSign.SignatureProviders" Version="1.2.7" />

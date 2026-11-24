@@ -17,7 +17,7 @@ public class EventMapping : IEntityTypeConfiguration<Event>
         builder.Property(e => e.Published);
         builder.HasKey(e => e.EventId);
         builder.Property(e => e.PersonId).ConfigureAnalyticsSync(hidden: true);
-        builder.Property(e => e.PersonIds).ConfigureAnalyticsSync(hidden: true);
+        builder.PrimitiveCollection(e => e.PersonIds).ConfigureAnalyticsSync(hidden: true);
         builder.HasIndex(e => new { e.PersonId, e.EventName }).HasFilter("person_id is not null");
         builder.HasIndex(e => new { e.PersonIds, e.EventName }).HasDatabaseName("ix_events_person_ids").HasMethod("gin").IsCreatedConcurrently();
         builder.HasIndex(e => new { e.EventName, e.Created }).IsCreatedConcurrently();
