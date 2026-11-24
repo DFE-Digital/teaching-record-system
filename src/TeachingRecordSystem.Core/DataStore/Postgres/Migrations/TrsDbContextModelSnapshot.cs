@@ -23,7 +23,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 .HasAnnotation("Npgsql:PostgresExtension:pg_trgm", ",,")
                 .HasAnnotation("Npgsql:PostgresExtension:unaccent", ",,")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", b =>
@@ -3831,6 +3831,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_users_client_id")
                         .HasFilter("client_id is not null");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_application_user_name")
+                        .HasFilter("user_type = 2 and active");
 
                     b.HasIndex("OneLoginAuthenticationSchemeName")
                         .IsUnique()

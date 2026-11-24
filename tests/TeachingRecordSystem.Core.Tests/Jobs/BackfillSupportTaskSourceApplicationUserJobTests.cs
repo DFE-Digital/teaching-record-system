@@ -156,24 +156,6 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
     }
 
     [Fact]
-    public async Task ExecuteAsync_DuplicateAccessYourTeachingQualificationsUsers_Throws()
-    {
-        // Arrange
-        await CreateChangeRequestApplicationUserAsync();
-        await CreateChangeRequestApplicationUserAsync();
-
-        var supportTask = await TestData.CreateChangeNameRequestSupportTaskAsync();
-        await ClearSourceApplicationUserIdAsync(supportTask);
-
-        // Act
-        var exception = await Record.ExceptionAsync(() => ExecuteJobAsync());
-
-        // Assert
-        Assert.NotNull(exception);
-        Assert.IsType<InvalidOperationException>(exception);
-    }
-
-    [Fact]
     public async Task ExecuteAsync_SourceApplicationUserNoLongerExists_IsLeftNull()
     {
         // Arrange — the client application user in the task's data has since been removed.
@@ -443,6 +425,7 @@ public class BackfillSupportTaskSourceApplicationUserJobTests(JobFixture fixture
         });
 
     private Task<ApplicationUser> CreateChangeRequestApplicationUserAsync() =>
+        // The job finds this user by name; the database is cleared before each test so the name is free
         TestData.CreateApplicationUserAsync(name: "Access your teaching qualifications");
 
     private async Task<SupportTask> CreateNpqTrnRequestTaskAsync(Guid applicationUserId)

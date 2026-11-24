@@ -77,6 +77,60 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_NameAlreadyExists_RendersError()
+    {
+        // Arrange
+        var existingApplicationUser = await TestData.CreateApplicationUserAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", existingApplicationUser.Name },
+                { "ShortName", TestData.GenerateApplicationUserShortName() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be unique");
+    }
+
+    [Fact]
+    public async Task Post_NameMatchesInactiveApplicationUser_CreatesApplicationUser()
+    {
+        // Arrange
+        var inactiveApplicationUser = await TestData.CreateApplicationUserAsync();
+
+        await WithDbContextAsync(dbContext =>
+            dbContext.ApplicationUsers
+                .Where(u => u.UserId == inactiveApplicationUser.UserId)
+                .ExecuteUpdateAsync(s => s.SetProperty(u => u.Active, false)));
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", inactiveApplicationUser.Name },
+                { "ShortName", TestData.GenerateApplicationUserShortName() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var applicationUsersWithName = await WithDbContextAsync(dbContext =>
+            dbContext.ApplicationUsers.Where(u => u.Name == inactiveApplicationUser.Name).ToListAsync());
+        Assert.Equal(2, applicationUsersWithName.Count);
+        Assert.Single(applicationUsersWithName, u => u.Active);
+    }
+
+    [Fact]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange

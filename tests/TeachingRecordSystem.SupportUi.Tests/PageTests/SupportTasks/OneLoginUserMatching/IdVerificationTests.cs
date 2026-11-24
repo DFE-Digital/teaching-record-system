@@ -107,8 +107,8 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         // Arrange
         var sortBy = OneLoginUserIdVerificationSupportTasksSortByOption.Email;
         var sortDirection = SortDirection.Ascending;
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Access your Teaching Qualifications");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "National Professional Qualification");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Access your Teaching Qualifications"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("National Professional Qualification"));
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Sam@example.com"), verifiedInfo: null);
         var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject, options => options
@@ -172,8 +172,8 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_OrderListByOption_OrdersList(OneLoginUserIdVerificationSupportTasksSortByOption sortBy, SortDirection sortDirection)
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Access your Teaching Qualifications", shortName: "AYTQ");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "National Professional Qualification", shortName: "NPQ");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Access your Teaching Qualifications"), shortName: "AYTQ");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("National Professional Qualification"), shortName: "NPQ");
         var oneLoginUser1 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Aaron@example.com"), verifiedInfo: null);
         var oneLoginUser2 = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>("Sam@example.com"), verifiedInfo: null);
         var supportTask1 = await TestData.CreateOneLoginUserIdVerificationSupportTaskAsync(oneLoginUser1.Subject, options => options

@@ -297,8 +297,8 @@ public partial class SupportTaskSearchServiceTests
         // Arrange
         // The short name is used in preference to the name, so ST2's source ("Bee application")
         // sorts before ST1's ("Zebra") even though ST1's application user is named "Ant application".
-        var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(name: "Ant application", shortName: "Zebra");
-        var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(name: "Bee application", shortName: null);
+        var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Ant application"), shortName: "Zebra");
+        var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Bee application"), shortName: null);
         var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r

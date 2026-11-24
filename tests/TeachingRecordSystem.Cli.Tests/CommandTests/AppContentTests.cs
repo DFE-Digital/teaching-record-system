@@ -273,7 +273,7 @@ public class AppContentTests(IServiceProvider services) : CommandTestBase(servic
         var applicationUser = new ApplicationUser
         {
             UserId = Guid.NewGuid(),
-            Name = "Test Application",
+            Name = $"Test Application {Guid.NewGuid()}",
             AppContent = new AppContent
             {
                 OneLoginCannotFindRecordEmailTemplateId = "template-abc",
@@ -296,7 +296,7 @@ public class AppContentTests(IServiceProvider services) : CommandTestBase(servic
         var applicationUser = new ApplicationUser
         {
             UserId = Guid.NewGuid(),
-            Name = "Test Application Without AppContent",
+            Name = $"Test Application Without AppContent {Guid.NewGuid()}",
             AppContent = null
         };
 

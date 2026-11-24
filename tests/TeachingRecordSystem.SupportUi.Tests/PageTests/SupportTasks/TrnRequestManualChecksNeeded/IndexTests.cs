@@ -118,8 +118,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SortBy_ShowsRequestsInCorrectOrder(TrnRequestManualChecksSortByOption sortBy, SortDirection sortDirection, string[] taskKeys)
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Application Z"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Application A"));
 
         var tasks = new SupportTaskLookup
         {

@@ -61,7 +61,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
-        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS");
+        var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("Apply for QTS"));
         var person = await TestData.CreatePersonAsync();
         var comments = TestData.GenerateLoremIpsum();
 
@@ -182,7 +182,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
-        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS");
+        var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("Apply for QTS"));
         var person = await TestData.CreatePersonAsync();
 
         var personDetails = CreatePersonDetails(_firstName, _middleName, _lastName, _dob, _email, _nino, _gender);
@@ -229,7 +229,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
-        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS");
+        var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("Apply for QTS"));
         var person = await TestData.CreatePersonAsync();
 
         var personDetails = CreatePersonDetails(_firstName, _middleName, _lastName, _dob, _email, _nino, _gender);
@@ -311,7 +311,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
     {
         // Arrange
         var createdByUser = await TestData.CreateUserAsync();
-        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS");
+        var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("Apply for QTS"));
         var person = await TestData.CreatePersonAsync();
 
         var personDetails = CreatePersonDetails(_firstName, _middleName, _lastName, _dob, _email, _nino, _gender);
