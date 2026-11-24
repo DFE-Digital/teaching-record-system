@@ -14,7 +14,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    [Migration("20261124125808_ApplicationUserNameUniqueIndex")]
+    [Migration("20261124132001_ApplicationUserNameUniqueIndex")]
     partial class ApplicationUserNameUniqueIndex
     {
         /// <inheritdoc />
@@ -3838,7 +3838,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_users_application_user_name")
-                        .HasFilter("user_type = 2");
+                        .HasFilter("user_type = 2 and active");
 
                     b.HasIndex("OneLoginAuthenticationSchemeName")
                         .IsUnique()

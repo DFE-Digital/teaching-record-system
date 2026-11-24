@@ -15,7 +15,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 table: "users",
                 column: "name",
                 unique: true,
-                filter: "user_type = 2");
+                filter: "user_type = 2 and active");
         }
 
         /// <inheritdoc />

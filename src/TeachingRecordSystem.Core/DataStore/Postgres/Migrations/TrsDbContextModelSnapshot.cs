@@ -3835,7 +3835,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_users_application_user_name")
-                        .HasFilter("user_type = 2");
+                        .HasFilter("user_type = 2 and active");
 
                     b.HasIndex("OneLoginAuthenticationSchemeName")
                         .IsUnique()
