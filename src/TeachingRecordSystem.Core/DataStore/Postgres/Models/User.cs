@@ -11,17 +11,12 @@ public abstract class UserBase
 
     public required Guid UserId { get; init; }
     public bool Active { get; set; } = true;
-    public UserType UserType { get; protected init; }
+    public UserType UserType { get; }
     public required string Name { get; set; }
 }
 
 public class User : UserBase
 {
-    public User()
-    {
-        UserType = UserType.Person;
-    }
-
     public const int RoleMaxLength = 50;
     public const int EmailMaxLength = 200;
     public const int AzureAdUserIdMaxLength = 100;
@@ -37,11 +32,6 @@ public class User : UserBase
 
 public class ApplicationUser : UserBase
 {
-    public ApplicationUser()
-    {
-        UserType = UserType.Application;
-    }
-
     public const int AuthenticationSchemeNameMaxLength = 50;
     public const int RedirectUriPathMaxLength = 150;
     public const int ClientIdMaxLength = 50;
@@ -155,11 +145,6 @@ public class SystemUser : UserBase
 {
     public static Guid SystemUserId { get; } = new Guid("a81394d1-a498-46d8-af3e-e077596ab303");
     public const string SystemUserName = "System";
-
-    public SystemUser()
-    {
-        UserType = UserType.System;
-    }
 
     public static SystemUser Instance { get; } = new()
     {

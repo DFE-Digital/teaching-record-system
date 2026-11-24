@@ -1,44 +1,43 @@
-using EFCore.BulkExtensions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public partial class TrsDbContext
 {
-    private void SeedData()
+    internal void SeedData()
     {
-        this.BulkInsertOrUpdate(GetAlertCategories());
-        this.BulkInsertOrUpdate(GetAlertTypes());
-        this.BulkInsertOrUpdate(GetCountries());
-        this.BulkInsertOrUpdate(GetInductionExemptionReasons());
-        this.BulkInsertOrUpdate(GetSupportTaskTypes());
-        this.BulkInsertOrUpdate(GetDegreeTypes());
-        this.BulkInsertOrUpdate(GetEstablishmentSources());
-        this.BulkInsertOrUpdate(GetInductionStatusInfo());
-        this.BulkInsertOrUpdate(GetMandatoryQualificationProviders());
-        this.BulkInsertOrUpdate(GetRouteToProfessionalStatusTypes());
-        this.BulkInsertOrUpdate(GetTpsEstablishmentTypes());
-        this.BulkInsertOrUpdate(GetTrainingSubjects());
-        this.BulkInsertOrUpdate(GetSystemUsers());
-        this.BulkInsertOrUpdate(GetEstablishments());
+        this.BulkUpsert(GetAlertCategories());
+        this.BulkUpsert(GetAlertTypes());
+        this.BulkUpsert(GetCountries());
+        this.BulkUpsert(GetInductionExemptionReasons());
+        this.BulkUpsert(GetSupportTaskTypes());
+        this.BulkUpsert(GetDegreeTypes());
+        this.BulkUpsert(GetEstablishmentSources());
+        this.BulkUpsert(GetInductionStatusInfo());
+        this.BulkUpsert(GetMandatoryQualificationProviders());
+        this.BulkUpsert(GetRouteToProfessionalStatusTypes());
+        this.BulkUpsert(GetTpsEstablishmentTypes());
+        this.BulkUpsert(GetTrainingSubjects());
+        this.BulkUpsert(GetSystemUsers());
+        this.BulkUpsert(GetEstablishments());
     }
 
-    private async Task SeedDataAsync(CancellationToken cancellationToken = default)
+    internal async Task SeedDataAsync(CancellationToken cancellationToken = default)
     {
-        await this.BulkInsertOrUpdateAsync(GetAlertCategories(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetAlertTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetCountries(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetInductionExemptionReasons(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetSupportTaskTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetDegreeTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetEstablishmentSources(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetInductionStatusInfo(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetMandatoryQualificationProviders(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetRouteToProfessionalStatusTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetTpsEstablishmentTypes(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetTrainingSubjects(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetSystemUsers(), cancellationToken: cancellationToken);
-        await this.BulkInsertOrUpdateAsync(GetEstablishments(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetAlertCategories(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetAlertTypes(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetCountries(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetInductionExemptionReasons(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetSupportTaskTypes(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetDegreeTypes(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetEstablishmentSources(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetInductionStatusInfo(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetMandatoryQualificationProviders(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetRouteToProfessionalStatusTypes(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetTpsEstablishmentTypes(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetTrainingSubjects(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetSystemUsers(), cancellationToken: cancellationToken);
+        await this.BulkUpsertAsync(GetEstablishments(), cancellationToken: cancellationToken);
     }
 
     private static List<AlertCategory> GetAlertCategories()
