@@ -35,8 +35,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestsAsync_ResultFields()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -68,7 +68,7 @@ public partial class SupportTaskSearchServiceTests
             Assert.Equal("Alice", r.FirstName);
             Assert.Equal("The", r.MiddleName);
             Assert.Equal("Apple", r.LastName);
-            Assert.Equal("A application", r.SourceApplicationName);
+            Assert.Equal(applicationUser1.Name, r.SourceApplicationName);
         }, r =>
         {
             Assert.Equal("ST2", tasks.GetKeyFor(r.SupportTaskReference));
@@ -77,7 +77,7 @@ public partial class SupportTaskSearchServiceTests
             Assert.Equal("Bob", r.FirstName);
             Assert.Equal("A", r.MiddleName);
             Assert.Equal("Banana", r.LastName);
-            Assert.Equal("B application", r.SourceApplicationName);
+            Assert.Equal(applicationUser2.Name, r.SourceApplicationName);
         });
     }
 
@@ -322,8 +322,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestsAsync_SortBySource_SortsByApplicationUserName(SortDirection sortDirection)
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -399,9 +399,9 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestsAsync_FilterBySourceApplication_ReturnsTasksForMatchingApplicationUsersOnly()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
-        var applicationUser3 = await TestData.CreateApplicationUserAsync(name: "C application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
+        var applicationUser3 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("C application"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -425,8 +425,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestsAsync_FilterBySourceApplicationCombinedWithSearch_AppliesBothFilters()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -448,8 +448,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestsAsync_BySourceApplication_ReturnsCountOfOpenTasksPerApplicationUserBeforeSourceFilterApplied()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -490,8 +490,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestsAsync_BySourceApplication_RespectsSearchTextFilter()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         SupportTaskLookup.Create(new()
         {

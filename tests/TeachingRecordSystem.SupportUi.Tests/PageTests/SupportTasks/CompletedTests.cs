@@ -332,8 +332,8 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var user = await TestData.CreateUserAsync();
-        var zebraApplicationUser = await TestData.CreateApplicationUserAsync(name: "Ant application", shortName: "Zebra");
-        var antApplicationUser = await TestData.CreateApplicationUserAsync(name: "Zebra application", shortName: "Ant");
+        var zebraApplicationUser = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Ant application"), shortName: "Zebra");
+        var antApplicationUser = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Zebra application"), shortName: "Ant");
         var tasks = new SupportTaskLookup
         {
             ["ST1"] = await TestData.CreateChangeNameRequestSupportTaskAsync(r => r

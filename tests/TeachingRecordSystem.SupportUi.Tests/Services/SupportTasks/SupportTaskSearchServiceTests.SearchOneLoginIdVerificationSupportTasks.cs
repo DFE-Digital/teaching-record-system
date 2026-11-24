@@ -129,7 +129,7 @@ public partial class SupportTaskSearchServiceTests
     {
         // Arrange
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, email: Option.Some<string?>(TestData.GenerateUniqueEmail()), verifiedInfo: null);
-        var applicationUser = await TestData.CreateApplicationUserAsync("x");
+        var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("x"));
 
         var supportTasksList = new List<SupportTask>
         {

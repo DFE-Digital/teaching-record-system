@@ -128,8 +128,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SortBy_ShowsRequestsInCorrectOrder(TrnRequestsSortByOption sortBy, SortDirection sortDirection, string[] taskKeys)
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Application Z"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("Application A"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -159,8 +159,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithOpenTasks_ShowsSourceFilterWithCountPerApplicationUser()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId);
         await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId);
@@ -173,15 +173,15 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(["A application (2)", "B application (1)"], GetSourceFilterLabels(doc));
+        Assert.Equal([$"{applicationUser1.Name} (2)", $"{applicationUser2.Name} (1)"], GetSourceFilterLabels(doc));
     }
 
     [Fact]
     public async Task Get_SourceFilter_IncludesApplicationUsersWithNoOpenTasks()
     {
         // Arrange
-        var applicationUserWithOpenTask = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUserWithClosedTaskOnly = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUserWithOpenTask = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUserWithClosedTaskOnly = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         await TestData.CreateTrnRequestSupportTaskAsync(applicationUserWithOpenTask.UserId);
         await TestData.CreateTrnRequestSupportTaskAsync(
@@ -195,14 +195,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(["A application (1)", "B application (0)"], GetSourceFilterLabels(doc));
+        Assert.Equal([$"{applicationUserWithOpenTask.Name} (1)", $"{applicationUserWithClosedTaskOnly.Name} (0)"], GetSourceFilterLabels(doc));
     }
 
     [Fact]
     public async Task Get_SourceFilter_UsesApplicationUserShortNameWhenSet()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(name: "A long application name", shortName: "Short");
+        var applicationUser = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A long application name"), shortName: "Short");
 
         await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
@@ -220,8 +220,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_FilterByApplicationUserIds_ShowsOnlyMatchingResults()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = SupportTaskLookup.Create(new()
         {
@@ -244,8 +244,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_FilterByApplicationUserIds_ChecksSelectedFilterCheckboxes()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         await TestData.CreateTrnRequestSupportTaskAsync(applicationUser1.UserId);
         await TestData.CreateTrnRequestSupportTaskAsync(applicationUser2.UserId);

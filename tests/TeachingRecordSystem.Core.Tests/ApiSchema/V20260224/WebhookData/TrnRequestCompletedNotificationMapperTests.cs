@@ -15,7 +15,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
         {
             // Arrange
             var person = await TestData.CreatePersonAsync();
-            var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+            var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("NPQ"));
 
             var (supportTask, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(
                 applicationUserId: applicationUser.UserId,
@@ -65,7 +65,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
         {
             // Arrange
             var person = await TestData.CreatePersonAsync();
-            var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+            var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("NPQ"));
 
             var (supportTask, trnRequestMetadata, matchedPersonIds) = await TestData.CreateTrnRequestSupportTaskAsync(
                 applicationUserId: applicationUser.UserId,
@@ -116,7 +116,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
         WithServiceAsync<TrnRequestCompletedNotificationMapper>(async mapper =>
         {
             // Arrange
-            var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+            var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("NPQ"));
 
             var (supportTask, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);
 
@@ -152,7 +152,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
         {
             // Arrange
             var person = await TestData.CreatePersonAsync();
-            var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+            var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("NPQ"));
 
             var (supportTask, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(
                 applicationUserId: applicationUser.UserId,
@@ -197,7 +197,7 @@ public class TrnRequestCompletedNotificationMapperTests(ServiceFixture fixture) 
         WithServiceAsync<TrnRequestCompletedNotificationMapper>(async mapper =>
         {
             // Arrange
-            var applicationUser = await TestData.CreateApplicationUserAsync("NPQ");
+            var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("NPQ"));
             var otherApplicationUser = await TestData.CreateApplicationUserAsync();
 
             var (_, trnRequestMetadata, _) = await TestData.CreateTrnRequestSupportTaskAsync(applicationUser.UserId);

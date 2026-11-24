@@ -9,7 +9,7 @@ public class NpqTrnRequestRejectingTests(HostFixture hostFixture) : ChangeHistor
     {
         // Arrange
         var user = await TestData.CreateUserAsync();
-        var applicationUser = await TestData.CreateApplicationUserAsync("Apply for QTS");
+        var applicationUser = await TestData.CreateApplicationUserAsync(TestData.GenerateApplicationUserName("Apply for QTS"));
         var evidenceFileId = Guid.NewGuid();
 
         var requestData = CreateRequestData(applicationUser.UserId, evidenceFileId);
@@ -25,7 +25,7 @@ public class NpqTrnRequestRejectingTests(HostFixture hostFixture) : ChangeHistor
         Assert.Contains("closed.", entry.GetElementByTestId("task-closed-message")?.TrimmedText());
 
         entry.AssertSummaryListRowValue("rejection-reason", "Reason", v => Assert.Equal("Insufficient evidence", v.TrimmedText()));
-        entry.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal("Apply for QTS", v.TrimmedText()));
+        entry.AssertSummaryListRowValue("request-data", "Source", v => Assert.Equal(applicationUser.Name, v.TrimmedText()));
         entry.AssertSummaryListRowValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));
         entry.AssertSummaryListRowValue("request-data", "Name", v => Assert.Equal("Megan Thee Stallion", v.TrimmedText()));
 

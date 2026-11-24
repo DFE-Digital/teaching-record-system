@@ -42,6 +42,12 @@ public partial class TestData(
 
     public string GenerateApplicationUserName() => $"{Faker.Company.Name()} {Interlocked.Increment(ref _applicationUserNumber)}";
 
+    /// <summary>
+    /// Generates a unique application user name that starts with <paramref name="prefix"/>,
+    /// for tests that need a recognisable name or a particular sort order.
+    /// </summary>
+    public string GenerateApplicationUserName(string prefix) => $"{prefix} {Interlocked.Increment(ref _applicationUserNumber)}";
+
     public string GenerateApplicationUserShortName() => $"app-{Interlocked.Increment(ref _applicationUserNumber)}";
 
     public string GenerateChangedApplicationUserName(string currentName)

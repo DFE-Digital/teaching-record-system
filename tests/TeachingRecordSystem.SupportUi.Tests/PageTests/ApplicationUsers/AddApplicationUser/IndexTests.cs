@@ -77,6 +77,28 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_NameAlreadyExists_RendersError()
+    {
+        // Arrange
+        var existingApplicationUser = await TestData.CreateApplicationUserAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "Name", existingApplicationUser.Name },
+                { "ShortName", TestData.GenerateApplicationUserShortName() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be unique");
+    }
+
+    [Fact]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange

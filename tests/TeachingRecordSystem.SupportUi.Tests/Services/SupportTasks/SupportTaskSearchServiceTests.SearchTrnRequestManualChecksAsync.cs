@@ -35,8 +35,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_ResultFields()
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = new SupportTaskLookup
         {
@@ -70,7 +70,7 @@ public partial class SupportTaskSearchServiceTests
             Assert.Equal("Alice", r.FirstName);
             Assert.Equal("The", r.MiddleName);
             Assert.Equal("Apple", r.LastName);
-            Assert.Equal("A application", r.SourceApplicationName);
+            Assert.Equal(applicationUser1.Name, r.SourceApplicationName);
         }, r =>
         {
             Assert.Equal("ST2", tasks.GetKeyFor(r.SupportTaskReference));
@@ -79,7 +79,7 @@ public partial class SupportTaskSearchServiceTests
             Assert.Equal("Bob", r.FirstName);
             Assert.Equal("A", r.MiddleName);
             Assert.Equal("Banana", r.LastName);
-            Assert.Equal("B application", r.SourceApplicationName);
+            Assert.Equal(applicationUser2.Name, r.SourceApplicationName);
         });
     }
 
@@ -178,8 +178,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SearchBySource_ReturnsOnlyTasksWithGivenSource(string[] sourceNames, string[] expectedTaskKeys)
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
         var sources = new[] { applicationUser1, applicationUser2 };
         var allSourceIds = sources.Select(s => s.UserId).ToArray();
 
@@ -192,7 +192,7 @@ public partial class SupportTaskSearchServiceTests
         };
 
         // Act
-        var sourceIds = sourceNames.Select(n => sources.First(s => s.Name == n).UserId).ToArray();
+        var sourceIds = sourceNames.Select(n => sources.First(s => s.Name.StartsWith(n + " ")).UserId).ToArray();
         var result = await SearchTrnRequestManualChecksAsync(new(Sources: sourceIds), new());
 
         // Assert
@@ -288,8 +288,8 @@ public partial class SupportTaskSearchServiceTests
     public async Task SearchTrnRequestManualChecksAsync_SortBySource_SortsByApplicationUserName(SortDirection sortDirection)
     {
         // Arrange
-        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "A application");
-        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "B application");
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("A application"));
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: TestData.GenerateApplicationUserName("B application"));
 
         var tasks = new SupportTaskLookup
         {

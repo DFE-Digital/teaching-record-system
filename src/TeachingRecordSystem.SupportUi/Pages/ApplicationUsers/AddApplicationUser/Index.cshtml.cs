@@ -51,7 +51,7 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, TimeProvider timeP
         }
         catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation(ApplicationUser.NameUniqueIndexName))
         {
-            ModelState.AddModelError(nameof(Name), "Name must be unique.");
+            ModelState.AddModelError(nameof(Name), "Name must be unique");
             return this.PageWithErrors();
         }
 
