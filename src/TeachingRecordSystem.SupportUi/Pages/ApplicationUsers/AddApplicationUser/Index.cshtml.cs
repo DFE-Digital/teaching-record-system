@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Users;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -8,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class IndexModel(SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider, UserService userService) : PageModel
+public class IndexModel(TrsDbContext dbContext, SupportUiLinkGenerator linkGenerator, TimeProvider timeProvider, UserService userService) : PageModel
 {
     private readonly InlineValidator<IndexModel> _validator = new()
     {
@@ -36,24 +37,23 @@ public class IndexModel(SupportUiLinkGenerator linkGenerator, TimeProvider timeP
 
         var processContext = new ProcessContext(ProcessType.ApplicationUserCreating, timeProvider.UtcNow, User.GetUserId());
 
-        ApplicationUser newUser;
+        await dbContext.AcquireUniqueValueLockAsync(ApplicationUser.NameUniqueIndexName, Name!, cancellationToken);
 
-        try
-        {
-            newUser = await userService.CreateApplicationUserAsync(
-                new CreateApplicationUserOptions
-                {
-                    Name = Name!,
-                    ShortName = ShortName
-                },
-                processContext,
-                cancellationToken);
-        }
-        catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation(ApplicationUser.NameUniqueIndexName))
+        // Matches ix_users_application_user_name, which only covers active application users
+        if (await dbContext.ApplicationUsers.AnyAsync(u => u.Name == Name && u.Active, cancellationToken))
         {
             ModelState.AddModelError(nameof(Name), "Name must be unique");
             return this.PageWithErrors();
         }
+
+        var newUser = await userService.CreateApplicationUserAsync(
+            new CreateApplicationUserOptions
+            {
+                Name = Name!,
+                ShortName = ShortName
+            },
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner("Application user added");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(newUser.UserId));

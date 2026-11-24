@@ -13,7 +13,7 @@ public class TeamMapping : IEntityTypeConfiguration<Team>
         builder.HasKey(x => x.TeamId);
         builder.HasQueryFilter(QueryFilterNames.Deleted, x => EF.Property<DateTime?>(x, nameof(Team.DeletedOn)) == null);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(Team.NameMaxLength);
-        builder.HasIndex(x => x.Name).IsUnique().HasFilter("deleted_on is null");
+        builder.HasIndex(x => x.Name).IsUnique().HasDatabaseName(Team.NameUniqueIndexName).HasFilter("deleted_on is null");
         builder.Property(x => x.CreatedOn).IsRequired();
         builder.Property(x => x.DeletedOn);
     }

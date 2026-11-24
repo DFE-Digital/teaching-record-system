@@ -42,24 +42,18 @@ public class EditModel(TrsDbContext dbContext, TeamService teamService, TimeProv
         await LoadMemberNamesAsync(cancellationToken);
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
+        await dbContext.AcquireUniqueValueLockAsync(Team.NameUniqueIndexName, Name!, cancellationToken);
+
         if (await dbContext.Teams.AnyAsync(t => t.TeamId != TeamId && t.Name == Name, cancellationToken))
         {
-            ModelState.AddModelError(nameof(Name), "Team name must be unique.");
+            ModelState.AddModelError(nameof(Name), "Team name must be unique");
             return this.PageWithErrors();
         }
 
         if (_team.Name != Name)
         {
             var processContext = new ProcessContext(ProcessType.TeamUpdating, timeProvider.UtcNow, User.GetUserId());
-            try
-            {
-                await teamService.UpdateTeamAsync(_team, Name!, processContext, cancellationToken);
-            }
-            catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation("ix_teams_name"))
-            {
-                ModelState.AddModelError(nameof(Name), "Team name must be unique.");
-                return this.PageWithErrors();
-            }
+            await teamService.UpdateTeamAsync(_team, Name!, processContext, cancellationToken);
         }
 
         TempData.SetFlashNotificationBanner($"Team updated to {Name}");
