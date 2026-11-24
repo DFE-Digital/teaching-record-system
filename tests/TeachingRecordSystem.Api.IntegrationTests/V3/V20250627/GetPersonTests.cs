@@ -155,6 +155,31 @@ public class GetPersonTests : TestBase
     }
 
     [Fact]
+    public async Task Get_ValidRequestWithRouteExemptFromInductionAndRouteTypeHasNoExemptionReason_ReturnsGenericExemptionReason()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(RouteToProfessionalStatusType.EuropeanRecognitionId)
+                .WithStatus(RouteToProfessionalStatusStatus.Failed)
+                .WithInductionExemption(true)));
+
+        var httpClient = GetHttpClientWithAuthorizeAccessToken(person.Trn!, Version);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=RoutesToProfessionalStatuses");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseRoute = Assert.Single(jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses").EnumerateArray());
+        var responseInductionExemption = responseRoute.GetProperty("inductionExemption");
+        Assert.True(responseInductionExemption.GetProperty("isExempt").GetBoolean());
+        var responseExemptionReason = Assert.Single(responseInductionExemption.GetProperty("exemptionReasons").EnumerateArray());
+        Assert.Equal(InductionExemptionReason.ExemptId, responseExemptionReason.GetProperty("inductionExemptionReasonId").GetGuid());
+    }
+
+    [Fact]
     public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
         // Arrange
