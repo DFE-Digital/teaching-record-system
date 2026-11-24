@@ -47,7 +47,7 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
         builder.HasOne(p => p.CompletedBy).WithMany().HasForeignKey(p => p.CompletedByUserId);
         builder.Property(p => p.SubjectEmailAddress).HasMaxLength(200).UseCollation(Collations.CaseInsensitive);
         builder
-            .Property<string[]>("SubjectNames")
+            .PrimitiveCollection<string[]>("SubjectNames")
             .HasColumnType("varchar[]")
             .UseCollation(Collations.CaseInsensitive)
             .ConfigureAnalyticsSync(included: false);
@@ -56,7 +56,7 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
             .UseCollation(Collations.CaseInsensitive)
             .IsCreatedConcurrently();
         builder
-            .Property(x => x.ZendeskTickets)
+            .PrimitiveCollection(x => x.ZendeskTickets)
             .HasColumnType("varchar[]")
             .HasDefaultValueSql("'{}'::varchar[]");
         builder.HasOne(x => x.SourceApplicationUser).WithMany().HasForeignKey(x => x.SourceApplicationUserId);

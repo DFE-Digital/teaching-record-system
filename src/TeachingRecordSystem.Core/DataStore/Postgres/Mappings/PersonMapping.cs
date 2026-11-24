@@ -58,7 +58,7 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
             .HasDefaultValue(InductionStatus.None)
             .ConfigureAnalyticsSync(included: true, hidden: false);
         builder.HasOne<InductionStatusInfo>().WithMany().HasForeignKey(p => p.InductionStatus);
-        builder.Property(p => p.InductionExemptionReasonIds)
+        builder.PrimitiveCollection(p => p.InductionExemptionReasonIds)
             .ConfigureAnalyticsSync(included: true, hidden: false)
             .IsRequired();
         builder.Property(p => p.InductionStatusWithoutExemption)
@@ -79,9 +79,9 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.Property(p => p.SourceTrnRequestId).ConfigureAnalyticsSync(included: true, hidden: false);
         builder.HasOne<TrnRequestMetadata>().WithMany().HasForeignKey(p => new { p.SourceApplicationUserId, p.SourceTrnRequestId });
         builder.Property(p => p.DateOfDeath).ConfigureAnalyticsSync(included: true, policyTag: PolicyTagNames.SensitiveHidden);
-        builder.Property<string[]>("names").HasColumnType("varchar[]").UseCollation(Collations.CaseInsensitive);
-        builder.Property<string[]>("last_names").HasColumnType("varchar[]").UseCollation(Collations.CaseInsensitive);
-        builder.Property<string[]>("national_insurance_numbers").HasColumnType("varchar[]").UseCollation(Collations.CaseInsensitive);
+        builder.PrimitiveCollection<string[]>("names").HasColumnType("varchar[]").UseCollation(Collations.CaseInsensitive);
+        builder.PrimitiveCollection<string[]>("last_names").HasColumnType("varchar[]").UseCollation(Collations.CaseInsensitive);
+        builder.PrimitiveCollection<string[]>("national_insurance_numbers").HasColumnType("varchar[]").UseCollation(Collations.CaseInsensitive);
         builder.HasIndex("Trn", "DateOfBirth", "EmailAddress", "names", "last_names", "national_insurance_numbers")
             .HasMethod("GIN")
             .UseCollation(Collations.CaseInsensitive)
