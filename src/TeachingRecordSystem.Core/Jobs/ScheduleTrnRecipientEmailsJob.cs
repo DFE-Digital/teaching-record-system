@@ -50,7 +50,7 @@ public class ScheduleTrnRecipientEmailsJob(
                  and p.email_address is not null
                  and p.trn is not null
                  """)
-            .ToAsyncEnumerable()
+            .AsAsyncEnumerable()
             .ChunkAsync(100);
 
         await foreach (var chunk in trnRecipients.WithCancellation(cancellationToken))
