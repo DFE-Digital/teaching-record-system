@@ -698,7 +698,7 @@
           "Polly.Core": "[8.7.0, )",
           "Scrutor": "[7.0.0, )",
           "Serilog.Formatting.Compact": "[3.0.0, )",
-          "Serilog.Settings.Configuration": "[10.0.1, )",
+          "Serilog.Settings.Configuration": "[11.0.0, )",
           "Serilog.Sinks.Console": "[6.1.1, )",
           "SerilogTimings": "[3.1.0, )",
           "morelinq": "[4.4.0, )"
@@ -889,7 +889,7 @@
       },
       "Serilog.Extensions.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[10.0.0, )",
+        "requested": "[11.0.0, )",
         "resolved": "11.0.0",
         "contentHash": "/YP7eSegUevmDBOsnqta5adjqUo+iETiZgcotmtd2waqxhGhcNIcihXeNAZ4IIwEKAY7ab/DGTWjXzU8/jLlIg==",
         "dependencies": {
@@ -908,7 +908,7 @@
       },
       "Serilog.Settings.Configuration": {
         "type": "CentralTransitive",
-        "requested": "[10.0.1, )",
+        "requested": "[11.0.0, )",
         "resolved": "11.0.0",
         "contentHash": "2fFL1FwT+711DmAGwmbG8V6Z+qinxQgjhg5T+fb3dC7yYwMs4CvOFMZENXyBVHg3/EJecsyWqw7x5vTdQ07xdg==",
         "dependencies": {
