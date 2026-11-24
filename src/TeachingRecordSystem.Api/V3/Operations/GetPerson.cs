@@ -465,7 +465,10 @@ public class GetPersonHandler(GetPersonHelper getPersonHelper, TrsDbContext dbCo
                     ExemptionReasons = Array.Empty<PostgresModels.InductionExemptionReason>()
                         .AppendIf(
                             r.ExemptFromInduction == true,
-                            r.RouteToProfessionalStatusType!.InductionExemptionReason!)
+                            // Not every route type has an exemption reason of its own; fall back to the generic one
+                            // (mirrors Person.GetAllInductionExemptionReasonIds)
+                            r.RouteToProfessionalStatusType!.InductionExemptionReason ??
+                                await referenceDataCache.GetInductionExemptionReasonByIdAsync(PostgresModels.InductionExemptionReason.ExemptId))
                         .AppendIf(
                             r.ExemptFromInductionDueToQtsDate == true,
                             await referenceDataCache.GetInductionExemptionReasonByIdAsync(PostgresModels.InductionExemptionReason.QualifiedBefore7May2000Id))
