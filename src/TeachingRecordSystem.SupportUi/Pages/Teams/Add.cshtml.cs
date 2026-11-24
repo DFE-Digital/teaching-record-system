@@ -30,6 +30,8 @@ public class AddModel(TrsDbContext dbContext, TeamService teamService, TimeProvi
         Name = Name?.Trim();
         await this.ThrowIfInvalidAsync(_validator, cancellationToken);
 
+        await dbContext.AcquireUniqueValueLockAsync(Team.NameUniqueIndexName, Name!, cancellationToken);
+
         if (await dbContext.Teams.AnyAsync(t => t.Name == Name, cancellationToken))
         {
             ModelState.AddModelError(nameof(Name), "Team name must be unique.");
@@ -37,15 +39,7 @@ public class AddModel(TrsDbContext dbContext, TeamService teamService, TimeProvi
         }
 
         var processContext = new ProcessContext(ProcessType.TeamCreating, timeProvider.UtcNow, User.GetUserId());
-        try
-        {
-            await teamService.CreateTeamAsync(Name!, processContext, cancellationToken);
-        }
-        catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation("ix_teams_name"))
-        {
-            ModelState.AddModelError(nameof(Name), "Team name must be unique.");
-            return this.PageWithErrors();
-        }
+        await teamService.CreateTeamAsync(Name!, processContext, cancellationToken);
 
         TempData.SetFlashNotificationBanner($"{Name} team added");
         return Redirect(linkGenerator.Teams.Index());

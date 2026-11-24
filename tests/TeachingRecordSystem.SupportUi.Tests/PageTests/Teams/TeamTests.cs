@@ -138,6 +138,25 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_DuplicateName_ShowsValidationError()
+    {
+        // Arrange
+        await TestData.CreateTeamAsync("Existing team");
+        SetCurrentUser(await TestData.CreateUserAsync(role: UserRoles.Administrator));
+        var request = new HttpRequestMessage(HttpMethod.Post, "/teams/add")
+        {
+            Content = new FormUrlEncodedContentBuilder { { "Name", "Existing team" } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique.");
+        Assert.Equal(1, await WithDbContextAsync(dbContext => dbContext.Teams.CountAsync(t => t.Name == "Existing team")));
+    }
+
+    [Fact]
     public async Task Get_EditTeam_ShowsNameMembersAndCancelLink()
     {
         // Arrange

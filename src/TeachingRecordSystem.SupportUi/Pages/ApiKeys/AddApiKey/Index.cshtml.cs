@@ -38,22 +38,22 @@ public class IndexModel(TrsDbContext dbContext, TimeProvider timeProvider, UserS
 
         var processContext = new ProcessContext(ProcessType.ApiKeyCreating, timeProvider.UtcNow, User.GetUserId());
 
-        try
-        {
-            await userService.CreateApiKeyAsync(
-                new CreateApiKeyOptions
-                {
-                    ApplicationUserId = ApplicationUserId,
-                    Key = Key!
-                },
-                processContext,
-                cancellationToken);
-        }
-        catch (DbUpdateException ex) when (ex.IsUniqueIndexViolation(ApiKey.KeyUniqueIndexName))
+        await dbContext.AcquireUniqueValueLockAsync(ApiKey.KeyUniqueIndexName, Key!, cancellationToken);
+
+        if (await dbContext.ApiKeys.AnyAsync(k => k.Key == Key, cancellationToken))
         {
             ModelState.AddModelError(nameof(Key), "Key is already in use");
             return this.PageWithErrors();
         }
+
+        await userService.CreateApiKeyAsync(
+            new CreateApiKeyOptions
+            {
+                ApplicationUserId = ApplicationUserId,
+                Key = Key!
+            },
+            processContext,
+            cancellationToken);
 
         TempData.SetFlashNotificationBanner("API key added");
         return Redirect(linkGenerator.ApplicationUsers.EditApplicationUser.Index(ApplicationUserId));

@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 public class Team
 {
     public const int NameMaxLength = 200;
+    public const string NameUniqueIndexName = "ix_teams_name";
 
     public required Guid TeamId { get; init; }
     public required string Name { get; set; }
