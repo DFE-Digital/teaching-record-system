@@ -34,7 +34,7 @@ public class AddModel(TrsDbContext dbContext, TeamService teamService, TimeProvi
 
         if (await dbContext.Teams.AnyAsync(t => t.Name == Name, cancellationToken))
         {
-            ModelState.AddModelError(nameof(Name), "Team name must be unique.");
+            ModelState.AddModelError(nameof(Name), "Team name must be unique");
             return this.PageWithErrors();
         }
 

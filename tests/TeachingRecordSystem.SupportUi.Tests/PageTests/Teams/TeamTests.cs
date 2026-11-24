@@ -152,7 +152,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique.");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique");
         Assert.Equal(1, await WithDbContextAsync(dbContext => dbContext.Teams.CountAsync(t => t.Name == "Existing team")));
     }
 
@@ -236,7 +236,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.PostAsync($"/teams/{team.TeamId}", new FormUrlEncodedContentBuilder { { "Name", "Existing team" } });
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique.");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique");
         Assert.Equal("Original team", await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.Name).SingleAsync()));
     }
 

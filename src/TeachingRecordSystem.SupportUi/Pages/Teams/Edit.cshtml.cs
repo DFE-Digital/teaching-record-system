@@ -46,7 +46,7 @@ public class EditModel(TrsDbContext dbContext, TeamService teamService, TimeProv
 
         if (await dbContext.Teams.AnyAsync(t => t.TeamId != TeamId && t.Name == Name, cancellationToken))
         {
-            ModelState.AddModelError(nameof(Name), "Team name must be unique.");
+            ModelState.AddModelError(nameof(Name), "Team name must be unique");
             return this.PageWithErrors();
         }
 
