@@ -7,4 +7,6 @@ module "domains" {
   domains               = each.value.domains
   environment           = each.value.environment_short
   host_name             = each.value.origin_hostname
+  rate_limit            = var.rate_limit
+  allow_aks              = var.allow_aks
 }
