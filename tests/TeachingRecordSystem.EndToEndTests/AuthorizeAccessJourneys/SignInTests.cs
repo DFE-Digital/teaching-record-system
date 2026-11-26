@@ -158,9 +158,9 @@ public partial class SignInTests(HostFixture hostFixture) : TestBase(hostFixture
         await page.ClickGovUkButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/qts-details");
-        Assert.Equal(1, await page.Locator("select#TrainingProviderId").CountAsync());
-        Assert.Equal(1, await page.Locator("select#SubjectId").CountAsync());
-        Assert.Equal(0, await page.Locator(".autocomplete__input").CountAsync());
+        await Expect(page.Locator("select#TrainingProviderId")).ToHaveCountAsync(1);
+        await Expect(page.Locator("select#SubjectId")).ToHaveCountAsync(1);
+        await Expect(page.Locator(".autocomplete__input")).ToHaveCountAsync(0);
         await page.FillAsync("input#YearQtsReceived", TimeProvider.UtcNow.Year.ToString());
         await page.SelectOptionAsync("select#TrainingProviderId", [new SelectOptionValue { Value = trainingProvider.TrainingProviderId.ToString() }]);
         await page.SelectOptionAsync("select#SubjectId", [new SelectOptionValue { Value = qtsSubject.TrainingSubjectId.ToString() }]);

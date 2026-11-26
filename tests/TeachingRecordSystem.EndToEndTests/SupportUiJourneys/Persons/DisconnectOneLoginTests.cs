@@ -89,12 +89,12 @@ public class DisconnectOneLoginTests(HostFixture hostFixture) : TestBase(hostFix
         await page.ClickBackLinkAsync();
 
         await page.AssertOnDisconnectOneLoginVerifiedPageAsync(person.PersonId, oneLogin.Subject);
-        Assert.True(await page.IsCheckedAsync($"input[value='{nameof(DisconnectOneLoginStayVerified.Yes)}']"));
+        await Expect(page.Locator($"input[value='{nameof(DisconnectOneLoginStayVerified.Yes)}']")).ToBeCheckedAsync();
 
         await page.ClickBackLinkAsync();
 
         await page.AssertOnDisconnectOneLoginIndexPageAsync(person.PersonId, oneLogin.Subject);
-        Assert.True(await page.IsCheckedAsync($"input[value='{nameof(DisconnectOneLoginReason.ConnectedIncorrectly)}']"));
+        await Expect(page.Locator($"input[value='{nameof(DisconnectOneLoginReason.ConnectedIncorrectly)}']")).ToBeCheckedAsync();
 
         await page.ClickBackLinkAsync();
 

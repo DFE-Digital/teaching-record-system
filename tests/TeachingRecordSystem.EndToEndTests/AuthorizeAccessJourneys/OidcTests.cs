@@ -25,13 +25,8 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
         // Assert
-        var accessToken = await page.GetByLabel("Access token").InputValueAsync();
-        Assert.NotNull(accessToken);
-        Assert.NotEmpty(accessToken);
-
-        var refreshToken = await page.GetByLabel("Refresh token").InputValueAsync();
-        Assert.NotNull(refreshToken);
-        Assert.NotEmpty(refreshToken);
+        await Expect(page.GetByLabel("Access token")).Not.ToBeEmptyAsync();
+        await Expect(page.GetByLabel("Refresh token")).Not.ToBeEmptyAsync();
 
         var claims = JsonSerializer.Deserialize<Dictionary<string, string>>(await page.GetByLabel("Claims").InputValueAsync()) ?? [];
         Assert.Equal(oneLoginUser.Subject, claims.GetValueOrDefault("sub"));
@@ -61,33 +56,23 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickGovUkStartButtonAsync();
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
+        await Expect(page.GetByLabel("Access token")).Not.ToBeEmptyAsync();
+        await Expect(page.GetByLabel("Refresh token")).Not.ToBeEmptyAsync();
+
         var initialAccessToken = await page.GetByLabel("Access token").InputValueAsync();
         var initialRefreshToken = await page.GetByLabel("Refresh token").InputValueAsync();
-
-        Assert.NotNull(initialAccessToken);
-        Assert.NotEmpty(initialAccessToken);
-        Assert.NotNull(initialRefreshToken);
-        Assert.NotEmpty(initialRefreshToken);
 
         await page.ClickAsync("a:text-is('Test refresh token')");
         await page.WaitForUrlPathAsync("/oidc-test/refresh-token");
 
         await page.ClickButtonAsync("Exchange refresh token for new access token");
-        await page.WaitForSelectorAsync("input#OldAccessToken[value]:not([value=''])", new() { Timeout = 10000 });
 
-        var oldAccessToken = await page.GetByLabel("Old access token").InputValueAsync();
-        var oldRefreshToken = await page.GetByLabel("Old refresh token").InputValueAsync();
-        Assert.Equal(initialAccessToken, oldAccessToken);
-        Assert.Equal(initialRefreshToken, oldRefreshToken);
+        await Expect(page.GetByLabel("Old access token")).ToHaveValueAsync(initialAccessToken, new() { Timeout = 10000 });
+        await Expect(page.GetByLabel("Old refresh token")).ToHaveValueAsync(initialRefreshToken);
 
-        var currentAccessToken = await page.GetByLabel("Current access token").InputValueAsync();
-        var currentRefreshToken = await page.GetByLabel("Current refresh token").InputValueAsync();
-
-        Assert.NotNull(currentAccessToken);
-        Assert.NotEmpty(currentAccessToken);
-        Assert.NotEqual(initialAccessToken, currentAccessToken);
-        Assert.NotNull(currentRefreshToken);
-        Assert.NotEmpty(currentRefreshToken);
-        Assert.NotEqual(initialRefreshToken, currentRefreshToken);
+        await Expect(page.GetByLabel("Current access token")).Not.ToBeEmptyAsync();
+        await Expect(page.GetByLabel("Current access token")).Not.ToHaveValueAsync(initialAccessToken);
+        await Expect(page.GetByLabel("Current refresh token")).Not.ToBeEmptyAsync();
+        await Expect(page.GetByLabel("Current refresh token")).Not.ToHaveValueAsync(initialRefreshToken);
     }
 }

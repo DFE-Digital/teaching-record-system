@@ -26,6 +26,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var teamsLink = page.GetByRole(AriaRole.Link, new() { Name = "Add and manage teams" });
-        Assert.True(await teamsLink.IsVisibleAsync());
+        await Expect(teamsLink).ToBeVisibleAsync();
     }
 }

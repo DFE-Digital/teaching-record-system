@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
 namespace TeachingRecordSystem.EndToEndTests.SupportUiJourneys.SupportTasks;
@@ -16,16 +17,13 @@ public static class IntegrationTransactionExtensions
     public static Task AssertOnIntegrationTransactionDetailPageAsync(this IPage page, long integrationTransactionId) =>
         page.WaitForUrlPathAsync($"/support-tasks/integration-transactions/{integrationTransactionId}/detail");
 
-    public static async Task AssertOnIntegrationTransactionDetailRowPageAsync(
+    public static Task AssertOnIntegrationTransactionDetailRowPageAsync(
         this IPage page,
         long integrationTransactionId,
-        long integrationTransactionRecordId)
-    {
-        await page.WaitForURLAsync(url =>
-            new Uri(url).PathAndQuery.Equals(
-                $"/support-tasks/integration-transactions/{integrationTransactionId}/row?integrationtransactionrecordid={integrationTransactionRecordId}",
-                StringComparison.OrdinalIgnoreCase));
-    }
+        long integrationTransactionRecordId) =>
+        Expect(page).ToHaveURLAsync(new Regex(
+            $@"^[a-z]+://[^/?#]+{Regex.Escape($"/support-tasks/integration-transactions/{integrationTransactionId}/row?integrationtransactionrecordid={integrationTransactionRecordId}")}(?:#|$)",
+            RegexOptions.IgnoreCase));
 
     public static Task GoToTeacherPensionsSupportTasks(this IPage page) =>
         page.GotoAsync($"/support-tasks/teacher-pensions");

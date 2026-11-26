@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
 namespace TeachingRecordSystem.EndToEndTests;
@@ -5,9 +7,31 @@ namespace TeachingRecordSystem.EndToEndTests;
 public static class PageExtensions
 {
     public static Task WaitForUrlPathAsync(this IPage page, string path) =>
-        page.WaitForURLAsync(
-            url => new Uri(url).LocalPath == path,
-            new PageWaitForURLOptions { WaitUntil = WaitUntilState.Commit });
+        Expect(page).ToHaveURLAsync(UrlPathRegex(path));
+
+    // Matches a URL whose path is exactly path, whether or not the characters in it that aren't
+    // unreserved are percent-encoded, e.g. the colons in a One Login subject
+    private static Regex UrlPathRegex(string path)
+    {
+        var pattern = new StringBuilder(@"^[a-z]+://[^/?#]+");
+
+        foreach (var c in path)
+        {
+            if (char.IsAsciiLetterOrDigit(c) || c is '/' or '-' or '_' or '.' or '~')
+            {
+                pattern.Append(Regex.Escape(c.ToString()));
+            }
+            else
+            {
+                var encoded = string.Concat(Encoding.UTF8.GetBytes(c.ToString()).Select(b => $"%{b:X2}"));
+                pattern.Append($"(?:{Regex.Escape(c.ToString())}|{encoded})");
+            }
+        }
+
+        pattern.Append("(?:[?#]|$)");
+
+        return new Regex(pattern.ToString(), RegexOptions.IgnoreCase);
+    }
 
     public static async Task GoToAuthorizeAccessTestStartPageAsync(this IPage page, string? trnToken = null, bool deferred = false)
     {
@@ -23,13 +47,13 @@ public static class PageExtensions
     public static async Task AssertSignedInAsync(this IPage page, string trn)
     {
         await page.WaitForUrlPathAsync("/test");
-        Assert.Equal(trn, await page.GetByTestId("trn").InnerTextAsync());
+        await Expect(page.GetByTestId("trn")).ToHaveTextAsync(trn);
     }
 
     public static async Task AssertSignedInWithDormantTrnRequestAsync(this IPage page, string expectedTrnRequestId)
     {
         await page.WaitForUrlPathAsync("/test");
-        Assert.Equal(expectedTrnRequestId, await page.GetByTestId("trn-request-id").InnerTextAsync());
+        await Expect(page.GetByTestId("trn-request-id")).ToHaveTextAsync(expectedTrnRequestId);
     }
 
     public static async Task FillDateInputAsync(this IPage page, DateOnly date)
@@ -70,45 +94,42 @@ public static class PageExtensions
     {
         if (expectedHeader != null)
         {
-            Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading{TestBase.TextIsSelector(expectedHeader)}"));
+            await Expect(page.NotificationBanner.Heading).ToHaveTextAsync(expectedHeader);
         }
         if (expectedMessage != null)
         {
-            Assert.Equal(expectedMessage, await page.InnerTextAsync($".govuk-notification-banner p{TestBase.TextIsSelector(expectedMessage)}"));
+            await Expect(page.NotificationBanner.Locator.Locator("p").GetByText(expectedMessage, new() { Exact = true })).ToBeVisibleAsync();
         }
     }
 
     public static Task AssertHasErrorSummaryAsync(this IPage page) =>
-        Assertions.Expect(page.ErrorSummary.Locator).ToBeVisibleAsync();
+        Expect(page.ErrorSummary.Locator).ToBeVisibleAsync();
 
     public static async Task AssertDateInputAsync(this IPage page, DateOnly date)
     {
-        Assert.Equal(date.Day.ToString(), await page.InputValueAsync("label:text-is('Day')"));
-        Assert.Equal(date.Month.ToString(), await page.InputValueAsync("label:text-is('Month')"));
-        Assert.Equal(date.Year.ToString(), await page.InputValueAsync("label:text-is('Year')"));
+        await Expect(page.Locator("label:text-is('Day')")).ToHaveValueAsync(date.Day.ToString());
+        await Expect(page.Locator("label:text-is('Month')")).ToHaveValueAsync(date.Month.ToString());
+        await Expect(page.Locator("label:text-is('Year')")).ToHaveValueAsync(date.Year.ToString());
     }
 
     public static async Task AssertNameInputAsync(this IPage page, string firstName, string middleName, string lastName)
     {
-        Assert.Equal(firstName, await page.InputValueAsync("text=First Name"));
-        Assert.Equal(middleName, await page.InputValueAsync("text=Middle Name"));
-        Assert.Equal(lastName, await page.InputValueAsync("text=Last Name"));
+        await Expect(page.Locator("text=First Name")).ToHaveValueAsync(firstName);
+        await Expect(page.Locator("text=Middle Name")).ToHaveValueAsync(middleName);
+        await Expect(page.Locator("text=Last Name")).ToHaveValueAsync(lastName);
     }
 
     public static async Task AssertDateInputEmptyAsync(this IPage page)
     {
-        Assert.Empty(await page.InputValueAsync("label:text-is('Day')"));
-        Assert.Empty(await page.InputValueAsync("label:text-is('Month')"));
-        Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
+        await Expect(page.Locator("label:text-is('Day')")).ToBeEmptyAsync();
+        await Expect(page.Locator("label:text-is('Month')")).ToBeEmptyAsync();
+        await Expect(page.Locator("label:text-is('Year')")).ToBeEmptyAsync();
     }
 
     public static async Task AssertBannerAsync(this IPage page, string title, string text)
     {
-        var bannerTitle = (await page.Locator("h2.govuk-notification-banner__title").TextContentAsync())?.Trim();
-        var bannerText = (await page.Locator("h3.govuk-notification-banner__heading").TextContentAsync())?.Trim();
-
-        Assert.Equal(title, bannerTitle);
-        Assert.Equal(text, bannerText);
+        await Expect(page.NotificationBanner.Title).ToHaveTextAsync(title);
+        await Expect(page.NotificationBanner.Heading).ToHaveTextAsync(text);
     }
 
     public static async Task FillDateInputAsync(this IPage page, string id, DateOnly date)
@@ -148,30 +169,20 @@ public static class PageExtensions
         await input.PressAsync("Enter");
     }
 
-    public static async Task AssertContentEqualsAsync(this IPage page, string content, string label)
-    {
-        var ddText = await page.FindContentForLabelAsync(label);
-        Assert.Contains(content, ddText);
-    }
+    public static Task AssertContentEqualsAsync(this IPage page, string content, string label) =>
+        Expect(page.FindContentForLabel(label)).ToContainTextAsync(content);
 
-    public static async Task AssertContentContainsAsync(this IPage page, string content, string label)
-    {
-        var ddText = await page.FindContentForLabelAsync(label);
-        Assert.Contains(content, ddText);
-    }
+    public static Task AssertContentContainsAsync(this IPage page, string content, string label) =>
+        Expect(page.FindContentForLabel(label)).ToContainTextAsync(content);
 
-    public static Task<string> FindContentForLabelAsync(this IPage page, string label)
+    public static ILocator FindContentForLabel(this IPage page, string label)
     {
         var dtElement = page.Locator($"dt{TestBase.HasTextSelector(label)}");
-        var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
-        return ddElement.InnerTextAsync();
+        return dtElement.Locator("xpath=following-sibling::dd[1]");
     }
 
-    public static async Task AssertNoListElementAsync(this IPage page, string label)
-    {
-        var element = page.Locator($"dt{TestBase.HasTextSelector(label)}");
-        Assert.False(await element.IsVisibleAsync());
-    }
+    public static Task AssertNoListElementAsync(this IPage page, string label) =>
+        Expect(page.Locator($"dt{TestBase.HasTextSelector(label)}")).ToBeHiddenAsync();
 
     public static Task ClickAcceptChangeButtonAsync(this IPage page) =>
         ClickGovUkButtonAsync(page, "Accept change");
@@ -216,19 +227,15 @@ public static class PageExtensions
         return link.ClickAsync();
     }
 
-    public static async Task AssertBannerLinksToPersonRecord(this IPage page)
-    {
-        var href = await page.Locator("a.govuk-link").GetAttributeAsync("href");
-        Assert.Contains("persons/", href);
-        var parts = href!.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        Assert.True(Guid.TryParse(parts.Last(), out _));
-    }
+    public static Task AssertBannerLinksToPersonRecord(this IPage page) =>
+        Expect(page.Locator("a.govuk-link")).ToHaveAttributeAsync(
+            "href",
+            new Regex(@"persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/?$", RegexOptions.IgnoreCase));
 
-    public static async Task AssertBannerLinksToPersonRecord(this IPage page, Guid personId)
-    {
-        var href = await page.Locator("a.govuk-link:has-text('View record (opens in a new tab)')").GetAttributeAsync("href");
-        Assert.Contains($"/persons/{personId}", href);
-    }
+    public static Task AssertBannerLinksToPersonRecord(this IPage page, Guid personId) =>
+        Expect(page.Locator("a.govuk-link:has-text('View record (opens in a new tab)')")).ToHaveAttributeAsync(
+            "href",
+            new Regex(Regex.Escape($"/persons/{personId}")));
 
     public static Task SelectProvideAdditionalInformationsAsync(this IPage page, bool addAdditionalDetail, string? details = null, string labelText = "Enter details") =>
         page.SelectReasonMoreDetailsAsync(labelText, addAdditionalDetail, details);

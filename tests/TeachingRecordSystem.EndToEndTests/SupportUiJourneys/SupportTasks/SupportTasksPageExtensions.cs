@@ -33,8 +33,8 @@ public static class SupportTasksPageExtensions
         page.ClickAsync("label[for='select-all-tasks']");
 
     public static Task AssertSelectedTaskCountAsync(this IPage page, int count) =>
-        page.Locator($"[data-testid='selected-task-count']{TestBase.TextIsSelector(count.ToString())}").WaitForAsync();
+        Expect(page.GetByTestId("selected-task-count")).ToHaveTextAsync(count.ToString());
 
     public static Task AssertNoTasksSelectedAsync(this IPage page) =>
-        page.Locator("[data-testid='selected-task-count']").WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Detached });
+        Expect(page.GetByTestId("selected-task-count")).Not.ToBeAttachedAsync();
 }

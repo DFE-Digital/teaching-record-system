@@ -30,7 +30,7 @@ public class AddPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnAddPersonCheckAnswersPageAsync();
         await page.ClickGovUkButtonAsync("Confirm and create record");
 
-        await page.WaitForURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
+        await Expect(page).ToHaveURLAsync(new Regex(@"/persons/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"));
         await page.AssertFlashMessageAsync(expectedHeader: "Record created for Alfred The Great");
     }
 

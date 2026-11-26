@@ -139,7 +139,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
         var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var changeReasonDetail = "My change reason detail";
-        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldSpecialism)));
         var personId = person.PersonId;
         var qualificationId = person.Qualifications!.OfType<MandatoryQualification>().Single().QualificationId;
 
@@ -154,7 +154,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqSpecialismPageAsync(qualificationId);
 
-        await page.IsCheckedAsync($"label{TextIsSelector(oldSpecialism.GetTitle())}");
+        await Expect(page.GetByLabel(oldSpecialism.GetTitle(), new() { Exact = true })).ToBeCheckedAsync();
 
         await page.CheckAsync($"label{TextIsSelector(newSpecialism.GetTitle())}");
 
@@ -278,7 +278,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isStatusChange)
         {
-            await page.IsCheckedAsync($"label{TextIsSelector(oldStatus.GetTitle())}");
+            await Expect(page.GetByLabel(oldStatus.GetTitle(), new() { Exact = true })).ToBeCheckedAsync();
 
             await page.CheckAsync($"label{TextIsSelector(newStatus.GetTitle())}");
         }
