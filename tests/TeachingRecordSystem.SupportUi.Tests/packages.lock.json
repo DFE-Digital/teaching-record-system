@@ -255,6 +255,15 @@
           "Google.Apis.Bigquery.v2": "[1.57.0.2704, 2.0.0)"
         }
       },
+      "GovUk.Frontend.AspNetCore.Testing": {
+        "type": "Transitive",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "uLeGA7D+Ciz4kkMjpbuLHRYMehqxb5CpTcrr9kc73EUCsfkhxjKUHofMTsOb4y4hsrG73uqqw86MU3IVM+DS+Q==",
+        "dependencies": {
+          "AngleSharp": "1.10.5",
+          "GovUk.Frontend.AspNetCore": "[5.1.1-pre.0.30]"
+        }
+      },
       "JWT": {
         "type": "Transitive",
         "resolved": "11.0.0",
@@ -929,7 +938,7 @@
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
-          "AngleSharp": "[1.10.0, )",
+          "AngleSharp": "[1.10.5, )",
           "Azure.Storage.Blobs": "[12.30.1, )",
           "Azure.Storage.Files.DataLake": "[12.28.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
@@ -968,7 +977,7 @@
         "dependencies": {
           "AspNetCore.SassCompiler": "[1.107.1, )",
           "CsvHelper": "[34.0.0, )",
-          "GovUk.Frontend.AspNetCore": "[5.1.0, )",
+          "GovUk.Frontend.AspNetCore": "[5.1.1-pre.0.30, )",
           "GovUk.Questions.AspNetCore": "[1.0.4, )",
           "Htmx": "[1.12.0, )",
           "Htmx.TagHelpers": "[1.12.0, )",
@@ -1004,6 +1013,7 @@
       "teachingrecordsystem.uitestcommon": {
         "type": "Project",
         "dependencies": {
+          "GovUk.Frontend.AspNetCore.Testing.Xunit.v3": "[5.1.1-pre.0.30, )",
           "JetBrains.Annotations": "[2026.2.0, )",
           "TeachingRecordSystem.TestCommon": "[1.0.0, )",
           "TeachingRecordSystem.WebCommon": "[1.0.0, )"
@@ -1038,9 +1048,9 @@
       },
       "AngleSharp": {
         "type": "CentralTransitive",
-        "requested": "[1.10.0, )",
-        "resolved": "1.10.0",
-        "contentHash": "jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA=="
+        "requested": "[1.10.5, )",
+        "resolved": "1.10.5",
+        "contentHash": "+XcQgYnOCjizDLpBImAscxgyje0ypUdWXvP+TDEVowygb50J6frELXN3YD2SjOR/BuJInWUr6tFUwl9WN1l31w=="
       },
       "AspNetCore.HealthChecks.NpgSql": {
         "type": "CentralTransitive",
@@ -1189,9 +1199,19 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[5.1.0, )",
-        "resolved": "5.1.0",
-        "contentHash": "qnTl5NKMJFziTehnsm3Khw1imn5yfNeKWB7m4wD+KOZc32JeyQw31Da7A1hJvfLkvxTi28ppi4muWGzAupZd4A=="
+        "requested": "[5.1.1-pre.0.30, )",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "CKYJK0TzBnDsXYSuvOS5tLgXcVyy42SxU4fJEbxiSEu8DVfmJQAn+ldfxRwc7s8s3Ab07RKck1aCcbL2HQ8soA=="
+      },
+      "GovUk.Frontend.AspNetCore.Testing.Xunit.v3": {
+        "type": "CentralTransitive",
+        "requested": "[5.1.1-pre.0.30, )",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "1oZf2ywzqcY4V5/Oh5g7cBn2nVQY1C5wz1BruX4nPcsTlCjWz94RhoovDvfbNysVCoQGeAwsctecYOariMuzvQ==",
+        "dependencies": {
+          "GovUk.Frontend.AspNetCore.Testing": "[5.1.1-pre.0.30]",
+          "xunit.v3.assert": "3.2.2"
+        }
       },
       "GovUk.Questions.AspNetCore": {
         "type": "CentralTransitive",

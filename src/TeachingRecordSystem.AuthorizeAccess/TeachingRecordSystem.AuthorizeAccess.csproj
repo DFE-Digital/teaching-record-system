@@ -3,9 +3,6 @@
   <PropertyGroup>
     <RestoreGovUkFrontendStylesheet>false</RestoreGovUkFrontendStylesheet>
     <RestoreGovUkFrontendNpmPackage>true</RestoreGovUkFrontendNpmPackage>
-    <!-- Mirrors the govuk-frontend npm package layout so that @govuk-one-login/service-header's
-         `@use "govuk-frontend/dist/govuk/..."` rules resolve against the 'lib' Sass load path. -->
-    <GovUkFrontendNpmPackageDirectory>lib/govuk-frontend/dist/govuk</GovUkFrontendNpmPackageDirectory>
     <RestoreGovUkFrontendSupportPackage>true</RestoreGovUkFrontendSupportPackage>
     <RequiresSharedAppsettings>true</RequiresSharedAppsettings>
   </PropertyGroup>

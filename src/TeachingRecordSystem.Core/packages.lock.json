@@ -4,9 +4,9 @@
     "net11.0": {
       "AngleSharp": {
         "type": "Direct",
-        "requested": "[1.10.0, )",
-        "resolved": "1.10.0",
-        "contentHash": "jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA=="
+        "requested": "[1.10.5, )",
+        "resolved": "1.10.5",
+        "contentHash": "+XcQgYnOCjizDLpBImAscxgyje0ypUdWXvP+TDEVowygb50J6frELXN3YD2SjOR/BuJInWUr6tFUwl9WN1l31w=="
       },
       "Azure.Storage.Blobs": {
         "type": "Direct",

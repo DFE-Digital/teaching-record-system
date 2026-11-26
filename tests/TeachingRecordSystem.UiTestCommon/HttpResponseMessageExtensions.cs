@@ -19,10 +19,15 @@ public static class HttpResponseMessageExtensions
         var browsingContext = BrowsingContext.New(Configuration.Default);
         var doc = (IHtmlDocument)await browsingContext.OpenAsync(req => req.Content(content));
 
-        AssertSmartQuotesUsed();
-        AssertDateInputsIncludeHint();
+        AssertDocumentIsValid(doc);
 
         return doc;
+    }
+
+    public static void AssertDocumentIsValid(IHtmlDocument doc)
+    {
+        AssertSmartQuotesUsed();
+        AssertDateInputsIncludeHint();
 
         void AssertSmartQuotesUsed()
         {

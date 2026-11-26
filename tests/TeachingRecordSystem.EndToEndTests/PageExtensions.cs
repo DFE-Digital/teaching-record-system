@@ -49,7 +49,7 @@ public static class PageExtensions
         page.ClickAsync(".govuk-button--start");
 
     public static Task ClickBackLinkAsync(this IPage page) =>
-        page.ClickAsync(".govuk-back-link");
+        page.BackLink.ClickAsync();
 
     public static Task GoToHomePageAsync(this IPage page) =>
         page.GotoAsync("/");
@@ -58,7 +58,7 @@ public static class PageExtensions
         page.GetByTestId(testId).ClickAsync();
 
     public static Task ClickChangeLinkForSummaryListRowWithKeyAsync(this IPage page, string key) =>
-        page.Locator($".govuk-summary-list__row:has(> dt{TestBase.TextSelector(key)})").GetByText("Change").ClickAsync();
+        page.GetSummaryListRowByKey(key).ChangeLink.ClickAsync();
 
     public static Task AssertOnAddApiKeyPageAsync(this IPage page) =>
         page.WaitForUrlPathAsync($"/api-keys/add");
@@ -78,11 +78,8 @@ public static class PageExtensions
         }
     }
 
-    public static void AssertHasErrorSummary(this IPage page)
-    {
-        var element = page.Locator("h2:text('There is a problem')");
-        Assert.NotNull(element);
-    }
+    public static Task AssertHasErrorSummaryAsync(this IPage page) =>
+        Assertions.Expect(page.ErrorSummary.Locator).ToBeVisibleAsync();
 
     public static async Task AssertDateInputAsync(this IPage page, DateOnly date)
     {

@@ -6,7 +6,7 @@
     <!-- https://github.com/dotnet/sdk/issues/25294 -->
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="AngleSharp" Version="1.10.0" />
+    <PackageVersion Include="AngleSharp" Version="1.10.5" />
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.SassCompiler" Version="1.107.1" />
@@ -31,7 +31,9 @@
     <PackageVersion Include="GovUk.Questions.AspNetCore" Version="1.0.4" />
     <PackageVersion Include="GovUk.Questions.AspNetCore.Testing" Version="1.0.4" />
     <PackageVersion Include="GovukNotify" Version="8.2.0" />
-    <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="5.1.0" />
+    <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="5.1.1-pre.0.30" />
+    <PackageVersion Include="GovUk.Frontend.AspNetCore.Testing.Playwright" Version="5.1.1-pre.0.30" />
+    <PackageVersion Include="GovUk.Frontend.AspNetCore.Testing.Xunit.v3" Version="5.1.1-pre.0.30" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.25" />
     <PackageVersion Include="Hangfire.Core" Version="1.8.25" />
     <PackageVersion Include="Hangfire.NetCore" Version="1.8.25" />

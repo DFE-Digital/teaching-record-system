@@ -652,7 +652,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.EnterDegreeTypeAsync("");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
-        page.AssertHasErrorSummary();
+        await page.AssertHasErrorSummaryAsync();
         await page.EnterDegreeTypeAsync(setDegreeType);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -708,7 +708,7 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
         await page.EnterCountryAsync("");
         await page.ClickContinueButtonAsync();
-        page.AssertHasErrorSummary();
+        await page.AssertHasErrorSummaryAsync();
         await page.EnterCountryAsync(setCountry.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -747,20 +747,20 @@ public class EditRouteToProfessionalStatusTests(HostFixture hostFixture) : TestB
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertHasErrorSummary();
+        await page.AssertHasErrorSummaryAsync();
         await page.SelectAgeRangeAsync(TrainingAgeSpecialismType.Range);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertHasErrorSummary();
+        await page.AssertHasErrorSummaryAsync();
         await page.FillAsync($"label:text-is('From')", "6");
         await page.FillAsync($"label:text-is('To')", "1");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        page.AssertHasErrorSummary();
+        await page.AssertHasErrorSummaryAsync();
         await page.FillAsync($"label:text-is('To')", "11");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();

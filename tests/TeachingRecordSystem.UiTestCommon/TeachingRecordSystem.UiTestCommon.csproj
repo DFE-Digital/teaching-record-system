@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GovUk.Frontend.AspNetCore.Testing.Xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>

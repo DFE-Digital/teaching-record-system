@@ -1,3 +1,4 @@
+using System.Net;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.AspNetCore.Http;
@@ -14,16 +15,17 @@ public static partial class AssertEx
 {
     public static void ResponseIsRedirectTo(HttpResponseMessage response, string expectedUrl)
     {
+        Assert.RedirectsTo(response, expectedUrl);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var location = response.Headers.Location?.OriginalString;
-        Assert.Equal(expectedUrl, location);
     }
 
     public static async Task<IHtmlDocument> HtmlResponseAsync(HttpResponseMessage response, int expectedStatusCode = 200)
     {
-        Assert.Equal(expectedStatusCode, (int)response.StatusCode);
+        var doc = await Assert.HtmlResponseAsync(response, (HttpStatusCode)expectedStatusCode);
 
-        return await response.GetDocumentAsync();
+        HttpResponseMessageExtensions.AssertDocumentIsValid(doc);
+
+        return doc;
     }
 
     public static void HtmlDocumentHasError(IHtmlDocument doc, string fieldName, string expectedMessage)
@@ -41,16 +43,8 @@ public static partial class AssertEx
         Assert.Equal(expectedMessage, errorMessage);
     }
 
-    public static void HtmlDocumentHasSummaryError(IHtmlDocument doc, string expectedMessage)
-    {
-        var errorElement = doc.QuerySelectorAll(".govuk-error-summary .govuk-error-summary__list li")
-            .SingleOrDefault(item => item.TrimmedText() == expectedMessage);
-
-        if (errorElement == null)
-        {
-            throw new XunitException($"Error message '{expectedMessage}' was not found within the error summary.");
-        }
-    }
+    public static void HtmlDocumentHasSummaryError(IHtmlDocument doc, string expectedMessage) =>
+        Assert.ErrorSummaryContains(doc, expectedMessage);
 
     public static void HtmlDocumentHasFlashNotificationBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {

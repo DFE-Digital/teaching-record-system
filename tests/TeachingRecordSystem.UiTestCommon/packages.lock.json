@@ -2,6 +2,16 @@
   "version": 2,
   "dependencies": {
     "net11.0": {
+      "GovUk.Frontend.AspNetCore.Testing.Xunit.v3": {
+        "type": "Direct",
+        "requested": "[5.1.1-pre.0.30, )",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "1oZf2ywzqcY4V5/Oh5g7cBn2nVQY1C5wz1BruX4nPcsTlCjWz94RhoovDvfbNysVCoQGeAwsctecYOariMuzvQ==",
+        "dependencies": {
+          "GovUk.Frontend.AspNetCore.Testing": "[5.1.1-pre.0.30]",
+          "xunit.v3.assert": "3.2.2"
+        }
+      },
       "JetBrains.Annotations": {
         "type": "Direct",
         "requested": "[2026.2.0, )",
@@ -188,6 +198,15 @@
         "dependencies": {
           "Google.Api.Gax.Rest": "[4.0.0, 5.0.0)",
           "Google.Apis.Bigquery.v2": "[1.57.0.2704, 2.0.0)"
+        }
+      },
+      "GovUk.Frontend.AspNetCore.Testing": {
+        "type": "Transitive",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "uLeGA7D+Ciz4kkMjpbuLHRYMehqxb5CpTcrr9kc73EUCsfkhxjKUHofMTsOb4y4hsrG73uqqw86MU3IVM+DS+Q==",
+        "dependencies": {
+          "AngleSharp": "1.10.5",
+          "GovUk.Frontend.AspNetCore": "[5.1.1-pre.0.30]"
         }
       },
       "JWT": {
@@ -739,7 +758,7 @@
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
-          "AngleSharp": "[1.10.0, )",
+          "AngleSharp": "[1.10.5, )",
           "Azure.Storage.Blobs": "[12.30.1, )",
           "Azure.Storage.Files.DataLake": "[12.28.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
@@ -825,9 +844,9 @@
       },
       "AngleSharp": {
         "type": "CentralTransitive",
-        "requested": "[1.10.0, )",
-        "resolved": "1.10.0",
-        "contentHash": "jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA=="
+        "requested": "[1.10.5, )",
+        "resolved": "1.10.5",
+        "contentHash": "+XcQgYnOCjizDLpBImAscxgyje0ypUdWXvP+TDEVowygb50J6frELXN3YD2SjOR/BuJInWUr6tFUwl9WN1l31w=="
       },
       "AspNetCore.HealthChecks.NpgSql": {
         "type": "CentralTransitive",
@@ -974,6 +993,12 @@
         "dependencies": {
           "FluentValidation": "12.2.0"
         }
+      },
+      "GovUk.Frontend.AspNetCore": {
+        "type": "CentralTransitive",
+        "requested": "[5.1.1-pre.0.30, )",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "CKYJK0TzBnDsXYSuvOS5tLgXcVyy42SxU4fJEbxiSEu8DVfmJQAn+ldfxRwc7s8s3Ab07RKck1aCcbL2HQ8soA=="
       },
       "GovukNotify": {
         "type": "CentralTransitive",

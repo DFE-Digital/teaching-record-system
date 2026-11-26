@@ -19,9 +19,9 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[5.1.0, )",
-        "resolved": "5.1.0",
-        "contentHash": "qnTl5NKMJFziTehnsm3Khw1imn5yfNeKWB7m4wD+KOZc32JeyQw31Da7A1hJvfLkvxTi28ppi4muWGzAupZd4A=="
+        "requested": "[5.1.1-pre.0.30, )",
+        "resolved": "5.1.1-pre.0.30",
+        "contentHash": "CKYJK0TzBnDsXYSuvOS5tLgXcVyy42SxU4fJEbxiSEu8DVfmJQAn+ldfxRwc7s8s3Ab07RKck1aCcbL2HQ8soA=="
       },
       "GovUk.OneLogin.AspNetCore": {
         "type": "Direct",
@@ -842,7 +842,7 @@
       "teachingrecordsystem.core": {
         "type": "Project",
         "dependencies": {
-          "AngleSharp": "[1.10.0, )",
+          "AngleSharp": "[1.10.5, )",
           "Azure.Storage.Blobs": "[12.30.1, )",
           "Azure.Storage.Files.DataLake": "[12.28.0, )",
           "CloudNative.CloudEvents": "[2.9.0, )",
@@ -905,9 +905,9 @@
       },
       "AngleSharp": {
         "type": "CentralTransitive",
-        "requested": "[1.10.0, )",
-        "resolved": "1.10.0",
-        "contentHash": "jibGB16fKOT+p0T7/eMzsiHj/V43QXg/wGQot4VWHF3zEdH+RGco8rHFNeAbf526CrSOkA8WwILz3DDus+cUUA=="
+        "requested": "[1.10.5, )",
+        "resolved": "1.10.5",
+        "contentHash": "+XcQgYnOCjizDLpBImAscxgyje0ypUdWXvP+TDEVowygb50J6frELXN3YD2SjOR/BuJInWUr6tFUwl9WN1l31w=="
       },
       "AspNetCore.HealthChecks.NpgSql": {
         "type": "CentralTransitive",
