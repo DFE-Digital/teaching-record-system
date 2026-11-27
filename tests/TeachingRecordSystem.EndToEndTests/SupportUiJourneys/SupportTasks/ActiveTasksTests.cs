@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace TeachingRecordSystem.EndToEndTests.SupportUiJourneys.SupportTasks;
 
 public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -31,8 +33,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.WaitForUrlPathAsync("/support-tasks/assign");
 
         // Listed in the order they appeared in, not the order the form submitted them in
-        var assignedReferences = await page.GetByTestId("task-reference").AllInnerTextsAsync();
-        Assert.Equal([firstSelectedTask, secondSelectedTask], assignedReferences);
+        await Expect(page.GetByTestId("task-reference")).ToHaveTextAsync([firstSelectedTask, secondSelectedTask]);
     }
 
     [Fact]
@@ -86,7 +87,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Both tasks are still selected, and we're back on the page we left from
         await page.AssertSelectedTaskCountAsync(2);
-        Assert.Contains("pageNumber=2", page.Url);
+        await Expect(page).ToHaveURLAsync(new Regex("pageNumber=2"));
     }
 
     [Fact]
@@ -110,7 +111,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Back on the first page with the task still ticked, rather than out of the list entirely
         await page.AssertSelectedTaskCountAsync(1);
-        Assert.Equal(1, await page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked").CountAsync());
+        await Expect(page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked")).ToHaveCountAsync(1);
     }
 
     [Fact]
@@ -151,17 +152,17 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // The task picked on the first page is still ticked, not just counted
         await page.AssertSelectedTaskCountAsync(1);
-        Assert.Equal(1, await page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked").CountAsync());
+        await Expect(page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked")).ToHaveCountAsync(1);
 
         // The back link is rendered out of band, which a history restore has to be careful not to
         // strip out of the response
-        Assert.Equal("/", await page.Locator(".govuk-back-link").GetAttributeAsync("href"));
+        await Expect(page.Locator(".govuk-back-link")).ToHaveAttributeAsync("href", "/");
 
         await page.GoForwardAsync();
 
         await page.AssertSelectedTaskCountAsync(2);
-        Assert.Equal(1, await page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked").CountAsync());
-        Assert.Contains("pageNumber=1", await page.Locator(".govuk-back-link").GetAttributeAsync("href"));
+        await Expect(page.Locator("[data-testid='results'] tbody input[type='checkbox']:checked")).ToHaveCountAsync(1);
+        await Expect(page.Locator(".govuk-back-link")).ToHaveAttributeAsync("href", new Regex("pageNumber=1"));
     }
 
     [Fact]
@@ -176,14 +177,14 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.ToggleSelectAllAsync();
         await page.AssertSelectedTaskCountAsync(TasksPerPage);
-        Assert.Equal(TasksPerPage, await page.Locator("[data-testid='results'] tbody input[type=checkbox]:checked").CountAsync());
+        await Expect(page.Locator("[data-testid='results'] tbody input[type=checkbox]:checked")).ToHaveCountAsync(TasksPerPage);
 
         await page.ClickAsync(".govuk-pagination__next a");
         await page.WaitForURLAsync(url => url.Contains("pageNumber=2"));
 
         // The first page's tasks are still selected, and the one on this page isn't
         await page.AssertSelectedTaskCountAsync(TasksPerPage);
-        Assert.False(await page.Locator("#select-all-tasks").IsCheckedAsync());
+        await Expect(page.Locator("#select-all-tasks")).Not.ToBeCheckedAsync();
 
         await page.ToggleSelectAllAsync();
         await page.AssertSelectedTaskCountAsync(TasksPerPage + 1);
@@ -211,13 +212,13 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
             await page.ClickAsync($"label[for='{await rows[i].GetAttributeAsync("id")}']");
             await page.AssertSelectedTaskCountAsync(i + 1);
 
-            Assert.Equal(i == rows.Count - 1, await selectAll.IsCheckedAsync());
+            await Expect(selectAll).ToBeCheckedAsync(new() { Checked = i == rows.Count - 1 });
         }
 
         // And unticking any one of them clears it again
         await page.ClickAsync($"label[for='{await rows[0].GetAttributeAsync("id")}']");
         await page.AssertSelectedTaskCountAsync(rows.Count - 1);
-        Assert.False(await selectAll.IsCheckedAsync());
+        await Expect(selectAll).Not.ToBeCheckedAsync();
     }
 
     [Fact]
@@ -262,7 +263,7 @@ public class ActiveTasksTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertNoTasksSelectedAsync();
 
         // Clearing the selection keeps you on the page you were on
-        Assert.Contains("pageNumber=2", page.Url);
+        await Expect(page).ToHaveURLAsync(new Regex("pageNumber=2"));
     }
 
     [Fact]
