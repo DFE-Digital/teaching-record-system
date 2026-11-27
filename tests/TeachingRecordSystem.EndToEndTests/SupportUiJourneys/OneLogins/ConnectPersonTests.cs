@@ -89,7 +89,6 @@ public class ConnectPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickBackLinkAsync();
 
         await page.WaitForUrlPathAsync($"/one-logins/{oneLoginUser.Subject}/connect-person");
-        var trnValue = await page.InputValueAsync("input[name='Trn']");
-        Assert.Equal(person.Trn, trnValue);
+        await Expect(page.Locator("input[name='Trn']")).ToHaveValueAsync(person.Trn);
     }
 }

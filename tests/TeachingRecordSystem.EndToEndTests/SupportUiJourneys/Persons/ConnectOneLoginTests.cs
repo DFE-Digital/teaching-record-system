@@ -87,7 +87,6 @@ public class ConnectOneLoginTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.ClickBackLinkAsync();
 
         await page.WaitForUrlPathAsync($"/persons/{person.PersonId}/connect-one-login");
-        var emailValue = await page.InputValueAsync("input[name='EmailAddress']");
-        Assert.Equal(oneLoginUser.EmailAddress, emailValue);
+        await Expect(page.Locator("input[name='EmailAddress']")).ToHaveValueAsync(oneLoginUser.EmailAddress!);
     }
 }

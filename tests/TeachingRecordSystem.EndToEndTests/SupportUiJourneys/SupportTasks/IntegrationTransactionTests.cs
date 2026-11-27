@@ -31,9 +31,7 @@ public class IntegrationTransactionTests(HostFixture hostFixture) : TestBase(hos
         await page.GoToIntegrationTransactionsPageAsync();
         await page.ClickAsync($"{LinkHrefContains($"{integrationTransaction1.IntegrationTransactionId.ToString()}/detail")}");
         await page.AssertOnIntegrationTransactionDetailPageAsync(integrationTransaction1.IntegrationTransactionId);
-        var locator = page.Locator("td:has-text(\"No integration transaction records\")");
-        var isVisible = await locator.IsVisibleAsync();
-        Assert.True(isVisible);
+        await Expect(page.Locator("td:has-text(\"No integration transaction records\")")).ToBeVisibleAsync();
     }
 
     [Fact]

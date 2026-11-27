@@ -64,17 +64,16 @@ public class OneLoginUserRecordMatchingTests(HostFixture hostFixture) : TestBase
         await page.ClickAsync($".trs-task-link__name{TextIsSelector($"{firstName} {lastName}")}");
         await page.WaitForUrlPathAsync($"/support-tasks/one-login-user-matching/{supportTask.SupportTaskReference}/resolve/matches");
 
-        var matchCardText = await page.Locator("[data-testid='match']").First.TextContentAsync();
+        var matchCard = page.Locator("[data-testid='match']").First;
 
-        Assert.NotNull(matchCardText);
-        Assert.Contains("QTS - QTLS and ETF Membership", matchCardText);
-        Assert.Contains("QTS - Primary and secondary postgraduate fee funded", matchCardText);
-        Assert.Contains("QTS - Provider led Postgrad", matchCardText);
-        Assert.Contains((currentYear - 1).ToString(), matchCardText);
-        Assert.Contains((currentYear - 2).ToString(), matchCardText);
-        Assert.Contains(currentYear.ToString(), matchCardText);
-        Assert.Contains(trainingProvider.Name, matchCardText);
-        Assert.Contains(subject.Name, matchCardText);
+        await Expect(matchCard).ToContainTextAsync("QTS - QTLS and ETF Membership");
+        await Expect(matchCard).ToContainTextAsync("QTS - Primary and secondary postgraduate fee funded");
+        await Expect(matchCard).ToContainTextAsync("QTS - Provider led Postgrad");
+        await Expect(matchCard).ToContainTextAsync((currentYear - 1).ToString());
+        await Expect(matchCard).ToContainTextAsync((currentYear - 2).ToString());
+        await Expect(matchCard).ToContainTextAsync(currentYear.ToString());
+        await Expect(matchCard).ToContainTextAsync(trainingProvider.Name);
+        await Expect(matchCard).ToContainTextAsync(subject.Name);
 
         await page.ClickRadioByLabelAsync("Connect it to Record A", exact: false);
         await page.ClickContinueButtonAsync();
