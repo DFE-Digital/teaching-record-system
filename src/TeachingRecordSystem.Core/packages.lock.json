@@ -301,22 +301,22 @@
       },
       "NSign.Client": {
         "type": "Direct",
-        "requested": "[1.2.7, )",
-        "resolved": "1.2.7",
-        "contentHash": "VYwsHBZr0+mm3TxX7ZhGJpc49M5t1HfQRvfZZqzFu4WWP9u0vE9znjG0zykuOgva0xNdEcGT2gpID3trs5iX5g==",
+        "requested": "[1.2.8, )",
+        "resolved": "1.2.8",
+        "contentHash": "VI1yoe/mOivrcrCYMx9jXj9Od08FHxSuWOIID7F4EgBbMI3Uvt0earZ9hh32WPFfBE9ZjarDWvPMuquBi3p7bw==",
         "dependencies": {
-          "Microsoft.Extensions.Http": "10.0.14",
-          "NSign.Abstractions": "1.2.7",
-          "StructuredFieldValues": "0.7.7"
+          "Microsoft.Extensions.Http": "11.0.0",
+          "NSign.Abstractions": "1.2.8",
+          "StructuredFieldValues": "0.8.1"
         }
       },
       "NSign.SignatureProviders": {
         "type": "Direct",
-        "requested": "[1.2.7, )",
-        "resolved": "1.2.7",
-        "contentHash": "jR8Im7CnD51ADEajikc5hEZVJPMNGXZleFDrQhTKVLNf4TlHSYdKlJsw3mRRTl+NtscBFHC4Pt1gbQgyRUMU+w==",
+        "requested": "[1.2.8, )",
+        "resolved": "1.2.8",
+        "contentHash": "Y1b09sdwcwkOJc6sIKUP5D4bHQ9gf0kz3hbQa5TcwoYscGd1tZhJWOjZkur4SpXziFfw9VMTZ7n1dtAd7jPX7g==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.7"
+          "NSign.Abstractions": "1.2.8"
         }
       },
       "OpenIddict.EntityFrameworkCore": {
@@ -801,11 +801,11 @@
       },
       "NSign.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.2.7",
-        "contentHash": "XsuSfEdpoe3dRUCrhFKXDXOtechYlc3aHKuvOQZdERwzdc/INPLrENKhTveACmhQSG9PJrrMS1wtCYJiwL3rAQ==",
+        "resolved": "1.2.8",
+        "contentHash": "mhY3u6NaZFtyqbY1LlQxQ865D/gJ0EpxrnLk3+dYO9poba/DvkgdvYnoeyAQO7WS8t73RNeyJwzbMmL0tNgGCQ==",
         "dependencies": {
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.14",
-          "StructuredFieldValues": "0.7.7"
+          "Microsoft.Extensions.Options.DataAnnotations": "11.0.0",
+          "StructuredFieldValues": "0.8.1"
         }
       },
       "OpenIddict.Abstractions": {
@@ -833,8 +833,8 @@
       },
       "StructuredFieldValues": {
         "type": "Transitive",
-        "resolved": "0.7.7",
-        "contentHash": "eqrFBXmowuor0M6KLjbkm8tfjADW9Jqy2rQi+SUrNkwU/AuDVHgHLAWmRhHiYVhq57QYzZNmdyKnsYWJTW0d/g=="
+        "resolved": "0.8.1",
+        "contentHash": "mvN5XXwqeN8BJyuZZXGNPIRb2Wq5L9HQhATxcJeTUPuMs9QaF7a44r9SusRWoTfz4aZN5mb6ovOQyzB20mTbGA=="
       },
       "System.ClientModel": {
         "type": "Transitive",
