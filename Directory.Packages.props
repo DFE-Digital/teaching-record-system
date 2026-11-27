@@ -73,9 +73,9 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="morelinq" Version="4.4.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0" />
-    <PackageVersion Include="NSign.AspNetCore" Version="1.2.7" />
-    <PackageVersion Include="NSign.Client" Version="1.2.7" />
-    <PackageVersion Include="NSign.SignatureProviders" Version="1.2.7" />
+    <PackageVersion Include="NSign.AspNetCore" Version="1.2.8" />
+    <PackageVersion Include="NSign.Client" Version="1.2.8" />
+    <PackageVersion Include="NSign.SignatureProviders" Version="1.2.8" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.9.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.9.0" />
     <PackageVersion Include="Optional" Version="4.0.0" />
