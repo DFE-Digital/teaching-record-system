@@ -76,8 +76,8 @@
     <PackageVersion Include="NSign.AspNetCore" Version="1.2.7" />
     <PackageVersion Include="NSign.Client" Version="1.2.7" />
     <PackageVersion Include="NSign.SignatureProviders" Version="1.2.7" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.8.0" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.8.0" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.9.0" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.9.0" />
     <PackageVersion Include="Optional" Version="4.0.0" />
     <PackageVersion Include="Polly.Core" Version="8.7.0" />
     <PackageVersion Include="prometheus-net.AspNetCore" Version="8.2.1" />

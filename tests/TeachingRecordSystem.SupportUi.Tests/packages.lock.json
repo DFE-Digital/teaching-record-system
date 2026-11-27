@@ -690,24 +690,24 @@
       },
       "OpenIddict.Abstractions": {
         "type": "Transitive",
-        "resolved": "7.8.0",
-        "contentHash": "sZYIldgCPse6qzl8GURqQgD8dCnnGzJndSwHYYv+13PECz9POUcFBnEnPZhzXRn/dY7dC7ALBud90jMrGa6dHQ==",
+        "resolved": "7.9.0",
+        "contentHash": "6Y2tUNZp1dpsdNqrEA9kumCuR+OzY2xtXQcwV81IaR+WPgLELnORiVp4kFr0IIa1hsCZS5MjnIL85UJcKZxtTQ==",
         "dependencies": {
           "Microsoft.IdentityModel.Tokens": "8.23.0"
         }
       },
       "OpenIddict.Core": {
         "type": "Transitive",
-        "resolved": "7.8.0",
-        "contentHash": "i4ZjcZ4PHxuNWuIbyh1doUTHY89+fbtxdBdimBEgqd1RPQV+N6e8HrmcQXYLs80fvnoTxLauTb4Rh/kTlP+h0g==",
+        "resolved": "7.9.0",
+        "contentHash": "lG6zJU5ofZVl7Pck1BdR3Gn3YqgA13RCd8n7G7SEELgQhBjn6H4IUHB/Th35fRB21saOfL73+AVTGv5p+60qWQ==",
         "dependencies": {
-          "OpenIddict.Abstractions": "7.8.0"
+          "OpenIddict.Abstractions": "7.9.0"
         }
       },
       "OpenIddict.EntityFrameworkCore.Models": {
         "type": "Transitive",
-        "resolved": "7.8.0",
-        "contentHash": "hDH51NOYcedXxfG/hHtz6nVFPdj57EnDleT1f95at5DQwUDDzfmkBMHYh2bSawK7UgmEF37juM4kjjZGlyf/ig=="
+        "resolved": "7.9.0",
+        "contentHash": "OyBBGAy2PoRK8v4imAfTUtd/qxXTIMwaxBQTtIF+ORH2GY1ejTTUu0pFC8b6gflRAgSrfYI+yKmURrPgq4FjWg=="
       },
       "Pipelines.Sockets.Unofficial": {
         "type": "Transitive",
@@ -952,7 +952,7 @@
           "NSign.Client": "[1.2.7, )",
           "NSign.SignatureProviders": "[1.2.7, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[11.0.0, )",
-          "OpenIddict.EntityFrameworkCore": "[7.8.0, )",
+          "OpenIddict.EntityFrameworkCore": "[7.9.0, )",
           "Optional": "[4.0.0, )",
           "Polly.Core": "[8.7.0, )",
           "Scrutor": "[7.0.0, )",
@@ -1029,7 +1029,7 @@
           "Mime-Detective": "[25.8.1, )",
           "NSign.Client": "[1.2.7, )",
           "NSign.SignatureProviders": "[1.2.7, )",
-          "OpenIddict.EntityFrameworkCore": "[7.8.0, )",
+          "OpenIddict.EntityFrameworkCore": "[7.9.0, )",
           "Sentry.AspNetCore": "[7.0.1, )",
           "Serilog.AspNetCore": "[11.0.0, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
@@ -1463,13 +1463,13 @@
       },
       "OpenIddict.EntityFrameworkCore": {
         "type": "CentralTransitive",
-        "requested": "[7.8.0, )",
-        "resolved": "7.8.0",
-        "contentHash": "a/06kBSNmiyl8tKeqvVDyf5HUeaxEWDAL/Qg+NqIPvu2eiTJ7/T97UM4EkDao/uNIDFv1sCCxlLGeQ8ekMIcAA==",
+        "requested": "[7.9.0, )",
+        "resolved": "7.9.0",
+        "contentHash": "21aUo9NccXZuc7rfrizj6u5py9dKAjeH8S3uTT7aC0hZ6ab/p+i9vk+NhjqUlYNkhVW7ORAphzn9yieIm4EolQ==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.14",
-          "OpenIddict.Core": "7.8.0",
-          "OpenIddict.EntityFrameworkCore.Models": "7.8.0"
+          "Microsoft.EntityFrameworkCore.Relational": "11.0.0",
+          "OpenIddict.Core": "7.9.0",
+          "OpenIddict.EntityFrameworkCore.Models": "7.9.0"
         }
       },
       "Optional": {
