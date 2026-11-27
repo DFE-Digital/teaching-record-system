@@ -48,7 +48,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(changeHistoryItem);
@@ -119,7 +119,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
 
         if (shouldDisplay)
@@ -185,7 +185,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(changeHistoryItem);
@@ -268,7 +268,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
 
         if (shouldDisplay)
@@ -324,7 +324,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var changeHistoryItem = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(changeHistoryItem);
@@ -395,7 +395,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
 
         if (shouldDisplay)

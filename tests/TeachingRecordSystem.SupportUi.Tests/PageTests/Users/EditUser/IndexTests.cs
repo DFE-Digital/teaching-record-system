@@ -55,7 +55,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var roleNames = html.QuerySelectorAll(".trs-user-roles input[type=radio]").Select(e => e.Attributes["value"]!.Value);
 
         Assert.DoesNotContain(UserRoles.Administrator, roleNames);
@@ -77,7 +77,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var roleNames = html.QuerySelectorAll(".trs-user-roles input[type=radio]").Select(e => e.Attributes["value"]!.Value);
 
         Assert.Contains(UserRoles.Administrator, roleNames);
@@ -103,7 +103,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal($"Change {existingUser.Name}\u2019s details", html.QuerySelector("h1")!.TextContent.Trim());
 
@@ -192,7 +192,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
@@ -217,7 +217,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
+        await Assert.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
     }
 
     [Fact]
@@ -241,7 +241,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var html = await AssertEx.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
+        var html = await Assert.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
         Assert.False(html.QuerySelector("input[name=Name]")!.HasAttribute("disabled"));
         Assert.False(html.QuerySelector("select[name=TeamId]")!.HasAttribute("disabled"));
         Assert.All(html.QuerySelectorAll(".trs-user-roles input[type=radio]"), e => Assert.False(e.HasAttribute("disabled")));
@@ -425,7 +425,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{newName} {expectedFlashMessage}");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{newName} {expectedFlashMessage}");
     }
 
     [Fact]
@@ -549,7 +549,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{existingUser.Name}\u2019s account has been reactivated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{existingUser.Name}\u2019s account has been reactivated");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";

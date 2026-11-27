@@ -35,7 +35,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -72,7 +72,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
@@ -105,7 +105,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
@@ -143,7 +143,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
@@ -181,7 +181,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("They were awarded a mandatory qualification", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
@@ -242,7 +242,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Record created for Alfred The Great");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Record created for Alfred The Great");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -384,7 +384,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);

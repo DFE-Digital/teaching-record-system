@@ -55,7 +55,7 @@ public class SetRouteToProfessionalStatusTests : TestBase
             CreateJsonContent(CreateRequestBody()));
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [Fact]

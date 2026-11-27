@@ -74,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.EndDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("New end date"));
         Assert.Equal(alert.EndDate!.Value.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Previous end date"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
@@ -156,7 +156,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EndDateTestBase(hostFi
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
 
         await WithDbContextAsync(async dbContext =>
         {

@@ -23,7 +23,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Null(doc.QuerySelector("a[data-testid='continue-link']"));
             });
 
@@ -47,7 +47,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
 
                 var returnLink = doc.QuerySelector(".govuk-button[data-testid='continue-btn']");
                 Assert.NotNull(returnLink);

@@ -61,7 +61,7 @@
 //             expectedJson["eyts"] = null;
 //         }
 //
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expectedJson,
 //             StatusCodes.Status200OK);
@@ -116,7 +116,7 @@
 //             expectedJson["eyts"] = null;
 //         }
 //
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expectedJson,
 //             StatusCodes.Status200OK);
@@ -138,10 +138,10 @@
 //         var response = await httpClient.SendAsync(request);
 //
 //         // Assert
-//         var jsonResponse = await AssertEx.JsonResponseAsync(response);
+//         var jsonResponse = await Assert.JsonResponseAsync(response);
 //         var responseItt = jsonResponse.RootElement.GetProperty("initialTeacherTraining");
 //
-//         AssertEx.JsonObjectEquals(
+//         Assert.JsonObjectEquals(
 //             new[]
 //             {
 //                 new
@@ -213,7 +213,7 @@
 //         var response = await httpClient.SendAsync(request);
 //
 //         // Assert
-//         var jsonResponse = await AssertEx.JsonResponseAsync(response);
+//         var jsonResponse = await Assert.JsonResponseAsync(response);
 //         Assert.True(jsonResponse.RootElement.GetProperty("pendingNameChange").GetBoolean());
 //     }
 //
@@ -243,7 +243,7 @@
 //         var response = await httpClient.SendAsync(request);
 //
 //         // Assert
-//         var jsonResponse = await AssertEx.JsonResponseAsync(response);
+//         var jsonResponse = await Assert.JsonResponseAsync(response);
 //         Assert.True(jsonResponse.RootElement.GetProperty("pendingDateOfBirthChange").GetBoolean());
 //     }
 //
@@ -270,10 +270,10 @@
 //         var response = await httpClient.SendAsync(request);
 //
 //         // Assert
-//         var jsonResponse = await AssertEx.JsonResponseAsync(response);
+//         var jsonResponse = await Assert.JsonResponseAsync(response);
 //         var responsePreviousNames = jsonResponse.RootElement.GetProperty("previousNames");
 //
-//         AssertEx.JsonObjectEquals(
+//         Assert.JsonObjectEquals(
 //             new[]
 //             {
 //                 new

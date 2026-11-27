@@ -72,7 +72,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture),
         response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(alert.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
@@ -89,7 +89,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
@@ -165,7 +165,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter changed details");
+        await Assert.HtmlResponseHasErrorAsync(response, "Details", "Enter changed details");
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class IndexTests(HostFixture hostFixture) : DetailsTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
+        await Assert.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
     }
 
     [Fact]

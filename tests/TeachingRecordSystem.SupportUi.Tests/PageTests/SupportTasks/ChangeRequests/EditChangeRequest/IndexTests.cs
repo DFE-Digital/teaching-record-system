@@ -115,7 +115,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(supportTask.GetSubject(), doc.GetElementsByTagName("h1")!.First().TrimmedText());
         Assert.Equal("Change name request", doc.QuerySelector(".govuk-caption-m")!.TrimmedText());
@@ -207,7 +207,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(supportTask.GetSubject(), doc.GetElementsByTagName("h1")!.First().TrimmedText());
         Assert.Equal("Change date of birth request", doc.QuerySelector(".govuk-caption-m")!.TrimmedText());

@@ -78,7 +78,7 @@ public class ConfirmRejectTests(HostFixture hostFixture) : ResolveOneLoginUserMa
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "GOV.UK One Login verification request rejected",
             $"Request closed for {supportTaskData.StatedFirstName} {supportTaskData.StatedLastName}. We’ve sent them an email confirming we could not verify their identity.");

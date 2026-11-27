@@ -43,7 +43,7 @@ public class StatusTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var resultOptions = doc.GetElementByTestId("status-options");
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -116,7 +116,7 @@ public class StatusTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Status", "Select a status");
+        await Assert.HtmlResponseHasErrorAsync(response, "Status", "Select a status");
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class StatusTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
+        await Assert.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
     [Theory]
@@ -171,7 +171,7 @@ public class StatusTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after start date");
     }
 
     [Fact]

@@ -31,7 +31,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var noNotesMessage = doc.GetElementByTestId("no-notes");
         Assert.NotNull(noNotesMessage);
         Assert.Equal("There are no notes associated with this record", noNotesMessage.TrimmedText());
@@ -60,7 +60,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var notes = doc.GetAllElementsByTestId("note");
         Assert.Collection(notes,
             n => Assert.Equal(expectedNoteText, n.GetElementByTestId($"{note2.NoteId}-note-text")?.TrimmedText()),
@@ -91,7 +91,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var flag = doc.GetElementByTestId("no-notes-permission");
         var notes = doc.GetAllElementsByTestId("note");
         Assert.NotNull(flag);
@@ -114,7 +114,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var noNotesMessage = doc.GetElementByTestId("no-notes");
         Assert.Null(noNotesMessage);
         var createdBy = doc.GetElementByTestId($"{note.NoteId}-note-created-by");
@@ -147,7 +147,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var noNotesMessage = doc.GetElementByTestId("no-notes");
         Assert.Null(noNotesMessage);
         var createdBy = doc.GetElementByTestId($"{note.NoteId}-note-created-by");
@@ -182,7 +182,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var noteText = doc.GetElementByTestId($"{note.NoteId}-note-text");
         Assert.NotNull(noteText);
         Assert.Equal(expectedNoteText, noteText.TrimmedText());
@@ -211,7 +211,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var notes = doc.GetAllElementsByTestId("note");
         Assert.Collection(notes,
             item1 =>
@@ -269,7 +269,7 @@ public class NotesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var button = doc.GetElementByTestId("add-note-button");
 
         if (canSeeAddButton)

@@ -23,7 +23,7 @@ public class RouteTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(route.RouteToProfessionalStatusTypeId.ToString(), ((IHtmlSelectElement)doc.GetElementById("RouteId")!).Value);
     }
 
@@ -46,7 +46,7 @@ public class RouteTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(route.RouteToProfessionalStatusTypeId.ToString(), ((IHtmlSelectElement)doc.GetElementById("ArchivedRouteId")!).Value);
     }
 
@@ -69,7 +69,7 @@ public class RouteTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "RouteId", "Enter a route type");
+        await Assert.HtmlResponseHasErrorAsync(response, "RouteId", "Enter a route type");
     }
 
     [Fact(Skip = "Waiting for archived route data")]
@@ -98,7 +98,7 @@ public class RouteTests(HostFixture hostFixture) : AddRouteTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "RouteId", "Enter only one route type");
+        await Assert.HtmlResponseHasErrorAsync(response, "RouteId", "Enter only one route type");
     }
 
     [Fact]

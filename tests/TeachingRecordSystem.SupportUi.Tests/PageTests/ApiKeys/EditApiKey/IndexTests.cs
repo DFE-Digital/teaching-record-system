@@ -48,7 +48,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(apiKey.Key, doc.GetElementById("Key")?.GetAttribute("value"));
     }
 
@@ -65,7 +65,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
@@ -82,7 +82,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
@@ -175,6 +175,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "API key expired");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "API key expired");
     }
 }

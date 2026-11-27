@@ -44,7 +44,7 @@ public class SetDeceasedTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: "DateOfDeath",
             expectedError: "Date cannot be in the future.");

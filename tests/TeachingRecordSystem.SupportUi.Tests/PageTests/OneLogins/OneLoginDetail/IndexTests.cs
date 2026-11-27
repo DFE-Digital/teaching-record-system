@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(email, doc.GetElementByTestId("page-title")!.TrimmedText());
 
@@ -100,7 +100,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var oneLoginDetailsCard = doc.GetElementByTestId("one-login-details");
         Assert.NotNull(oneLoginDetailsCard);
@@ -133,7 +133,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var oneLoginDetailsCard = doc.GetElementByTestId("one-login-details");
         Assert.NotNull(oneLoginDetailsCard);
@@ -197,7 +197,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var expectedVerifiedName = $"{person.FirstName} {person.LastName}";
         Assert.Equal(expectedVerifiedName, doc.GetElementByTestId("page-title")!.TrimmedText());

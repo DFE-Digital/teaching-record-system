@@ -74,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : LinkTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Link} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("New link"));
         Assert.Equal(populateOptional ? WebConstants.EmptyFallbackContent : $"{alert.ExternalLink} (opens in new tab)", doc.GetSummaryListValueByKey("Previous link"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
@@ -156,7 +156,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : LinkTestBase(hostFixtu
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
 
         Events.AssertProcessesCreated(p =>
         {

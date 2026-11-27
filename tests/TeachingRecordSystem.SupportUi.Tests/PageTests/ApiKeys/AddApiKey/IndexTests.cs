@@ -48,7 +48,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key must be 100 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "Key", "Key must be 100 characters or less");
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key must be at least 16 characters");
+        await Assert.HtmlResponseHasErrorAsync(response, "Key", "Key must be at least 16 characters");
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key is already in use");
+        await Assert.HtmlResponseHasErrorAsync(response, "Key", "Key is already in use");
     }
 
     [Fact]
@@ -221,6 +221,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "API key added");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "API key added");
     }
 }

@@ -35,7 +35,7 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoiceSelection = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
@@ -78,7 +78,7 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("reason-options-legend");
         Assert.Equal("Why are you changing the induction details?", reasonChoicesLegend!.TrimmedText());
@@ -168,9 +168,9 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re changing the induction details");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re changing the induction details");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter details");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter details");
     }
 
     [Fact]
@@ -230,7 +230,7 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -261,7 +261,7 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var urlEncoder = UrlEncoder.Default;
@@ -306,7 +306,7 @@ public class ReasonTests(HostFixture hostFixture) : EditInductionTestBase(hostFi
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");

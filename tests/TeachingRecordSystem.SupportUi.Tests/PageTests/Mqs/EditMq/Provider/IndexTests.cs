@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(databaseProvider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
@@ -64,7 +64,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(journeyProvider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
@@ -110,7 +110,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqProviderTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ProviderId", "Select a training provider");
+        await Assert.HtmlResponseHasErrorAsync(response, "ProviderId", "Select a training provider");
     }
 
     [Fact]

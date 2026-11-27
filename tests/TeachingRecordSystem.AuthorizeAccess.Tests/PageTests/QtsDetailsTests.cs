@@ -42,7 +42,7 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Equal("Enter your QTS details (optional)", doc.QuerySelector("h1")?.TextContent.Trim());
                 Assert.Equal(existingYear, doc.GetElementById("YearQtsReceived")?.GetAttribute("value"));
                 Assert.Equal(existingTrainingProviderId?.ToString(), doc.QuerySelector("#TrainingProviderId option[selected]")?.GetAttribute("value"));
@@ -104,7 +104,7 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "YearQtsReceived", "Year QTS was received must be 4 digits");
+                await Assert.HtmlResponseHasErrorAsync(response, "YearQtsReceived", "Year QTS was received must be 4 digits");
             });
 
     [Fact]
@@ -135,7 +135,7 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "YearQtsReceived", "Year QTS was received cannot be in the future");
+                await Assert.HtmlResponseHasErrorAsync(response, "YearQtsReceived", "Year QTS was received cannot be in the future");
             });
 
     [Fact]
@@ -236,7 +236,7 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
+                await Assert.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
             });
 
     [Fact]
@@ -265,7 +265,7 @@ public class QtsDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "SubjectId", "Select a subject");
+                await Assert.HtmlResponseHasErrorAsync(response, "SubjectId", "Select a subject");
             });
 
     [Fact]

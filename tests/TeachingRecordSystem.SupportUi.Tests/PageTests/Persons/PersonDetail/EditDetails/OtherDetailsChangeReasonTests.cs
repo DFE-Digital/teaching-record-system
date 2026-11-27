@@ -42,7 +42,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("change-reason-caption");
         Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
@@ -70,7 +70,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -121,7 +121,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoiceSelection = doc.GetChildElementsOfTestId<IHtmlInputElement>("change-reason-options", "input[type='radio']")
             .Single(i => i.IsChecked).Value;
@@ -168,7 +168,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("change-reason-options-legend");
         Assert.Equal("Why are you changing this record?", reasonChoicesLegend!.TrimmedText());
@@ -220,7 +220,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("change-reason-options-legend");
         Assert.Equal("Why are you changing the other personal details on this record?", reasonChoicesLegend!.TrimmedText());
@@ -289,8 +289,8 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.Reason), "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.Reason), "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -321,7 +321,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.ReasonDetail), "Enter a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.ReasonDetail), "Enter a reason");
     }
 
     [Fact]
@@ -353,7 +353,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
     [Fact]
@@ -386,7 +386,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(OtherDetailsChangeReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
@@ -419,7 +419,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var urlEncoder = UrlEncoder.Default;
@@ -467,7 +467,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
@@ -918,7 +918,7 @@ public class OtherDetailsChangeReasonTests(HostFixture hostFixture) : EditDetail
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);

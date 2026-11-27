@@ -27,7 +27,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -76,7 +76,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var entry = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(entry);
@@ -105,7 +105,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var entry = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(entry);
@@ -135,7 +135,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -161,7 +161,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -186,7 +186,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var entry = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(entry);
@@ -209,7 +209,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -236,7 +236,7 @@ public class ChangeLogMandatoryQualificationDqtProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,

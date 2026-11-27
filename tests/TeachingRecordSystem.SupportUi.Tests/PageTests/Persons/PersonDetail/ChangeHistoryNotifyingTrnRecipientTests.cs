@@ -38,7 +38,7 @@ public partial class ChangeHistoryTests
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,

@@ -25,7 +25,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseAsync(response);
+                await Assert.HtmlResponseAsync(response);
             });
 
     [Fact]
@@ -61,7 +61,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "File", "The file must be a PDF, JPG, or PNG");
+                await Assert.HtmlResponseHasErrorAsync(response, "File", "The file must be a PDF, JPG, or PNG");
             });
 
     [Fact]
@@ -98,7 +98,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "File", "The file must be no larger than 10MB");
+                await Assert.HtmlResponseHasErrorAsync(response, "File", "The file must be no larger than 10MB");
             });
 
     [Fact]
@@ -143,7 +143,7 @@ public class ProofOfIdentityTests(HostFixture hostFixture) : TestBase(hostFixtur
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "File", "The selected file contains a virus");
+                await Assert.HtmlResponseHasErrorAsync(response, "File", "The selected file contains a virus");
             });
 
     [Fact]

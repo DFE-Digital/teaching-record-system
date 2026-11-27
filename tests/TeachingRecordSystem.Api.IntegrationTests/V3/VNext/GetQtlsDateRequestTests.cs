@@ -52,7 +52,7 @@ public class GetQtlsDateRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -75,7 +75,7 @@ public class GetQtlsDateRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

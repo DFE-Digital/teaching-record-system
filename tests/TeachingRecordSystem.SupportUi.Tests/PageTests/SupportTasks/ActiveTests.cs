@@ -19,7 +19,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
         Assert.Null(doc.GetElementByTestId("results"));
@@ -37,7 +37,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
         Assert.Null(doc.GetElementByTestId("results"));
@@ -66,7 +66,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
         Assert.NotNull(row);
@@ -90,7 +90,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
         Assert.NotNull(row);
@@ -111,7 +111,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
         Assert.NotNull(row);
@@ -131,7 +131,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -166,7 +166,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var optionValues = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -194,7 +194,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -221,7 +221,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var optionValues = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -252,7 +252,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1", "ST3"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -276,7 +276,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -297,7 +297,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1", "ST2"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -321,7 +321,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -343,7 +343,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1", "ST3"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -365,7 +365,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -391,7 +391,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1", "ST3"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -415,7 +415,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -442,7 +442,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -471,7 +471,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -493,7 +493,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
@@ -514,7 +514,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Single(GetResultTaskReferences(doc));
     }
 
@@ -530,7 +530,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal([selectedReference], GetSelectionCarriedOverFromOtherPages(doc));
         Assert.DoesNotContain(selectedReference, GetResultTaskReferences(doc));
@@ -549,7 +549,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal([selectedTask.SupportTaskReference], GetCheckedTaskReferences(doc));
         Assert.Empty(GetSelectionCarriedOverFromOtherPages(doc));
@@ -562,7 +562,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var selectedOnFirstPage = await CreateTasksSpanningTwoPagesAndSelectOneOnFirstPageAsync();
 
         var secondPageResponse = await HttpClient.GetAsync("/support-tasks/active?pageNumber=2");
-        var selectedOnSecondPage = GetResultTaskReferences(await AssertEx.HtmlResponseAsync(secondPageResponse)).Single();
+        var selectedOnSecondPage = GetResultTaskReferences(await Assert.HtmlResponseAsync(secondPageResponse)).Single();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -572,7 +572,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal("2", doc.GetElementByTestId("selected-task-count")?.TrimmedText());
     }
@@ -589,7 +589,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Null(doc.GetElementByTestId("selected-task-count"));
     }
@@ -608,7 +608,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal("1", doc.GetElementByTestId("selected-task-count")?.TrimmedText());
         Assert.Equal([selectedReference], GetSelectionCarriedOverFromOtherPages(doc));
@@ -626,7 +626,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var paginationLinks = doc.QuerySelectorAll(".govuk-pagination a").ToArray();
         Assert.NotEmpty(paginationLinks);
@@ -657,7 +657,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var paginationLinks = doc.QuerySelectorAll(".govuk-pagination a").ToArray();
         Assert.NotEmpty(paginationLinks);
@@ -678,7 +678,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var returnUrl = doc.QuerySelector("#assign-tasks-form input[name='returnUrl']")?.GetAttribute("value");
         Assert.Equal("/support-tasks/active?sortBy=Subject", returnUrl);
@@ -696,7 +696,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal("2", doc.GetElementByTestId("selected-task-count")?.TrimmedText());
     }
@@ -717,7 +717,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Contains(expectedText, doc.QuerySelector(".trs-tasks-selection__summary")!.TrimmedText());
     }
@@ -736,7 +736,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var clearSelectionLink = doc.GetElementByTestId("clear-selection");
         Assert.NotNull(clearSelectionLink);
@@ -759,7 +759,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal("/support-tasks/active?sortBy=Subject&pageNumber=2", doc.GetElementByTestId("clear-selection")?.GetAttribute("href"));
     }
@@ -776,7 +776,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var checkbox = GetResultRows(doc).Single().QuerySelector("input[type='checkbox']")!;
         Assert.Equal("/support-tasks/active/SelectionBanner?sortBy=Subject", checkbox.GetAttribute("hx-get"));
@@ -794,7 +794,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var sortButtons = doc.QuerySelectorAll("th[aria-sort] button").ToArray();
         Assert.NotEmpty(sortButtons);
@@ -818,7 +818,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal("Subject", doc.QuerySelector("#assign-tasks-form input[name='sortBy']")?.GetAttribute("value"));
         Assert.Equal("Descending", doc.QuerySelector("#assign-tasks-form input[name='sortDirection']")?.GetAttribute("value"));
@@ -836,7 +836,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         // A cached snapshot would come back without the ticked checkboxes, since clicking one never
         // sets its checked attribute
@@ -872,7 +872,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var backLink = doc.QuerySelector(".govuk-back-link");
         Assert.Equal("/", backLink?.GetAttribute("href"));
@@ -893,7 +893,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var backLink = doc.QuerySelector(".govuk-back-link");
         var expectedHref = "/support-tasks/active?sortBy=Subject&sortDirection=Ascending&pageNumber=1";
@@ -920,7 +920,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         // A history restore replaces the whole body, and htmx lifts out of band elements out of the
         // response before swapping it in - which would leave the restored page with no back link
@@ -943,7 +943,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var selectAll = doc.GetElementByTestId("select-all-tasks");
         Assert.NotNull(selectAll);
@@ -973,7 +973,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var selectAll = doc.GetElementByTestId("select-all-tasks");
         Assert.NotNull(selectAll);
@@ -999,7 +999,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         // It only does anything through htmx, unlike the checkbox on each row
         Assert.Contains("trs-requires-js", doc.GetElementByTestId("select-all-tasks")!.ParentElement!.ClassName!);
@@ -1029,7 +1029,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var selectAll = doc.GetElementByTestId("select-all-tasks");
         Assert.NotNull(selectAll);
@@ -1052,7 +1052,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(
             $"{firstTask.SupportTaskReference},{secondTask.SupportTaskReference}",
@@ -1075,7 +1075,7 @@ public class ActiveTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
 
         var response = await HttpClient.GetAsync("/support-tasks/active");
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         return GetResultTaskReferences(doc).First();
     }
 

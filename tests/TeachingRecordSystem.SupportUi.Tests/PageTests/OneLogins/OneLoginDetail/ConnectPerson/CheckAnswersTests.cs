@@ -40,7 +40,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ConnectPersonTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var summaryList = doc.GetElementByTestId("summary");
         Assert.NotNull(summaryList);
@@ -89,7 +89,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ConnectPersonTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var summaryList = doc.GetElementByTestId("summary");
         Assert.NotNull(summaryList);
@@ -127,7 +127,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ConnectPersonTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "IdentityConfirmed", "Confirm you’ve completed the required identity checks");
+        await Assert.HtmlResponseHasErrorAsync(response, "IdentityConfirmed", "Confirm you’ve completed the required identity checks");
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ConnectPersonTestBase(
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
         var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
@@ -253,7 +253,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ConnectPersonTestBase(
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
         var expectedFlashMessage = $"Record connected to {string.JoinNonEmpty(' ', person.FirstName, person.MiddleName, person.LastName)}’s GOV.UK One Login";
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, expectedFlashMessage);
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }

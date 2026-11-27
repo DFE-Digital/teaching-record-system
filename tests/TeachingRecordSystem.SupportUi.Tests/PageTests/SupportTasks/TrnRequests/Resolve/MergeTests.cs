@@ -236,7 +236,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
+        await Assert.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
     }
 
     [Fact]

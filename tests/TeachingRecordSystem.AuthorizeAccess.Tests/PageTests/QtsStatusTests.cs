@@ -29,7 +29,7 @@ public class QtsStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseAsync(response);
+                await Assert.HtmlResponseAsync(response);
             });
 
     [Fact]
@@ -52,7 +52,7 @@ public class QtsStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "HaveQts", "Select yes if you have qualified teacher status (QTS)");
+                await Assert.HtmlResponseHasErrorAsync(response, "HaveQts", "Select yes if you have qualified teacher status (QTS)");
             });
 
     [Fact]

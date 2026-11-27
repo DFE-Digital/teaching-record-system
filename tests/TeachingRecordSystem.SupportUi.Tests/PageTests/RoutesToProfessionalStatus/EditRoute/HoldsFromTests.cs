@@ -59,7 +59,7 @@ public class HoldsFromTests(HostFixture hostFixture) : EditRouteTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
         Assert.NotNull(heading);
@@ -132,7 +132,7 @@ public class HoldsFromTests(HostFixture hostFixture) : EditRouteTestBase(hostFix
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
+            await Assert.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
         }
     }
 
@@ -428,7 +428,7 @@ public class HoldsFromTests(HostFixture hostFixture) : EditRouteTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
+        await Assert.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the date they first held this professional status");
     }
 
     [Fact]
@@ -474,7 +474,7 @@ public class HoldsFromTests(HostFixture hostFixture) : EditRouteTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "The date they first held this professional status must not be in the future");
+        await Assert.HtmlResponseHasErrorAsync(response, "HoldsFrom", "The date they first held this professional status must not be in the future");
     }
 
     [Fact]

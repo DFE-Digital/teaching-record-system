@@ -75,7 +75,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueByKey("New details"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Previous details"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueByKey("Reason"));
@@ -158,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DetailsTestBase(hostFi
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert changed");
 
         Events.AssertProcessesCreated(p =>
         {

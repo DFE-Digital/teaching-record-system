@@ -35,7 +35,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Content", "Enter text for the note");
+        await Assert.HtmlResponseHasErrorAsync(response, "Content", "Enter text for the note");
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Content", "Note must be 4000 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "Content", "Note must be 4000 characters or less");
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "Note added");
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "Note added");
     }
 
     [Fact]

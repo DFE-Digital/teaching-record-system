@@ -131,7 +131,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, expectedErrorField, "Select a reason");
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Theory]
@@ -352,7 +352,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter additional detail");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter additional detail");
     }
 
     [Fact]
@@ -382,7 +382,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqStatusTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var provideAdditionalInformationRadioButtons = doc.GetElementByTestId("has-additional-reason_detail-options")!.GetElementsByTagName("input");
         var selectedOption = provideAdditionalInformationRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedOption);

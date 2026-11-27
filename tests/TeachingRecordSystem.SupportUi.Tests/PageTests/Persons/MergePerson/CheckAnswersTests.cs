@@ -47,7 +47,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("TRN", v => Assert.Equal(personA.Trn, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Evidence", v =>
@@ -94,7 +94,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var allSummaryListRowValues = doc.GetElementsByClassName("govuk-summary-list__row")
             .ToDictionary(
@@ -177,7 +177,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}");
 
         var primaryPerson = await WithDbContextAsync(dbContext => dbContext.Persons
@@ -268,7 +268,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Records merged for {primaryPerson.FirstName} {primaryPerson.MiddleName} {primaryPerson.LastName}");
 
@@ -417,7 +417,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -453,7 +453,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);
@@ -466,7 +466,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
+        Assert.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
@@ -688,7 +688,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
+        Assert.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
@@ -769,7 +769,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
     [Theory]
@@ -813,6 +813,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : MergePersonTestBase(ho
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 }

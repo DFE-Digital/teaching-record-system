@@ -21,7 +21,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var thisTrn = doc.GetElementByTestId("this-trn");
 
         Assert.NotNull(thisTrn);
@@ -48,7 +48,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var otherTrn = doc.GetChildElementOfTestId<IHtmlInputElement>("other-trn", "input");
         Assert.NotNull(otherTrn);
@@ -76,7 +76,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "Enter a TRN");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "Enter a TRN");
     }
 
     [Theory]
@@ -102,7 +102,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be a number");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be a number");
     }
 
     [Theory]
@@ -128,7 +128,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be 7 digits long");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be 7 digits long");
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be for a different record");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "TRN must be for a different record");
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "No record found with that TRN");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "No record found with that TRN");
     }
 
     [Fact]
@@ -210,7 +210,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "The TRN you entered belongs to a deactivated record");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(EnterTrnModel.OtherTrn), "The TRN you entered belongs to a deactivated record");
     }
 
     [Fact]
@@ -290,7 +290,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
@@ -325,7 +325,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
@@ -351,7 +351,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         Assert.Equal(personA.PersonId, journeyInstance.State.PersonAId);
@@ -465,7 +465,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -501,7 +501,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);
@@ -514,7 +514,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
+        Assert.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
@@ -559,7 +559,7 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
     [Theory]
@@ -603,6 +603,6 @@ public class EnterTrnTests(HostFixture hostFixture) : MergePersonTestBase(hostFi
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 }

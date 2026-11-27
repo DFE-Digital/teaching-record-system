@@ -908,7 +908,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
+        await Assert.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
     }
 
     [Fact]

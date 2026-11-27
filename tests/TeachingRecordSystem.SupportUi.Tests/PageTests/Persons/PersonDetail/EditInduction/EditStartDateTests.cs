@@ -56,7 +56,7 @@ public class EditStartDateTests(HostFixture hostFixture) : EditInductionTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var startDate = doc.QuerySelectorAll<IHtmlInputElement>("[type=text]");
         Assert.Equal(dateValid.Day.ToString(), startDate.ElementAt(0).Value);
         Assert.Equal(dateValid.Month.ToString(), startDate.ElementAt(1).Value);
@@ -112,7 +112,7 @@ public class EditStartDateTests(HostFixture hostFixture) : EditInductionTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter an induction start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Enter an induction start date");
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class EditStartDateTests(HostFixture hostFixture) : EditInductionTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be in the future");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be in the future");
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class EditStartDateTests(HostFixture hostFixture) : EditInductionTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be before 7 May 1999");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be before 7 May 1999");
     }
 
     [Theory]

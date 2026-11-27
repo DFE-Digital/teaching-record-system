@@ -18,7 +18,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
@@ -41,7 +41,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Null(doc.GetElementByTestId("no-tasks-message"));
         Assert.Null(doc.GetElementByTestId("no-results-message"));
@@ -97,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -139,7 +139,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(taskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -163,7 +163,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
@@ -184,7 +184,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var nextPageLink = GetNextPageLink(doc);
         Assert.NotNull(nextPageLink);
         Assert.Contains("pageNumber=2", nextPageLink);
@@ -209,7 +209,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var nextPageLink = GetNextPageLink(doc);
         Assert.NotNull(nextPageLink);
         Assert.Contains($"search={Uri.EscapeDataString(lastName)}", nextPageLink);

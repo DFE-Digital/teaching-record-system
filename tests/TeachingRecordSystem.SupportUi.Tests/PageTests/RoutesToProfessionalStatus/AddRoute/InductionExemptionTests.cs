@@ -70,7 +70,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : AddRoute
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var inductionExemptionChoice = doc.GetElementByTestId("induction-exemption")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Single(i => i.IsChecked).Value;
@@ -152,7 +152,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : AddRoute
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "IsExemptFromInduction", "Select yes if this route provides an induction exemption");
+        await Assert.HtmlResponseHasErrorAsync(response, "IsExemptFromInduction", "Select yes if this route provides an induction exemption");
     }
 
     [Fact]

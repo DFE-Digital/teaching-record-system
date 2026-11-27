@@ -22,7 +22,7 @@ public class AddNoteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Content", "Enter text for the note");
+        await Assert.HtmlResponseHasErrorAsync(response, "Content", "Enter text for the note");
     }
 
     [Fact]

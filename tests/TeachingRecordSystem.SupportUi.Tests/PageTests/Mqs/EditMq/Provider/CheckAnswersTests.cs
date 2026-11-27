@@ -49,7 +49,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqProviderTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
@@ -112,7 +112,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqProviderTestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification changed");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification changed");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
 

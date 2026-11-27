@@ -24,7 +24,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseAsync(response);
+                await Assert.HtmlResponseAsync(response);
             });
 
     [Fact]
@@ -45,7 +45,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 var continueLink = doc.GetElementByTestId("continue-link");
                 Assert.NotNull(continueLink);
                 Assert.Contains("access your teaching record", continueLink.TextContent);
@@ -77,7 +77,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 var customLink = doc.GetElementByTestId("custom-link");
                 Assert.NotNull(customLink);
                 Assert.Contains("Register for a national professional qualification", customLink.TextContent);

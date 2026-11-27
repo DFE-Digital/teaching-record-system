@@ -36,7 +36,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
                 Assert.Equal(trn, doc.GetSummaryListValueByKey("TRN"));
                 Assert.Equal(TimeProvider.UtcNow.Year.ToString(), doc.GetSummaryListValueByKey("Year received"));
@@ -83,7 +83,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Equal($"{firstName} {lastName}", doc.GetSummaryListValueByKey("Name"));
                 Assert.Equal(dateOfBirth.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
                 Assert.Equal(nationalInsuranceNumber, doc.GetSummaryListValueByKey("National Insurance number"));
@@ -111,7 +111,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Null(doc.GetSummaryListValueByKey("Year received"));
                 Assert.Null(doc.GetSummaryListValueByKey("Provider"));
                 Assert.Null(doc.GetSummaryListValueByKey("Subject"));

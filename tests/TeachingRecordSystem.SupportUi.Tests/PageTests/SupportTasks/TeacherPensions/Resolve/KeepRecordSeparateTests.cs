@@ -133,7 +133,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : ResolveTeacherPe
         Assert.Null(journeyState!.KeepSeparateReason);
         Assert.Null(journeyState!.Reason);
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Reason", "Enter Reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "Reason", "Enter Reason");
     }
 
     [Theory]
@@ -266,7 +266,7 @@ public class KeepRecordSeparateTests(HostFixture hostFixture) : ResolveTeacherPe
 
         // Submit the Cancel button exactly as the rendered page defines it, rather than a URL of our
         // own choosing — this button used to post to the check answers page, which threw.
-        var doc = await AssertEx.HtmlResponseAsync(await HttpClient.GetAsync(pageUrl));
+        var doc = await Assert.HtmlResponseAsync(await HttpClient.GetAsync(pageUrl));
         var cancelButton = doc.GetElementsByTagName("button").Single(b => b.TextContent.Trim() == "Cancel");
         Assert.Null(cancelButton.GetAttribute("formaction"));
 

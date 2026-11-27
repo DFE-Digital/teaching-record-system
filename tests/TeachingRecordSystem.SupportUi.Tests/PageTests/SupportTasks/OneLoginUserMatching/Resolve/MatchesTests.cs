@@ -471,7 +471,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveOneLoginUserMatching
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "MatchedPersonId", "Select what you want to do with this GOV.UK One Login");
+        await Assert.HtmlResponseHasErrorAsync(response, "MatchedPersonId", "Select what you want to do with this GOV.UK One Login");
     }
 
     [Theory]

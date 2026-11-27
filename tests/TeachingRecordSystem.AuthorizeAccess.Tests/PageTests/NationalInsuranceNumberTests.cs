@@ -31,7 +31,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Equal(existingNationalInsuranceNumber, doc.GetElementById("NationalInsuranceNumber")?.GetAttribute("value"));
             });
 
@@ -55,7 +55,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "HaveNationalInsuranceNumber", "Select yes if you have a National Insurance number");
+                await Assert.HtmlResponseHasErrorAsync(response, "HaveNationalInsuranceNumber", "Select yes if you have a National Insurance number");
             });
 
     [Fact]
@@ -83,7 +83,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number");
+                await Assert.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number");
             });
 
     [Fact]
@@ -111,7 +111,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number in the correct format");
+                await Assert.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number in the correct format");
             });
 
     [Fact]

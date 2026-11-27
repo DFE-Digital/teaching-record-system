@@ -77,7 +77,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
         Assert.Contains(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
@@ -97,7 +97,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
         Assert.DoesNotContain(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
@@ -117,7 +117,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
         var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).Where(t => !t.IsDbsAlertType);
         Assert.True(alertTypeOptions.SequenceEqualIgnoringOrder(nonDbsAlertTypes.Select(t => t.AlertTypeId)));
@@ -136,7 +136,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var radioButtons = doc.GetElementsByName("AlertTypeId");
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal(journeyInstance.State.AlertTypeId.ToString(), selectedRadioButton.GetAttribute("value"));
@@ -190,7 +190,7 @@ public class TypeTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AlertTypeId", "Select an alert type");
+        await Assert.HtmlResponseHasErrorAsync(response, "AlertTypeId", "Select an alert type");
     }
 
     [Fact]

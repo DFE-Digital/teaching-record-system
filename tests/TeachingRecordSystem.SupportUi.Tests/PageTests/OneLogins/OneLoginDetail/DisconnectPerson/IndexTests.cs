@@ -28,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : DisconnectPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Reason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "Reason", "Select a reason");
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class IndexTests(HostFixture hostFixture) : DisconnectPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ReasonDetail", "Enter a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "ReasonDetail", "Enter a reason");
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class IndexTests(HostFixture hostFixture) : DisconnectPersonTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ReasonDetail", "Reason details must be 4000 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "ReasonDetail", "Reason details must be 4000 characters or less");
     }
 
     [Theory]

@@ -55,7 +55,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -79,7 +79,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -123,7 +123,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var inductionStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus").GetString();
         Assert.Equal(InductionStatus.Passed.ToString(), inductionStatus);
     }
@@ -143,7 +143,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var qtlsStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qtlsStatus").GetString();
         Assert.Equal("Active", qtlsStatus);
     }
@@ -163,7 +163,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var qtlsStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qtlsStatus").GetString();
         Assert.Equal("Expired", qtlsStatus);
     }
@@ -184,7 +184,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var qts = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("qts");
 
         Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), qts.GetProperty("awarded").GetString());

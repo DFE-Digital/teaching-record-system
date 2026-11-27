@@ -49,7 +49,7 @@ public class SetQtlsDateRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(SetQtlsRequest.QtsDate),
             expectedError: "Date cannot be in the future.");
@@ -90,7 +90,7 @@ public class SetQtlsDateRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -117,7 +117,7 @@ public class SetQtlsDateRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

@@ -93,7 +93,7 @@ public class GetTrnRequestTests : TestBase
         // Assert
         var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
 
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -131,7 +131,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

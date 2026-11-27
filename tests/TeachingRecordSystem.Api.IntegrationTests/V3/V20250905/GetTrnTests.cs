@@ -16,7 +16,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class GetTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status410Gone);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.RecordIsDeactivated, StatusCodes.Status410Gone);
     }
 
     [Fact]

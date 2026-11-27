@@ -32,7 +32,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("no-open-alerts"));
     }
 
@@ -51,7 +51,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("open-alert"),
@@ -80,7 +80,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("no-closed-alerts"));
     }
 
@@ -99,7 +99,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var closedAlertsTable = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlertsTable);
@@ -128,7 +128,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
@@ -146,7 +146,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
@@ -164,7 +164,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
@@ -183,7 +183,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("open-alert"));
     }
 
@@ -202,7 +202,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("open-alert"));
     }
 
@@ -221,7 +221,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -245,7 +245,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -270,7 +270,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -295,7 +295,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -319,7 +319,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("closed-alerts"));
     }
 
@@ -338,7 +338,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("closed-alerts"));
     }
 
@@ -357,7 +357,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -380,7 +380,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -404,7 +404,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -428,7 +428,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -451,7 +451,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
@@ -470,7 +470,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
@@ -489,7 +489,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
@@ -519,7 +519,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var openAlert = doc.GetElementByTestId("open-alert");
         Assert.NotNull(openAlert);

@@ -76,7 +76,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : AddRoute
         else
         {
             var doc = await ReadContentAsync(response);
-            AssertEx.HtmlDocumentHasError(doc, "SubjectId1", "Enter a subject");
+            Assert.HtmlDocumentHasError(doc, "SubjectId1", "Enter a subject");
         }
     }
 

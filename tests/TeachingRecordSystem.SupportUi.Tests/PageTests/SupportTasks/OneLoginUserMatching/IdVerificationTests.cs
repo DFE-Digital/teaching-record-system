@@ -48,7 +48,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var resultRows = doc.GetElementByTestId("results")?
             .QuerySelectorAll("tbody > tr");
@@ -89,7 +89,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var resultRows = doc.GetElementByTestId("results")?
             .QuerySelectorAll("tbody > tr");
@@ -150,7 +150,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var resultRows = doc.GetElementByTestId("results")?
             .QuerySelectorAll("tbody > tr");
@@ -233,7 +233,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var resultRows = doc.GetElementByTestId("results")?
             .QuerySelectorAll("tbody > tr");
@@ -272,7 +272,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var resultRows = doc.GetElementByTestId("results")?
             .QuerySelectorAll("tbody > tr");
@@ -300,7 +300,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.QuerySelector(".govuk-pagination"));
     }
 
@@ -317,7 +317,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var resultRows = doc.GetElementByTestId("results")?
             .QuerySelectorAll("tbody > tr");
@@ -354,7 +354,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(
             expected,
             doc.GetElementByTestId("results")!
@@ -383,7 +383,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(
             [supportTasksList[0].SupportTaskReference],
             doc.GetElementByTestId("results")!
@@ -408,7 +408,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("results"));
         Assert.Null(doc.QuerySelector(".govuk-pagination"));
         Assert.NotNull(doc.GetElementByTestId("search"));
@@ -425,7 +425,7 @@ public class IdVerificationTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Null(doc.GetElementByTestId("search"));
         Assert.Null(doc.GetElementByTestId("results"));

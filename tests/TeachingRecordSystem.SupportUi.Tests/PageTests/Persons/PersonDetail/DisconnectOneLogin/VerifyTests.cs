@@ -31,7 +31,7 @@ public class VerifyTests(HostFixture hostFixture) : DisconnectOneLoginTestBase(h
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StayVerified", "Select yes if you want to keep the person verified");
+        await Assert.HtmlResponseHasErrorAsync(response, "StayVerified", "Select yes if you want to keep the person verified");
     }
 
     [Theory]

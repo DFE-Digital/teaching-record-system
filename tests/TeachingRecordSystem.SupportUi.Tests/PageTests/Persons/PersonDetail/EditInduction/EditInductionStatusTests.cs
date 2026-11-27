@@ -34,7 +34,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("induction-status-caption");
         Assert.Equal(expectedCaption, caption!.TrimmedText());
     }
@@ -60,7 +60,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").Select(button => button as IHtmlButtonElement);
@@ -93,7 +93,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
         Assert.Equal("Select an induction status", statusChoicesLegend!.TrimmedText());
@@ -138,7 +138,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
         Assert.Equal("Select an induction status", statusChoicesLegend!.TrimmedText());
@@ -191,7 +191,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         Assert.Equal(expectedChoices, statusChoices);
     }
@@ -216,7 +216,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var selectedStatus = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Single(r => r.IsChecked);
         Assert.Equal(currentInductionStatus.ToString(), selectedStatus.Value);
     }
@@ -275,7 +275,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
     }
 
     [Fact]
@@ -313,7 +313,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
     }
 
 
@@ -376,7 +376,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Contains(statusSpecificText, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TrimmedText());
     }
 
@@ -424,7 +424,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc!.GetElementByTestId("induction-status-warning"));
     }
 

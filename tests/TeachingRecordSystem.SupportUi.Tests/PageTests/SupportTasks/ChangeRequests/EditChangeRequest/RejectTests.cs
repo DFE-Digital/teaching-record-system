@@ -99,7 +99,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "RejectionReasonChoice", "Select the reason for rejecting this change");
+        await Assert.HtmlResponseHasErrorAsync(response, "RejectionReasonChoice", "Select the reason for rejecting this change");
     }
 
     [Theory]
@@ -216,7 +216,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been rejected");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been rejected");
     }
 
     [Theory]
@@ -284,7 +284,7 @@ public class RejectTests(HostFixture hostFixture) : TestBase(hostFixture), IAsyn
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been cancelled");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "The request has been cancelled");
     }
 
     // These tests reject with RequestAndProofDontMatch

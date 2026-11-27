@@ -57,7 +57,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "findBy", expectedErrorMessage);
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, "findBy", expectedErrorMessage);
     }
 
     [Theory]
@@ -78,7 +78,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, expectedErrorPropertyName, expectedErrorMessage);
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, expectedErrorPropertyName, expectedErrorMessage);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -136,7 +136,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -217,7 +217,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -281,7 +281,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {

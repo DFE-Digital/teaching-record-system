@@ -56,7 +56,7 @@ public class StartDateTests(HostFixture hostFixture) : AddMqTestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{startDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{startDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{startDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
@@ -105,7 +105,7 @@ public class StartDateTests(HostFixture hostFixture) : AddMqTestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
     [Theory]
@@ -134,7 +134,7 @@ public class StartDateTests(HostFixture hostFixture) : AddMqTestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date must be after end date");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Start date must be after end date");
     }
 
     [Fact]

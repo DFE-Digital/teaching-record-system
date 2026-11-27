@@ -61,7 +61,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason", v => Assert.Equal("Another reason", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
@@ -127,7 +127,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Name", v => Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal(person.DateOfBirth!.Value.ToString(WebConstants.DateDisplayFormat), v.TrimmedText()));
@@ -176,7 +176,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -250,7 +250,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : SetStatusTestBase(host
         var expectedMessage = targetStatus == PersonStatus.Deactivated
             ? "Lily The Pink\u2019s record has been deactivated"
             : "Lily The Pink\u2019s record has been reactivated";
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedMessage);
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedMessage);
 
         await WithDbContextAsync(async dbContext =>
         {

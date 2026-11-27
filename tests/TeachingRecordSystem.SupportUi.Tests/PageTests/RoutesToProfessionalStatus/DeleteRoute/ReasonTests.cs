@@ -34,7 +34,7 @@ public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoiceSelection = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
@@ -87,7 +87,7 @@ public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("reason-options-legend");
         Assert.Equal("Why are you deleting this route?", reasonChoicesLegend!.TrimmedText());
@@ -126,7 +126,7 @@ public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"/persons/{person.PersonId}/qualifications", doc.GetElementByTestId("back-link")!.GetAttribute("href"));
     }
 
@@ -193,9 +193,9 @@ public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixt
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re deleting this route");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re deleting this route");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixt
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter details");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Enter details");
     }
 
     [Fact]
@@ -258,7 +258,7 @@ public class ReasonTests(HostFixture hostFixture) : DeleteRouteTestBase(hostFixt
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]

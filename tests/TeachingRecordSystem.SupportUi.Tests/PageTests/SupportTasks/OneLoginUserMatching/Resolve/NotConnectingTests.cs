@@ -32,7 +32,7 @@ public class NotConnectingTests(HostFixture hostFixture) : ResolveOneLoginUserMa
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseAsync(response);
+        await Assert.HtmlResponseAsync(response);
     }
 
     [Theory]
@@ -65,7 +65,7 @@ public class NotConnectingTests(HostFixture hostFixture) : ResolveOneLoginUserMa
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.True(doc.GetElementsByName("Reason").SingleOrDefault(e => e.GetAttribute("value") == nameof(OneLoginIdVerificationRejectReason.AnotherReason))!.HasAttribute("checked"));
         Assert.Equal(additionalDetails, doc.GetElementsByName("AdditionalDetails").Single().TrimmedText());
     }
@@ -100,7 +100,7 @@ public class NotConnectingTests(HostFixture hostFixture) : ResolveOneLoginUserMa
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Reason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "Reason", "Select a reason");
     }
 
     [Theory]
@@ -136,7 +136,7 @@ public class NotConnectingTests(HostFixture hostFixture) : ResolveOneLoginUserMa
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalDetails", "Enter additional detail");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalDetails", "Enter additional detail");
     }
 
     [Theory]

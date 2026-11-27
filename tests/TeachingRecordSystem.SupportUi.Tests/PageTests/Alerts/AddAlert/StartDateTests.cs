@@ -73,7 +73,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{journeyInstance.State.StartDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.StartDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
@@ -127,7 +127,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class StartDateTests(HostFixture hostFixture) : AddAlertTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date cannot be in the future");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Start date cannot be in the future");
     }
 
     [Fact]

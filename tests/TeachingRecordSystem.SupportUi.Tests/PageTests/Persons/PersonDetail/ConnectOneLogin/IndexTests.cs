@@ -36,7 +36,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Contains(person.Trn, doc.Body!.TextContent);
         Assert.NotNull(doc.GetElementById("EmailAddress"));
@@ -78,7 +78,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "Enter a GOV.UK One Login email address");
+        await Assert.HtmlResponseHasErrorAsync(response, "EmailAddress", "Enter a GOV.UK One Login email address");
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "Email address is not valid.");
+        await Assert.HtmlResponseHasErrorAsync(response, "EmailAddress", "Email address is not valid.");
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is not linked to a GOV.UK One Login record");
+        await Assert.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is not linked to a GOV.UK One Login record");
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to this record");
+        await Assert.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to this record");
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to another record");
+        await Assert.HtmlResponseHasErrorAsync(response, "EmailAddress", "The email address you entered is already connected to another record");
     }
 
     [Fact]

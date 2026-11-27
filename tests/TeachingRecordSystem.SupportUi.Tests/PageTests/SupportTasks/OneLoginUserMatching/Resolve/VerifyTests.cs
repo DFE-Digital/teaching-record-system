@@ -38,7 +38,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{requestData.StatedFirstName} {requestData.StatedLastName}", doc.GetSummaryListValueByKey("Name"));
         Assert.Equal(requestData.StatedDateOfBirth.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("Date of birth"));
         Assert.Equal(oneLoginUser.EmailAddress, doc.GetSummaryListValueByKey("Email address"));
@@ -79,7 +79,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementsByTagName("h2").SingleOrDefault(h => h.TextContent.Trim() == "QTS details"));
         Assert.Null(doc.GetSummaryListValueByKey("Year received"));
         Assert.Null(doc.GetSummaryListValueByKey("Provider"));
@@ -107,7 +107,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(TimeProvider.UtcNow.Year.ToString(), doc.GetSummaryListValueByKey("Year received"));
         Assert.Null(doc.GetSummaryListValueByKey("Provider"));
         Assert.Null(doc.GetSummaryListValueByKey("Subject"));
@@ -141,7 +141,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(normalizedTrn, doc.GetSummaryListValueByKey("TRN"));
         Assert.Equal(normalizedNino, doc.GetSummaryListValueByKey("National Insurance number"));
     }
@@ -167,7 +167,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         AssertCheckedRadioOption("Verified", verified.ToString());
 
         void AssertCheckedRadioOption(string name, string expectedCheckedValue)
@@ -194,7 +194,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Verified", "Select yes if you can verify this person’s identity");
+        await Assert.HtmlResponseHasErrorAsync(response, "Verified", "Select yes if you can verify this person’s identity");
     }
 
     [Fact]
@@ -562,7 +562,7 @@ public class VerifyTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(returnUrl, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
     }
 

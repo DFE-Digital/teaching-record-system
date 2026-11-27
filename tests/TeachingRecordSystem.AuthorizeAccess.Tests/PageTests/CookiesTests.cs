@@ -16,7 +16,7 @@ public class CookiesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseAsync(response);
+                await Assert.HtmlResponseAsync(response);
             });
     }
 }

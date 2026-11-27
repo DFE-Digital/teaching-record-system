@@ -47,7 +47,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var document = await AssertEx.HtmlResponseAsync(response);
+        var document = await Assert.HtmlResponseAsync(response);
 
         Assert.Null(document.GetElementByTestId("zendesk-ticket-0"));
         Assert.NotNull(document.GetElementByTestId("zendesk-ticket-new"));
@@ -102,7 +102,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var document = await AssertEx.HtmlResponseAsync(response);
+        var document = await Assert.HtmlResponseAsync(response);
 
         var ticketInput = document.QuerySelector("input#TicketUrls-0");
 
@@ -137,7 +137,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         var redirectDoc = await redirectResponse.GetDocumentAsync();
 
         // Assert
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Zendesk tickets updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Zendesk tickets updated");
 
         var details = redirectDoc.GetElementByTestId("zendesk-tickets");
         Assert.NotNull(details);
@@ -614,7 +614,7 @@ public class ZendeskTicketsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(
+        await Assert.HtmlResponseHasErrorAsync(
             response,
             "TicketUrls-2",
             "Enter a valid Zendesk URL");

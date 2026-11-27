@@ -90,7 +90,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -135,7 +135,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

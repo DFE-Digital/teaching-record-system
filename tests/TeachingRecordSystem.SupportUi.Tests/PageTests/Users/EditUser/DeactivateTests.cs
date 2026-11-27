@@ -191,7 +191,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReason", "Select a reason for deactivating this user");
+        await Assert.HtmlResponseHasErrorAsync(response, "HasAdditionalReason", "Select a reason for deactivating this user");
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalReasonDetail", "Enter a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalReasonDetail", "Enter a reason");
     }
 
     [Fact]
@@ -245,7 +245,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasMoreInformation", "Select yes if you want to provide more details");
+        await Assert.HtmlResponseHasErrorAsync(response, "HasMoreInformation", "Select yes if you want to provide more details");
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "MoreInformationDetail", "Enter more details");
+        await Assert.HtmlResponseHasErrorAsync(response, "MoreInformationDetail", "Enter more details");
     }
 
     [Fact]
@@ -300,7 +300,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -327,7 +327,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -355,7 +355,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
@@ -382,7 +382,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var urlEncoder = UrlEncoder.Default;
@@ -425,7 +425,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
@@ -598,7 +598,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     [Fact]
@@ -650,7 +650,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     [Fact]
@@ -703,7 +703,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     [Fact]
@@ -756,7 +756,7 @@ public class DeactivateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: $"{existingUser.Name}\u2019s account has been deactivated");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}/deactivate";

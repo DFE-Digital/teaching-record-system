@@ -31,7 +31,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 if (haveExistingValueInState)
                 {
                     Assert.Equal("31", doc.GetElementById("DateOfBirth.Day")?.GetAttribute("value"));
@@ -71,7 +71,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "DateOfBirth", "Enter your date of birth");
+                await Assert.HtmlResponseHasErrorAsync(response, "DateOfBirth", "Enter your date of birth");
             });
 
     [Fact]

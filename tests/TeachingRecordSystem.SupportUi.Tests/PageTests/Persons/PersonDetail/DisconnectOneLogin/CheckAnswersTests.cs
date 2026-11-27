@@ -99,7 +99,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DisconnectOneLoginTest
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         //doc.AssertSummaryListRowValue("GOV.UK One Login email address", v => Assert.Equal(oneLogin.Subject, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Why are you disconnecting GOV.UK One Login from this record?", v => Assert.Contains(reason!.GetDisplayName()!, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Should this GOV.UK One Login stay verified?", v => Assert.Contains(stayVerified!.GetDisplayName()!, v.TrimmedText()));
@@ -125,7 +125,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DisconnectOneLoginTest
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         //doc.AssertSummaryListRowValue("GOV.UK One Login email address", v => Assert.Equal(oneLogin.Subject, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Why are you disconnecting GOV.UK One Login from this record?", v => Assert.Contains(reason!.GetDisplayName()!, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Should this GOV.UK One Login stay verified?", v => Assert.Contains(stayVerified!.GetDisplayName()!, v.TrimmedText()));

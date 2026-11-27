@@ -92,7 +92,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("ChangeReason", journeyInstance.State.ChangeReason!.ToString()!);
         AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
@@ -181,7 +181,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
+        await Assert.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information");
     }
 
     [Fact]
@@ -225,7 +225,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
+        await Assert.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
     [Fact]
@@ -248,7 +248,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -271,7 +271,7 @@ public class ReasonTests(HostFixture hostFixture) : EndDateTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]

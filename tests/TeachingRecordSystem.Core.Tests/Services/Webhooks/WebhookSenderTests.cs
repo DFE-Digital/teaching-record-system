@@ -83,7 +83,7 @@ public class WebhookSenderTests(ServiceFixture serviceFixture)
                 Assert.NotNull(req.Headers.GetValues("signature").SingleOrDefault());
 
                 var body = await req.Content!.ReadAsStringAsync();
-                AssertEx.JsonEquals(serializedData.ToString(), body);
+                Assert.JsonEquals(serializedData.ToString(), body);
             });
     }
 }

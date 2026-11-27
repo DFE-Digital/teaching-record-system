@@ -76,7 +76,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(alert.AlertType!.Name, doc.GetSummaryListValueByKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueByKey("Details"));
         Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Link"));
@@ -158,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ReopenAlertTestBase(ho
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert re-opened");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert re-opened");
 
         await WithDbContextAsync(async dbContext =>
         {

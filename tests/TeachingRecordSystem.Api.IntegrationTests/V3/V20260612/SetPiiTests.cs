@@ -92,7 +92,7 @@ public class SetPiiTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbidden, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbidden, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class SetPiiTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbiddenPersonHasQts, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbiddenPersonHasQts, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class SetPiiTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, StatusCodes.Status400BadRequest);
     }
 
     [Fact]

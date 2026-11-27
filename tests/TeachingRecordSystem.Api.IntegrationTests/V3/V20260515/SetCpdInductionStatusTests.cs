@@ -61,7 +61,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonDoesNotHaveQts, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonDoesNotHaveQts, StatusCodes.Status400BadRequest);
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidInductionStatus, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidInductionStatus, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.StaleRequest, StatusCodes.Status409Conflict);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.StaleRequest, StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsNotPermitted, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsNotPermitted, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsNotPermitted, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsNotPermitted, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsRequired, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsRequired, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsNotPermitted, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsNotPermitted, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -276,7 +276,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsRequired, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsRequired, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -302,7 +302,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsRequired, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsRequired, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -328,7 +328,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsRequired, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionStartDateIsRequired, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -353,7 +353,7 @@ public class SetCpdInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsRequired, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InductionCompletedDateIsRequired, StatusCodes.Status400BadRequest);
     }
 
     [Theory]

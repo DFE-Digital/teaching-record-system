@@ -35,7 +35,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Equal(existingTrn, doc.GetElementById("Trn")?.GetAttribute("value"));
             });
 
@@ -59,7 +59,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "HaveTrn", "Select yes if you have a teacher reference number");
+                await Assert.HtmlResponseHasErrorAsync(response, "HaveTrn", "Select yes if you have a teacher reference number");
             });
 
     [Fact]
@@ -84,7 +84,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Enter your teacher reference number");
+                await Assert.HtmlResponseHasErrorAsync(response, "Trn", "Enter your teacher reference number");
             });
 
     [Fact]
@@ -109,7 +109,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Your teacher reference number should contain 7 digits");
+                await Assert.HtmlResponseHasErrorAsync(response, "Trn", "Your teacher reference number should contain 7 digits");
             });
 
     [Fact]
@@ -134,7 +134,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Enter a valid teacher reference number");
+                await Assert.HtmlResponseHasErrorAsync(response, "Trn", "Enter a valid teacher reference number");
             });
 
     [Fact]

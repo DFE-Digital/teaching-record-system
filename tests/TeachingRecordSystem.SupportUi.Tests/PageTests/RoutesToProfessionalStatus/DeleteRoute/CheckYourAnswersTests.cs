@@ -69,7 +69,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(
             $"/routes/{qualificationId}/delete/reason?{journeyInstance.GetUniqueIdQueryParameter()}",
             doc.GetElementByTestId("back-link")!.GetAttribute("href"));
@@ -150,7 +150,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", status.GetTitle());
@@ -190,7 +190,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Reason", deleteRouteState.ChangeReason!.GetDisplayName()!);
         doc.AssertSummaryListRowValueContentMatches("Reason details", deleteRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
@@ -231,7 +231,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : DeleteRouteTestBas
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Route to professional status deleted");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Route to professional status deleted");
 
         await WithDbContextAsync(async dbContext => Assert.Null(await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
 

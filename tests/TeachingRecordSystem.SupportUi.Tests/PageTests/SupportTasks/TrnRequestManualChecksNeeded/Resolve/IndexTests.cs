@@ -45,7 +45,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal("an alert, QTS and EYTS", doc.GetElementByTestId("flags-description")?.TextContent);
         var trnRequestMetadata = supportTask.TrnRequestMetadata!;
         var cardActions = doc.QuerySelectorAll<IHtmlAnchorElement>(".govuk-summary-card__actions>*");
@@ -126,7 +126,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChecksCompleted", "You must complete all checks before confirming");
+        await Assert.HtmlResponseHasErrorAsync(response, "ChecksCompleted", "You must complete all checks before confirming");
     }
 
     [Fact]

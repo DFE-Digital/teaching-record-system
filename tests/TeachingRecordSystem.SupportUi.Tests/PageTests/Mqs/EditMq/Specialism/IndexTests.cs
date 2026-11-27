@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var specialismList = doc.GetElementByTestId("specialism-list");
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -66,7 +66,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var specialismList = doc.GetElementByTestId("specialism-list");
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -97,7 +97,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var legacySpecialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).Where(s => s.Legacy).ToArray();
         var specialismRadios = doc.GetElementsByName("Specialism");
@@ -129,7 +129,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var legacySpecialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).Where(s => s.Legacy).ToArray();
         var specialismRadios = doc.GetElementsByName("Specialism");
@@ -179,7 +179,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqSpecialismTestBase(host
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
+        await Assert.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
     }
 
     [Fact]

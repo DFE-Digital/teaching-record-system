@@ -75,7 +75,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
@@ -155,7 +155,7 @@ public class DetailsTests(HostFixture hostFixture) : AddAlertTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Details must be 4000 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "Details", "Details must be 4000 characters or less");
     }
 
     [Fact]

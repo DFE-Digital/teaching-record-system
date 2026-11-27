@@ -29,7 +29,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseAsync(response);
+        await Assert.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be unique");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Name must be unique");
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ShortName", "Short name must be 25 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "ShortName", "Short name must be 25 characters or less");
     }
 
     [Fact]
@@ -221,6 +221,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user added");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user added");
     }
 }

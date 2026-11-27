@@ -29,7 +29,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : AddRouteTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
         Assert.NotNull(heading);
@@ -74,8 +74,8 @@ public class StartAndEndDateTests(HostFixture hostFixture) : AddRouteTestBase(ho
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingStartDate", "Enter a start date");
-            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter an end date");
+            await Assert.HtmlResponseHasErrorAsync(response, "TrainingStartDate", "Enter a start date");
+            await Assert.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter an end date");
         }
     }
 
@@ -110,7 +110,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : AddRouteTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(startDate.Day.ToString(), doc.QuerySelector("#TrainingStartDate\\.Day")?.GetAttribute("value"));
         Assert.Equal(startDate.Month.ToString(), doc.QuerySelector("#TrainingStartDate\\.Month")?.GetAttribute("value"));
@@ -256,7 +256,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : AddRouteTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "End date must be after start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "End date must be after start date");
     }
 
     [Fact]

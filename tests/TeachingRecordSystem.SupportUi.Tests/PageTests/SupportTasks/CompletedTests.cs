@@ -19,7 +19,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
         Assert.Null(doc.GetElementByTestId("results"));
@@ -37,7 +37,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("no-results-message"));
         Assert.Null(doc.GetElementByTestId("results"));
@@ -67,7 +67,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var row = doc.GetElementByTestId($"task:{supportTask.SupportTaskReference}");
         Assert.NotNull(row);
@@ -106,7 +106,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -143,7 +143,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         // There's a hidden input with the same id earlier in the page, so select the element by tag name too
         var optionValues = ((IHtmlSelectElement)doc.QuerySelector("select#CompletedByUserId")!)
@@ -185,7 +185,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST3", "ST1"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -220,7 +220,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -255,7 +255,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -286,7 +286,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -321,7 +321,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -356,7 +356,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedTaskKeys, GetResultTaskKeys(doc, tasks));
     }
 
@@ -384,7 +384,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -416,7 +416,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1", "ST3"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -448,7 +448,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(["ST1"], GetResultTaskKeys(doc, tasks));
     }
 
@@ -473,7 +473,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
@@ -497,7 +497,7 @@ public class CompletedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Single(GetResultTaskReferences(doc));
     }
 

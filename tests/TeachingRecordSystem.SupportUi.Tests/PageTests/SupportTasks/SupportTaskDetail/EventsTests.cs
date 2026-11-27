@@ -35,7 +35,7 @@ public class EventsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(
             processTypes.Reverse().Select(t => t.ToString()).ToArray(),
@@ -70,7 +70,7 @@ public class EventsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(
             [nameof(SupportTaskUpdatedEvent), nameof(SupportTaskCreatedEvent)],

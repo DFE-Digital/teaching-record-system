@@ -80,7 +80,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -113,7 +113,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction imported into DQT", raisedBy.DqtUserName!, process.CreatedOn);
     }
@@ -139,7 +139,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction deactivated in DQT", raisedBy.DqtUserName!, process.CreatedOn);
     }
@@ -165,7 +165,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(process.ProcessId, "Induction reactivated in DQT", raisedBy.DqtUserName!, process.CreatedOn);
     }
@@ -268,7 +268,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -303,7 +303,7 @@ public class ChangeLogDqtInductionProcessTests : TestBase
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,

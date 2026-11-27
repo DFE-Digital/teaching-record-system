@@ -89,7 +89,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
@@ -166,7 +166,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
+        await Assert.HtmlResponseHasErrorAsync(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class LinkTests(HostFixture hostFixture) : AddAlertTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
+        await Assert.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
     }
 
     [Fact]
