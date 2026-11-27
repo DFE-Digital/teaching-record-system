@@ -30,7 +30,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var uploadEvidenceChoicesLegend = doc.GetElementByTestId("upload-evidence-options-legend");
         Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TrimmedText());
@@ -62,7 +62,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"Primary record (TRN {personB.Trn})", doc.GetElementByTestId("primary-record-heading")!.TrimmedText());
         Assert.Equal($"Secondary record (TRN {personA.Trn})", doc.GetElementByTestId("secondary-record-heading")!.TrimmedText());
     }
@@ -258,7 +258,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var uploadEvidenceChoices = doc.GetChildElementsOfTestId<IHtmlInputElement>("upload-evidence-options", "input[type='radio']")
             .Single(i => i.IsChecked).Value;
@@ -311,7 +311,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
+        await Assert.HtmlResponseHasErrorAsync(response, fieldName, expectedErrorMessage);
     }
 
     [Fact]
@@ -340,7 +340,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
     [Fact]
@@ -370,7 +370,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(MergeModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
@@ -400,7 +400,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var urlEncoder = UrlEncoder.Default;
@@ -445,7 +445,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");
@@ -670,7 +670,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         Assert.Equal(firstNameSelection, journeyInstance.State.FirstNameSource);
@@ -801,7 +801,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -837,7 +837,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);
@@ -850,7 +850,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
+        Assert.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
@@ -1037,7 +1037,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
+        Assert.ResponseIsRedirectTo(response, $"/persons/{personA.PersonId}");
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
 
@@ -1143,7 +1143,7 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
     [Theory]
@@ -1187,6 +1187,6 @@ public class MergePersonTests(HostFixture hostFixture) : MergePersonTestBase(hos
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 }

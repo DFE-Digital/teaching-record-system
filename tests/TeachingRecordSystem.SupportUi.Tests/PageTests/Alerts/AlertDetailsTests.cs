@@ -56,7 +56,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var h1 = doc.GetElementsByTagName("h1").Single();
         Assert.Equal(alert.AlertType!.Name, h1.TrimmedText());
@@ -143,7 +143,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Empty(doc.GetSummaryListActionsByKey("End date"));
     }
 
@@ -164,7 +164,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotEmpty(doc.GetSummaryListActionsByKey("End date"));
     }
 
@@ -186,7 +186,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Empty(doc.GetSummaryListActionsByKey("End date"));
     }
 
@@ -208,7 +208,7 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotEmpty(doc.GetSummaryListActionsByKey("End date"));
     }
 }

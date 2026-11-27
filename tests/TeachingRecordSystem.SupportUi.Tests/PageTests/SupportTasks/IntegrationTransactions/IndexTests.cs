@@ -28,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var noRecordsCell = doc.GetElementByTestId("no-integration-transactions-message");
         Assert.NotNull(noRecordsCell);
@@ -92,7 +92,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertResultsContainsIntegrationTransaction(integrationTransaction1.IntegrationTransactionId.ToString());
         doc.AssertResultsContainsIntegrationTransaction(integrationTransaction2.IntegrationTransactionId.ToString());
@@ -129,7 +129,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertResultsContainsIntegrationTransaction(integrationTransaction.IntegrationTransactionId.ToString());
 
@@ -197,7 +197,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertResultsContainsIntegrationTransaction(integrationTransaction.IntegrationTransactionId.ToString());
         var importstatusCell = doc.GetElementByTestId($"integration-transaction:{integrationTransaction.IntegrationTransactionId.ToString()}:importstatus");

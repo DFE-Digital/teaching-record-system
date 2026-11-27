@@ -81,7 +81,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("ProvideAdditionalInformation", bool.TrueString);
         var reasonDetailTextbox =
@@ -155,7 +155,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "DeleteReason", "Select a reason");
     }
 
     [Theory]
@@ -178,7 +178,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information");
+        await Assert.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information");
     }
 
     [Theory]
@@ -202,7 +202,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "DeleteReasonDetail", "Enter a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "DeleteReasonDetail", "Enter a reason");
     }
 
     [Theory]
@@ -226,7 +226,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Theory]
@@ -250,7 +250,7 @@ public class IndexTests(HostFixture hostFixture) : DeleteAlertTestBase(hostFixtu
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Theory]

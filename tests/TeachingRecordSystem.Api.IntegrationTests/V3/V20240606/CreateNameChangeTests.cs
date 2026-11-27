@@ -73,7 +73,7 @@ public class CreateNameChangeTests : TestBase
         var response = await GetHttpClientWithAuthorizeAccessToken(person.Trn, Version).SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class CreateNameChangeTests : TestBase
             Assert.NotNull(email);
             Assert.NotNull(email.SentOn);
 
-            await AssertEx.JsonResponseEqualsAsync(
+            await Assert.JsonResponseEqualsAsync(
                 response,
                 expected: new
                 {

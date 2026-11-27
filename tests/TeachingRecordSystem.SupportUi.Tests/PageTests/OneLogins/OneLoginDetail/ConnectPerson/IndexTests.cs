@@ -35,7 +35,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementById("Trn"));
     }
@@ -81,7 +81,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Enter a TRN");
+        await Assert.HtmlResponseHasErrorAsync(response, "Trn", "Enter a TRN");
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "TRN must be a number");
+        await Assert.HtmlResponseHasErrorAsync(response, "Trn", "TRN must be a number");
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "TRN must be 7 digits long");
+        await Assert.HtmlResponseHasErrorAsync(response, "Trn", "TRN must be 7 digits long");
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "The TRN you entered does not exist");
+        await Assert.HtmlResponseHasErrorAsync(response, "Trn", "The TRN you entered does not exist");
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class IndexTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "This GOV.UK One Login is already connected to this record");
+        await Assert.HtmlResponseHasErrorAsync(response, "Trn", "This GOV.UK One Login is already connected to this record");
     }
 
     [Fact]

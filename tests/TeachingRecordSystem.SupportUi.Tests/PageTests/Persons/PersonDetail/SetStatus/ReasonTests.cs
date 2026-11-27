@@ -61,7 +61,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -119,7 +119,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (targetStatus == PersonStatus.Deactivated)
         {
@@ -230,13 +230,13 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         // Assert
         if (targetStatus == PersonStatus.Deactivated)
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.DeactivateReason), "Select a reason");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.DeactivateReason), "Select a reason");
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReason), "Select a reason");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReason), "Select a reason");
         }
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.UploadEvidence)}", "Select yes if you want to upload evidence");
     }
 
     [Theory]
@@ -276,11 +276,11 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         // Assert
         if (targetStatus == PersonStatus.Deactivated)
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.DeactivateReasonDetail), "Enter a reason");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.DeactivateReasonDetail), "Enter a reason");
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReasonDetail), "Enter a reason");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(ReasonModel.ReactivateReasonDetail), "Enter a reason");
         }
     }
 
@@ -319,7 +319,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "Select a file");
     }
 
     [Theory]
@@ -358,7 +358,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, $"{nameof(ReasonModel.Evidence)}.{nameof(EvidenceUploadModel.EvidenceFile)}", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Theory]
@@ -397,7 +397,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var urlEncoder = UrlEncoder.Default;
@@ -451,7 +451,7 @@ public class ReasonTests(HostFixture hostFixture) : SetStatusTestBase(hostFixtur
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response, 400);
+        var doc = await Assert.HtmlResponseAsync(response, 400);
 
         var urlEncoder = UrlEncoder.Default;
         var expectedBlobStorageFileUrl = urlEncoder.Encode($"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}");

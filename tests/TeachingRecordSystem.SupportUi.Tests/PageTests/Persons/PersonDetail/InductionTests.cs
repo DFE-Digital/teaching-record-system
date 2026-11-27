@@ -17,7 +17,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TrimmedText());
         Assert.Null(doc.GetElementByTestId("induction-card"));
     }
@@ -55,7 +55,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (hasExemption)
         {
@@ -86,7 +86,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
@@ -117,7 +117,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var expectedExemptionReasonText =
             allExemptionReasons.Single(r => r.InductionExemptionReasonId == exemptionReasonId).Name;
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(InductionStatus.Exempt.GetTitle(), inductionStatus!.TrimmedText());
         var exemptionReason = doc.GetElementByTestId("induction-exemption-reasons")!.Children[1].TrimmedText();
@@ -148,7 +148,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TrimmedText();
@@ -173,7 +173,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TrimmedText();
         Assert.True(string.IsNullOrWhiteSpace(startDate.Trim()));
     }
@@ -201,7 +201,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
         var completedDate = doc.GetElementByTestId("induction-completed-date")!.Children[1].TrimmedText();
@@ -255,7 +255,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (hasReadWriteAccess)
         {
@@ -307,7 +307,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Null(doc.GetElementByTestId("induction-status-warning"));
     }
@@ -330,7 +330,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("induction-status-warning"));
     }
 
@@ -351,7 +351,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TrimmedText());
     }
@@ -384,7 +384,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeLinks = doc.GetAllElementsByTestId(
             "change-induction-status",
             "change-induction-exemption-reason",
@@ -420,7 +420,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeLinks = doc.GetAllElementsByTestId(
             "change-induction-status",
             "change-induction-start-date",
@@ -473,7 +473,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeLinks = doc.GetAllElementsByTestId(
             "change-induction-status",
             "change-induction-exemption-reason",
@@ -517,7 +517,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeLinks = doc.GetAllElementsByTestId(
             "change-induction-status",
             "change-induction-start-date",

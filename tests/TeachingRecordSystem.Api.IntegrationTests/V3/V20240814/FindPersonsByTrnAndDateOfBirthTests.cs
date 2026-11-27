@@ -55,7 +55,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -79,7 +79,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -122,10 +122,10 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseInductionStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new
             {
                 status = "Pass",

@@ -31,7 +31,7 @@ public class VerifiedTests(HostFixture hostFixture) : DisconnectPersonTestBase(h
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StayVerified", "Select yes if you want to keep the GOV.UK One Login verified");
+        await Assert.HtmlResponseHasErrorAsync(response, "StayVerified", "Select yes if you want to keep the GOV.UK One Login verified");
     }
 
     [Theory]

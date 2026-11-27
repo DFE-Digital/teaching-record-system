@@ -49,7 +49,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStartDateTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
         Assert.Equal(oldStartDate.ToString(WebConstants.DateDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TrimmedText());
@@ -114,7 +114,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditMqStartDateTestBas
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification changed");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification changed");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
 

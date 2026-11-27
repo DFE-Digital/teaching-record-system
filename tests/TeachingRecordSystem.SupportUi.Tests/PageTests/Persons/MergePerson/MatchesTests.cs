@@ -41,7 +41,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("person-a", "First name", v => Assert.Equal("Alfred", v.TrimmedText()));
         doc.AssertSummaryListRowValue("person-a", "Middle name", v => Assert.Equal("The", v.TrimmedText()));
@@ -87,7 +87,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("person-a", "Alerts", v =>
         {
@@ -141,7 +141,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertMatchRowHasExpectedHighlight("person-a", "First name", false);
         doc.AssertMatchRowHasExpectedHighlight("person-a", "Middle name", false);
@@ -190,7 +190,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -225,7 +225,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -262,7 +262,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -303,7 +303,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -342,7 +342,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -386,7 +386,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -428,7 +428,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -464,7 +464,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var warningText = doc.GetElementByTestId("warning-text");
         var primaryPersonOptions = doc.GetElementByTestId("primary-person-options");
@@ -498,7 +498,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var primaryPersonChoice = doc.GetChildElementsOfTestId<IHtmlInputElement>("primary-person-options", "input[type='radio']")
             .Single(i => i.IsChecked).Value;
@@ -532,7 +532,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "Select primary record");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "Select primary record");
     }
 
     [Fact]
@@ -562,7 +562,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
@@ -607,7 +607,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         Assert.Equal(personB.PersonId, journeyInstance.State.PrimaryPersonId);
@@ -726,7 +726,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -762,7 +762,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);
@@ -775,7 +775,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
+        Assert.ResponseIsRedirectTo(redirectResponse, $"/persons/{personA.PersonId}");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
     }
@@ -851,7 +851,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The secondary record has an alert");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The secondary record has an alert");
     }
 
     [Fact]
@@ -881,7 +881,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The induction status of the secondary record is failed in Wales");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The induction status of the secondary record is failed in Wales");
     }
 
     [Fact]
@@ -961,7 +961,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The induction status of the secondary record is failed in Wales");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(MatchesModel.PrimaryPersonId), "The induction status of the secondary record is failed in Wales");
     }
 
     [Fact]
@@ -992,7 +992,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AssertEx.ResponseIsRedirectTo(response,
+        Assert.ResponseIsRedirectTo(response,
             $"/persons/{personA.PersonId}/merge/merge?{journeyInstance.GetUniqueIdQueryParameter()}");
     }
 
@@ -1070,7 +1070,7 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 
     [Theory]
@@ -1114,6 +1114,6 @@ public class MatchesTests(HostFixture hostFixture) : MergePersonTestBase(hostFix
             expectedRedirect = $"{expectedRedirect}/merge/{expectedPage}?{journeyInstance.GetUniqueIdQueryParameter()}";
         }
 
-        AssertEx.ResponseIsRedirectTo(response, expectedRedirect);
+        Assert.ResponseIsRedirectTo(response, expectedRedirect);
     }
 }

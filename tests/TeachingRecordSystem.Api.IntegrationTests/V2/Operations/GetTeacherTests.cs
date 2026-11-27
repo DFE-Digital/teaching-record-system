@@ -45,7 +45,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
+//         await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
 //     }
 //
 //     [Fact]
@@ -116,7 +116,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             new
 //             {
@@ -183,7 +183,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             new
 //             {

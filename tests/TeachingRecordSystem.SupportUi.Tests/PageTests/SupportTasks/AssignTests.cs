@@ -32,7 +32,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var references = doc.QuerySelectorAll("[data-testid=task-reference]").Select(e => e.TrimmedText()).ToArray();
         Assert.Equal([supportTask1.SupportTaskReference, supportTask2.SupportTaskReference], references);
@@ -58,7 +58,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = doc.GetElementById("AssignToUserId")!
             .QuerySelectorAll("option")
@@ -92,7 +92,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = doc.GetElementById("AssignToUserId")!
             .QuerySelectorAll("option")
@@ -126,7 +126,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = doc.GetElementById("AssignToUserId")!
             .QuerySelectorAll("option")
@@ -164,7 +164,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = doc.GetElementById("AssignToUserId")!
             .QuerySelectorAll("option")
@@ -202,7 +202,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("team-workload"));
         Assert.Contains("1 Change name request", doc.DocumentElement!.TextContent);
@@ -229,7 +229,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var sortLinks = doc.GetElementByTestId("team-workload")!
             .QuerySelectorAll("[hx-get]")
@@ -259,7 +259,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var references = doc.QuerySelectorAll("[data-testid=task-reference]").Select(e => e.TrimmedText()).ToArray();
         Assert.Equal([outstandingTask.SupportTaskReference], references);
@@ -299,7 +299,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AssignToUserId", "Select who to assign the tasks to");
+        await Assert.HtmlResponseHasErrorAsync(response, "AssignToUserId", "Select who to assign the tasks to");
         Events.AssertNoEventsPublished();
     }
 
@@ -379,7 +379,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "2 tasks assigned to Reviewer One");
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "2 tasks assigned to Reviewer One");
     }
 
     [Fact]
@@ -411,7 +411,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "1 task assigned to you");
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "1 task assigned to you");
     }
 
     [Fact]
@@ -458,7 +458,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "1 task unassigned");
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "1 task unassigned");
     }
 
     [Theory]
@@ -481,7 +481,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var subjects = doc.QuerySelectorAll("[data-testid='task-name']").Select(e => e.TrimmedText()).ToArray();
         Assert.Equal(expectedSubjects, subjects);
@@ -502,7 +502,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var references = doc.QuerySelectorAll("[data-testid='task-reference']").Select(e => e.TrimmedText()).ToArray();
         Assert.Equal([first.SupportTaskReference, second.SupportTaskReference], references);
@@ -526,7 +526,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var expectedLink = $"{returnUrl}" +
             $"&SupportTaskReference={firstTask.SupportTaskReference}" +
@@ -552,7 +552,7 @@ public class AssignTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal(
             $"{returnUrl}?SupportTaskReference={outstandingTask.SupportTaskReference}",

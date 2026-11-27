@@ -78,7 +78,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
         Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetSummaryListValueByKey("Name"));
@@ -104,7 +104,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetElementByTestId("page-title")!.TrimmedText());
         Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetSummaryListValueByKey("Name"));
@@ -128,7 +128,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("open-alert-notification"));
     }
 
@@ -145,7 +145,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("open-alert-notification"));
     }
 
@@ -163,7 +163,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("open-alert-notification"));
     }
 
@@ -179,7 +179,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var notes = doc.GetElementByTestId("notes-tab");
         Assert.NotNull(notes);
     }
@@ -196,7 +196,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Empty(doc.GetAllElementsByTestId("professional-status-details"));
     }
 
@@ -216,7 +216,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
         Assert.Equal(awardDate.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("QTS held since"));
@@ -245,7 +245,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("Holds", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
         Assert.Equal(awardDate.ToString(WebConstants.DateDisplayFormat), doc.GetSummaryListValueByKey("QTS held since"));
@@ -274,7 +274,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("QTS held since"));
@@ -303,7 +303,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("QTS held since"));
@@ -332,7 +332,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("professional-status-details"));
         Assert.Equal("No", doc.GetSummaryListValueByKey("Qualified teacher status (QTS)"));
         Assert.Null(doc.GetSummaryListValueByKey("QTS held since"));
@@ -365,7 +365,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeDetailsLink = doc.GetElementByTestId("change-details-link");
         if (canSeeChangeDetailsLink)
         {
@@ -396,7 +396,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var changeDetailsLink = doc.GetElementByTestId("change-details-link");
         Assert.Null(changeDetailsLink);
     }
@@ -422,7 +422,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("merge-button"));
     }
 
@@ -439,7 +439,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
@@ -455,7 +455,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
@@ -482,7 +482,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("merge-button"));
     }
 
@@ -510,7 +510,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var mergeButton = doc.GetElementByTestId("merge-button");
         if (expectMergeButtonToBeShown)
         {
@@ -549,7 +549,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var pageTitle = doc.GetElementByTestId("page-title");
         Assert.NotNull(pageTitle);
         if (expectPersonToBeMarkedAsDeactivated)
@@ -585,7 +585,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
 
         if (expectButtonToBeVisible)
@@ -622,7 +622,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
         Assert.NotNull(setStatusButton);
         Assert.Equal(expectedButtonText, setStatusButton.TrimmedText());
@@ -651,7 +651,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var setStatusButton = doc.GetElementByTestId("set-status-button") as IHtmlAnchorElement;
         Assert.Null(setStatusButton);
     }
@@ -680,7 +680,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var message = doc.GetElementByTestId("deactivated-message");
         var link = doc.GetElementByTestId("active-merged-record-link") as IHtmlAnchorElement;
 
@@ -734,7 +734,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var connectButton = doc.GetElementByTestId("connect-one-login-button");
         if (expectConnectButtonToBeShown)
         {
@@ -771,7 +771,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var disconnectLink = doc.QuerySelector($"a[href*='disconnect-one-login']");
         if (expectDisconnectLinkToBeShown)
         {
@@ -796,7 +796,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginSummary = doc.GetElementByTestId("associated-one-login-users");
         Assert.Null(oneLoginSummary);
     }
@@ -814,7 +814,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginSummary = doc.GetElementByTestId("associated-one-login-users");
         Assert.NotNull(oneLoginSummary);
         oneLoginSummary.AssertSummaryListRowValue("Email address", v => Assert.Equal(person.EmailAddress, v.TrimmedText()));
@@ -836,7 +836,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginSummary = doc.GetElementByTestId("associated-one-login-users");
         Assert.NotNull(oneLoginSummary);
         oneLoginSummary.AssertSummaryListHasRows(

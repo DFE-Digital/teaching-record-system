@@ -89,7 +89,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
 
         // Act
         var response = await HttpClient.SendAsync(request);
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var firstName = doc.GetSummaryListValueElementByKey("First name");
         var lastName = doc.GetSummaryListValueElementByKey("Last name");
         var niNumber = doc.GetSummaryListValueElementByKey("NI number");
@@ -452,7 +452,7 @@ public class CheckAnswers(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed");
 

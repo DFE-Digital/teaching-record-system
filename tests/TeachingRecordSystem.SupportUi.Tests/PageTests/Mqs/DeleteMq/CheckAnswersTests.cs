@@ -60,7 +60,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var deletionSummary = doc.GetElementByTestId("deletion-summary");
         Assert.NotNull(deletionSummary);
         Assert.Equal(provider?.Name ?? "None", deletionSummary.GetElementByTestId("provider")!.TrimmedText());
@@ -142,7 +142,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DeleteMqTestBase(hostF
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification deleted");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification deleted");
 
         Events.AssertProcessesCreated(p =>
         {

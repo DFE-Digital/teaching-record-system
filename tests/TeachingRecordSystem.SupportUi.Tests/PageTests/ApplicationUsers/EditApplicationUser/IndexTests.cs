@@ -51,7 +51,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByLabel(ApiRoles.GetPerson)?.GetAttribute("checked"));
         Assert.NotNull(doc.GetElementByLabel(ApiRoles.UpdatePerson)?.GetAttribute("checked"));
@@ -142,7 +142,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ShortName", "Short name must be 25 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "ShortName", "Short name must be 25 characters or less");
     }
 
     [Theory]
@@ -242,7 +242,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, expectedErrorMessage);
+        await Assert.HtmlResponseHasErrorAsync(response, expectedErrorField, expectedErrorMessage);
     }
 
     [Fact]
@@ -360,7 +360,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Application user updated");
     }
 
     [Fact]

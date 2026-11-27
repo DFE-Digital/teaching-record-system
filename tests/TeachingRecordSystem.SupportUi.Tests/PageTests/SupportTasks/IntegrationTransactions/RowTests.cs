@@ -50,7 +50,7 @@ public class RowTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         response.EnsureSuccessStatusCode();
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertSummaryListRowValue("Row ID", v => Assert.Equal(itr1.IntegrationTransactionRecordId.ToString(), v.TrimmedText()));
         doc.AssertSummaryListRowValue("Status", v => Assert.Equal(rowStatus.GetDisplayName(), v.TrimmedText()));

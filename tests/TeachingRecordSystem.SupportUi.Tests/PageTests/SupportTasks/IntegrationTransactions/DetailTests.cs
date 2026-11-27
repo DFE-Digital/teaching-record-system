@@ -50,7 +50,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var message = doc.GetElementByTestId("no-integration-transaction-records-message");
         var interfaceType = doc.GetElementByTestId("integration-transaction-interface-type");
@@ -100,7 +100,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var itr1 = integrationTransaction1.Records.First();
         doc.AssertResultsContainsIntegrationTransactionRecord(itr1.IntegrationTransactionRecordId);
@@ -149,7 +149,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertResultsContainsIntegrationTransactionRecord(itr1.IntegrationTransactionRecordId);
         var rowItrId = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:id");
@@ -204,7 +204,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var unknownPerson = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:personid");
         Assert.NotNull(unknownPerson);
@@ -257,7 +257,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var exportFailuresButton = doc.GetElementByTestId("export-integration-record-failures");
         Assert.NotNull(exportFailuresButton);
@@ -306,7 +306,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var exportFailuresButton = doc.GetElementByTestId("export-integration-record-failures");
         Assert.Null(exportFailuresButton);

@@ -8,91 +8,92 @@ using Xunit.Sdk;
 
 namespace TeachingRecordSystem.UiTestCommon;
 
-#pragma warning disable CA1711
-public static partial class AssertEx
-#pragma warning restore CA1711
+public static class UiAssertExtensions
 {
-    public static void ResponseIsRedirectTo(HttpResponseMessage response, string expectedUrl)
+    extension(Assert)
     {
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var location = response.Headers.Location?.OriginalString;
-        Assert.Equal(expectedUrl, location);
-    }
-
-    public static async Task<IHtmlDocument> HtmlResponseAsync(HttpResponseMessage response, int expectedStatusCode = 200)
-    {
-        Assert.Equal(expectedStatusCode, (int)response.StatusCode);
-
-        return await response.GetDocumentAsync();
-    }
-
-    public static void HtmlDocumentHasError(IHtmlDocument doc, string fieldName, string expectedMessage)
-    {
-        var errorElementId = $"{fieldName.Replace('.', '_')}-error";
-        var errorElement = doc.GetElementById(errorElementId);
-
-        if (errorElement == null)
+        public static void ResponseIsRedirectTo(HttpResponseMessage response, string expectedUrl)
         {
-            throw new XunitException($"No error found for field '{fieldName}'.");
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+            var location = response.Headers.Location?.OriginalString;
+            Assert.Equal(expectedUrl, location);
         }
 
-        var vht = errorElement.GetElementsByTagName("span")[0];
-        var errorMessage = errorElement.InnerHtml.Replace(vht.OuterHtml, "").Trim();
-        Assert.Equal(expectedMessage, errorMessage);
-    }
-
-    public static void HtmlDocumentHasSummaryError(IHtmlDocument doc, string expectedMessage)
-    {
-        var errorElement = doc.QuerySelectorAll(".govuk-error-summary .govuk-error-summary__list li")
-            .SingleOrDefault(item => item.TrimmedText() == expectedMessage);
-
-        if (errorElement == null)
+        public static async Task<IHtmlDocument> HtmlResponseAsync(HttpResponseMessage response, int expectedStatusCode = 200)
         {
-            throw new XunitException($"Error message '{expectedMessage}' was not found within the error summary.");
-        }
-    }
+            Assert.Equal(expectedStatusCode, (int)response.StatusCode);
 
-    public static void HtmlDocumentHasFlashNotificationBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
-    {
-        var banner = doc.GetElementsByClassName("govuk-notification-banner").SingleOrDefault();
-
-        if (banner is null)
-        {
-            throw new XunitException("No notification banner found.");
+            return await response.GetDocumentAsync();
         }
 
-        if (expectedHeading != null)
+        public static void HtmlDocumentHasError(IHtmlDocument doc, string fieldName, string expectedMessage)
         {
-            var heading = banner.GetElementsByClassName("govuk-notification-banner__heading").SingleOrDefault();
+            var errorElementId = $"{fieldName.Replace('.', '_')}-error";
+            var errorElement = doc.GetElementById(errorElementId);
 
-            Assert.Equal(expectedHeading, heading?.TrimmedText());
+            if (errorElement == null)
+            {
+                throw new XunitException($"No error found for field '{fieldName}'.");
+            }
+
+            var vht = errorElement.GetElementsByTagName("span")[0];
+            var errorMessage = errorElement.InnerHtml.Replace(vht.OuterHtml, "").Trim();
+            Assert.Equal(expectedMessage, errorMessage);
         }
 
-        if (expectedMessage != null)
+        public static void HtmlDocumentHasSummaryError(IHtmlDocument doc, string expectedMessage)
         {
-            var message = string.Join("\n", banner.QuerySelectorAll(".govuk-notification-banner p").Select(e => e.TrimmedText()));
+            var errorElement = doc.QuerySelectorAll(".govuk-error-summary .govuk-error-summary__list li")
+                .SingleOrDefault(item => item.TrimmedText() == expectedMessage);
 
-            Assert.Equal(expectedMessage, message);
+            if (errorElement == null)
+            {
+                throw new XunitException($"Error message '{expectedMessage}' was not found within the error summary.");
+            }
         }
-    }
 
-    public static async Task HtmlResponseHasErrorAsync(
-        HttpResponseMessage response,
-        string fieldName,
-        string expectedMessage,
-        int expectedStatusCode = 400)
-    {
-        var doc = await HtmlResponseAsync(response, expectedStatusCode);
-        HtmlDocumentHasError(doc, fieldName, expectedMessage);
-    }
+        public static void HtmlDocumentHasFlashNotificationBanner(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
+        {
+            var banner = doc.GetElementsByClassName("govuk-notification-banner").SingleOrDefault();
 
-    public static async Task HtmlResponseHasSummaryErrorAsync(
-        HttpResponseMessage response,
-        string expectedMessage,
-        int expectedStatusCode = 400)
-    {
-        var doc = await HtmlResponseAsync(response, expectedStatusCode);
-        HtmlDocumentHasSummaryError(doc, expectedMessage);
+            if (banner is null)
+            {
+                throw new XunitException("No notification banner found.");
+            }
+
+            if (expectedHeading != null)
+            {
+                var heading = banner.GetElementsByClassName("govuk-notification-banner__heading").SingleOrDefault();
+
+                Assert.Equal(expectedHeading, heading?.TrimmedText());
+            }
+
+            if (expectedMessage != null)
+            {
+                var message = string.Join("\n", banner.QuerySelectorAll(".govuk-notification-banner p").Select(e => e.TrimmedText()));
+
+                Assert.Equal(expectedMessage, message);
+            }
+        }
+
+        public static async Task HtmlResponseHasErrorAsync(
+            HttpResponseMessage response,
+            string fieldName,
+            string expectedMessage,
+            int expectedStatusCode = 400)
+        {
+            var doc = await HtmlResponseAsync(response, expectedStatusCode);
+            HtmlDocumentHasError(doc, fieldName, expectedMessage);
+        }
+
+        public static async Task HtmlResponseHasSummaryErrorAsync(
+            HttpResponseMessage response,
+            string expectedMessage,
+            int expectedStatusCode = 400)
+        {
+            var doc = await HtmlResponseAsync(response, expectedStatusCode);
+            HtmlDocumentHasSummaryError(doc, expectedMessage);
+        }
     }
 
     public static void AssertSummaryListRowValueContentMatches(this IElement doc, string keyContent, string? expected)

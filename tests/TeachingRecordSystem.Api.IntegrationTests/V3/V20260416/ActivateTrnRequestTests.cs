@@ -21,7 +21,7 @@ public class ActivateTrnRequestTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
+        var jsonResponse = await Assert.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
         Assert.Equal("Completed", jsonResponse.RootElement.GetProperty("status").GetString());
         Assert.NotNull(jsonResponse.RootElement.GetProperty("trn").GetString());
     }
@@ -42,7 +42,7 @@ public class ActivateTrnRequestTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
+        var jsonResponse = await Assert.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
         Assert.Equal("Completed", jsonResponse.RootElement.GetProperty("status").GetString());
         Assert.NotNull(jsonResponse.RootElement.GetProperty("trn").GetString());
     }

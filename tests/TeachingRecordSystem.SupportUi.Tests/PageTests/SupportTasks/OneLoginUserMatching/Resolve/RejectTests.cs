@@ -24,7 +24,7 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseAsync(response);
+        await Assert.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.True(doc.GetElementsByName("Reason").SingleOrDefault(e => e.GetAttribute("value") == nameof(OneLoginIdVerificationRejectReason.AnotherReason))!.HasAttribute("checked"));
         Assert.Equal(additionalDetails, doc.GetElementsByName("AdditionalDetails").Single().TrimmedText());
     }
@@ -76,7 +76,7 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Reason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "Reason", "Select a reason");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class RejectTests(HostFixture hostFixture) : ResolveOneLoginUserMatchingT
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalDetails", "Enter additional detail");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalDetails", "Enter additional detail");
     }
 
     [Fact]

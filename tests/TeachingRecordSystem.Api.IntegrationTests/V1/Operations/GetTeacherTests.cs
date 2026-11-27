@@ -20,7 +20,7 @@ public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
     [Theory]
@@ -35,7 +35,7 @@ public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class GetTeacherTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var responseJson = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
+        var responseJson = await Assert.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
         Assert.Equal(personWithMatchingTrn.Trn, responseJson.RootElement.GetProperty("trn").GetString());
     }
 }

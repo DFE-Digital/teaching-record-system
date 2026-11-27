@@ -56,7 +56,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
@@ -115,7 +115,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
@@ -165,7 +165,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
@@ -203,7 +203,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
@@ -242,7 +242,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -279,7 +279,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -314,7 +314,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -349,7 +349,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -396,7 +396,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -441,7 +441,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -485,7 +485,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -529,7 +529,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -563,7 +563,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Contains("existing1@example.com", doc.Body!.TextContent);
         Assert.Contains("existing2@example.com", doc.Body!.TextContent);

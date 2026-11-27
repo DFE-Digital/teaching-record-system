@@ -63,7 +63,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : EditRouteTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("h1.govuk-fieldset__heading");
         Assert.NotNull(heading);
@@ -141,7 +141,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : EditRouteTestBas
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingAgeSpecialism.AgeRangeType", "Enter an age range specialism");
+            await Assert.HtmlResponseHasErrorAsync(response, "TrainingAgeSpecialism.AgeRangeType", "Enter an age range specialism");
         }
     }
 
@@ -279,7 +279,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : EditRouteTestBas
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
+        var doc = await Assert.HtmlResponseAsync(response, StatusCodes.Status400BadRequest);
     }
 
     [Theory]

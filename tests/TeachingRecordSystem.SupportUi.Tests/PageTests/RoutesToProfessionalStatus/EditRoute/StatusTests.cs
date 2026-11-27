@@ -35,7 +35,7 @@ public class StatusTests(HostFixture hostFixture) : EditRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var statusChoice = doc.GetElementByTestId("status")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Single(i => i.IsChecked).Value;

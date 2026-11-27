@@ -72,7 +72,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var exemptionReasonsElement = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
         Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElement.Count());
         Assert.All(exemptionReasonsElement, checkbox =>
@@ -113,7 +113,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var exemptionReasonsElement = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
         Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElement.Count());
         Assert.All(exemptionReasonsElement, checkbox =>
@@ -159,7 +159,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var exemptionReasonsElement = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
         Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElement.Count());
         Assert.All(exemptionReasonsElement, checkbox =>
@@ -212,7 +212,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var exemptionReasonsElements = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
         Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElements.Count());
         Assert.All(exemptionReasonsElements, checkbox =>
@@ -268,7 +268,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (hasExemption)
         {
@@ -304,7 +304,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var selectedExemptionReasonsCheckboxes = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]").Where(c => c.IsChecked).Select(c => c.Value);
         Assert.All(selectedExemptionReasonsCheckboxes, checkboxValue =>
             {
@@ -331,7 +331,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : EditInductionTe
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ExemptionReasonIds", "Select the reason for a teacher’s exemption to induction");
+        await Assert.HtmlResponseHasErrorAsync(response, "ExemptionReasonIds", "Select the reason for a teacher’s exemption to induction");
     }
 
     [Fact]

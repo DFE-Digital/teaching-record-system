@@ -31,7 +31,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.NotNull(noMandatoryQualifications);
@@ -49,7 +49,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.NotNull(noProfessionalStatuses);
@@ -85,7 +85,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.Null(noMandatoryQualifications);
@@ -125,7 +125,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
@@ -170,7 +170,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
@@ -211,7 +211,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
@@ -248,7 +248,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
@@ -288,7 +288,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
@@ -333,7 +333,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noProfessionalStatuses = doc.GetElementByTestId("no-professional-statuses");
         Assert.Null(noProfessionalStatuses);
@@ -421,7 +421,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var editLinks = doc.GetAllElementsByTestId(
             "add-route",
             $"edit-route-link-{professionalStatusQualificationId}",
@@ -503,7 +503,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var editLinks = doc.GetAllElementsByTestId(
             "add-route",
             $"edit-route-link-{professionalStatusQualificationId}",

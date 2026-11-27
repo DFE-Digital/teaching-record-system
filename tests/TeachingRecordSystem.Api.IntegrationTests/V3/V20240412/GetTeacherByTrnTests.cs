@@ -67,7 +67,7 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -103,10 +103,10 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new
             {
                 startDate = startDate.ToString("yyyy-MM-dd"),
@@ -131,7 +131,7 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
         Assert.Equal(JsonValueKind.Null, responseInduction.ValueKind);
     }
@@ -153,10 +153,10 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new
@@ -186,10 +186,10 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseSanctions = jsonResponse.RootElement.GetProperty("sanctions");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new
@@ -219,10 +219,10 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new
@@ -253,10 +253,10 @@ public class GetTeacherByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responsePreviousNames = jsonResponse.RootElement.GetProperty("previousNames");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new

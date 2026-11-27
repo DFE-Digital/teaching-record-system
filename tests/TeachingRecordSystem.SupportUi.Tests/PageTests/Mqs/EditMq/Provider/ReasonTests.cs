@@ -88,7 +88,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqProviderTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqProviderTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqProviderTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class ReasonTests(HostFixture hostFixture) : EditMqProviderTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]

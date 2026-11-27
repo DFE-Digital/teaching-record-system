@@ -60,7 +60,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : EditRouteTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("label.govuk-label--l");
         Assert.NotNull(heading);
@@ -135,7 +135,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : EditRouteTestBase(hostFi
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
+            await Assert.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
         }
     }
 
@@ -223,7 +223,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : EditRouteTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
+        await Assert.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
     }
 
     [Fact]

@@ -96,7 +96,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]

@@ -32,7 +32,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                var doc = await AssertEx.HtmlResponseAsync(response);
+                var doc = await Assert.HtmlResponseAsync(response);
                 Assert.Equal(existingFirstName, doc.GetElementById("FirstName")?.GetAttribute("value"));
                 Assert.Equal(existingLastName, doc.GetElementById("LastName")?.GetAttribute("value"));
             });
@@ -63,7 +63,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
                 var response = await HttpClient.SendAsync(request);
 
                 // Assert
-                await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorFieldName, expectedErrorMessage);
+                await Assert.HtmlResponseHasErrorAsync(response, expectedErrorFieldName, expectedErrorMessage);
             });
 
     [Fact]

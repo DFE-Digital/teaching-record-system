@@ -106,7 +106,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{_person!.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -188,7 +188,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{_person!.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
@@ -211,7 +211,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{_secondaryPerson!.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -245,7 +245,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);
@@ -267,7 +267,7 @@ public class ChangeLogMergeProcessTests(HostFixture hostFixture) : TestBase(host
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{_person!.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,

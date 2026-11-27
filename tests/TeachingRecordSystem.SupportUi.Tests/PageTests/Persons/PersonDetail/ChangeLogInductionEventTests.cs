@@ -72,7 +72,7 @@ public class ChangeLogInductionEventTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var item = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
         Assert.NotNull(item);
@@ -204,7 +204,7 @@ public class ChangeLogInductionEventTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var item = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
         Assert.NotNull(item);
@@ -313,7 +313,7 @@ public class ChangeLogInductionEventTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.Null(doc.GetElementByDataAttribute("data-process-id", processId.ToString()));
     }
@@ -363,7 +363,7 @@ public class ChangeLogInductionEventTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var item = doc.GetElementByDataAttribute("data-process-id", processId.ToString());
         Assert.NotNull(item);

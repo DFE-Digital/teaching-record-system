@@ -120,7 +120,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddMqTestBase(hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(provider.Name, doc.GetElementByTestId("provider")!.TrimmedText());
         Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TrimmedText());
         Assert.Equal(startDate.ToString(WebConstants.DateDisplayFormat), doc.GetElementByTestId("start-date")!.TrimmedText());
@@ -210,7 +210,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddMqTestBase(hostFixt
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification added");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Mandatory qualification added");
 
         Assert.Null(GetJourneyInstanceState(journeyInstance));
 

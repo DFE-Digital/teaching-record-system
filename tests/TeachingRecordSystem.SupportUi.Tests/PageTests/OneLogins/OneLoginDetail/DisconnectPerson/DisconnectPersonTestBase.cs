@@ -37,7 +37,7 @@ public abstract class DisconnectPersonTestBase(HostFixture hostFixture) : TestBa
     /// </summary>
     protected async Task<HttpResponseMessage> PostCancelAsync(string pageUrl)
     {
-        var doc = await AssertEx.HtmlResponseAsync(await HttpClient.GetAsync(pageUrl));
+        var doc = await Assert.HtmlResponseAsync(await HttpClient.GetAsync(pageUrl));
         var cancelButton = doc.GetElementByTestId("cancel-button")!;
         Assert.Null(cancelButton.GetAttribute("formaction"));
 

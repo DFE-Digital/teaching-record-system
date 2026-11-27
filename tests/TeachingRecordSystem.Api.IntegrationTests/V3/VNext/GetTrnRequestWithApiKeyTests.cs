@@ -93,7 +93,7 @@ public class GetTrnRequestWithApiKeyTests : TestBase
         // Assert
         var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
 
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -118,7 +118,7 @@ public class GetTrnRequestWithApiKeyTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={dormantRequest.RequestId}");
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -142,7 +142,7 @@ public class GetTrnRequestWithApiKeyTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={rejectedRequest.RequestId}");
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

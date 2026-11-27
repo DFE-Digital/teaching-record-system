@@ -57,7 +57,7 @@ public class ProviderTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(provider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
@@ -104,7 +104,7 @@ public class ProviderTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ProviderId", "Select a training provider");
+        await Assert.HtmlResponseHasErrorAsync(response, "ProviderId", "Select a training provider");
     }
 
     [Fact]

@@ -58,7 +58,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var allSummaryListRowValues = doc.GetElementsByClassName("govuk-summary-list__row")
             .ToDictionary(
@@ -131,7 +131,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
@@ -171,7 +171,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.GetSummaryListValueElementByKey("Comments"));
     }
 
@@ -212,7 +212,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetSummaryListValueElementByKey("Comments"));
     }
 
@@ -253,7 +253,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetSummaryListValueElementByKey("TRN"));
     }
 
@@ -297,7 +297,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(comments, doc.GetSummaryListValueElementByKey("Comments")?.TrimmedText());
     }
 
@@ -339,7 +339,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
         Assert.Null(doc.GetElementByTestId("dob-change-link"));
         Assert.Null(doc.GetElementByTestId("ni-change-link"));
@@ -390,7 +390,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("email-change-link")?.GetAttribute("href"));
         Assert.Equal(expectedChangeLink, doc.GetElementByTestId("ni-change-link")?.GetAttribute("href"));
@@ -473,7 +473,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Record created for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
         AssertBannerLinksToRecord(nextPageDoc, person.PersonId);
@@ -549,7 +549,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             $"Records merged for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
         AssertBannerLinksToRecord(nextPageDoc, matchedPerson.PersonId);

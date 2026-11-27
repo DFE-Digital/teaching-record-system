@@ -55,7 +55,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "findBy", expectedErrorMessage);
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, "findBy", expectedErrorMessage);
     }
 
     [Theory]
@@ -76,7 +76,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, expectedErrorPropertyName, expectedErrorMessage);
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, expectedErrorPropertyName, expectedErrorMessage);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -125,7 +125,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -173,10 +173,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseInductionStatus = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("inductionStatus");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new
             {
                 status = "Pass",
@@ -209,7 +209,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseSanctions = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("sanctions");
         Assert.Equal(0, responseSanctions.GetArrayLength());
     }

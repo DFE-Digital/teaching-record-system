@@ -57,7 +57,7 @@ public class ChangeLogDqtQtsRegistrationProcessTests(HostFixture hostFixture) : 
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -140,7 +140,7 @@ public class ChangeLogDqtQtsRegistrationProcessTests(HostFixture hostFixture) : 
         var response = await HttpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,

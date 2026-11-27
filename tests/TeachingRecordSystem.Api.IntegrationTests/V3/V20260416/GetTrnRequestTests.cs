@@ -80,7 +80,7 @@ public class GetTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -123,7 +123,7 @@ public class GetTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(applicationUser.UserId, trnRequestId);
 
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -149,7 +149,7 @@ public class GetTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -175,7 +175,7 @@ public class GetTrnRequestTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

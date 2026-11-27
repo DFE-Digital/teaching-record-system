@@ -227,7 +227,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveTeacherPensionsPoten
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
+        await Assert.HtmlResponseHasErrorAsync(response, "PersonId", "Select a record");
     }
 
     public static TheoryData<PersonMatchedAttribute[], bool> GetHighlightedDifferencesData()

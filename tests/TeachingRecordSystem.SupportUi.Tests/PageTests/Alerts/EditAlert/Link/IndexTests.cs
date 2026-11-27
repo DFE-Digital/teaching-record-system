@@ -73,7 +73,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(alert.ExternalLink, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
@@ -91,7 +91,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
@@ -173,11 +173,11 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         // Assert
         if (hasCurrentLink)
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "AddLink", "Select change link if you want to change the link to the panel outcome");
+            await Assert.HtmlResponseHasErrorAsync(response, "AddLink", "Select change link if you want to change the link to the panel outcome");
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
+            await Assert.HtmlResponseHasErrorAsync(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
         }
     }
 
@@ -199,7 +199,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
+        await Assert.HtmlResponseHasErrorAsync(response, "Link", "Enter a valid URL");
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public class IndexTests(HostFixture hostFixture) : LinkTestBase(hostFixture), IA
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Link", "Enter a different link");
+        await Assert.HtmlResponseHasErrorAsync(response, "Link", "Enter a different link");
     }
 
     [Fact]

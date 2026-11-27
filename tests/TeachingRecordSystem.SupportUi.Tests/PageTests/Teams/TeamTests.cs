@@ -13,7 +13,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.GetAsync("/teams");
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Contains("No teams have been added yet.", doc.Body!.TextContent);
         Assert.Null(doc.QuerySelector("table"));
         Assert.NotNull(doc.QuerySelector("a[href='/teams/add']"));
@@ -114,7 +114,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
 
         var listResponse = await response.FollowRedirectAsync(HttpClient);
-        var listHtml = await AssertEx.HtmlResponseAsync(listResponse);
+        var listHtml = await Assert.HtmlResponseAsync(listResponse);
         Assert.Contains($"{name} team added", listHtml.Body!.TextContent);
         Assert.Contains($"/teams/{team.TeamId}", listHtml.Body.InnerHtml);
         Assert.Contains($"/teams/{team.TeamId}/delete", listHtml.Body.InnerHtml);
@@ -134,7 +134,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a team name");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Enter a team name");
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique");
         Assert.Equal(1, await WithDbContextAsync(dbContext => dbContext.Teams.CountAsync(t => t.Name == "Existing team")));
     }
 
@@ -172,7 +172,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.GetAsync($"/teams/{team.TeamId}");
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal("Change a team", doc.QuerySelector("h1")?.TextContent.Trim());
         Assert.Equal("Original team", doc.QuerySelector("input[name='Name']")?.GetAttribute("value"));
         Assert.Contains("Team name", doc.Body!.TextContent);
@@ -182,7 +182,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("/teams", doc.QuerySelector("a.govuk-button--secondary")?.GetAttribute("href"));
 
         var cancelResponse = await HttpClient.GetAsync(doc.QuerySelector("a.govuk-button--secondary")!.GetAttribute("href"));
-        var teamList = await AssertEx.HtmlResponseAsync(cancelResponse);
+        var teamList = await Assert.HtmlResponseAsync(cancelResponse);
         Assert.Contains("Original team", teamList.Body!.TextContent);
         Assert.Equal("Original team", await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.Name).SingleAsync()));
     }
@@ -220,7 +220,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
             });
         });
         var listResponse = await response.FollowRedirectAsync(HttpClient);
-        var doc = await AssertEx.HtmlResponseAsync(listResponse);
+        var doc = await Assert.HtmlResponseAsync(listResponse);
         Assert.Contains("Team updated to Updated team", doc.Body!.TextContent);
     }
 
@@ -236,7 +236,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.PostAsync($"/teams/{team.TeamId}", new FormUrlEncodedContentBuilder { { "Name", "Existing team" } });
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Team name must be unique");
         Assert.Equal("Original team", await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.Name).SingleAsync()));
     }
 
@@ -251,7 +251,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.PostAsync($"/teams/{team.TeamId}", new FormUrlEncodedContentBuilder { { "Name", "" } });
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a team name");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Enter a team name");
     }
 
     [Fact]
@@ -283,7 +283,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.GetAsync($"/teams/{team.TeamId}/delete");
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal("Delete a team", doc.QuerySelector("h1")?.TextContent.Trim());
         Assert.Contains("Are you sure you want to delete the team Example team?", doc.Body!.TextContent);
         Assert.Contains("Doing this will mean team members will be automatically unassigned from this team.", doc.Body.TextContent);
@@ -294,7 +294,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal("/teams", doc.QuerySelector("a.govuk-button--secondary")?.GetAttribute("href"));
 
         var cancelResponse = await HttpClient.GetAsync(doc.QuerySelector("a.govuk-button--secondary")!.GetAttribute("href"));
-        var teamList = await AssertEx.HtmlResponseAsync(cancelResponse);
+        var teamList = await Assert.HtmlResponseAsync(cancelResponse);
         Assert.Contains(team.Name, teamList.Body!.TextContent);
         Assert.Null(await WithDbContextAsync(dbContext => dbContext.Teams.Where(t => t.TeamId == team.TeamId).Select(t => t.DeletedOn).SingleAsync()));
     }
@@ -346,7 +346,7 @@ public class TeamTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
 
         var listResponse = await response.FollowRedirectAsync(HttpClient);
-        var doc = await AssertEx.HtmlResponseAsync(listResponse);
+        var doc = await Assert.HtmlResponseAsync(listResponse);
         Assert.Contains("Example team team deleted", doc.Body!.TextContent);
         Assert.DoesNotContain($"/teams/{team.TeamId}/delete", doc.Body.InnerHtml);
     }

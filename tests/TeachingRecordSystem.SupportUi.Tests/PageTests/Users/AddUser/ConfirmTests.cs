@@ -76,7 +76,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var roleNames = html.QuerySelectorAll(".trs-user-roles input[type=radio]").Select(e => e.Attributes["value"]!.Value);
 
         Assert.DoesNotContain(UserRoles.Administrator, roleNames);
@@ -107,7 +107,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var roleNames = html.QuerySelectorAll(".trs-user-roles input[type=radio]").Select(e => e.Attributes["value"]!.Value);
 
         Assert.Contains(UserRoles.Administrator, roleNames);
@@ -140,7 +140,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var teamOptions = html.QuerySelectorAll("select[name=TeamId] option").ToArray();
 
         Assert.Equal("", teamOptions.First().Attributes["value"]!.Value);
@@ -249,7 +249,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
+        await Assert.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
@@ -283,7 +283,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
+        await Assert.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
     }
 
     [Fact]
@@ -486,7 +486,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{newName} has been added as a record manager.");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, $"{newName} has been added as a record manager.");
     }
 
     private void ConfigureUserServiceMock(string userId, User? user) =>

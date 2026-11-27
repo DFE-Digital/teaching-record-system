@@ -32,7 +32,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("edit-details-caption");
         Assert.Equal("Alfred The Great", caption!.TrimmedText());
     }
@@ -52,7 +52,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -87,7 +87,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
 
         Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
+        var doc = await Assert.HtmlResponseAsync(redirectResponse);
         var firstName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-first-name", "input");
         var middleName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-middle-name", "input");
         var lastName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-last-name", "input");
@@ -130,7 +130,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
 
         Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
+        var doc = await Assert.HtmlResponseAsync(redirectResponse);
         var emailAddress = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-email-address", "input");
         var nationalInsuranceNumber = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-national-insurance-number", "input");
 
@@ -163,7 +163,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var firstName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-first-name", "input");
         var middleName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-middle-name", "input");
         var lastName = doc.GetChildElementOfTestId<IHtmlInputElement>("edit-details-last-name", "input");
@@ -208,7 +208,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var genderOptions = doc.GetChildElementsOfTestId<IHtmlInputElement>("edit-details-gender-options", "input[type='radio']");
 
         Action<IHtmlInputElement> AssertRadioButtonLabel(string expectedValue) =>
@@ -240,7 +240,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Enter the person\u2019s first name");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Enter the person\u2019s first name");
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Enter the person\u2019s first name");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Enter the person\u2019s first name");
     }
 
     [Fact]
@@ -292,7 +292,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Person\u2019s first name must be 100 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Person\u2019s first name must be 100 characters or less");
     }
 
     [Fact]
@@ -318,7 +318,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.MiddleName), "Person\u2019s middle name must be 100 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.MiddleName), "Person\u2019s middle name must be 100 characters or less");
     }
 
     [Fact]
@@ -344,7 +344,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Enter the person\u2019s last name");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Enter the person\u2019s last name");
     }
 
     [Fact]
@@ -370,7 +370,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Enter the person\u2019s last name");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Enter the person\u2019s last name");
     }
 
     [Fact]
@@ -396,7 +396,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Person\u2019s last name must be 100 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.LastName), "Person\u2019s last name must be 100 characters or less");
     }
 
     [Fact]
@@ -422,7 +422,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.DateOfBirth), "Enter the person\u2019s date of birth");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.DateOfBirth), "Enter the person\u2019s date of birth");
     }
 
     [Fact]
@@ -448,7 +448,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.DateOfBirth), "Person\u2019s date of birth must be in the past");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.DateOfBirth), "Person\u2019s date of birth must be in the past");
     }
 
     [Fact]
@@ -475,7 +475,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Person\u2019s email address must be 100 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Person\u2019s email address must be 100 characters or less");
     }
 
     [Theory]
@@ -519,7 +519,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Enter a valid email address");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Enter a valid email address");
         }
     }
 
@@ -598,7 +598,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
         }
     }
 
@@ -641,7 +641,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+            await Assert.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
         }
     }
 
@@ -798,7 +798,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasSummaryErrorAsync(response, "Please change one or more of the person\u2019s details");
+        await Assert.HtmlResponseHasSummaryErrorAsync(response, "Please change one or more of the person\u2019s details");
     }
 
     [Fact]
@@ -1276,7 +1276,7 @@ public class PersonalDetailsTests(HostFixture hostFixture) : EditDetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);

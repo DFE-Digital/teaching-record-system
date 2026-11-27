@@ -225,7 +225,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", status.GetTitle());
@@ -287,7 +287,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Held since", endDate.ToString(WebConstants.DateDisplayFormat));
         doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Yes");
@@ -335,7 +335,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", "In training");
@@ -383,7 +383,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Reason", editRouteState.ChangeReason!.GetDisplayName()!);
         doc.AssertSummaryListRowValueContentMatches("Additional information", editRouteState.ChangeReasonDetail!.AdditionalInformation!);
@@ -445,7 +445,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditRouteTestBase(
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Route to professional status updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Route to professional status updated");
 
         await WithDbContextAsync(async dbContext =>
         {

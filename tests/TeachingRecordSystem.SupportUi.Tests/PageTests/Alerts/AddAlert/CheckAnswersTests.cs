@@ -65,7 +65,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.AlertTypeName, doc.GetSummaryListValueByKey("Alert type"));
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueByKey("Details"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Link} (opens in new tab)" : WebConstants.EmptyFallbackContent, doc.GetSummaryListValueByKey("Link"));
@@ -137,7 +137,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : AddAlertTestBase(hostF
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert added");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Alert added");
 
         Events.AssertProcessesCreated(p =>
         {

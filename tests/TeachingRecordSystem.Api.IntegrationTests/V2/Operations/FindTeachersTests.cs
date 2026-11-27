@@ -43,7 +43,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expected: new
 //             {
@@ -77,7 +77,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expected: new
 //             {
@@ -114,7 +114,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expected: new
 //             {
@@ -162,7 +162,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expected: new
 //             {
@@ -230,7 +230,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expected: new
 //             {
@@ -280,7 +280,7 @@
 //         var response = await GetHttpClientWithApiKey().SendAsync(request);
 //
 //         // Assert
-//         await AssertEx.JsonResponseEqualsAsync(
+//         await Assert.JsonResponseEqualsAsync(
 //             response,
 //             expected: new
 //             {

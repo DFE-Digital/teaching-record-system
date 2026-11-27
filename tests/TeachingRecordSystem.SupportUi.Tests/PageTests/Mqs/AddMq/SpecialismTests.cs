@@ -37,7 +37,7 @@ public class SpecialismTests(HostFixture hostFixture) : AddMqTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var providerList = doc.GetElementByTestId("specialism-list");
         var radioButtons = providerList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -86,7 +86,7 @@ public class SpecialismTests(HostFixture hostFixture) : AddMqTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
+        await Assert.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
     }
 
     [Fact]

@@ -72,7 +72,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{alert.EndDate:%d}", doc.GetElementById("EndDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{alert.EndDate:%M}", doc.GetElementById("EndDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{alert.EndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
@@ -91,7 +91,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{journeyInstance.State.EndDate:%d}", doc.GetElementById("EndDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.EndDate:%M}", doc.GetElementById("EndDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.EndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
@@ -161,7 +161,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
+        await Assert.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date cannot be in the future");
+        await Assert.HtmlResponseHasErrorAsync(response, "EndDate", "End date cannot be in the future");
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after the start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after the start date");
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class IndexTests(HostFixture hostFixture) : EndDateTestBase(hostFixture),
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter a different end date");
+        await Assert.HtmlResponseHasErrorAsync(response, "EndDate", "Enter a different end date");
     }
 
     [Fact]

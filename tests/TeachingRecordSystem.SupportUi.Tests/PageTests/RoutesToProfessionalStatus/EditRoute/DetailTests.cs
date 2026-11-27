@@ -130,7 +130,7 @@ public class DetailTests(HostFixture hostFixture) : EditRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", status.GetDisplayName()!);
@@ -178,7 +178,7 @@ public class DetailTests(HostFixture hostFixture) : EditRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Route", route.Name);
         doc.AssertSummaryListRowValueContentMatches("Status", status.Title);
@@ -228,7 +228,7 @@ public class DetailTests(HostFixture hostFixture) : EditRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.DoesNotContain(doc.QuerySelectorAll(".govuk-summary-list__key"), e => e.TrimmedText() == elementText);
     }
 
@@ -274,7 +274,7 @@ public class DetailTests(HostFixture hostFixture) : EditRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Induction exemption", expectedContent);
         doc.AssertChangeLinkExists("Induction exemption");
@@ -324,7 +324,7 @@ public class DetailTests(HostFixture hostFixture) : EditRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValueContentMatches("Induction exemption", "Yes");
         doc.AssertNoChangeLink("Induction exemption");

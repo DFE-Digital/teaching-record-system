@@ -36,7 +36,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStartDateTestBase(hostF
         response = await response.FollowRedirectAsync(HttpClient);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{databaseStartDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{databaseStartDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{databaseStartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
@@ -63,7 +63,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStartDateTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal($"{journeyStartDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyStartDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyStartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
@@ -110,7 +110,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStartDateTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
     [Theory]
@@ -139,7 +139,7 @@ public class IndexTests(HostFixture hostFixture) : EditMqStartDateTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date must be after end date");
+        await Assert.HtmlResponseHasErrorAsync(response, "StartDate", "Start date must be after end date");
     }
 
     [Fact]

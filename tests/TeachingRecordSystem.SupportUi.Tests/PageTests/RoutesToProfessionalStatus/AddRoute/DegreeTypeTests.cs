@@ -28,7 +28,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : AddRouteTestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("label.govuk-label--l");
         Assert.NotNull(heading);
@@ -73,7 +73,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : AddRouteTestBase(hostFix
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
+            await Assert.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
         }
     }
 

@@ -72,7 +72,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "Enter an email address");
+        await Assert.HtmlResponseHasErrorAsync(response, "Email", "Enter an email address");
     }
 
 
@@ -100,7 +100,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "User does not exist");
+        await Assert.HtmlResponseHasErrorAsync(response, "Email", "User does not exist");
     }
 
     [Fact]

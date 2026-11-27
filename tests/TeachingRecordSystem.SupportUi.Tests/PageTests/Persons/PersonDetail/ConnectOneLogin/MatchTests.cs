@@ -59,7 +59,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var recordCard = doc.GetElementByTestId("record");
         Assert.NotNull(recordCard);
@@ -117,7 +117,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
 
         var oneLoginCard = doc.GetElementByTestId("one-login");
@@ -170,7 +170,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
 
@@ -206,7 +206,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
 
@@ -248,7 +248,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
         AssertOneLoginRowNotHighlighted(oneLoginCard, "Name");
@@ -283,7 +283,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
         AssertOneLoginRowIsHighlighted(oneLoginCard, "Name");
@@ -315,7 +315,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
         AssertOneLoginRowIsHighlighted(oneLoginCard, "Date of birth");
@@ -363,7 +363,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
 
@@ -408,7 +408,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
 
@@ -454,7 +454,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
 
@@ -498,7 +498,7 @@ public class MatchTests(HostFixture hostFixture) : ConnectOneLoginTestBase(hostF
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var oneLoginCard = doc.GetElementByTestId("one-login");
         Assert.NotNull(oneLoginCard);
 

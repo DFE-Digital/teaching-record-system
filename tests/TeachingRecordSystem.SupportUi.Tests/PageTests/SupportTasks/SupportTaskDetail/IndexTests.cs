@@ -31,7 +31,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementById("AssignedToUserId"));
         Assert.NotNull(doc.GetElementById("Status"));
@@ -59,7 +59,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var assignedToSelect = (IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!;
         Assert.Equal(user.UserId.ToString(), assignedToSelect.Value);
@@ -85,7 +85,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var optionValues = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -114,7 +114,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -148,7 +148,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var options = ((IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!)
             .Options
@@ -175,7 +175,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var assignedToSelect = (IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!;
 
@@ -203,7 +203,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var assignedToSelect = (IHtmlSelectElement)doc.GetElementById("AssignedToUserId")!;
 
@@ -262,7 +262,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var bodyText = doc.Body!.TextContent;
 
         Assert.Null(doc.GetElementByTestId("no-notes"));
@@ -284,7 +284,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var noNotesMessage = doc.GetElementByTestId("no-notes");
         Assert.NotNull(noNotesMessage);
@@ -307,7 +307,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var details = doc.GetElementByTestId("notes");
         Assert.NotNull(details);
@@ -329,7 +329,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var details = doc.GetElementByTestId("zendesk-tickets");
         Assert.NotNull(details);
@@ -349,7 +349,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var details = doc.GetElementByTestId("zendesk-tickets");
         Assert.NotNull(details);
@@ -370,7 +370,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId("no-notes"));
         Assert.Null(doc.GetElementByTestId("notes"));
@@ -391,7 +391,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         // The overview form is only shown for outstanding tasks
         Assert.Null(doc.GetElementById("Status"));
@@ -451,7 +451,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "Task updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(nextPageDoc, "Task updated");
     }
 
     [Fact]

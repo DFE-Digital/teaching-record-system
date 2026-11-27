@@ -23,7 +23,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.GetAsync("/");
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var teamsLink = doc.QuerySelector("a[href='/teams']");
         Assert.Equal(shouldShowTeamsLink, teamsLink is not null);
     }
@@ -39,7 +39,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.GetAsync("/");
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Null(doc.QuerySelector("a[href='/teams']"));
     }
 
@@ -55,7 +55,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var supportTasks = doc.GetElementByTestId($"support-tasks-panel");
         Assert.Null(supportTasks);
@@ -73,7 +73,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var myTasks = doc.GetElementByTestId($"my-tasks-count");
         var unassignedTasks = doc.GetElementByTestId($"unassigned-task-count");
@@ -116,7 +116,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var myTasks = doc.GetElementByTestId($"my-tasks-count");
         var inProgressTasks = doc.GetElementByTestId($"in-progress-tasks-count");
@@ -154,7 +154,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var unassignedTasks = doc.GetElementByTestId($"unassigned-task-count");
         Assert.NotNull(unassignedTasks);

@@ -40,7 +40,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("edit-details-caption");
         Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
@@ -70,7 +70,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
@@ -115,7 +115,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
@@ -157,7 +157,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
@@ -199,7 +199,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         var urlEncoder = UrlEncoder.Default;
@@ -251,7 +251,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal(ChangeReasonDetails, v.TrimmedText()));
@@ -317,7 +317,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
@@ -369,7 +369,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         doc.AssertSummaryListRowValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
@@ -406,7 +406,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertSummaryListRowValue("Reason for personal details change", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
         doc.AssertSummaryListRowValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
@@ -496,7 +496,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -578,7 +578,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -637,7 +637,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, expectedHeading: "Personal details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -969,7 +969,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : EditDetailsTestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
         Assert.NotNull(cancelButton);
         Assert.Equal("Cancel", cancelButton.Name);

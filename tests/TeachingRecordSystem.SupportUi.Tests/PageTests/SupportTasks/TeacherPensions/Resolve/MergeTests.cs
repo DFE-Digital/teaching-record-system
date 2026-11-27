@@ -233,7 +233,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -276,11 +276,11 @@ public class MergeTests(HostFixture hostFixture) : ResolveTeacherPensionsPotenti
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "FirstNameSource", "Select a First name");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "LastNameSource", "Select a Last name");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "DateOfBirthSource", "Select a date of birth");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumberSource", "Select a National Insurance number");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "GenderSource", "Select a gender");
+        await Assert.HtmlResponseHasErrorAsync(response, "FirstNameSource", "Select a First name");
+        await Assert.HtmlResponseHasErrorAsync(response, "LastNameSource", "Select a Last name");
+        await Assert.HtmlResponseHasErrorAsync(response, "DateOfBirthSource", "Select a date of birth");
+        await Assert.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumberSource", "Select a National Insurance number");
+        await Assert.HtmlResponseHasErrorAsync(response, "GenderSource", "Select a gender");
     }
 
     [Fact]

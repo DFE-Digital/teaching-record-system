@@ -19,7 +19,7 @@ public class GetIttProvidersTests(HostFixture hostFixture) : TestBase(hostFixtur
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {

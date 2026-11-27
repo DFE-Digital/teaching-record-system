@@ -48,7 +48,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusCreating);
         AssertRaisedBy(timelineItem, createdByUser.Name);
@@ -95,7 +95,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusCreating);
         Assert.Equal($"EYTS date changed from None to {awardDate.ToString(WebConstants.DateDisplayFormat)}", timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
@@ -137,7 +137,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusCreating);
         var reasonText = timelineItem.GetElementByTestId("reason")?.TrimmedText();
@@ -221,7 +221,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
         AssertRaisedBy(timelineItem, updatedByUser.Name);
@@ -296,7 +296,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
         AssertRaisedBy(timelineItem, updatedByUser.Name);
@@ -378,7 +378,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusUpdating);
         var reasonText = timelineItem.GetElementByTestId("reason")?.TrimmedText();
@@ -439,7 +439,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         AssertRaisedBy(timelineItem, deletedByUser.Name);
@@ -486,7 +486,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Null(timelineItem.GetElementByTestId("old-qts-date"));
@@ -518,7 +518,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Null(timelineItem.GetElementByTestId("old-eyts-date"));
@@ -550,7 +550,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Null(timelineItem.GetElementByTestId("old-pqts-date"));
@@ -582,7 +582,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusDeleting);
         Assert.Equal("Person has EYPS changed from Yes to No", timelineItem.GetElementByTestId("has-eyps")?.TrimmedText());
@@ -741,7 +741,7 @@ public class ChangeLogRouteToProfessionalStatusProcessTests(HostFixture hostFixt
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var timelineItem = await GetChangeHistoryEntryAsync(doc, person.PersonId, ProcessType.RouteToProfessionalStatusMigratingFromDqt);
         AssertRaisedBy(timelineItem, createdByUser.Name);

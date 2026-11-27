@@ -131,7 +131,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
         Assert.NotNull(label);
         var value = label.NextElementSibling;
@@ -203,7 +203,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         if (showStartDateRow)
         {
@@ -282,7 +282,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         if (ShowsCompletedDate)
         {
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
@@ -362,7 +362,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         if (ShowsExemptionReason)
         {
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
@@ -404,7 +404,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseAsync(response);
+        await Assert.HtmlResponseAsync(response);
 
         // Act
         // Cancelling is a field on the form rather than a handler of its own: a distinct URL
@@ -456,7 +456,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason for changing induction details");
         Assert.NotNull(label);
@@ -614,7 +614,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Induction details have been updated");
+        Assert.HtmlDocumentHasFlashNotificationBanner(redirectDoc, "Induction details have been updated");
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -688,7 +688,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason");
         Assert.NotNull(label);
@@ -734,7 +734,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Additional information");
         Assert.NotNull(label);
@@ -781,7 +781,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : EditInductionTestB
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Evidence");
         Assert.NotNull(label);

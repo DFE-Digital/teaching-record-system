@@ -29,7 +29,7 @@ public class CountryTests(HostFixture hostFixture) : AddRouteTestBase(hostFixtur
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("label.govuk-label--l");
         Assert.NotNull(heading);
@@ -75,7 +75,7 @@ public class CountryTests(HostFixture hostFixture) : AddRouteTestBase(hostFixtur
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingCountryId", "Enter a country");
+            await Assert.HtmlResponseHasErrorAsync(response, "TrainingCountryId", "Enter a country");
         }
     }
 

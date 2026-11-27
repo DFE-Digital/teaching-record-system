@@ -30,7 +30,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var searchInput = doc.GetElementById("Search");
         Assert.NotNull(searchInput);
@@ -53,7 +53,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var searchInput = doc.GetElementById("Search");
         Assert.NotNull(searchInput);
@@ -79,7 +79,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var dateOfBirthResults = doc.GetAllElementsByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthResults);
@@ -102,7 +102,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var nameResults = doc.GetAllElementsByTestId("name");
         Assert.NotNull(nameResults);
@@ -124,7 +124,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var nameResults = doc.GetAllElementsByTestId("trn");
         Assert.Single(nameResults);
@@ -146,7 +146,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var personResults = doc.GetAllElementsByTestId($"person-{person.PersonId}");
         Assert.Single(personResults);
@@ -173,7 +173,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var personResults = doc.GetAllElementsByTestId($"person-{person.PersonId}");
         Assert.Single(personResults);
@@ -203,7 +203,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId($"person-{activePerson1.PersonId}"));
         Assert.NotNull(doc.GetElementByTestId($"person-{activePerson2.PersonId}"));
@@ -237,7 +237,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId($"person-{deactivatedPerson1.PersonId}"));
         Assert.NotNull(doc.GetElementByTestId($"person-{deactivatedPerson2.PersonId}"));
@@ -265,7 +265,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId($"person-{personWithOneLogin1.PersonId}"));
         Assert.NotNull(doc.GetElementByTestId($"person-{personWithOneLogin2.PersonId}"));
@@ -300,7 +300,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByTestId($"person-{activePersonWithOneLogin.PersonId}"));
         Assert.Null(doc.GetElementByTestId($"person-{activePersonWithoutOneLogin.PersonId}"));

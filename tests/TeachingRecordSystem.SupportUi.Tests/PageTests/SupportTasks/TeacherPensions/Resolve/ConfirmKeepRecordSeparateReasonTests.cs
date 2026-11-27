@@ -64,7 +64,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
 
         // Act
         var response = await HttpClient.SendAsync(request);
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var reason = doc.GetSummaryListValueElementByKey("Reason");
         Assert.NotNull(reason);
         Assert.Contains(state.Reason, reason.TextContent);
@@ -110,7 +110,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
 
         // Act
         var response = await HttpClient.SendAsync(request);
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var reason = doc.GetSummaryListValueElementByKey("Reason");
         Assert.NotNull(reason);
         Assert.Contains(state.KeepSeparateReason.GetDisplayName()!, reason.TextContent);
@@ -186,7 +186,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed",
             $"The records were not merged.");
@@ -266,7 +266,7 @@ public class ConfirmKeepRecordSeparateReasonTests(HostFixture hostFixture) : Res
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
 
-        AssertEx.HtmlDocumentHasFlashNotificationBanner(
+        Assert.HtmlDocumentHasFlashNotificationBanner(
             nextPageDoc,
             "Teachers’ Pensions duplicate task completed",
             $"The records were not merged.");

@@ -58,7 +58,7 @@ public class SetWelshInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class SetWelshInductionStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Act
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonDoesNotHaveQts, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonDoesNotHaveQts, StatusCodes.Status400BadRequest);
     }
 
     [Fact]

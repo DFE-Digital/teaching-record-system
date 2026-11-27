@@ -51,7 +51,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         var element = doc.GetElementByTestId($"user-{user.UserId}")!.InnerHtml;
         Assert.NotNull(element);
         Assert.Contains(user.Name, element);
@@ -75,7 +75,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         Assert.Equal(team.Name, GetTeamValue(doc.GetElementByTestId($"user-{userWithTeam.UserId}")!));
         Assert.Equal("Not assigned", GetTeamValue(doc.GetElementByTestId($"user-{userWithoutTeam.UserId}")!));
 
@@ -101,7 +101,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         AssertElementsInnerTextContains(html.GetElementsByClassName("trs-user"), ["Buser", "Cuser"]);
         AssertElementsInnerTextContains(
             html.QuerySelectorAll(@".moj-filter input[name=""Team""] + label"),
@@ -120,7 +120,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         Assert.NotEmpty(html.QuerySelectorAll(@".moj-filter input[name=""Role""]"));
         Assert.Empty(html.QuerySelectorAll(@".moj-filter input[name=""Team""]"));
     }
@@ -143,7 +143,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var userElements = html.GetElementsByClassName("trs-user");
 
         Assert.Equal(expectedUserCount, userElements.Length);
@@ -186,7 +186,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var userElements = html.GetElementsByClassName("trs-user");
 
         AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
@@ -217,7 +217,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var userElements = html.GetElementsByClassName("trs-user");
 
         Assert.Equal(expectedUserCount, userElements.Length);
@@ -279,7 +279,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""Role""] + label");
         var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""Status""] + label");
 
@@ -307,7 +307,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var userElements = html.GetElementsByClassName("trs-user");
 
         AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
@@ -333,7 +333,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var userElements = html.GetElementsByClassName("trs-user");
 
         AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
@@ -381,7 +381,7 @@ public class UsersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var html = await AssertEx.HtmlResponseAsync(response);
+        var html = await Assert.HtmlResponseAsync(response);
         var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""Role""] + label");
         var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""Status""] + label");
 

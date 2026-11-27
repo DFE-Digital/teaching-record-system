@@ -44,7 +44,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [Theory]
@@ -72,7 +72,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status must be 'Approved' when route type is '{RouteToProfessionalStatusType.ApplyForQtsId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status must be 'Approved' when route type is '{RouteToProfessionalStatusType.ApplyForQtsId}'.");
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'Approved' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'Approved' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatusType.AssessmentOnlyRouteId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatusType.AssessmentOnlyRouteId}'.");
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'UnderAssessment' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'UnderAssessment' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -159,7 +159,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.AwardedDate)}", $"Awarded date must be specified when status is '{status}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.AwardedDate)}", $"Awarded date must be specified when status is '{status}'.");
     }
 
     [Theory]
@@ -187,7 +187,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.AwardedDate)}", $"Awarded date cannot be specified when status is '{status}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.AwardedDate)}", $"Awarded date cannot be specified when status is '{status}'.");
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.AwardedDate)}", "Awarded date cannot be in the future.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.AwardedDate)}", "Awarded date cannot be in the future.");
     }
 
     [Fact]
@@ -231,7 +231,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingStartDate)}", "Training start date must be specified.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingStartDate)}", "Training start date must be specified.");
     }
 
     [Fact]
@@ -253,7 +253,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingEndDate)}", "Training end date must be specified.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingEndDate)}", "Training end date must be specified.");
     }
 
     [Fact]
@@ -276,7 +276,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingEndDate)}", "Training end date cannot be before training start date.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingEndDate)}", "Training end date cannot be before training start date.");
     }
 
     [Fact]
@@ -298,7 +298,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingSubjectReferences)}", "A maximum of 3 training subject references are allowed.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingSubjectReferences)}", "A maximum of 3 training subject references are allowed.");
     }
 
     [Fact]
@@ -325,7 +325,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingAgeSpecialism)}.{nameof(SetProfessionalStatusRequestTrainingAgeSpecialism.From)}", $"From age must be specified for specialism type '{TrainingAgeSpecialismType.Range}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingAgeSpecialism)}.{nameof(SetProfessionalStatusRequestTrainingAgeSpecialism.From)}", $"From age must be specified for specialism type '{TrainingAgeSpecialismType.Range}'.");
     }
 
     [Fact]
@@ -352,7 +352,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingAgeSpecialism)}.{nameof(SetProfessionalStatusRequestTrainingAgeSpecialism.To)}", $"To age must be specified for specialism type '{TrainingAgeSpecialismType.Range}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingAgeSpecialism)}.{nameof(SetProfessionalStatusRequestTrainingAgeSpecialism.To)}", $"To age must be specified for specialism type '{TrainingAgeSpecialismType.Range}'.");
     }
 
     [Fact]
@@ -379,7 +379,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingAgeSpecialism)}.{nameof(SetProfessionalStatusRequestTrainingAgeSpecialism.To)}", $"To age cannot be less than From age for specialism type '{TrainingAgeSpecialismType.Range}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingAgeSpecialism)}.{nameof(SetProfessionalStatusRequestTrainingAgeSpecialism.To)}", $"To age cannot be less than From age for specialism type '{TrainingAgeSpecialismType.Range}'.");
     }
 
     [Fact]
@@ -406,7 +406,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorsForPropertiesAsync(
+        await Assert.JsonResponseHasValidationErrorsForPropertiesAsync(
             response,
             new Dictionary<string, string>
             {
@@ -434,7 +434,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -458,7 +458,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be specified when route type is '{routeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be specified when route type is '{routeTypeId}'.");
     }
 
     [Fact]
@@ -481,7 +481,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be specified when route type is '{routeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be specified when route type is '{routeTypeId}'.");
     }
 
     [Theory]
@@ -505,7 +505,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB' when route type is '{routeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB' when route type is '{routeTypeId}'.");
     }
 
     [Fact]
@@ -528,7 +528,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatusType.ScotlandRId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatusType.ScotlandRId}'.");
     }
 
     [Fact]
@@ -551,7 +551,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatusType.ScotlandRId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatusType.ScotlandRId}'.");
     }
 
     [Fact]
@@ -574,7 +574,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatusType.NiRId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatusType.NiRId}'.");
     }
 
     [Fact]
@@ -597,7 +597,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatusType.NiRId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatusType.NiRId}'.");
     }
 
     [Fact]
@@ -620,7 +620,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatusType.WelshRId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatusType.WelshRId}'.");
     }
 
     [Theory]
@@ -644,7 +644,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be '{trainingCountryReference}' when route type is not '{RouteToProfessionalStatusType.WelshRId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be '{trainingCountryReference}' when route type is not '{RouteToProfessionalStatusType.WelshRId}'.");
     }
 
     [Fact]
@@ -666,7 +666,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingProviderUkprn)}", $"Training provider UKPRN must be specified when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingProviderUkprn)}", $"Training provider UKPRN must be specified when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -690,7 +690,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingProviderUkprn)}", $"Training provider UKPRN cannot be specified when route type is '{routeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingProviderUkprn)}", $"Training provider UKPRN cannot be specified when route type is '{routeTypeId}'.");
     }
 
     [Theory]
@@ -715,7 +715,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.IsExemptFromInduction)}", $"Is exempt from induction must be specified when route type is '{routeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.IsExemptFromInduction)}", $"Is exempt from induction must be specified when route type is '{routeTypeId}'.");
     }
 
     [Fact]
@@ -736,7 +736,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.IsExemptFromInduction)}", $"Is exempt from induction cannot be specified when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.IsExemptFromInduction)}", $"Is exempt from induction cannot be specified when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Fact]
@@ -757,7 +757,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidRouteType, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidRouteType, StatusCodes.Status400BadRequest);
     }
 
     [Theory]
@@ -781,7 +781,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidTrainingSubjectReference, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidTrainingSubjectReference, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -806,7 +806,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidTrainingCountryReference, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidTrainingCountryReference, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -829,7 +829,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidTrainingProviderUkprn, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidTrainingProviderUkprn, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -850,7 +850,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidDegreeType, StatusCodes.Status400BadRequest);
+        await Assert.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.InvalidDegreeType, StatusCodes.Status400BadRequest);
     }
 
     private SetProfessionalStatusRequest CreateRequest() =>

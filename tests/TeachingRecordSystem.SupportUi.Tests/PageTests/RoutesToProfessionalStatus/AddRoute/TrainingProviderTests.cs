@@ -27,7 +27,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : AddRouteTestBase(h
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var heading = doc.QuerySelector("label.govuk-label--l");
         Assert.NotNull(heading);
@@ -69,7 +69,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : AddRouteTestBase(h
         }
         else
         {
-            await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
+            await Assert.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
         }
     }
 
@@ -145,7 +145,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : AddRouteTestBase(h
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
+        await Assert.HtmlResponseHasErrorAsync(response, "TrainingProviderId", "Select a training provider");
     }
 
     [Fact]

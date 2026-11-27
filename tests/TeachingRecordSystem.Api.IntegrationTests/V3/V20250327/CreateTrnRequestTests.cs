@@ -50,7 +50,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(CreateTrnRequestRequest.RequestId),
             expectedError: StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
@@ -72,7 +72,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(CreateTrnRequestRequest.RequestId),
             expectedError: StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
@@ -97,7 +97,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.DateOfBirth",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -125,7 +125,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.DateOfBirth",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -151,7 +151,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.NationalInsuranceNumber",
             StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
@@ -213,7 +213,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
+        await Assert.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
+        await Assert.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -318,7 +318,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.NationalInsuranceNumber",
             StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
@@ -401,7 +401,7 @@ public class CreateTrnRequestTests : TestBase
 
         var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
 
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -453,7 +453,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -530,7 +530,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "person.emailAddresses[0]", "Email address cannot be null.");
+        await Assert.JsonResponseHasValidationErrorForPropertyAsync(response, "person.emailAddresses[0]", "Email address cannot be null.");
     }
 
     private static CreateTrnRequestRequest CreateDummyRequest() => new()

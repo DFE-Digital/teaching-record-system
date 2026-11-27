@@ -126,7 +126,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DisconnectPersonTestBa
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         doc.AssertSummaryListRowValue("Why are you disconnecting this record from GOV.UK One Login?", v => Assert.Contains(reason!.GetDisplayName()!, v.TrimmedText()));
         doc.AssertSummaryListRowValue("Should this GOV.UK One Login stay verified?", v => Assert.Contains(stayVerified!.GetDisplayName()!, v.TrimmedText()));
     }
@@ -151,7 +151,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : DisconnectPersonTestBa
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
         doc.GetElementByTestId("disconnect-reason-detail");
     }
 

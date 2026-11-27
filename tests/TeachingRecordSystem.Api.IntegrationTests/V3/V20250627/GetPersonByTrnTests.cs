@@ -161,7 +161,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEqualsAsync(
+        await Assert.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -192,7 +192,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseQts = jsonResponse.RootElement.GetProperty("qts");
 
         Assert.Equal(qtsDate.ToString("yyyy-MM-dd"), responseQts.GetProperty("holdsFrom").GetString());
@@ -221,10 +221,10 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new
             {
                 status = InductionStatus.Passed.ToString(),
@@ -247,10 +247,10 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new
             {
                 status = InductionStatus.None.ToString(),
@@ -273,7 +273,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         Assert.Equal("Active", jsonResponse.RootElement.GetProperty("qtlsStatus").GetString());
     }
 
@@ -289,7 +289,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         Assert.Equal("Expired", jsonResponse.RootElement.GetProperty("qtlsStatus").GetString());
     }
 
@@ -315,10 +315,10 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new
@@ -343,7 +343,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
         Assert.True(responseRoutes.GetArrayLength() >= 1);
     }
@@ -366,11 +366,11 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
         var responseTrainingAgeSpecialism = responseRoutes.EnumerateArray().Single().GetProperty("trainingAgeSpecialism");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new
             {
                 type = "Range",
@@ -396,7 +396,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseRoutes = jsonResponse.RootElement.GetProperty("routesToProfessionalStatuses");
         var responseTrainingAgeSpecialism = responseRoutes.EnumerateArray().Single().GetProperty("trainingAgeSpecialism");
 
@@ -423,10 +423,10 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new
@@ -467,10 +467,10 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var jsonResponse = await Assert.JsonResponseAsync(response);
         var responsePreviousNames = jsonResponse.RootElement.GetProperty("previousNames");
 
-        AssertEx.JsonObjectEquals(
+        Assert.JsonObjectEquals(
             new[]
             {
                 new

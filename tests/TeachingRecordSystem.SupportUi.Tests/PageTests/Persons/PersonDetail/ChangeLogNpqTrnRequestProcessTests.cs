@@ -106,7 +106,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -207,7 +207,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -247,7 +247,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -293,7 +293,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         doc.AssertHasChangeHistoryEntry(
             process.ProcessId,
@@ -352,7 +352,7 @@ public class ChangeLogNpqTrnRequestProcessTests : TestBase
             new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history"));
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var item = doc.GetElementByDataAttribute("data-process-id", process.ProcessId.ToString());
         Assert.NotNull(item);

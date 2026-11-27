@@ -70,7 +70,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("AddReason", journeyInstance.State.AddReason!.ToString()!);
         AssertCheckedRadioOption("ProvideAdditionalInformation", bool.TrueString);
@@ -129,7 +129,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "AddReason", "Select a reason");
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re adding this mandatory qualification");
+        await Assert.HtmlResponseHasErrorAsync(response, "ProvideAdditionalInformation", "Select yes if you want to add more information about why you’re adding this mandatory qualification");
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter a reason");
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -251,7 +251,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await Assert.HtmlResponseHasErrorAsync(response, "Evidence.EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class ReasonTests(HostFixture hostFixture) : AddMqTestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Additional detail must be 4000 characters or less");
+        await Assert.HtmlResponseHasErrorAsync(response, "AdditionalInformation", "Additional detail must be 4000 characters or less");
     }
 
     [Fact]

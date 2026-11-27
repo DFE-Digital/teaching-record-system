@@ -31,7 +31,7 @@ public class ReasonTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var radioButtons = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']");
@@ -68,7 +68,7 @@ public class ReasonTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
+        var doc = await Assert.HtmlResponseAsync(response);
 
         var selectedRadio = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
@@ -107,7 +107,7 @@ public class ReasonTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ConnectReason", "Select a reason");
+        await Assert.HtmlResponseHasErrorAsync(response, "ConnectReason", "Select a reason");
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class ReasonTests(HostFixture hostFixture) : ConnectPersonTestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ReasonDetail", "Enter details");
+        await Assert.HtmlResponseHasErrorAsync(response, "ReasonDetail", "Enter details");
     }
 
     [Fact]
