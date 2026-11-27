@@ -1502,8 +1502,8 @@
           "Microsoft.Extensions.Http": "[11.0.0, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[11.0.0, )",
           "Microsoft.Extensions.Options.DataAnnotations": "[11.0.0, )",
-          "NSign.Client": "[1.2.7, )",
-          "NSign.SignatureProviders": "[1.2.7, )",
+          "NSign.Client": "[1.2.8, )",
+          "NSign.SignatureProviders": "[1.2.8, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[11.0.0, )",
           "OpenIddict.EntityFrameworkCore": "[7.9.0, )",
           "Optional": "[4.0.0, )",
@@ -1573,8 +1573,8 @@
           "Microsoft.Extensions.Azure": "[1.14.1, )",
           "Microsoft.Extensions.Caching.Postgres": "[1.2.2, )",
           "Mime-Detective": "[25.8.1, )",
-          "NSign.Client": "[1.2.7, )",
-          "NSign.SignatureProviders": "[1.2.7, )",
+          "NSign.Client": "[1.2.8, )",
+          "NSign.SignatureProviders": "[1.2.8, )",
           "OpenIddict.EntityFrameworkCore": "[7.9.0, )",
           "Sentry.AspNetCore": "[7.0.1, )",
           "Serilog.AspNetCore": "[11.0.0, )",
@@ -2113,22 +2113,22 @@
       },
       "NSign.Client": {
         "type": "CentralTransitive",
-        "requested": "[1.2.7, )",
-        "resolved": "1.2.7",
-        "contentHash": "VYwsHBZr0+mm3TxX7ZhGJpc49M5t1HfQRvfZZqzFu4WWP9u0vE9znjG0zykuOgva0xNdEcGT2gpID3trs5iX5g==",
+        "requested": "[1.2.8, )",
+        "resolved": "1.2.8",
+        "contentHash": "VI1yoe/mOivrcrCYMx9jXj9Od08FHxSuWOIID7F4EgBbMI3Uvt0earZ9hh32WPFfBE9ZjarDWvPMuquBi3p7bw==",
         "dependencies": {
-          "Microsoft.Extensions.Http": "10.0.14",
-          "NSign.Abstractions": "1.2.7",
-          "StructuredFieldValues": "0.7.7"
+          "Microsoft.Extensions.Http": "11.0.0",
+          "NSign.Abstractions": "1.2.8",
+          "StructuredFieldValues": "0.8.1"
         }
       },
       "NSign.SignatureProviders": {
         "type": "CentralTransitive",
-        "requested": "[1.2.7, )",
-        "resolved": "1.2.7",
-        "contentHash": "jR8Im7CnD51ADEajikc5hEZVJPMNGXZleFDrQhTKVLNf4TlHSYdKlJsw3mRRTl+NtscBFHC4Pt1gbQgyRUMU+w==",
+        "requested": "[1.2.8, )",
+        "resolved": "1.2.8",
+        "contentHash": "Y1b09sdwcwkOJc6sIKUP5D4bHQ9gf0kz3hbQa5TcwoYscGd1tZhJWOjZkur4SpXziFfw9VMTZ7n1dtAd7jPX7g==",
         "dependencies": {
-          "NSign.Abstractions": "1.2.7"
+          "NSign.Abstractions": "1.2.8"
         }
       },
       "OpenIddict.AspNetCore": {
